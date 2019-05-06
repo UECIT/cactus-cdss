@@ -1,5 +1,20 @@
 # CDSS-Supplier-Stub
-## Application setup
+## Running with Docker
+
+To run this locally just run:
+```bash
+`$ docker-compose up
+```
+
+This will obtain the mySQL image, initialize the ```cdss-supplier``` database and run the ```populate_data.sql``` script which creates the tables and populates with the mock data.
+
+It will also download and run the cdss-supplise-stub image from the docker registry in gitlab.com.
+
+Within the ```docker-compose.yml``` file. The mySQL host can be changed from ```cdss-mysql``` to ```localhost``` if the mysql server is being hosted on the local machine instead of the docker container.
+
+Have a look at Docker documentation for more information.
+
+## Running without Docker
 
 Create a MySql database and run the sql scripts under `src/main/resources/sql`
 
