@@ -5,10 +5,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.hl7.fhir.dstu3.model.Bundle;
 import org.hl7.fhir.dstu3.model.Enumerations.PublicationStatus;
 import org.hl7.fhir.dstu3.model.GuidanceResponse;
 import org.hl7.fhir.dstu3.model.IdType;
 import org.hl7.fhir.dstu3.model.Parameters;
+import org.hl7.fhir.dstu3.model.Resource;
+import org.hl7.fhir.dstu3.model.ResourceType;
 import org.hl7.fhir.dstu3.model.ServiceDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -49,9 +52,11 @@ public class ServiceDefinitionProvider implements IResourceProvider {
 	}
 
 	@Operation(name = EVALUATE, idempotent = true)
-	public GuidanceResponse evaluate(@IdParam IdType serviceDefinitionId, @ResourceParam Parameters params) {
-		return evaluateService.getGuidanceResponse(params, serviceDefinitionId.getIdPartAsLong());
-	}
+    public GuidanceResponse evaluate(@IdParam IdType serviceDefinitionId, @ResourceParam Resource resource) {
+        return ResourceType.Parameters.equals(resource.getResourceType()) ?
+                evaluateService.getGuidanceResponse((Parameters)resource, serviceDefinitionId.getIdPartAsLong()) :
+                evaluateService.getGuidanceResponse((Bundle)resource, serviceDefinitionId.getIdPartAsLong());
+    }
 
 	@Read
 	public ServiceDefinition getServiceDefinitionById(@IdParam IdType serviceDefinitionId) {

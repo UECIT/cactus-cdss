@@ -3,6 +3,7 @@ package uk.nhs.cdss.services;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hl7.fhir.dstu3.model.Bundle;
 import org.hl7.fhir.dstu3.model.CodeableConcept;
 import org.hl7.fhir.dstu3.model.Coding;
 import org.hl7.fhir.dstu3.model.GuidanceResponse;
@@ -31,6 +32,10 @@ public class EvaluateService {
 	private DataRequirementRepository dataRequirementRepository;
 
 	private boolean noSelection = false;
+	
+    public GuidanceResponse getGuidanceResponse(Bundle bundle, Long serviceDefinitionId) {
+        return getGuidanceResponse((Parameters)bundle.getEntry().get(0).getResource(), serviceDefinitionId);
+    }
 
 	public GuidanceResponse getGuidanceResponse(Parameters parameters, Long serviceDefinitionId) {
 		noSelection = false;
