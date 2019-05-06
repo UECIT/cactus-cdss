@@ -19,7 +19,7 @@ public abstract class Builder<DTO extends Resource> {
 	
 	@Transactional
 	public DTO build(Long id) {
-		ResourceEntity resource = resourceRepository.findOne(id);
+		ResourceEntity resource = resourceRepository.findById(id).get();
 		final DTO dto = deriveClass().cast(fhirParser.parseResource(resource.getResourceJson()));	
 		dto.setId(String.valueOf(id));
 		

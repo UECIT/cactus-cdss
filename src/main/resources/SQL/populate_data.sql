@@ -10,14 +10,6 @@ DROP TABLE IF EXISTS cdss_supplier.resource;
 DROP TABLE IF EXISTS cdss_supplier.coded_data;
 DROP TABLE IF EXISTS cdss_supplier.data_requirement;
 
-CREATE TABLE cdss_supplier.resource (
-  id                     BIGINT NOT NULL AUTO_INCREMENT,
-  resource_type        VARCHAR(255),
-  parent_id            BIGINT NULL,
-  resource_json        BLOB,
-  PRIMARY KEY (id)
-);
-
 CREATE TABLE cdss_supplier.data_requirement (
   id                     BIGINT NOT NULL AUTO_INCREMENT,
   service_definition_id  BIGINT NULL,
@@ -62,6 +54,14 @@ CREATE TABLE cdss_supplier.result (
   result                 VARCHAR(255) NULL,
   coded_data_id 		 BIGINT NULL,
   FOREIGN KEY (coded_data_id) REFERENCES cdss_supplier.coded_data(id),
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE cdss_supplier.resource (
+  id                     BIGINT NOT NULL AUTO_INCREMENT,
+  resource_type		VARCHAR(255),
+  parent_id			BIGINT NULL,
+  resource_json		VARCHAR(60000),
   PRIMARY KEY (id)
 );
 
@@ -344,6 +344,24 @@ VALUES
  (128, 128, 'observation', '309521004', 'Numbness of hand', false),
  (129, 129, 'observation', '122568004', 'Exudate specimen from wound', true);
  
+INSERT INTO cdss_supplier.result
+ (id, service_definition_id, result, coded_data_id)
+VALUES
+ (1, 1, 'Primary Care within 24 hours', 63),
+ (2, 2, 'Emergency Ambulance/999', 64),
+ (3, 3, 'Self-care', 65),
+ (4, 4, 'Primary Care 6 hours', 63),
+ (5, 5, 'ED', 66),
+ (6, 6, 'Place holder for Care Advice', 66),
+ (7, 7, 'Community mental health team home visit', 67),
+ (8, 8, 'Self-care', 65),
+ (9, 9, 'Community mental health team home visit', 67),
+ (10, 10, 'Self-care', 65),
+ (11, 11, 'Primary Care within 24 hours', 63),
+ (12, 12, 'Emergency Ambulance/999', 64),
+ (13, 13, 'Self-care', 65),
+ (14, 14, 'Primary Care 6 hours', 63);
+ 
 INSERT INTO cdss_supplier.use_context
  (id, code, display, system) 
 VALUES
@@ -401,22 +419,4 @@ VALUES
  (12, '271594007', 'https://www.hl7.org/fhir/triggerdefinition.html'),
  (13, '250087009', 'https://www.hl7.org/fhir/triggerdefinition.html'),
  (14, '309521004', 'https://www.hl7.org/fhir/triggerdefinition.html');
- 
- INSERT INTO cdss_supplier.result
- (id, service_definition_id, result, coded_data_id)
-VALUES
- (1, 1, 'Primary Care within 24 hours', 63),
- (2, 2, 'Emergency Ambulance/999', 64),
- (3, 3, 'Self-care', 65),
- (4, 4, 'Primary Care 6 hours', 63),
- (5, 5, 'ED', 66),
- (6, 6, 'Place holder for Care Advice', 66),
- (7, 7, 'Community mental health team home visit', 67),
- (8, 8, 'Self-care', 65),
- (9, 9, 'Community mental health team home visit', 67),
- (10, 10, 'Self-care', 65),
- (11, 11, 'Primary Care within 24 hours', 63),
- (12, 12, 'Emergency Ambulance/999', 64),
- (13, 13, 'Self-care', 65),
- (14, 14, 'Primary Care 6 hours', 63);
  

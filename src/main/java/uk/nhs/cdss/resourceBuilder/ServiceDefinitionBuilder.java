@@ -32,7 +32,7 @@ public class ServiceDefinitionBuilder {
 	private ServiceDefinitionRepository serviceDefinitionRepository;
 
 	public ServiceDefinition createServiceDefinition(Long id) {
-		ServiceDefinitionEntity entity = serviceDefinitionRepository.findOne(id);
+		ServiceDefinitionEntity entity = serviceDefinitionRepository.findById(id).get();
 		return createServiceDefinition(entity, true);
 	}
 

@@ -41,8 +41,6 @@ public class FHIRRestfulServer extends RestfulServer {
 		setFhirContext(ctx);
 		setETagSupport(ETagSupportEnum.ENABLED);
 
-		
-
 		CorsConfiguration config = new CorsConfiguration();
 		config.setMaxAge(10L);
 		config.addAllowedOrigin("*");

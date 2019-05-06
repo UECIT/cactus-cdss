@@ -225,7 +225,7 @@ public class GuidanceResponseBuilder {
 	// Build Result for a guidanceResponse
 	private void setDisposition(GuidanceResponse guidanceResponse, Long serviceDefinitionId) {
 		ResultEntity resultEntity = resultRepository.findDistinctByServiceDefinitionId(serviceDefinitionId);
-		ServiceDefinitionEntity serviceDefinitionEntity = serviceDefinitionRepository.findOne(serviceDefinitionId);
+		ServiceDefinitionEntity serviceDefinitionEntity = serviceDefinitionRepository.findById(serviceDefinitionId).get();
 		String description = serviceDefinitionEntity.getDescription();
 		String[] cheifConcernArray = description.split("\\d\\D+");
 

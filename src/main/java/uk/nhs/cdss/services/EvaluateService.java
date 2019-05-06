@@ -32,11 +32,11 @@ public class EvaluateService {
 	private DataRequirementRepository dataRequirementRepository;
 
 	private boolean noSelection = false;
-	
-    public GuidanceResponse getGuidanceResponse(Bundle bundle, Long serviceDefinitionId) {
-        return getGuidanceResponse((Parameters)bundle.getEntry().get(0).getResource(), serviceDefinitionId);
-    }
 
+	public GuidanceResponse getGuidanceResponse(Bundle bundle, Long serviceDefinitionId) {
+		return getGuidanceResponse((Parameters)bundle.getEntry().get(0).getResource(), serviceDefinitionId);
+	}
+	
 	public GuidanceResponse getGuidanceResponse(Parameters parameters, Long serviceDefinitionId) {
 		noSelection = false;
 		List<ParametersParameterComponent> inputData = ResourceProviderUtils

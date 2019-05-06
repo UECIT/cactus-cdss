@@ -40,7 +40,7 @@ public class QuestionnaireBuilder {
 			groupItem.setType(QuestionnaireItemType.GROUP);
 			groupItem.setText("Question Group 1:");
 
-			QuestionnaireEntity entity = questionnaireRepository.findOne(id);
+			QuestionnaireEntity entity = questionnaireRepository.findById(id).get();
 			QuestionnaireItemComponent question = questionnaire.addItem();
 			question.setLinkId(entity.getId().toString());
 			question.setType(QuestionnaireItemType.STRING);
@@ -48,7 +48,7 @@ public class QuestionnaireBuilder {
 			question.setRepeats(false);
 			question.setRequired(true);
 
-			QuestionnaireEntity entity2 = questionnaireRepository.findOne(id + 1L);
+			QuestionnaireEntity entity2 = questionnaireRepository.findById(id + 1L).get();
 			QuestionnaireItemComponent question2 = questionnaire.addItem();
 			question2.setLinkId(entity2.getId().toString());
 			question2.setType(QuestionnaireItemType.CHOICE);
@@ -62,7 +62,7 @@ public class QuestionnaireBuilder {
 			groupItem.setType(QuestionnaireItemType.GROUP);
 			groupItem.setText("Question Group 2:");
 
-			QuestionnaireEntity entity = questionnaireRepository.findOne(id);
+			QuestionnaireEntity entity = questionnaireRepository.findById(id).get();
 			QuestionnaireItemComponent question = questionnaire.addItem();
 			question.setLinkId(entity.getId().toString());
 			question.setType(QuestionnaireItemType.CHOICE);
@@ -70,7 +70,7 @@ public class QuestionnaireBuilder {
 			question.setRequired(true);
 			setQuestionnaireAnswers(entity, question);
 
-			QuestionnaireEntity entity2 = questionnaireRepository.findOne(id + 1L);
+			QuestionnaireEntity entity2 = questionnaireRepository.findById(id + 1L).get();
 			QuestionnaireItemComponent question2 = questionnaire.addItem();
 			question2.setLinkId(entity2.getId().toString());
 			question2.setType(QuestionnaireItemType.CHOICE);
@@ -78,7 +78,7 @@ public class QuestionnaireBuilder {
 			question2.setRequired(true);
 			setQuestionnaireAnswers(entity2, question2);
 
-			QuestionnaireEntity entity3 = questionnaireRepository.findOne(id + 2L);
+			QuestionnaireEntity entity3 = questionnaireRepository.findById(id + 2L).get();
 			QuestionnaireItemComponent question3 = questionnaire.addItem();
 			question3.setLinkId(entity3.getId().toString());
 			question3.setType(QuestionnaireItemType.CHOICE);
@@ -91,7 +91,7 @@ public class QuestionnaireBuilder {
 			groupItem.setType(QuestionnaireItemType.GROUP);
 			groupItem.setText("Mental Health Questions:");
 
-			QuestionnaireEntity entity = questionnaireRepository.findOne(id);
+			QuestionnaireEntity entity = questionnaireRepository.findById(id).get();
 			QuestionnaireItemComponent question = questionnaire.addItem();
 			question.setLinkId(entity.getId().toString());
 			question.setType(QuestionnaireItemType.CHOICE);
@@ -99,7 +99,7 @@ public class QuestionnaireBuilder {
 			question.setRequired(true);
 			setQuestionnaireAnswers(entity, question);
 
-			QuestionnaireEntity entity2 = questionnaireRepository.findOne(id + 1L);
+			QuestionnaireEntity entity2 = questionnaireRepository.findById(id + 1L).get();
 			QuestionnaireItemComponent question2 = questionnaire.addItem();
 			question2.setLinkId(entity2.getId().toString());
 			question2.setType(QuestionnaireItemType.CHOICE);
@@ -107,7 +107,7 @@ public class QuestionnaireBuilder {
 			question2.setRequired(true);
 			setQuestionnaireAnswers(entity2, question2);
 
-			QuestionnaireEntity entity3 = questionnaireRepository.findOne(id + 2L);
+			QuestionnaireEntity entity3 = questionnaireRepository.findById(id + 2L).get();
 			QuestionnaireItemComponent question3 = questionnaire.addItem();
 			question3.setLinkId(entity3.getId().toString());
 			question3.setType(QuestionnaireItemType.CHOICE);
@@ -115,7 +115,7 @@ public class QuestionnaireBuilder {
 			question3.setRequired(true);
 			setQuestionnaireAnswers(entity3, question3);
 
-			QuestionnaireEntity entity4 = questionnaireRepository.findOne(id + 3L);
+			QuestionnaireEntity entity4 = questionnaireRepository.findById(id + 3L).get();
 			QuestionnaireItemComponent question4 = questionnaire.addItem();
 			question4.setLinkId(entity4.getId().toString());
 			question4.setType(QuestionnaireItemType.CHOICE);
@@ -123,7 +123,7 @@ public class QuestionnaireBuilder {
 			question4.setRequired(true);
 			setQuestionnaireAnswers(entity4, question4);
 
-			QuestionnaireEntity entity5 = questionnaireRepository.findOne(id + 4L);
+			QuestionnaireEntity entity5 = questionnaireRepository.findById(id + 4L).get();
 			QuestionnaireItemComponent question5 = questionnaire.addItem();
 			question5.setLinkId(entity5.getId().toString());
 			question5.setType(QuestionnaireItemType.CHOICE);
@@ -132,42 +132,42 @@ public class QuestionnaireBuilder {
 			setQuestionnaireAnswers(entity5, question5);
 
 			// Add new question types
-			QuestionnaireEntity entity6 = questionnaireRepository.findOne(id + 5L);
+			QuestionnaireEntity entity6 = questionnaireRepository.findById(id + 5L).get();
 			QuestionnaireItemComponent question6 = questionnaire.addItem();
 			question6.setLinkId(entity6.getId().toString());
 			question6.setType(QuestionnaireItemType.INTEGER);
 			question6.setText(entity6.getQuestion());
 			question6.setRequired(true);
 
-			QuestionnaireEntity entity7 = questionnaireRepository.findOne(id + 6L);
+			QuestionnaireEntity entity7 = questionnaireRepository.findById(id + 6L).get();
 			QuestionnaireItemComponent question7 = questionnaire.addItem();
 			question7.setLinkId(entity7.getId().toString());
 			question7.setType(QuestionnaireItemType.BOOLEAN);
 			question7.setText(entity7.getQuestion());
 			question7.setRequired(true);
 
-			QuestionnaireEntity entity8 = questionnaireRepository.findOne(id + 7L);
+			QuestionnaireEntity entity8 = questionnaireRepository.findById(id + 7L).get();
 			QuestionnaireItemComponent question8 = questionnaire.addItem();
 			question8.setLinkId(entity8.getId().toString());
 			question8.setType(QuestionnaireItemType.DECIMAL);
 			question8.setText(entity8.getQuestion());
 			question8.setRequired(true);
 
-			QuestionnaireEntity entity9 = questionnaireRepository.findOne(id + 8L);
+			QuestionnaireEntity entity9 = questionnaireRepository.findById(id + 8L).get();
 			QuestionnaireItemComponent question9 = questionnaire.addItem();
 			question9.setLinkId(entity9.getId().toString());
 			question9.setType(QuestionnaireItemType.DATE);
 			question9.setText(entity9.getQuestion());
 			question9.setRequired(true);
 
-			QuestionnaireEntity entity10 = questionnaireRepository.findOne(id + 10L);
+			QuestionnaireEntity entity10 = questionnaireRepository.findById(id + 10L).get();
 			QuestionnaireItemComponent question10 = questionnaire.addItem();
 			question10.setLinkId(entity10.getId().toString());
 			question10.setType(QuestionnaireItemType.ATTACHMENT);
 			question10.setText(entity10.getQuestion());
 			question10.setRequired(true);
 
-			QuestionnaireEntity entity11 = questionnaireRepository.findOne(id + 11L);
+			QuestionnaireEntity entity11 = questionnaireRepository.findById(id + 11L).get();
 			QuestionnaireItemComponent question11 = questionnaire.addItem();
 			question11.setLinkId(entity11.getId().toString());
 			question11.setType(QuestionnaireItemType.STRING);
@@ -184,7 +184,7 @@ public class QuestionnaireBuilder {
 			}
 
 		} else if (id.equals(39L)) {
-			QuestionnaireEntity entity = questionnaireRepository.findOne(id);
+			QuestionnaireEntity entity = questionnaireRepository.findById(id).get();
 			QuestionnaireItemComponent question = questionnaire.addItem();
 			question.setLinkId(entity.getId().toString());
 			question.setType(QuestionnaireItemType.CHOICE);
@@ -198,14 +198,14 @@ public class QuestionnaireBuilder {
 					.setValue(new BooleanType(true));
 
 		} else if (id.equals(42L) || id.equals(43L)) { // generate a "table" style question.
-			QuestionnaireEntity entity = questionnaireRepository.findOne(42L);
+			QuestionnaireEntity entity = questionnaireRepository.findById(42L).get();
 			QuestionnaireItemComponent question = questionnaire.addItem();
 			question.setLinkId(entity.getId().toString());
 			question.setType(QuestionnaireItemType.GROUP);
 			question.setText(entity.getQuestion());
 
 			// add subQuestion1
-			QuestionnaireEntity subEntity1 = questionnaireRepository.findOne(43L);
+			QuestionnaireEntity subEntity1 = questionnaireRepository.findById(43L).get();
 			QuestionnaireItemComponent subQuestion1 = question.addItem();
 			subQuestion1.setLinkId(subEntity1.getId().toString());
 			subQuestion1.setType(QuestionnaireItemType.CHOICE);
@@ -214,7 +214,7 @@ public class QuestionnaireBuilder {
 			setQuestionnaireAnswers(subEntity1, subQuestion1);
 
 			// add subQuestion2
-			QuestionnaireEntity subEntity2 = questionnaireRepository.findOne(44L);
+			QuestionnaireEntity subEntity2 = questionnaireRepository.findById(44L).get();
 			QuestionnaireItemComponent subQuestion2 = question.addItem();
 			subQuestion2.setLinkId(subEntity2.getId().toString());
 			subQuestion2.setType(QuestionnaireItemType.CHOICE);
@@ -268,7 +268,7 @@ public class QuestionnaireBuilder {
 			answerContext.addExtension(answerContextExtension);
 
 		} else {
-			QuestionnaireEntity entity = questionnaireRepository.findOne(id);
+			QuestionnaireEntity entity = questionnaireRepository.findById(id).get();
 			QuestionnaireItemComponent question = questionnaire.addItem();
 			question.setLinkId(entity.getId().toString());
 			question.setType(QuestionnaireItemType.CHOICE);

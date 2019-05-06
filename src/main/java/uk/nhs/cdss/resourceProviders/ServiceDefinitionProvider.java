@@ -15,6 +15,7 @@ import org.hl7.fhir.dstu3.model.ResourceType;
 import org.hl7.fhir.dstu3.model.ServiceDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RestController;
 
 import ca.uhn.fhir.rest.annotation.IdParam;
 import ca.uhn.fhir.rest.annotation.Operation;
@@ -33,7 +34,7 @@ import uk.nhs.cdss.repos.ServiceDefinitionRepository;
 import uk.nhs.cdss.resourceBuilder.ServiceDefinitionBuilder;
 import uk.nhs.cdss.services.EvaluateService;
 
-@Component
+@RestController
 public class ServiceDefinitionProvider implements IResourceProvider {
 	private static final String EVALUATE = "$evaluate";
 
@@ -50,14 +51,15 @@ public class ServiceDefinitionProvider implements IResourceProvider {
 	public Class<ServiceDefinition> getResourceType() {
 		return ServiceDefinition.class;
 	}
+	
 
-	@Operation(name = EVALUATE, idempotent = true)
-    public GuidanceResponse evaluate(@IdParam IdType serviceDefinitionId, @ResourceParam Resource resource) {
-        return ResourceType.Parameters.equals(resource.getResourceType()) ?
-                evaluateService.getGuidanceResponse((Parameters)resource, serviceDefinitionId.getIdPartAsLong()) :
-                evaluateService.getGuidanceResponse((Bundle)resource, serviceDefinitionId.getIdPartAsLong());
-    }
-
+	@Operation(name = EVALUATE, idempotent = true, type=Parameters.class)
+	public GuidanceResponse evaluate(@IdParam IdType serviceDefinitionId, @ResourceParam Resource resource) {
+		return ResourceType.Parameters.equals(resource.getResourceType()) ?
+				evaluateService.getGuidanceResponse((Parameters)resource, serviceDefinitionId.getIdPartAsLong()) :
+				evaluateService.getGuidanceResponse((Bundle)resource, serviceDefinitionId.getIdPartAsLong());
+	}
+	
 	@Read
 	public ServiceDefinition getServiceDefinitionById(@IdParam IdType serviceDefinitionId) {
 		return serviceDefinitionBuilder.createServiceDefinition(serviceDefinitionId.getIdPartAsLong());
