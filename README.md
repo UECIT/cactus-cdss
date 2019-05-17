@@ -20,7 +20,7 @@ Create a MySql database and run the sql scripts under `src/main/resources/sql`
 
 Update the `src/main/resources/application.properties` file to point to the database.
 
-**Note that for MySQL 8+ references to columns named system in the script need to be updated to `\``system`\`` as it is a reserved word and must be escaped with the back-ticks**
+**Note that for MySQL 8+ references to columns named system in the script need to be updated to \`system\` as it is a reserved word and must be escaped with the back-ticks**
 
 ## Licence
 
