@@ -7,6 +7,7 @@ import org.hl7.fhir.dstu3.model.Bundle;
 import org.hl7.fhir.dstu3.model.CodeableConcept;
 import org.hl7.fhir.dstu3.model.Coding;
 import org.hl7.fhir.dstu3.model.GuidanceResponse;
+import org.hl7.fhir.dstu3.model.IdType;
 import org.hl7.fhir.dstu3.model.Parameters;
 import org.hl7.fhir.dstu3.model.Parameters.ParametersParameterComponent;
 import org.hl7.fhir.dstu3.model.QuestionnaireResponse;
@@ -56,7 +57,7 @@ public class EvaluateService {
 	private String getRequestId(Parameters params) {
 		ParametersParameterComponent requestId = ResourceProviderUtils.getParameterByName(params.getParameter(),
 				"requestId");
-		return ResourceProviderUtils.castToType(requestId.getValue(), StringType.class).asStringValue();
+		return ResourceProviderUtils.castToType(requestId.getValue(), IdType.class).asStringValue();
 	}
 
 	private List<DataRequirementEntity> getQuestionnaireDataRequirement(List<ParametersParameterComponent> inputData,
