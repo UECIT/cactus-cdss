@@ -19,13 +19,19 @@ public interface ServiceDefinitionRepository extends JpaRepository<ServiceDefini
 			"FROM ServiceDefinitionEntity sd " +
 			"JOIN sd.triggers t " +
 			"JOIN sd.useContexts uc " +
+            "JOIN sd.dataRequirements dr " +
+            "JOIN dr.codedData cd " +
 			"WHERE (:status IS NULL OR sd.status = :status) " +
 			"AND (:effectiveFrom IS NULL OR sd.effectiveFrom <= :effectiveFrom) " +
 			"AND (:effectiveTo IS NULL OR sd.effectiveTo >= :effectiveTo) " +
 			"AND (:jurisdiction IS NULL OR sd.jurisdiction = :jurisdiction) " +
 			"AND (:experimental IS NULL OR sd.experimental = :experimental) " +
-			"AND t.code IN (:triggers) ";
-	
+			"AND t.code = :triggerEventDataCode " +
+            "AND t.system = :triggerEventDataProfile " +
+            "AND t.type = :triggerType " +
+            "AND cd.type = :triggerEventDataType " +
+            "AND cd.code = :triggerEventDataCode ";
+
 	public static final String CODE_CLAUSE = 
 			"AND sd.id IN ( " +
 			"	SELECT sd.id FROM ServiceDefinitionEntity sd " +  
@@ -34,17 +40,25 @@ public interface ServiceDefinitionRepository extends JpaRepository<ServiceDefini
 		    "	GROUP BY sd.id " +
 		    "	HAVING COUNT(DISTINCT uc.code) = :codeCount " +
 		    ") ";
-	
+
 	@Query(SEARCH_QUERY + CODE_CLAUSE)
 	public List<ServiceDefinitionEntity> search(
 			@Param("status") PublicationStatus status, @Param("effectiveFrom") Date effectiveFrom, 
 			@Param("effectiveTo") Date effectiveTo, @Param("jurisdiction") String jurisdiction, 
 			@Param("codes") List<String> codes, @Param("codeCount") Long codeCount,
-			@Param("triggers") List<String> triggers, @Param("experimental") Boolean experimental);
+			@Param("triggerType") String triggerType,
+            @Param("triggerEventDataType") String triggerEventDataType,
+            @Param("triggerEventDataProfile") String triggerEventDataProfile,
+            @Param("triggerEventDataCode") String triggerEventDataCode,
+            @Param("experimental") Boolean experimental);
 	
 	@Query(SEARCH_QUERY)
 	public List<ServiceDefinitionEntity> search(
 			@Param("status") PublicationStatus status, @Param("effectiveFrom") Date effectiveFrom, 
-			@Param("effectiveTo") Date effectiveTo,	@Param("jurisdiction") String jurisdiction, 
-			@Param("triggers") List<String> triggers, @Param("experimental") Boolean experimental);
+			@Param("effectiveTo") Date effectiveTo,	@Param("jurisdiction") String jurisdiction,
+            @Param("triggerType") String triggerType,
+            @Param("triggerEventDataType") String triggerEventDataType,
+            @Param("triggerEventDataProfile") String triggerEventDataProfile,
+            @Param("triggerEventDataCode") String triggerEventDataCode,
+            @Param("experimental") Boolean experimental);
 }

@@ -87,6 +87,7 @@ CREATE TABLE cdss_supplier.trigger_definition (
   service_definition_id  BIGINT NULL,
   code       			 VARCHAR(255) NULL,
   system				 VARCHAR(2048) NULL,
+  type                   VARCHAR(20) NULL,
   PRIMARY KEY (id),
   FOREIGN KEY (service_definition_id) REFERENCES cdss_supplier.service_definition(id)
 );
@@ -403,20 +404,20 @@ VALUES
  (14, 3);
  
 INSERT INTO cdss_supplier.trigger_definition 
- (service_definition_id, code, system) 
+ (service_definition_id, code, system, type)
 VALUES
- (1, '240091000000105', 'https://www.hl7.org/fhir/triggerdefinition.html'),
- (2, '271594007', 'https://www.hl7.org/fhir/triggerdefinition.html'),
- (3, '250087009', 'https://www.hl7.org/fhir/triggerdefinition.html'),
- (4, '309521004', 'https://www.hl7.org/fhir/triggerdefinition.html'),
- (5, '45326000', 'https://www.hl7.org/fhir/triggerdefinition.html'),
- (6, '57676002', 'https://www.hl7.org/fhir/triggerdefinition.html'),
- (7, '248062006', 'https://www.hl7.org/fhir/triggerdefinition.html'),
- (8, '288959006', 'https://www.hl7.org/fhir/triggerdefinition.html'),
- (9, '35489007', 'https://www.hl7.org/fhir/triggerdefinition.html'),
- (10, '49727002', 'https://www.hl7.org/fhir/triggerdefinition.html'),
- (11, '240091000000105', 'https://www.hl7.org/fhir/triggerdefinition.html'),
- (12, '271594007', 'https://www.hl7.org/fhir/triggerdefinition.html'),
- (13, '250087009', 'https://www.hl7.org/fhir/triggerdefinition.html'),
- (14, '309521004', 'https://www.hl7.org/fhir/triggerdefinition.html');
+ (1, '240091000000105', 'https://www.hl7.org/fhir/triggerdefinition.html', 'data-added'),
+ (2, '271594007', 'https://www.hl7.org/fhir/triggerdefinition.html', 'data-added'),
+ (3, '250087009', 'https://www.hl7.org/fhir/triggerdefinition.html', 'data-added'),
+ (4, '309521004', 'https://www.hl7.org/fhir/triggerdefinition.html', 'data-added'),
+ (5, '45326000', 'https://www.hl7.org/fhir/triggerdefinition.html', 'data-added'),
+ (6, '57676002', 'https://www.hl7.org/fhir/triggerdefinition.html', 'data-added'),
+ (7, '248062006', 'https://www.hl7.org/fhir/triggerdefinition.html', 'data-added'),
+ (8, '288959006', 'https://www.hl7.org/fhir/triggerdefinition.html', 'data-added'),
+ (9, '35489007', 'https://www.hl7.org/fhir/triggerdefinition.html', 'data-added'),
+ (10, '49727002', 'https://www.hl7.org/fhir/triggerdefinition.html', 'data-added'),
+ (11, '240091000000105', 'https://www.hl7.org/fhir/triggerdefinition.html', 'data-added'),
+ (12, '271594007', 'https://www.hl7.org/fhir/triggerdefinition.html', 'data-added'),
+ (13, '250087009', 'https://www.hl7.org/fhir/triggerdefinition.html', 'data-added'),
+ (14, '309521004', 'https://www.hl7.org/fhir/triggerdefinition.html', 'data-added');
  
