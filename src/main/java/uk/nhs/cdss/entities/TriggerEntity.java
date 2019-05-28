@@ -21,6 +21,9 @@ public class TriggerEntity {
 	@Column(name = "system")
 	private String system;
 
+	@Column(name = "type")
+	private String type;
+
 	public Long getId() {
 		return id;
 	}
@@ -40,5 +43,12 @@ public class TriggerEntity {
 	}
 	public void setSystem(String system) {
 		this.system = system;
+	}
+
+	public String getType() {
+		return type;
+	}
+	public void setType(String type) {
+		this.type = type;
 	}
 }

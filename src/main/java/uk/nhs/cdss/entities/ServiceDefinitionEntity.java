@@ -66,9 +66,20 @@ public class ServiceDefinitionEntity {
     
     @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany
-	@JoinColumn(name="service_definition_id", referencedColumnName="id", insertable=false, updatable = false, nullable = false)
+	@JoinColumn(
+			name="service_definition_id",
+			referencedColumnName="id",
+			insertable=false, updatable = false, nullable = false)
     private List<TriggerEntity> triggers;
-    
+
+	@LazyCollection(LazyCollectionOption.FALSE)
+	@OneToMany
+	@JoinColumn(
+			name="service_definition_id",
+			referencedColumnName="id",
+			insertable=false, updatable = false, nullable = false)
+	private List<DataRequirementEntity> dataRequirements;
+
 	public Long getId() {
 		return id;
 	}
@@ -155,5 +166,13 @@ public class ServiceDefinitionEntity {
 
 	public void setTriggers(List<TriggerEntity> triggers) {
 		this.triggers = triggers;
+	}
+
+	public List<DataRequirementEntity> getDataRequirements() {
+		return dataRequirements;
+	}
+
+	public void setDataRequirements(List<DataRequirementEntity> dataRequirements) {
+		this.dataRequirements = dataRequirements;
 	}
 }
