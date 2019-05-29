@@ -30,6 +30,11 @@ public class ReferralRequestUtil {
 		Reference reference = new Reference();
 		reference.setDisplay("Chief concern: Vomiting");
 		referralRequest.addReasonReference(reference);
+		
+		referralRequest.addReasonCode(new CodeableConcept().addCoding(new Coding()
+				.setCode("439401001")
+				.setSystem("http://snomed.info/sct")
+				.setDisplay("Diagnosis")));
 
 		referralRequest.setOccurrence(new DateTimeType(new Date()));
 
