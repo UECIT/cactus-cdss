@@ -54,18 +54,18 @@ public class ServiceDefinitionBuilder {
 	private void addDataRequirements(ServiceDefinitionEntity entity, ServiceDefinition serviceDefinition, Boolean resourcesNotContained) {
 		List<DataRequirementEntity> dataRequirements = dataRequirementRepository.findByServiceDefinitionId(entity.getId());
 		
-		dataRequirements.forEach(dataRequirementEntity -> serviceDefinition.addDataRequirement(
-						dataRequirementBuilder.buildDataRequirement(ResourceType.QUESTIONNAIRERESPONSE.toCode(), 
-								"https://www.hl7.org/fhir/questionnaireresponse.html", dataRequirementEntity, resourcesNotContained)));
+		// NEW 
+		dataRequirements.forEach(dataRequirementEntity -> 
+				dataRequirementBuilder.buildServiceDefinitionDataRequirements(ResourceType.QUESTIONNAIRERESPONSE.toCode(), 
+						"https://www.hl7.org/fhir/questionnaireresponse.html", dataRequirementEntity, resourcesNotContained, serviceDefinition));
 		
 		TriggerEntity trigger = entity.getTriggers().get(0);
 		
 		DataRequirementEntity dataRequirement = 
 				dataRequirementRepository.findDistinctByServiceDefinitionIdAndCodedDataCodeAndCodedDataType(entity.getId(), trigger.getCode(), "Observation");
 		
-		serviceDefinition.addTrigger().setEventData(
-				dataRequirementBuilder.buildDataRequirement(DataType.TRIGGERDEFINITION.toCode(), 
-						"https://www.hl7.org/fhir/triggerdefinition.html", dataRequirement, resourcesNotContained));
+				dataRequirementBuilder.buildTriggerDataRequirement(DataType.TRIGGERDEFINITION.toCode(), 
+						"https://www.hl7.org/fhir/triggerdefinition.html", dataRequirement, resourcesNotContained, serviceDefinition);
 	}
 
 	private void addTopic(ServiceDefinition serviceDefinition) {

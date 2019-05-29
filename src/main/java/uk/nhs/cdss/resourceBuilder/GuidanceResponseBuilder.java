@@ -163,7 +163,7 @@ public class GuidanceResponseBuilder {
 
 		// return first unknown data requirement
 		if (unknownDataRequirements.size() > 0) {
-			return dataRequirementBuilder.buildDataRequirement("QuestionnaireResponse", "https://www.hl7.org/fhir/questionnaireresponse.html", unknownDataRequirements.get(0), false);
+			return dataRequirementBuilder.buildNextDataRequirement("QuestionnaireResponse", "https://www.hl7.org/fhir/questionnaireresponse.html", unknownDataRequirements.get(0), false);
 		}
 		return null;
 	}
@@ -414,6 +414,11 @@ public class GuidanceResponseBuilder {
 		try {
 			reference.setDisplay("Chief concern: " + concernsArray[0]);
 			referralRequest.addReasonReference(reference);
+			
+			referralRequest.addReasonCode(new CodeableConcept().addCoding(new Coding()
+					.setCode("439401001")
+					.setSystem("http://snomed.info/sct")
+					.setDisplay("Diagnosis")));
 		} catch (Exception e) {}
 
 		try {
