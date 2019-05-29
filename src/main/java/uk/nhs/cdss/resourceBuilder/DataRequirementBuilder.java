@@ -25,56 +25,29 @@ public class DataRequirementBuilder {
 
 	public ServiceDefinition buildTriggerDataRequirement(String type, String url, DataRequirementEntity entity,
 			boolean resourcesNotContained, ServiceDefinition serviceDefinition) {
-//		DataRequirement dataRequirement = new DataRequirement();
-//		dataRequirement.setId(entity.getId().toString());
-//		dataRequirement.setType(type).addProfile(url);
-//		addQuestionnaireExtension(entity, dataRequirement);
-//		addResourceExtension(entity, dataRequirement, resourcesNotContained);
-//		serviceDefinition.addTrigger().setEventData(dataRequirement);
-		
-		DataRequirement dataRequirement = new DataRequirement();
-		
-		List<Resource> resources = codedDataResourceBuilder.getCodedDataResources(entity.getCodedData(), false, false);
-		
-		dataRequirement.setId("DR" + entity.getId().toString());
-		dataRequirement.setType("Observation");
-		dataRequirement
-				.addProfile("https://fhir.hl7.org.uk/STU3/StructureDefinition/CareConnect-Observation-1");
 
+		DataRequirement dataRequirement = new DataRequirement();
+		List<Resource> resources = codedDataResourceBuilder.getCodedDataResources(entity.getCodedData(), false, false);
 		resources.stream().forEach(resource -> {
 			Observation observation = (Observation) resource;
-			dataRequirement.addCodeFilter().setPath("code")
-					.addValueCode(observation.getCode().getCodingFirstRep().getCode()).addValueCoding()
-					.setCode(observation.getCode().getCodingFirstRep().getCode()).setSystem("http://snomed.info/sct")
-					.setDisplay(observation.getCode().getCodingFirstRep().getDisplay());
+			buildObservation(dataRequirement, observation, entity);
 		});
-		
-		addQuestionnaireExtension(entity, dataRequirement);
-		
-		serviceDefinition.addTrigger().setEventData(dataRequirement);
 
+		addQuestionnaireExtension(entity, dataRequirement);
+		serviceDefinition.addTrigger().setEventData(dataRequirement);
 		return serviceDefinition;
 	}
 
 	public DataRequirement buildNextDataRequirement(String type, String url, DataRequirementEntity entity,
 			boolean resourcesNotContained) {
-		DataRequirement dataRequirement = new DataRequirement();
 		
+		DataRequirement dataRequirement = new DataRequirement();
 		List<Resource> resources = codedDataResourceBuilder.getCodedDataResources(entity.getCodedData(), false, false);
-
 		resources.stream().forEach(resource -> {
 			Observation observation = (Observation) resource;
-
-			dataRequirement.setId("DR" + entity.getId().toString());
-			dataRequirement.setType("Observation");
-			dataRequirement
-					.addProfile("https://fhir.hl7.org.uk/STU3/StructureDefinition/CareConnect-Observation-1");
-			dataRequirement.addCodeFilter().setPath("code")
-					.addValueCode(observation.getCode().getCodingFirstRep().getCode()).addValueCoding()
-					.setCode(observation.getCode().getCodingFirstRep().getCode()).setSystem("http://snomed.info/sct")
-					.setDisplay(observation.getCode().getCodingFirstRep().getDisplay());
+			buildObservation(dataRequirement, observation, entity);
 		});
-		
+
 		addQuestionnaireExtension(entity, dataRequirement);
 		return dataRequirement;
 	}
@@ -94,56 +67,69 @@ public class DataRequirementBuilder {
 		List<Resource> resources = codedDataResourceBuilder.getCodedDataResources(entity.getCodedData(), false, false);
 
 		resources.stream().forEach(resource -> {
-			
+
 			if (resource instanceof Observation) {
 				Observation observation = (Observation) resource;
-
 				DataRequirement dataRequirementObservation = new DataRequirement();
-				dataRequirementObservation.setId("DR" + entity.getId().toString() + " - Observation");
-				dataRequirementObservation.setType("Observation");
-				dataRequirementObservation
-						.addProfile("https://fhir.hl7.org.uk/STU3/StructureDefinition/CareConnect-Observation-1");
-				dataRequirementObservation.addCodeFilter().setPath("code")
-						.addValueCode(observation.getCode().getCodingFirstRep().getCode()).addValueCoding()
-						.setCode(observation.getCode().getCodingFirstRep().getCode()).setSystem("http://snomed.info/sct")
-						.setDisplay(observation.getCode().getCodingFirstRep().getDisplay());
+				buildObservation(dataRequirementObservation, observation, entity);
 				serviceDefinition.addDataRequirement(dataRequirementObservation);
-			} 
-			
+			}
+
 			if (resource instanceof Immunization) {
 				Immunization immunization = (Immunization) resource;
-
 				DataRequirement dataRequirementObservation = new DataRequirement();
-				dataRequirementObservation.setId("DR" + entity.getId().toString() + " - Immunization");
-				dataRequirementObservation.setType("Immunization");
-				dataRequirementObservation
-						.addProfile("https://fhir.hl7.org.uk/STU3/StructureDefinition/CareConnect-Immunization-1");
-				dataRequirementObservation.addCodeFilter().setPath("code")
-						.addValueCode(immunization.getVaccineCode().getCodingFirstRep().getCode()).addValueCoding()
-						.setCode(immunization.getVaccineCode().getCodingFirstRep().getCode()).setSystem("http://snomed.info/sct")
-						.setDisplay(immunization.getVaccineCode().getCodingFirstRep().getDisplay());
+				buildImmunization(dataRequirementObservation, immunization, entity);
 				serviceDefinition.addDataRequirement(dataRequirementObservation);
-			} 
-			
+			}
+
 			if (resource instanceof MedicationAdministration) {
 				MedicationAdministration medicationAdministration = (MedicationAdministration) resource;
-
 				DataRequirement dataRequirementObservation = new DataRequirement();
-				dataRequirementObservation.setId("DR" + entity.getId().toString() + " - MedicationAdministration");
-				dataRequirementObservation.setType("MedicationAdministration");
-				dataRequirementObservation
-						.addProfile("https://fhir.hl7.org.uk/STU3/StructureDefinition/CareConnect-MedicationAdministration-1");
-				dataRequirementObservation.addCodeFilter().setPath("code")
-						.addValueCode(medicationAdministration.getMedicationCodeableConcept().getCodingFirstRep().getCode()).addValueCoding()
-						.setCode(medicationAdministration.getMedicationCodeableConcept().getCodingFirstRep().getCode()).setSystem("http://snomed.info/sct")
-						.setDisplay(medicationAdministration.getMedicationCodeableConcept().getCodingFirstRep().getDisplay());
+				buildMedicationAdministration(dataRequirementObservation, medicationAdministration, entity);
 				serviceDefinition.addDataRequirement(dataRequirementObservation);
-			} 
+			}
 
 		});
 
 		return serviceDefinition;
 
+	}
+
+	private void buildObservation(DataRequirement dataRequirement, Observation observation,
+			DataRequirementEntity entity) {
+		dataRequirement.setId("DR" + entity.getId().toString() + " - Observation");
+		dataRequirement.setType("Observation");
+		dataRequirement.addProfile("https://fhir.hl7.org.uk/STU3/StructureDefinition/CareConnect-Observation-1");
+		dataRequirement.addCodeFilter().setPath("code")
+				.addValueCode(observation.getCode().getCodingFirstRep().getCode()).addValueCoding()
+					.setCode(observation.getCode().getCodingFirstRep().getCode())
+					.setSystem("http://snomed.info/sct")
+					.setDisplay(observation.getCode().getCodingFirstRep().getDisplay());
+	}
+
+	private void buildImmunization(DataRequirement dataRequirement, Immunization immunization,
+			DataRequirementEntity entity) {
+		dataRequirement.setId("DR" + entity.getId().toString() + " - Immunization");
+		dataRequirement.setType("Immunization");
+		dataRequirement.addProfile("https://fhir.hl7.org.uk/STU3/StructureDefinition/CareConnect-Immunization-1");
+		dataRequirement.addCodeFilter().setPath("code")
+				.addValueCode(immunization.getVaccineCode().getCodingFirstRep().getCode()).addValueCoding()
+					.setCode(immunization.getVaccineCode().getCodingFirstRep().getCode())
+					.setSystem("http://snomed.info/sct")
+					.setDisplay(immunization.getVaccineCode().getCodingFirstRep().getDisplay());
+	}
+
+	private void buildMedicationAdministration(DataRequirement dataRequirement,
+			MedicationAdministration medicationAdministration, DataRequirementEntity entity) {
+		dataRequirement.setId("DR" + entity.getId().toString() + " - MedicationAdministration");
+		dataRequirement.setType("MedicationAdministration");
+		dataRequirement
+				.addProfile("https://fhir.hl7.org.uk/STU3/StructureDefinition/CareConnect-MedicationAdministration-1");
+		dataRequirement.addCodeFilter().setPath("code")
+				.addValueCode(medicationAdministration.getMedicationCodeableConcept().getCodingFirstRep().getCode()).addValueCoding()
+					.setCode(medicationAdministration.getMedicationCodeableConcept().getCodingFirstRep().getCode())
+					.setSystem("http://snomed.info/sct")
+					.setDisplay(medicationAdministration.getMedicationCodeableConcept().getCodingFirstRep().getDisplay());
 	}
 
 	private void addQuestionnaireExtension(DataRequirementEntity entity, DataRequirement dataRequirement) {
