@@ -3,7 +3,6 @@ package uk.nhs.cdss.resourceBuilder;
 import java.util.List;
 
 import org.hl7.fhir.dstu3.model.Coding;
-import org.hl7.fhir.dstu3.model.Enumerations.DataType;
 import org.hl7.fhir.dstu3.model.Enumerations.ResourceType;
 import org.hl7.fhir.dstu3.model.IdType;
 import org.hl7.fhir.dstu3.model.Identifier.IdentifierUse;
@@ -63,9 +62,7 @@ public class ServiceDefinitionBuilder {
 		
 		DataRequirementEntity dataRequirement = 
 				dataRequirementRepository.findDistinctByServiceDefinitionIdAndCodedDataCodeAndCodedDataType(entity.getId(), trigger.getCode(), "Observation");
-		
-				dataRequirementBuilder.buildTriggerDataRequirement(DataType.TRIGGERDEFINITION.toCode(), 
-						"https://www.hl7.org/fhir/triggerdefinition.html", dataRequirement, resourcesNotContained, serviceDefinition);
+				dataRequirementBuilder.buildTriggerDataRequirement(dataRequirement, serviceDefinition);
 	}
 
 	private void addTopic(ServiceDefinition serviceDefinition) {

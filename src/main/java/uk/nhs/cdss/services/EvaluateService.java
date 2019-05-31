@@ -125,7 +125,7 @@ public class EvaluateService {
 
 					// set on answer
 					cc.addCoding(coding);
-					questionnaireResponseItemComponent.getAnswerFirstRep().setValue(cc);
+					questionnaireResponseItemComponent.getAnswerFirstRep().setValue(coding);
 
 				}
 

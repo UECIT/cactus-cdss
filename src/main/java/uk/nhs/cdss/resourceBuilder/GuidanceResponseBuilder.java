@@ -163,7 +163,7 @@ public class GuidanceResponseBuilder {
 
 		// return first unknown data requirement
 		if (unknownDataRequirements.size() > 0) {
-			return dataRequirementBuilder.buildNextDataRequirement("QuestionnaireResponse", "https://www.hl7.org/fhir/questionnaireresponse.html", unknownDataRequirements.get(0), false);
+			return dataRequirementBuilder.buildNextDataRequirement(unknownDataRequirements.get(0));
 		}
 		return null;
 	}
