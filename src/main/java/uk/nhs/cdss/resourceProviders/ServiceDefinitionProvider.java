@@ -68,6 +68,7 @@ public class ServiceDefinitionProvider implements IResourceProvider {
 			@OptionalParam(name=ServiceDefinition.SP_STATUS) TokenParam status,
 			@OptionalParam(name="experimental") TokenParam experimental,
 			@OptionalParam(name=ServiceDefinition.SP_EFFECTIVE) DateRangeParam effective,
+			@OptionalParam(name="useContext-code") TokenAndListParam useContextCode,
 			@OptionalParam(name="useContext-valueconcept") TokenAndListParam useContext,
 			@OptionalParam(name=ServiceDefinition.SP_JURISDICTION) TokenParam jurisdiction,
 			@RequiredParam(name="trigger-type") TokenParam triggerType,
