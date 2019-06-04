@@ -12,7 +12,6 @@ import org.hl7.fhir.dstu3.model.Immunization;
 import org.hl7.fhir.dstu3.model.MedicationAdministration;
 import org.hl7.fhir.dstu3.model.Observation;
 import org.hl7.fhir.dstu3.model.Questionnaire;
-import org.hl7.fhir.dstu3.model.Reference;
 import org.hl7.fhir.dstu3.model.Resource;
 import org.hl7.fhir.dstu3.model.ResourceType;
 import org.hl7.fhir.dstu3.model.ServiceDefinition;
@@ -44,24 +43,28 @@ public class DataRequirementBuilder {
 				(resource) -> ((MedicationAdministration)resource).getMedicationCodeableConcept().getCodingFirstRep());
 	}
 	
+	
 	public void buildTriggerDataRequirement(DataRequirementEntity entity, ServiceDefinition serviceDefinition) {
-		DataRequirement dataRequirement = buildNextDataRequirement(entity);
-		serviceDefinition.addTrigger().setEventData(dataRequirement);
-	}
-
-	public DataRequirement buildNextDataRequirement(DataRequirementEntity entity) {
 		DataRequirement dataRequirement = new DataRequirement();
 		List<Resource> resources = 
 				codedDataResourceBuilder.getCodedDataResources(entity.getCodedData(), false, false);
 		
 		resources.stream().forEach(resource -> 
 			buildDataRequirement(dataRequirement, resource, entity.getId()));
+		serviceDefinition.addTrigger().setEventData(dataRequirement);
+	}
 
-		addQuestionnaireExtension(entity, dataRequirement);
+	public DataRequirement buildNextDataRequirement(DataRequirementEntity entity) {
+		Questionnaire questionnaire = questionnaireBuilder.buildQuestionnaire(entity.getQuestionnaireId());
+		DataRequirement dataRequirement = buildDataRequirement(questionnaire, entity.getId());
+		dataRequirement.addCodeFilter()
+				.setPath("url")
+				.addValueCode("Questionnaire/" + entity.getQuestionnaireId());
 		
 		return dataRequirement;
 	}
 
+	
 	public ServiceDefinition buildServiceDefinitionDataRequirements(String type, String url,
 			DataRequirementEntity entity, boolean resourcesNotContained, ServiceDefinition serviceDefinition) {
 
@@ -111,11 +114,6 @@ public class DataRequirementBuilder {
 						.setSystem("http://snomed.info/sct")
 						.setDisplay(coding.getDisplay());
 		}
-	}
-
-	private void addQuestionnaireExtension(DataRequirementEntity entity, DataRequirement dataRequirement) {
-		dataRequirement.addExtension().setUrl("https://www.hl7.org/fhir/questionnaire.html")
-				.setValue(new Reference(questionnaireBuilder.buildQuestionnaire(entity.getQuestionnaireId())));
 	}
 
 }
