@@ -54,6 +54,7 @@ public class ServiceDefinitionBuilder {
 		List<DataRequirementEntity> dataRequirements = dataRequirementRepository.findByServiceDefinitionId(entity.getId());
 		
 		// NEW 
+		dataRequirementBuilder.buildFixedDataRequierments(serviceDefinition);
 		dataRequirements.forEach(dataRequirementEntity -> 
 				dataRequirementBuilder.buildServiceDefinitionDataRequirements(ResourceType.QUESTIONNAIRERESPONSE.toCode(), 
 						"https://www.hl7.org/fhir/questionnaireresponse.html", dataRequirementEntity, resourcesNotContained, serviceDefinition));

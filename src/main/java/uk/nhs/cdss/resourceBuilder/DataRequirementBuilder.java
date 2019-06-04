@@ -15,6 +15,7 @@ import org.hl7.fhir.dstu3.model.Questionnaire;
 import org.hl7.fhir.dstu3.model.Resource;
 import org.hl7.fhir.dstu3.model.ResourceType;
 import org.hl7.fhir.dstu3.model.ServiceDefinition;
+import org.hl7.fhir.dstu3.model.StringType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -114,6 +115,32 @@ public class DataRequirementBuilder {
 						.setSystem("http://snomed.info/sct")
 						.setDisplay(coding.getDisplay());
 		}
+	}
+	
+	public ServiceDefinition buildFixedDataRequierments(ServiceDefinition serviceDefinition) {
+		
+		DataRequirement patientDataRequirement = new DataRequirement();
+		patientDataRequirement.setId("DR1 - Patient");
+		patientDataRequirement.setType("Patient");
+		patientDataRequirement.addProfile("https://fhir.hl7.org.uk/STU3/StructureDefinition/CareConnect-Patient-1");
+		serviceDefinition.addDataRequirement(patientDataRequirement);
+		
+		DataRequirement organizationDataRequirement = new DataRequirement();
+		organizationDataRequirement.setId("DR2 - Organization");
+		organizationDataRequirement.setType("Organization");
+		organizationDataRequirement.addProfile("https://fhir.hl7.org.uk/STU3/StructureDefinition/CareConnect-Organization-1");
+		organizationDataRequirement
+		.addCodeFilter()
+			.setPath("identifier")
+			.setValueSet(new StringType("K9872"));
+		serviceDefinition.addDataRequirement(organizationDataRequirement);
+		
+		DataRequirement ageDataRequirement = new DataRequirement();
+		ageDataRequirement.setId("DR3 - Age");
+		ageDataRequirement.setType("Age");
+		serviceDefinition.addDataRequirement(ageDataRequirement);
+		
+		return serviceDefinition;
 	}
 
 }
