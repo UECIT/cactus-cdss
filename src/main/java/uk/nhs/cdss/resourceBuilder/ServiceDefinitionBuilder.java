@@ -53,7 +53,6 @@ public class ServiceDefinitionBuilder {
 	private void addDataRequirements(ServiceDefinitionEntity entity, ServiceDefinition serviceDefinition, Boolean resourcesNotContained) {
 		List<DataRequirementEntity> dataRequirements = dataRequirementRepository.findByServiceDefinitionId(entity.getId());
 		
-		// NEW 
 		dataRequirementBuilder.buildFixedDataRequierments(serviceDefinition);
 		dataRequirements.forEach(dataRequirementEntity -> 
 				dataRequirementBuilder.buildServiceDefinitionDataRequirements(ResourceType.QUESTIONNAIRERESPONSE.toCode(), 

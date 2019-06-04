@@ -12,6 +12,7 @@ import org.hl7.fhir.dstu3.model.Immunization;
 import org.hl7.fhir.dstu3.model.MedicationAdministration;
 import org.hl7.fhir.dstu3.model.Observation;
 import org.hl7.fhir.dstu3.model.Questionnaire;
+import org.hl7.fhir.dstu3.model.QuestionnaireResponse;
 import org.hl7.fhir.dstu3.model.Resource;
 import org.hl7.fhir.dstu3.model.ResourceType;
 import org.hl7.fhir.dstu3.model.ServiceDefinition;
@@ -60,7 +61,7 @@ public class DataRequirementBuilder {
 		DataRequirement dataRequirement = buildDataRequirement(questionnaire, entity.getId());
 		dataRequirement.addCodeFilter()
 				.setPath("url")
-				.addValueCode("Questionnaire/" + entity.getQuestionnaireId());
+				.setValueSet(new StringType("Questionnaire/" + entity.getQuestionnaireId()));
 		
 		return dataRequirement;
 	}
@@ -68,13 +69,11 @@ public class DataRequirementBuilder {
 	
 	public ServiceDefinition buildServiceDefinitionDataRequirements(String type, String url,
 			DataRequirementEntity entity, boolean resourcesNotContained, ServiceDefinition serviceDefinition) {
-
-		Questionnaire questionnaire = questionnaireBuilder.buildQuestionnaire(entity.getQuestionnaireId());
 		
-		DataRequirement dataRequirement = buildDataRequirement(questionnaire, entity.getId());
+		DataRequirement dataRequirement = buildDataRequirement(new QuestionnaireResponse(), entity.getId());
 		dataRequirement.addCodeFilter()
-				.setPath(questionnaireBuilder.buildQuestionnaire(entity.getQuestionnaireId()).getId())
-				.addValueCode("#PRE_STD_AD_DISCLAIMERS");
+			.setPath("questionnaire.url")
+			.setValueSet(new StringType("Questionnaire/" + entity.getQuestionnaireId()));
 
 		serviceDefinition.addDataRequirement(dataRequirement);
 
@@ -109,7 +108,6 @@ public class DataRequirementBuilder {
 			dataRequirement
 				.addCodeFilter()
 					.setPath("code")
-					.addValueCode(coding.getCode())
 					.addValueCoding()
 						.setCode(coding.getCode())
 						.setSystem("http://snomed.info/sct")
@@ -130,9 +128,9 @@ public class DataRequirementBuilder {
 		organizationDataRequirement.setType("Organization");
 		organizationDataRequirement.addProfile("https://fhir.hl7.org.uk/STU3/StructureDefinition/CareConnect-Organization-1");
 		organizationDataRequirement
-		.addCodeFilter()
-			.setPath("identifier")
-			.setValueSet(new StringType("K9872"));
+			.addCodeFilter()
+				.setPath("identifier")
+				.setValueSet(new StringType("K9872"));
 		serviceDefinition.addDataRequirement(organizationDataRequirement);
 		
 		DataRequirement ageDataRequirement = new DataRequirement();
