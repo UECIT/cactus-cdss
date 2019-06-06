@@ -1,5 +1,6 @@
 package uk.nhs.cdss.utils;
 
+import org.hl7.fhir.dstu3.model.CareConnectProcedureRequest;
 import org.hl7.fhir.dstu3.model.CodeableConcept;
 import org.hl7.fhir.dstu3.model.Narrative;
 import org.hl7.fhir.dstu3.model.ProcedureRequest;
@@ -12,7 +13,7 @@ import org.hl7.fhir.dstu3.model.Narrative.NarrativeStatus;
 public class ProcedureRequestUtil {
 
 	public ProcedureRequest buildProcedureRequest() {
-		ProcedureRequest procedureRequest = new ProcedureRequest();
+		ProcedureRequest procedureRequest = new CareConnectProcedureRequest();
 		
 		procedureRequest.setStatus(ProcedureRequestStatus.ACTIVE);
 		procedureRequest.setIntent(ProcedureRequestIntent.OPTION);

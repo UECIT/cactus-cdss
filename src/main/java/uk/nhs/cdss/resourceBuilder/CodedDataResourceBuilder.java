@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hl7.fhir.dstu3.model.BooleanType;
+import org.hl7.fhir.dstu3.model.CareConnectObservation;
 import org.hl7.fhir.dstu3.model.CodeableConcept;
 import org.hl7.fhir.dstu3.model.Coding;
 import org.hl7.fhir.dstu3.model.Immunization;
@@ -75,7 +76,7 @@ public class CodedDataResourceBuilder {
 	// reason"
 	// ensure this only applies to the "None of the above" triage
 	private Observation createObservation(boolean populated, CodedDataEntity codedDataEntity, boolean noSelection) {
-		Observation observation = new Observation()
+		Observation observation = new CareConnectObservation()
 				.setStatus(populated ? ObservationStatus.FINAL : ObservationStatus.UNKNOWN)
 				.setCode(new CodeableConcept().addCoding(
 						new Coding(SystemURL.VS_SNOMED, codedDataEntity.getCode(), codedDataEntity.getDisplay())));

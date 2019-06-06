@@ -3,19 +3,21 @@ package uk.nhs.cdss.utils;
 import java.util.Collections;
 import java.util.Date;
 
-import org.hl7.fhir.dstu3.model.Annotation;
+import org.hl7.fhir.dstu3.model.CareConnectAnnotation;
+import org.hl7.fhir.dstu3.model.CareConnectIdentifier;
+import org.hl7.fhir.dstu3.model.CareConnectPractitioner;
 import org.hl7.fhir.dstu3.model.CodeableConcept;
 import org.hl7.fhir.dstu3.model.Coding;
 import org.hl7.fhir.dstu3.model.DateTimeType;
+import org.hl7.fhir.dstu3.model.Enumerations.AdministrativeGender;
 import org.hl7.fhir.dstu3.model.HumanName;
 import org.hl7.fhir.dstu3.model.Identifier;
 import org.hl7.fhir.dstu3.model.Practitioner;
+import org.hl7.fhir.dstu3.model.Practitioner.PractitionerQualificationComponent;
 import org.hl7.fhir.dstu3.model.Provenance;
 import org.hl7.fhir.dstu3.model.Reference;
 import org.hl7.fhir.dstu3.model.ReferralRequest;
 import org.hl7.fhir.dstu3.model.StringType;
-import org.hl7.fhir.dstu3.model.Enumerations.AdministrativeGender;
-import org.hl7.fhir.dstu3.model.Practitioner.PractitionerQualificationComponent;
 import org.springframework.stereotype.Component;
 
 import uk.nhs.cdss.SystemURL;
@@ -57,7 +59,7 @@ public class ReferralRequestUtil {
 		referralRequest.addSupportingInfo().setDisplay("Chief concern: Vomiting");
 		referralRequest.addSupportingInfo().setDisplay("Secondary concern: ");
 
-		referralRequest.addNote(new Annotation(new StringType("All okay")));
+		referralRequest.addNote(new CareConnectAnnotation(new StringType("All okay")));
 		referralRequest.addRecipient().setReference("https://www.hl7.org/fhir/practitioner.html");
 		
 		return referralRequest;
@@ -71,8 +73,8 @@ public class ReferralRequestUtil {
 	}
 	
 	public Practitioner buildPractitioner() {
-		Practitioner practitioner = new Practitioner();
-		Identifier identifier = new Identifier();
+		Practitioner practitioner = new CareConnectPractitioner();
+		Identifier identifier = new CareConnectIdentifier();
 		identifier.setSystem("https://fhir.nhs.uk/Id/nhs-number");
 		identifier.setValue("9476719910");
 		practitioner.getIdentifier().add(identifier);

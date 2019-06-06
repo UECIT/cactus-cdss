@@ -1,6 +1,8 @@
 package uk.nhs.cdss.utils;
 
 import org.hl7.fhir.dstu3.model.Annotation;
+import org.hl7.fhir.dstu3.model.CareConnectAnnotation;
+import org.hl7.fhir.dstu3.model.CareConnectCarePlan;
 import org.hl7.fhir.dstu3.model.CarePlan;
 import org.hl7.fhir.dstu3.model.CodeableConcept;
 import org.hl7.fhir.dstu3.model.Narrative;
@@ -16,7 +18,7 @@ import uk.nhs.cdss.entities.ResultEntity;
 public class CarePlanUtil {
 	
 	public CarePlan buildResultCarePlan(ResultEntity resultEntity) {
-		CarePlan result = new CarePlan();
+		CarePlan result = new CareConnectCarePlan();
 		result.setStatus(CarePlanStatus.ACTIVE);
 		result.setIntent(CarePlanIntent.ORDER);
 		result.setTitle("Self Care");
@@ -38,7 +40,7 @@ public class CarePlanUtil {
 	}
 	
 	public CarePlan buildCarePlan1() {
-		CarePlan careAdvice1 = new CarePlan();
+		CarePlan careAdvice1 = new CareConnectCarePlan();
 		careAdvice1.setStatus(CarePlanStatus.ACTIVE);
 		careAdvice1.setIntent(CarePlanIntent.OPTION);
 		careAdvice1.setTitle("Wound Care");
@@ -60,7 +62,7 @@ public class CarePlanUtil {
 	}
 	
 	public CarePlan buildCarePlan2() {			// TEST Adding CareAdvice
-		CarePlan careAdvice2 = new CarePlan();
+		CarePlan careAdvice2 = new CareConnectCarePlan();
 		careAdvice2.setTitle("Wound Care");
 		careAdvice2.setId("#careAdvice2");
 		careAdvice2.setStatus(CarePlanStatus.ACTIVE);
@@ -106,10 +108,10 @@ public class CarePlanUtil {
 		reference1.setDisplay("Immobilize the hand and wrist by placing them on a rigid splint (see drawing).");
 		carePlan.addSupportingInfo(reference1);
 		// set notes
-		Annotation note = new Annotation();
+		Annotation note = new CareConnectAnnotation();
 		note.setText("Immobilize the hand and wrist by placing them on a rigid splint (see drawing).");
 		carePlan.addNote(note);
-		Annotation note1 = new Annotation();
+		Annotation note1 = new CareConnectAnnotation();
 		note1.setText("Immobilize the hand and wrist by placing them on a rigid splint (see drawing).");
 		carePlan.addNote(note1);
 

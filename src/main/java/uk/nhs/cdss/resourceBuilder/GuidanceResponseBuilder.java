@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.hl7.fhir.dstu3.model.Annotation;
+import org.hl7.fhir.dstu3.model.CareConnectAnnotation;
 import org.hl7.fhir.dstu3.model.CarePlan;
 import org.hl7.fhir.dstu3.model.CodeableConcept;
 import org.hl7.fhir.dstu3.model.Coding;
@@ -429,7 +430,7 @@ public class GuidanceResponseBuilder {
 			referralRequest.addSupportingInfo().setDisplay("Secondary concern: " + concernsArray[1]);
 		} catch (Exception e) {}
 
-		referralRequest.addNote(new Annotation(new StringType("All okay")));
+		referralRequest.addNote(new CareConnectAnnotation(new StringType("All okay")));
 		referralRequest.addRecipient().setReference("https://www.hl7.org/fhir/practitioner.html");
 
 		return referralRequest;
