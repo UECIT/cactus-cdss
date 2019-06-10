@@ -23,6 +23,9 @@ public class TriggerEntity {
 
 	@Column(name = "type")
 	private String type;
+	
+	@Column(name = "data_requirement_id")
+	private String dataRequirementId;
 
 	public Long getId() {
 		return id;
@@ -51,4 +54,12 @@ public class TriggerEntity {
 	public void setType(String type) {
 		this.type = type;
 	}
+	
+	public String getDataRequirementId() {
+		return dataRequirementId;
+	}
+	public void setDataRequirementId(String dataRequirementId) {
+		this.dataRequirementId = dataRequirementId;
+	}
+	
 }

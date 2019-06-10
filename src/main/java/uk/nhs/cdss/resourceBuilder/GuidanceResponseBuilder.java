@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import org.hl7.fhir.dstu3.model.Annotation;
 import org.hl7.fhir.dstu3.model.CareConnectAnnotation;
 import org.hl7.fhir.dstu3.model.CarePlan;
 import org.hl7.fhir.dstu3.model.CodeableConcept;

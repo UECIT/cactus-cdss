@@ -20,7 +20,6 @@ import ca.uhn.fhir.rest.annotation.IdParam;
 import ca.uhn.fhir.rest.annotation.Operation;
 import ca.uhn.fhir.rest.annotation.OptionalParam;
 import ca.uhn.fhir.rest.annotation.Read;
-import ca.uhn.fhir.rest.annotation.RequiredParam;
 import ca.uhn.fhir.rest.annotation.ResourceParam;
 import ca.uhn.fhir.rest.annotation.Search;
 import ca.uhn.fhir.rest.param.DateRangeParam;
@@ -71,14 +70,15 @@ public class ServiceDefinitionProvider implements IResourceProvider {
 			@OptionalParam(name="useContext-code") TokenAndListParam useContextCode,
 			@OptionalParam(name="useContext-valueconcept") TokenAndListParam useContext,
 			@OptionalParam(name=ServiceDefinition.SP_JURISDICTION) TokenParam jurisdiction,
-			@RequiredParam(name="trigger-type") TokenParam triggerType,
-			@RequiredParam(name="trigger-eventdata-type") TokenParam triggerEventDataType,
-			@RequiredParam(name="trigger-eventdata-profile") TokenParam triggerEventDataProfile,
-			@RequiredParam(name="trigger-eventdata-valuecoding") TokenParam triggerEventDataCode) {
+			@OptionalParam(name="trigger-eventdata-id") TokenAndListParam triggerId) {
 
 		List<String> useContexts = useContext == null ? 
 				new ArrayList<>() : useContext.getValuesAsQueryTokens().stream().map(tokenList -> 
 					tokenList.getValuesAsQueryTokens().get(0).getValue()).collect(Collectors.toList());
+				
+		List<String> triggerIds = triggerId == null ? 
+						new ArrayList<>() : triggerId.getValuesAsQueryTokens().stream().map(tokenList -> 
+							tokenList.getValuesAsQueryTokens().get(0).getValue()).collect(Collectors.toList());
 				
 		List<ServiceDefinitionEntity> entities = useContexts.isEmpty() ?
 				serviceDefinitionRepository.search(
@@ -86,10 +86,7 @@ public class ServiceDefinitionProvider implements IResourceProvider {
 					effective == null ? null : effective.getLowerBoundAsInstant(),
 					effective == null ? null : effective.getUpperBoundAsInstant(),
 					jurisdiction == null ? null : jurisdiction.getValue().toUpperCase(),
-					triggerType == null ? null : triggerType.getValue(),
-					triggerEventDataType == null ? null : triggerEventDataType.getValue(),
-					triggerEventDataProfile == null ? null : triggerEventDataProfile.getValue(),
-					triggerEventDataCode == null ? null : triggerEventDataCode.getValue(),
+					triggerIds, new Long(triggerIds.size()),
 					experimental == null ? null : !"FALSE".equalsIgnoreCase(experimental.getValue())) :
 				serviceDefinitionRepository.search(
 					status == null ? null : PublicationStatus.valueOf(status.getValue().toUpperCase()),
@@ -97,10 +94,7 @@ public class ServiceDefinitionProvider implements IResourceProvider {
 					effective == null ? null : effective.getUpperBoundAsInstant(),
 					jurisdiction == null ? null : jurisdiction.getValue().toUpperCase(),
 					useContexts, new Long(useContexts.size()),
-					triggerType == null ? null : triggerType.getValue(),
-					triggerEventDataType == null ? null : triggerEventDataType.getValue(),
-					triggerEventDataProfile == null ? null : triggerEventDataProfile.getValue(),
-					triggerEventDataCode == null ? null : triggerEventDataCode.getValue(),
+					triggerIds, new Long(triggerIds.size()),
 					experimental == null ? null : !"FALSE".equalsIgnoreCase(experimental.getValue()));
 		
 		Collection<ServiceDefinition> serviceDefinitions = new ArrayList<>();
