@@ -1,8 +1,6 @@
 package uk.nhs.cdss.resourceBuilder;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.Base64;
 
 import org.hl7.fhir.dstu3.model.Attachment;
@@ -15,8 +13,9 @@ import org.hl7.fhir.dstu3.model.Questionnaire.QuestionnaireItemComponent;
 import org.hl7.fhir.dstu3.model.Questionnaire.QuestionnaireItemType;
 import org.hl7.fhir.exceptions.FHIRException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ResourceUtils;
+import org.springframework.util.FileCopyUtils;
 
 import uk.nhs.cdss.entities.QuestionnaireEntity;
 import uk.nhs.cdss.repos.QuestionnaireRepository;
@@ -174,9 +173,9 @@ public class QuestionnaireBuilder {
 			question11.setText(entity11.getQuestion());
 			question11.setRequired(true);
 			try {
-				File file = ResourceUtils.getFile("classpath:colours.png");
+				ClassPathResource cpr = new ClassPathResource("colours.png");
+				byte[] fileContent = FileCopyUtils.copyToByteArray(cpr.getInputStream());
 				Attachment initialAttachment = new Attachment();
-				byte[] fileContent = Files.readAllBytes(file.toPath());
 				initialAttachment.setUrl("data:image/png;base64," + Base64.getEncoder().encodeToString(fileContent));
 				question11.setInitial(initialAttachment);
 			} catch (IOException e) {
