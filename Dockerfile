@@ -1,17 +1,16 @@
-FROM openjdk:8-jdk-alpine as build
-WORKDIR /workspace/app
+FROM maven:3-jdk-8-alpine as build
+WORKDIR /app
 
-COPY mvnw .
-COPY .mvn .mvn
 COPY pom.xml .
 COPY src src
 
-RUN ./mvnw install -DskipTests
+RUN mvn install -DskipTests
 
 FROM openjdk:8-jdk-alpine
 WORKDIR /app
 VOLUME /tmp
-COPY --from=build /workspace/app/target/cdss-supplier-stub-0.0.1-SNAPSHOT.war /app
-COPY --from=build /workspace/app/target/classes/application.properties /app
+COPY --from=build /app/target/cdss-supplier-stub.war /app
+COPY --from=build /app/target/classes/application.properties /app
 
-ENTRYPOINT [ "java", "-jar", "cdss-supplier-stub-0.0.1-SNAPSHOT.war", "application.properties" ]
+ENTRYPOINT [ "java", "-jar", "cdss-supplier-stub.war", "application.properties" ]
+EXPOSE 8080
