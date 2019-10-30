@@ -1,6 +1,6 @@
 version: '3.2'
 services:
-  ems-backend:
-    image: cdss-supplier-stub
+  cdss-app:
+    image: cds-test-engine
     build: 
       context: .

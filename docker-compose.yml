@@ -10,7 +10,7 @@ services:
 
   cdss-app:
     image:
-      registry.gitlab.com/pvandermerwe/cdss-supplier-stub:latest
+      registry.gitlab.com/ems-test-harness/cds-test-engine:latest
     environment: 
       - SPRING_DATASOURCE_URL=jdbc:mysql://cdss-mysql:3306/cdss_supplier
     ports: 
