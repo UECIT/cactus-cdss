@@ -23,6 +23,14 @@
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
+			<id>central</id>
+			<name>Central Repository</name>
+			<url>https://repo.maven.apache.org/maven2</url>
+		</repository>
+		<repository>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
 			<id>bintray-ems-test-harness-EMS-Test-Harness</id>
 			<name>bintray</name>
 			<url>https://dl.bintray.com/ems-test-harness/EMS-Test-Harness</url>
