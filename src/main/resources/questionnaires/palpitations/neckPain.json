@@ -1,0 +1,16 @@
+{
+  "id": "palpitations.neckPain",
+  "items": [
+    {
+      "id": "q2",
+      "text": "Are you suffering from any pain in your neck or shoulders?",
+      "type": "CHOICE",
+      "required": true,
+      "options": [
+        "Yes",
+        "No",
+        "Unsure"
+      ]
+    }
+  ]
+}

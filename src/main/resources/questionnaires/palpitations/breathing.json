@@ -1,0 +1,16 @@
+{
+  "id": "palpitations.breathing",
+  "items": [
+    {
+      "id": "q3",
+      "text": "Are you experiencing shortness of breath?",
+      "type": "CHOICE",
+      "required": true,
+      "options": [
+        "Yes",
+        "No",
+        "Unsure"
+      ]
+    }
+  ]
+}
