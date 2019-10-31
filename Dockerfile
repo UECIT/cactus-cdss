@@ -1,12 +1,15 @@
-FROM maven:3-jdk-8-alpine as build
+FROM maven:3-jdk-11 as deps
 WORKDIR /app
 
 COPY pom.xml .
+RUN mvn -B -Dmaven.repo.local=/app/.m2 dependency:go-offline
+
+FROM deps as build
+
 COPY src src
+RUN mvn -B -Dmaven.repo.local=/app/.m2 package
 
-RUN mvn install -DskipTests
-
-FROM openjdk:8-jdk-alpine
+FROM openjdk:11-jre-slim
 WORKDIR /app
 VOLUME /tmp
 COPY --from=build /app/target/cdss-supplier-stub.war /app
