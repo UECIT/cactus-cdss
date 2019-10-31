@@ -5,8 +5,11 @@ import java.util.List;
 
 public class Questionnaire {
 
-  private final String id;
+  private String id;
   private final List<Question> items = new ArrayList<>();
+
+  public Questionnaire() {
+  }
 
   public Questionnaire(String id) {
     this.id = id;

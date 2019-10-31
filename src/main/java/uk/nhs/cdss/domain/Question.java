@@ -5,18 +5,21 @@ import java.util.List;
 
 public class Question {
 
-  private final String id;
+  private String id;
   private String prefix;
   private String text;
   private QuestionType type;
-  private Boolean required;
-  private Boolean repeats;
-  private Boolean readOnly;
+  private boolean required;
+  private boolean repeats;
+  private boolean readOnly;
   private Object initial;
 
   private final List<Object> options = new ArrayList<>();
   private final List<QuestionConstraint> constraints = new ArrayList<>();
   private final List<Question> items = new ArrayList<>();
+
+  public Question() {
+  }
 
   public Question(String id) {
     this.id = id;
@@ -68,27 +71,27 @@ public class Question {
     this.type = type;
   }
 
-  public Boolean getRequired() {
+  public boolean getRequired() {
     return required;
   }
 
-  public void setRequired(Boolean required) {
+  public void setRequired(boolean required) {
     this.required = required;
   }
 
-  public Boolean getRepeats() {
+  public boolean getRepeats() {
     return repeats;
   }
 
-  public void setRepeats(Boolean repeats) {
+  public void setRepeats(boolean repeats) {
     this.repeats = repeats;
   }
 
-  public Boolean getReadOnly() {
+  public boolean getReadOnly() {
     return readOnly;
   }
 
-  public void setReadOnly(Boolean readOnly) {
+  public void setReadOnly(boolean readOnly) {
     this.readOnly = readOnly;
   }
 
