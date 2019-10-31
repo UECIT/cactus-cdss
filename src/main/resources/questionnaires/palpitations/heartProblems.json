@@ -1,0 +1,16 @@
+{
+  "id": "palpitations.heartProblems",
+  "items": [
+    {
+      "id": "q4",
+      "text": "Do you have a history of heart problems?",
+      "type": "CHOICE",
+      "required": true,
+      "options": [
+        "Yes",
+        "No",
+        "Unsure"
+      ]
+    }
+  ]
+}
