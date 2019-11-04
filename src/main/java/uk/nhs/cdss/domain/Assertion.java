@@ -11,7 +11,6 @@ public class Assertion {
   private final String id;
   private Status status;
   private CodableConcept code;
-  private Patient patient;
   private ZonedDateTime issued;
   private Object value;
 
@@ -43,14 +42,6 @@ public class Assertion {
     this.code = code;
   }
 
-  public Patient getPatient() {
-    return patient;
-  }
-
-  public void setPatient(Patient patient) {
-    this.patient = patient;
-  }
-
   public ZonedDateTime getIssued() {
     return issued;
   }
@@ -73,5 +64,15 @@ public class Assertion {
 
   public List<CodableConcept> getComponents() {
     return components;
+  }
+
+  @Override
+  public String toString() {
+    return "Assertion{" +
+        "id='" + id + '\'' +
+        ", status=" + status +
+        ", code=" + code +
+        ", value=" + value +
+        '}';
   }
 }

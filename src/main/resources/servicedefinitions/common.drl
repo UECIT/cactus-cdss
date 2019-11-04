@@ -1,0 +1,105 @@
+package uk.nhs.cdss.rules
+
+import uk.nhs.cdss.domain.Answer
+import uk.nhs.cdss.domain.Assertion
+import uk.nhs.cdss.domain.Assertion.Status
+import uk.nhs.cdss.domain.CarePlan
+import uk.nhs.cdss.domain.CodableConcept
+import uk.nhs.cdss.domain.Questionnaire
+import uk.nhs.cdss.domain.QuestionnaireResponse
+
+declare InitialQuestionnaire
+    id: String @key
+end
+
+declare QuestionFlow
+    id: String @key
+    next: String @key
+end
+
+declare Answered
+    id: String @key
+end
+
+declare AnswerAssertion
+    questionnaireId: String @key
+    questionId: String @key
+    answer: String @key
+
+    code: CodableConcept
+    value: Object
+end
+
+// Check whether a questionnaire has been answered or can be bypassed
+rule "Answer present"
+    salience 20
+when
+    Answer( $id := questionnaireId )
+then
+    insert( new Answered($id) );
+end
+
+rule "Assertion present"
+    salience 20
+when
+    // TODO this is a little blunt - it assumes only one assertion per questionnaire
+    $aa: AnswerAssertion( $id := questionnaireId )
+    Assertion( code == $aa.code )
+then
+    insert( new Answered($id) );
+end
+
+
+// Question Flow
+rule "Ask first question"
+    salience 10
+when
+    not Answered()
+    $q: InitialQuestionnaire()
+then
+    System.out.println("No answers: requesting questionnaire " + $q.getId());
+    insert( new Questionnaire($q.getId()) );
+end
+
+rule "Ask next question"
+    salience 10
+when
+    $q: QuestionFlow()
+    Answered( $q.id; )
+    not Answered( $q.next; )
+    not Questionnaire( id == $q.next )
+then
+    System.out.println("Have answer for " + $q.getId() + ": requesting questionnaire " + $q.getNext());
+    insert( new Questionnaire($q.getNext()) );
+end
+
+
+// Simple assertions
+rule "Simple Assertions"
+    salience 20
+when
+    $a: Answer( $qid := questionnaireId, $ref := questionId )
+    $m: AnswerAssertion( $qid := questionnaireId, $ref := questionId, answer == $a.value )
+then
+    String question = $qid + "#" + $ref;
+    System.out.println("Assertion: " + question + " == " + $m.getAnswer() + " => " + $m.getCode() + " == " + $m.getValue());
+    Assertion assertion = new Assertion(question, Assertion.Status.AMENDED);
+    assertion.setCode($m.getCode());
+    assertion.setValue($m.getValue());
+    assertion.getRelated().add($a.getQuestionnaireResponse());
+    insert(assertion);
+end
+
+
+// Queries
+query "assertions"
+  assertion : Assertion()
+end
+
+query "questionnaires"
+  questionnaire : Questionnaire()
+end
+
+query "carePlans"
+  carePlan: CarePlan()
+end
