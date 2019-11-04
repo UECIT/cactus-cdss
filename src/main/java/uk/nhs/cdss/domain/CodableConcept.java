@@ -3,6 +3,7 @@ package uk.nhs.cdss.domain;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 public class CodableConcept {
 
@@ -24,5 +25,27 @@ public class CodableConcept {
 
   public String getText() {
     return text;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    CodableConcept that = (CodableConcept) o;
+    return Objects.equals(coding, that.coding);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(coding);
+  }
+
+  @Override
+  public String toString() {
+    return String.format("'%s' %s", text, coding);
   }
 }
