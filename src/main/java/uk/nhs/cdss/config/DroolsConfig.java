@@ -44,10 +44,12 @@ public class DroolsConfig {
   @Bean
   public CodeDirectory codeDirectory() {
     CodeDirectory codeDirectory = new CodeDirectory();
-    codeDirectory.put("chestPain", buildCode("chestPain", "Feeling pain in chest"));
-    codeDirectory.put("neckPain", buildCode("neckPain", "Feeling pain in neck area"));
-    codeDirectory.put("breathingProblems", buildCode("breathingProblems", "Having trouble breathing"));
-    codeDirectory.put("heartProblems", buildCode("heartProblems", "Irregular heart beats"));
+    codeDirectory.put("palpitations", new CodableConcept("palpitations", "palpitations"));
+    codeDirectory.put("chestPain", new CodableConcept("chestPain", "chestPain"));
+    codeDirectory.put("neckPain", new CodableConcept("neckPain", "neckPain"));
+    codeDirectory.put("shoulderPain", new CodableConcept("shoulderPain", "shoulderPain"));
+    codeDirectory.put("breathingProblems", new CodableConcept("breathingProblems", "breathingProblems"));
+    codeDirectory.put("heartProblems", new CodableConcept("heartProblems", "heartProblems"));
     return codeDirectory;
   }
 }
