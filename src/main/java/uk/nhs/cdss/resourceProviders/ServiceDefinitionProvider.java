@@ -30,7 +30,8 @@ import uk.nhs.cdss.entities.ServiceDefinitionEntity;
 import uk.nhs.cdss.repos.ServiceDefinitionRepository;
 import uk.nhs.cdss.resourceBuilder.ServiceDefinitionBuilder;
 import uk.nhs.cdss.services.EvaluateService;
-import uk.nhs.cdss.transform.ServiceDefinitionTransformer;
+import uk.nhs.cdss.transform.Transformers.ServiceDefinitionTransformer;
+import uk.nhs.cdss.transform.impl.out.ServiceDefinitionTransformerImpl;
 
 @RestController
 public class ServiceDefinitionProvider implements IResourceProvider {
@@ -46,7 +47,7 @@ public class ServiceDefinitionProvider implements IResourceProvider {
 	public ServiceDefinitionProvider(
 			EvaluateService evaluateService, ServiceDefinitionBuilder serviceDefinitionBuilder,
 			ServiceDefinitionRepository serviceDefinitionRepository,
-			ServiceDefinitionTransformer serviceDefinitionTransformer,
+			ServiceDefinitionTransformerImpl serviceDefinitionTransformer,
 			ObjectMapper objectMapper) {
 		this.evaluateService = evaluateService;
 		this.serviceDefinitionBuilder = serviceDefinitionBuilder;
