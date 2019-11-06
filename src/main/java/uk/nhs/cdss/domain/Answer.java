@@ -1,5 +1,7 @@
 package uk.nhs.cdss.domain;
 
+import org.hl7.fhir.dstu3.model.Type;
+
 public class Answer {
 
   private final String questionnaireId;
@@ -32,5 +34,9 @@ public class Answer {
 
   public void setQuestionnaireResponse(QuestionnaireResponse questionnaireResponse) {
     this.questionnaireResponse = questionnaireResponse;
+  }
+
+  public String getFullyQualifiedId() {
+    return questionnaireId + "#" + questionId;
   }
 }

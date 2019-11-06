@@ -1,8 +1,9 @@
 package uk.nhs.cdss.domain;
 
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import org.hl7.fhir.dstu3.model.Type;
 
 public class Assertion {
 
@@ -11,7 +12,7 @@ public class Assertion {
   private final String id;
   private Status status;
   private CodableConcept code;
-  private ZonedDateTime issued;
+  private Instant issued;
   private Object value;
 
   private final List<QuestionnaireResponse> related = new ArrayList<>();
@@ -42,11 +43,11 @@ public class Assertion {
     this.code = code;
   }
 
-  public ZonedDateTime getIssued() {
+  public Instant getIssued() {
     return issued;
   }
 
-  public void setIssued(ZonedDateTime issued) {
+  public void setIssued(Instant issued) {
     this.issued = issued;
   }
 

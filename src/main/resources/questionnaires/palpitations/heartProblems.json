@@ -7,9 +7,15 @@
       "type": "CHOICE",
       "required": true,
       "options": [
-        "Yes",
-        "No",
-        "Unsure"
+        {
+          "stringValue": "Yes"
+        },
+        {
+          "stringValue": "No"
+        },
+        {
+          "stringValue": "Unsure"
+        }
       ]
     }
   ]
