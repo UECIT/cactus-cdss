@@ -14,6 +14,7 @@ import org.hl7.fhir.dstu3.model.QuestionnaireResponse.QuestionnaireResponseItemC
 import org.hl7.fhir.exceptions.FHIRException;
 import org.springframework.stereotype.Service;
 import uk.nhs.cdss.engine.CDSEngine;
+import uk.nhs.cdss.engine.ServiceDefinitionException;
 import uk.nhs.cdss.entities.CodedDataEntity;
 import uk.nhs.cdss.entities.DataRequirementEntity;
 import uk.nhs.cdss.repos.DataRequirementRepository;
@@ -47,7 +48,8 @@ public class EvaluateService {
     this.dataRequirementRepository = dataRequirementRepository;
   }
 
-  public GuidanceResponse getGuidanceResponseNew(Parameters parameters, Long serviceDefinitionId) {
+  public GuidanceResponse getGuidanceResponseNew(Parameters parameters, Long serviceDefinitionId)
+      throws ServiceDefinitionException {
     var evaluationParameters = new EvaluationParameters(parameters);
     var inputBundle = new CDSInputBundle(serviceDefinitionId, evaluationParameters);
     var input = inputTransformer.transform(inputBundle);
