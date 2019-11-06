@@ -21,11 +21,11 @@ public class DroolsCDSEngineTest {
   @Before
   public void setup() {
     DroolsConfig droolsConfig = new DroolsConfig();
-    engine = new DroolsCDSEngine(droolsConfig.knowledgeBaseFactory(), droolsConfig.codeDirectory());
+    engine = new DroolsCDSEngine(new CDSKnowledgeBaseFactory(), droolsConfig.codeDirectory());
   }
 
   @Test
-  public void empty_input_requests_data() {
+  public void empty_input_requests_data() throws ServiceDefinitionException {
     CDSInput input = new CDSInput(PALPITATIONS, REQUEST_1, ENCOUNTER_1, SUPPLIER_1);
 
     CDSOutput output = engine.evaluate(input);
@@ -36,7 +36,7 @@ public class DroolsCDSEngineTest {
   }
 
   @Test
-  public void chest_pain_answer_positive_assertion() {
+  public void chest_pain_answer_positive_assertion() throws ServiceDefinitionException {
     CDSInput input = new CDSInput(PALPITATIONS, REQUEST_1, ENCOUNTER_1, SUPPLIER_1);
     QuestionnaireResponse response = new QuestionnaireResponse("response",
         "palpitations.chestPain");
@@ -53,7 +53,7 @@ public class DroolsCDSEngineTest {
   }
 
   @Test
-  public void chest_pain_answer_positive_result() {
+  public void chest_pain_answer_positive_result() throws ServiceDefinitionException {
     CDSInput input = new CDSInput(PALPITATIONS, REQUEST_1, ENCOUNTER_1, SUPPLIER_1);
     QuestionnaireResponse response = new QuestionnaireResponse("response",
         "palpitations.chestPain");
@@ -70,7 +70,7 @@ public class DroolsCDSEngineTest {
   }
 
   @Test
-  public void chest_pain_answer_negative_assertion() {
+  public void chest_pain_answer_negative_assertion() throws ServiceDefinitionException {
     CDSInput input = new CDSInput(PALPITATIONS, REQUEST_1, ENCOUNTER_1, SUPPLIER_1);
     QuestionnaireResponse response = new QuestionnaireResponse("response",
         "palpitations.chestPain");
@@ -87,7 +87,7 @@ public class DroolsCDSEngineTest {
   }
 
   @Test
-  public void chest_pain_answer_negative_result() {
+  public void chest_pain_answer_negative_result() throws ServiceDefinitionException {
     CDSInput input = new CDSInput(PALPITATIONS, REQUEST_1, ENCOUNTER_1, SUPPLIER_1);
     QuestionnaireResponse response = new QuestionnaireResponse("response",
         "palpitations.chestPain");
@@ -103,7 +103,7 @@ public class DroolsCDSEngineTest {
   }
 
   @Test
-  public void chest_pain_answer_no_assertion() {
+  public void chest_pain_answer_no_assertion() throws ServiceDefinitionException {
     CDSInput input = new CDSInput(PALPITATIONS, REQUEST_1, ENCOUNTER_1, SUPPLIER_1);
     QuestionnaireResponse response = new QuestionnaireResponse("response",
         "palpitations.chestPain");
@@ -118,7 +118,7 @@ public class DroolsCDSEngineTest {
   }
 
   @Test
-  public void any_chest_pain_answer_requests_data() {
+  public void any_chest_pain_answer_requests_data() throws ServiceDefinitionException {
     CDSInput input = new CDSInput(PALPITATIONS, REQUEST_1, ENCOUNTER_1, SUPPLIER_1);
     QuestionnaireResponse response = new QuestionnaireResponse("response",
         "palpitations.chestPain");
@@ -134,7 +134,7 @@ public class DroolsCDSEngineTest {
   }
 
   @Test
-  public void flow_complete_result() {
+  public void flow_complete_result() throws ServiceDefinitionException {
     CDSInput input = new CDSInput(PALPITATIONS, REQUEST_1, ENCOUNTER_1, SUPPLIER_1);
 
     QuestionnaireResponse response = new QuestionnaireResponse("response",

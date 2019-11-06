@@ -24,18 +24,20 @@ public class DroolsCDSEngine implements CDSEngine {
   public static final String CAREPLANS_QUERY = "carePlans";
   public static final String CAREPLAN_ID = "carePlan";
 
-  private final InternalKnowledgeBase kbase;
+  private final CDSKnowledgeBaseFactory knowledgeBaseFactory;
   private final CodeDirectory codeDirectory;
 
-  public DroolsCDSEngine(InternalKnowledgeBase kbase, CodeDirectory codeDirectory) {
-    this.kbase = kbase;
+  public DroolsCDSEngine(CDSKnowledgeBaseFactory knowledgeBaseFactory, CodeDirectory codeDirectory) {
+    this.knowledgeBaseFactory = knowledgeBaseFactory;
     this.codeDirectory = codeDirectory;
   }
 
   @Override
-  public CDSOutput evaluate(CDSInput input) {
-
+  public CDSOutput evaluate(CDSInput input) throws ServiceDefinitionException {
+    InternalKnowledgeBase kbase = knowledgeBaseFactory
+        .getKnowledgeBase(input.getServiceDefinitionId());
     KieSession ksession = kbase.newKieSession();
+
     try {
       ksession.setGlobal("codeDirectory", codeDirectory);
 
