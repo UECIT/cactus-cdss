@@ -10,17 +10,18 @@ import java.io.IOException;
 import org.hl7.fhir.dstu3.model.IdType;
 import org.hl7.fhir.dstu3.model.Questionnaire;
 import org.springframework.stereotype.Component;
-import uk.nhs.cdss.transform.QuestionnaireTransformer;
+import uk.nhs.cdss.transform.bundle.QuestionnaireBundle;
+import uk.nhs.cdss.transform.impl.in.QuestionnaireTransformerImpl;
 
 @Component
 public class QuestionnaireProvider implements IResourceProvider {
 
-  private final QuestionnaireTransformer questionnaireTransformer;
+  private final QuestionnaireTransformerImpl questionnaireTransformer;
 
   private final ObjectMapper objectMapper;
 
   public QuestionnaireProvider(
-      QuestionnaireTransformer questionnaireTransformer, ObjectMapper objectMapper) {
+      QuestionnaireTransformerImpl questionnaireTransformer, ObjectMapper objectMapper) {
     this.questionnaireTransformer = questionnaireTransformer;
     this.objectMapper = objectMapper;
   }
@@ -46,7 +47,8 @@ public class QuestionnaireProvider implements IResourceProvider {
               "/questionnaires/" + serviceDefinitionId + "/" + questionnaireId + ".json"),
               uk.nhs.cdss.domain.Questionnaire.class);
 
-      return questionnaireTransformer.transform(idPart, domainQuestionnaire);
+      return questionnaireTransformer.transform(
+          new QuestionnaireBundle(idPart, domainQuestionnaire));
 
     } catch (IOException e) {
       throw new InternalErrorException("Unable to load questionnaire", e);

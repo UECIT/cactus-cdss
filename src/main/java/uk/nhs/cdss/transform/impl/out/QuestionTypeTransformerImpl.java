@@ -1,11 +1,12 @@
-package uk.nhs.cdss.transform;
+package uk.nhs.cdss.transform.impl.out;
 
 import org.hl7.fhir.dstu3.model.Questionnaire.QuestionnaireItemType;
 import org.springframework.stereotype.Component;
 import uk.nhs.cdss.domain.QuestionType;
+import uk.nhs.cdss.transform.Transformers.QuestionTypeTransformer;
 
 @Component
-public class QuestionTypeTransformer {
+public class QuestionTypeTransformerImpl implements QuestionTypeTransformer {
 
   public QuestionnaireItemType transform(QuestionType type) {
     switch (type) {

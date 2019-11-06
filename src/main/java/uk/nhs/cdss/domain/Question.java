@@ -2,6 +2,7 @@ package uk.nhs.cdss.domain;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.hl7.fhir.dstu3.model.Type;
 
 public class Question {
 
@@ -14,7 +15,7 @@ public class Question {
   private boolean readOnly;
   private Object initial;
 
-  private final List<Object> options = new ArrayList<>();
+  private final List<OptionType> options = new ArrayList<>();
   private final List<QuestionConstraint> constraints = new ArrayList<>();
   private final List<Question> items = new ArrayList<>();
 
@@ -95,7 +96,7 @@ public class Question {
     this.readOnly = readOnly;
   }
 
-  public List<Object> getOptions() {
+  public List<OptionType> getOptions() {
     return options;
   }
 

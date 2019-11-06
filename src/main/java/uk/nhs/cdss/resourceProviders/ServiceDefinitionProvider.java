@@ -86,22 +86,25 @@ public class ServiceDefinitionProvider implements IResourceProvider {
 					effective == null ? null : effective.getLowerBoundAsInstant(),
 					effective == null ? null : effective.getUpperBoundAsInstant(),
 					jurisdiction == null ? null : jurisdiction.getValue().toUpperCase(),
-					triggerIds, new Long(triggerIds.size()),
+					triggerIds, (long) triggerIds.size(),
 					experimental == null ? null : !"FALSE".equalsIgnoreCase(experimental.getValue())) :
 				serviceDefinitionRepository.search(
 					status == null ? null : PublicationStatus.valueOf(status.getValue().toUpperCase()),
 					effective == null ? null : effective.getLowerBoundAsInstant(),
 					effective == null ? null : effective.getUpperBoundAsInstant(),
 					jurisdiction == null ? null : jurisdiction.getValue().toUpperCase(),
-					useContexts, new Long(useContexts.size()),
-					triggerIds, new Long(triggerIds.size()),
+					useContexts, (long) useContexts.size(),
+					triggerIds, (long) triggerIds.size(),
 					experimental == null ? null : !"FALSE".equalsIgnoreCase(experimental.getValue()));
 		
 		Collection<ServiceDefinition> serviceDefinitions = new ArrayList<>();
 		
 		if (!entities.isEmpty()) 
-				entities.stream().forEach(entity -> 
-					serviceDefinitions.add(serviceDefinitionBuilder.createServiceDefinition(entity, true)));
+				entities.forEach(entity ->
+					serviceDefinitions.add(
+							serviceDefinitionBuilder.createServiceDefinition(
+									entity,
+									true)));
 		
 		return serviceDefinitions;
 	}

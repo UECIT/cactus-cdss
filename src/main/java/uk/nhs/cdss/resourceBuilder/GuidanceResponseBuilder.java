@@ -17,7 +17,6 @@ import org.hl7.fhir.dstu3.model.Immunization;
 import org.hl7.fhir.dstu3.model.MedicationAdministration;
 import org.hl7.fhir.dstu3.model.Observation;
 import org.hl7.fhir.dstu3.model.Parameters;
-import org.hl7.fhir.dstu3.model.Parameters.ParametersParameterComponent;
 import org.hl7.fhir.dstu3.model.Practitioner;
 import org.hl7.fhir.dstu3.model.ProcedureRequest;
 import org.hl7.fhir.dstu3.model.Provenance;
@@ -27,6 +26,7 @@ import org.hl7.fhir.dstu3.model.ReferralRequest;
 import org.hl7.fhir.dstu3.model.RequestGroup;
 import org.hl7.fhir.dstu3.model.RequestGroup.RequestIntent;
 import org.hl7.fhir.dstu3.model.RequestGroup.RequestStatus;
+import org.hl7.fhir.dstu3.model.Resource;
 import org.hl7.fhir.dstu3.model.ResourceType;
 import org.hl7.fhir.dstu3.model.ServiceDefinition;
 import org.hl7.fhir.dstu3.model.StringType;
@@ -47,391 +47,391 @@ import uk.nhs.cdss.utils.CarePlanUtil;
 import uk.nhs.cdss.utils.ProcedureRequestUtil;
 import uk.nhs.cdss.utils.ReferralRequestUtil;
 import uk.nhs.cdss.utils.RequestGroupUtil;
-import uk.nhs.cdss.utils.ResourceProviderUtils;
 
 @Component
 public class GuidanceResponseBuilder {
 
-	@Autowired
-	private CodedDataResourceBuilder codedDataResourceBuilder;
+  @Autowired
+  private CodedDataResourceBuilder codedDataResourceBuilder;
 
-	@Autowired
-	private ServiceDefinitionBuilder serviceDefinitionBuilder;
+  @Autowired
+  private ServiceDefinitionBuilder serviceDefinitionBuilder;
 
-	@Autowired
-	private DataRequirementBuilder dataRequirementBuilder;
+  @Autowired
+  private DataRequirementBuilder dataRequirementBuilder;
 
-	@Autowired
-	private DataRequirementRepository dataRequirementRepository;
+  @Autowired
+  private DataRequirementRepository dataRequirementRepository;
 
-	@Autowired
-	private ResultRepository resultRepository;
+  @Autowired
+  private ResultRepository resultRepository;
 
-	@Autowired
-	private ServiceDefinitionRepository serviceDefinitionRepository;
-	
-	@Autowired
-	private ResourceRepository resourceRepository;
-	
-	@Autowired
-	private IParser fhirParser;
-	
-	@Autowired
-	private CarePlanUtil carePlanUtil;
-	@Autowired
-	private RequestGroupUtil requestGroupUtil;
-	@Autowired
-	private ReferralRequestUtil referralRequestUtil;
-	@Autowired
-	private ProcedureRequestUtil procedureRequestUtil;
+  @Autowired
+  private ServiceDefinitionRepository serviceDefinitionRepository;
 
-	public GuidanceResponse buildGuidanceResponse(String requestId, Long serviceDefinitionId,
-			List<ParametersParameterComponent> inputData, List<DataRequirementEntity> matchedDataRequirementEntity,
-			boolean noSelection) {
+  @Autowired
+  private ResourceRepository resourceRepository;
 
-		GuidanceResponse guidanceResponse = new GuidanceResponse().setRequestId(requestId)
-				.setModule(new Reference(serviceDefinitionBuilder.createServiceDefinition(serviceDefinitionId)))
-				.setOccurrenceDateTime(new Date());
+  @Autowired
+  private IParser fhirParser;
 
-		populateOutputParameters(matchedDataRequirementEntity, guidanceResponse, noSelection);
+  @Autowired
+  private CarePlanUtil carePlanUtil;
+  @Autowired
+  private RequestGroupUtil requestGroupUtil;
+  @Autowired
+  private ReferralRequestUtil referralRequestUtil;
+  @Autowired
+  private ProcedureRequestUtil procedureRequestUtil;
 
-		DataRequirement nextDataRequirement = getNextDataRequirement(inputData, matchedDataRequirementEntity,
-				serviceDefinitionId);
+  public GuidanceResponse buildGuidanceResponse(String requestId, Long serviceDefinitionId,
+      List<Resource> inputData, List<DataRequirementEntity> matchedDataRequirementEntity,
+      boolean noSelection) {
 
-		if (nextDataRequirement != null) {
-			guidanceResponse.addDataRequirement(nextDataRequirement);
-			if (serviceDefinitionId == 3L) {
-				setCareAdvice(guidanceResponse);
-			}
-			guidanceResponse.setStatus(GuidanceResponseStatus.DATAREQUIRED);
-			
-			// Add support for data requested
-			if (serviceDefinitionId == 4L) {
-				guidanceResponse.setStatus(GuidanceResponseStatus.DATAREQUESTED);
-				// add interim result
-				setInterimResult(guidanceResponse);
-			}
-		}
+    GuidanceResponse guidanceResponse = new GuidanceResponse().setRequestId(requestId)
+        .setModule(new Reference(serviceDefinitionBuilder.createServiceDefinition(serviceDefinitionId)))
+        .setOccurrenceDateTime(new Date());
 
-		if (matchedDataRequirementEntity == null && nextDataRequirement == null) {
-			guidanceResponse.setStatus(GuidanceResponseStatus.SUCCESS);
-			setDisposition(guidanceResponse, serviceDefinitionId);
-		} else if (nextDataRequirement == null) {
-			guidanceResponse.setStatus(GuidanceResponseStatus.INPROGRESS);
-		}
-		return guidanceResponse;
-	}
+    populateOutputParameters(matchedDataRequirementEntity, guidanceResponse, noSelection);
 
-	private void populateOutputParameters(List<DataRequirementEntity> matchedDataRequirementEntity,
-			GuidanceResponse guidanceResponse, boolean noSelection) {
-		if (matchedDataRequirementEntity != null) {
-			Parameters outputParameters = new Parameters();
+    DataRequirement nextDataRequirement = getNextDataRequirement(inputData, matchedDataRequirementEntity,
+        serviceDefinitionId);
+
+    if (nextDataRequirement != null) {
+      guidanceResponse.addDataRequirement(nextDataRequirement);
+      if (serviceDefinitionId == 3L) {
+        setCareAdvice(guidanceResponse);
+      }
+      guidanceResponse.setStatus(GuidanceResponseStatus.DATAREQUIRED);
+
+      // Add support for data requested
+      if (serviceDefinitionId == 4L) {
+        guidanceResponse.setStatus(GuidanceResponseStatus.DATAREQUESTED);
+        // add interim result
+        setInterimResult(guidanceResponse);
+      }
+    }
+
+    if (matchedDataRequirementEntity == null && nextDataRequirement == null) {
+      guidanceResponse.setStatus(GuidanceResponseStatus.SUCCESS);
+      setDisposition(guidanceResponse, serviceDefinitionId);
+    } else if (nextDataRequirement == null) {
+      guidanceResponse.setStatus(GuidanceResponseStatus.INPROGRESS);
+    }
+    return guidanceResponse;
+  }
+
+  private void populateOutputParameters(List<DataRequirementEntity> matchedDataRequirementEntity,
+      GuidanceResponse guidanceResponse, boolean noSelection) {
+    if (matchedDataRequirementEntity != null) {
+      Parameters outputParameters = new Parameters();
 //			outputParameters.setId("#outputParameters");
 
-			for (DataRequirementEntity dataRequirementEntity : matchedDataRequirementEntity) {
-				dataRequirementEntity.getCodedData().forEach(codedData -> {
-					outputParameters.addParameter().setName("outputData")
-							.setResource(codedDataResourceBuilder.buildCodedDataResource(codedData, true, noSelection));
-				});
-			}
-			
-			ResourceEntity outputParametersEntity = new ResourceEntity();
-			outputParametersEntity.setResourceJson(fhirParser.encodeResourceToString(outputParameters));
-			outputParametersEntity.setResourceType(ResourceType.Parameters);
-			outputParametersEntity = resourceRepository.save(outputParametersEntity);
-			outputParameters.setId("/Parameters/" + outputParametersEntity.getId());
-			
-			guidanceResponse.setOutputParameters(new Reference(outputParameters));
-		}
-	}
+      for (DataRequirementEntity dataRequirementEntity : matchedDataRequirementEntity) {
+        dataRequirementEntity.getCodedData().forEach(codedData ->
+            outputParameters
+                .addParameter()
+                .setName("outputData")
+                .setResource(codedDataResourceBuilder.buildCodedDataResource(
+                    codedData,
+                    true,
+                    noSelection)));
+      }
 
-	private DataRequirement getNextDataRequirement(List<ParametersParameterComponent> inputData,
-			List<DataRequirementEntity> matchedDataRequirement, Long serviceDefinitionId) {
+      ResourceEntity outputParametersEntity = new ResourceEntity();
+      outputParametersEntity.setResourceJson(fhirParser.encodeResourceToString(outputParameters));
+      outputParametersEntity.setResourceType(ResourceType.Parameters);
+      outputParametersEntity = resourceRepository.save(outputParametersEntity);
+      outputParameters.setId("/Parameters/" + outputParametersEntity.getId());
 
-		// get list of known observation/immunization snomed codes
-		List<String> observationInputCodes = new ArrayList<>();
-		List<String> immunizationInputCodes = new ArrayList<>();
-		List<String> medicationInputCodes = new ArrayList<>();
+      guidanceResponse.setOutputParameters(new Reference(outputParameters));
+    }
+  }
 
-		populateInputCodes(inputData, observationInputCodes, immunizationInputCodes, medicationInputCodes);
+  private DataRequirement getNextDataRequirement(List<Resource> inputData,
+      List<DataRequirementEntity> matchedDataRequirement, Long serviceDefinitionId) {
 
-		// match input codes against data requirements to find unknown data
-		List<DataRequirementEntity> unknownDataRequirements = new ArrayList<>();
+    // get list of known observation/immunization snomed codes
+    List<String> observationInputCodes = new ArrayList<>();
+    List<String> immunizationInputCodes = new ArrayList<>();
+    List<String> medicationInputCodes = new ArrayList<>();
 
-		populateUnknownDataRequirements(matchedDataRequirement, serviceDefinitionId, observationInputCodes,
-				immunizationInputCodes, medicationInputCodes, unknownDataRequirements);
+    populateInputCodes(inputData, observationInputCodes, immunizationInputCodes, medicationInputCodes);
 
-		// return first unknown data requirement
-		if (unknownDataRequirements.size() > 0) {
-			return dataRequirementBuilder.buildNextDataRequirement(unknownDataRequirements.get(0));
-		}
-		return null;
-	}
+    // match input codes against data requirements to find unknown data
+    List<DataRequirementEntity> unknownDataRequirements = new ArrayList<>();
 
-	private void populateInputCodes(List<ParametersParameterComponent> inputData, List<String> observationCodes,
-			List<String> immunizationCodes, List<String> medicationCodes) {
-		inputData.stream().filter(data -> !(data.getResource() instanceof QuestionnaireResponse)).forEach(parameter -> {
-			if (parameter.getResource() instanceof Observation) {
-				Observation observation = ResourceProviderUtils.castToType(parameter.getResource(), Observation.class);
-				observationCodes.add(observation.getCode().getCodingFirstRep().getCode());
-			} else if (parameter.getResource() instanceof Immunization) {
-				Immunization immunization = ResourceProviderUtils.castToType(parameter.getResource(),
-						Immunization.class);
-				immunizationCodes.add(immunization.getVaccineCode().getCodingFirstRep().getCode());
-			} else if (parameter.getResource() instanceof MedicationAdministration) {
-				MedicationAdministration medication = ResourceProviderUtils.castToType(parameter.getResource(),
-						MedicationAdministration.class);
-				try {
-					medicationCodes.add(medication.getMedicationCodeableConcept().getCodingFirstRep().getCode());
-				} catch (FHIRException e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
+    populateUnknownDataRequirements(matchedDataRequirement, serviceDefinitionId, observationInputCodes,
+        immunizationInputCodes, medicationInputCodes, unknownDataRequirements);
 
-	private void populateUnknownDataRequirements(List<DataRequirementEntity> matchedDataRequirement,
-			Long serviceDefinitionId, List<String> observationCodes, List<String> immunizationCodes,
-			List<String> medicationCodes, List<DataRequirementEntity> unknownDataRequirements) {
-		List<DataRequirementEntity> dataRequirements = dataRequirementRepository
-				.findByServiceDefinitionId(serviceDefinitionId);
+    // return first unknown data requirement
+    if (unknownDataRequirements.size() > 0) {
+      return dataRequirementBuilder.buildNextDataRequirement(unknownDataRequirements.get(0));
+    }
+    return null;
+  }
 
-		dataRequirements.stream().filter(entity -> matchedDataRequirement == null
-				|| !checkMatchedDataRequirement(matchedDataRequirement, entity.getId())).forEach(entity -> {
-					entity.getCodedData().forEach(codedDataEntity -> {
-						if (codedDataEntity.getType().equals("observation")
-								&& !observationCodes.contains(codedDataEntity.getCode())) {
-							unknownDataRequirements.add(entity);
-						} else if (codedDataEntity.getType().equals("immunization")
-								&& !immunizationCodes.contains(codedDataEntity.getCode())) {
-							unknownDataRequirements.add(entity);
-						} else if (codedDataEntity.getType().equals("medication")
-								&& !medicationCodes.contains(codedDataEntity.getCode())) {
-							unknownDataRequirements.add(entity);
-						}
-					});
-				});
-	}
+  private void populateInputCodes(List<Resource> inputData, List<String> observationCodes,
+      List<String> immunizationCodes, List<String> medicationCodes) {
+    inputData.stream().filter(data -> !(data instanceof QuestionnaireResponse)).forEach(parameter -> {
+      if (parameter instanceof Observation) {
+        Observation observation = (Observation) parameter;
+        observationCodes.add(observation.getCode().getCodingFirstRep().getCode());
+      } else if (parameter instanceof Immunization) {
+        Immunization immunization = (Immunization) parameter;
+        immunizationCodes.add(immunization.getVaccineCode().getCodingFirstRep().getCode());
+      } else if (parameter instanceof MedicationAdministration) {
+        MedicationAdministration medication = (MedicationAdministration) parameter;
+        try {
+          medicationCodes.add(medication.getMedicationCodeableConcept().getCodingFirstRep().getCode());
+        } catch (FHIRException e) {
+          e.printStackTrace();
+        }
+      }
+    });
+  }
 
-	private boolean checkMatchedDataRequirement(List<DataRequirementEntity> matchedDataRequirement, Long id) {
-		for (DataRequirementEntity dataRequirementEntity : matchedDataRequirement) {
-			if (dataRequirementEntity.getId() == id) {
-				return true;
-			}
-		}
-		return false;
-	}
+  private void populateUnknownDataRequirements(List<DataRequirementEntity> matchedDataRequirement,
+      Long serviceDefinitionId, List<String> observationCodes, List<String> immunizationCodes,
+      List<String> medicationCodes, List<DataRequirementEntity> unknownDataRequirements) {
+    List<DataRequirementEntity> dataRequirements = dataRequirementRepository
+        .findByServiceDefinitionId(serviceDefinitionId);
 
-	// Build Result for a guidanceResponse
-	private void setDisposition(GuidanceResponse guidanceResponse, Long serviceDefinitionId) {
-		ResultEntity resultEntity = resultRepository.findDistinctByServiceDefinitionId(serviceDefinitionId);
-		ServiceDefinitionEntity serviceDefinitionEntity = serviceDefinitionRepository.findById(serviceDefinitionId).get();
-		String description = serviceDefinitionEntity.getDescription();
-		String[] cheifConcernArray = description.split("\\d\\D+");
+    dataRequirements.stream().filter(entity -> matchedDataRequirement == null
+        || !checkMatchedDataRequirement(matchedDataRequirement, entity.getId())).forEach(entity ->
+        entity.getCodedData().forEach(codedDataEntity -> {
+          if (codedDataEntity.getType().equals("observation")
+              && !observationCodes.contains(codedDataEntity.getCode())) {
+            unknownDataRequirements.add(entity);
+          } else if (codedDataEntity.getType().equals("immunization")
+              && !immunizationCodes.contains(codedDataEntity.getCode())) {
+            unknownDataRequirements.add(entity);
+          } else if (codedDataEntity.getType().equals("medication")
+              && !medicationCodes.contains(codedDataEntity.getCode())) {
+            unknownDataRequirements.add(entity);
+          }
+        }));
+  }
 
-		// Generate Fhir Resources - result/careadvice
-		CarePlan result = carePlanUtil.buildResultCarePlan(resultEntity);
-		
-		RequestGroup requestGroup = requestGroupUtil.buildRequestGroup(RequestStatus.ACTIVE, RequestIntent.ORDER);
-		
-		guidanceResponse.setResult(new Reference(requestGroup));
-		
-		// Persist requestGroup
-		ResourceEntity requestGroupEntity = new ResourceEntity();
-		// at the end of the headache triage, add a ActivityDefinition sending the user to the mental health triage.
-		if (serviceDefinitionId == 2l) {
-			ServiceDefinition serviceDefinition = serviceDefinitionBuilder.createServiceDefinition(7l);
-			guidanceResponse.getDataRequirement().add(serviceDefinition.getTrigger().get(0).getEventData());
-		} 
-		
-		if (serviceDefinitionId == 3l) {
-			CarePlan selfCare = carePlanUtil.buildResultCarePlan(resultEntity);
-			
-			ResourceEntity careResult = new ResourceEntity();
-			careResult.setResourceJson(fhirParser.encodeResourceToString(selfCare));
-			careResult.setResourceType(ResourceType.CarePlan);
-			requestGroupEntity.addChild(careResult);
-		} else {
-			CarePlan careAdvice1 = carePlanUtil.buildCarePlan1();
-			CarePlan careAdvice2 = carePlanUtil.buildCarePlan2();
-				
-			ReferralRequest referralRequest = addReferralRequest(guidanceResponse, result, cheifConcernArray);
-			Provenance provenance = referralRequestUtil.buildProvenance();
-			Practitioner practitioner = referralRequestUtil.buildPractitioner();
-			
-			Coding fhirCoding = new Coding().setCode(resultEntity.getCodedData().getCode())
-					.setSystem("https://www.hl7.org/fhir/stu3/valueset-c80-practice-codes.html")
-					.setDisplay(resultEntity.getCodedData().getDisplay());
-			
-			referralRequest.addServiceRequested().setCoding(Collections.singletonList(fhirCoding));
-			
-			ResourceEntity referralRequestEntity = new ResourceEntity();
-			referralRequestEntity.setResourceJson(fhirParser.encodeResourceToString(referralRequest));
-			referralRequestEntity.setResourceType(ResourceType.ReferralRequest);
-			requestGroupEntity.addChild(referralRequestEntity);
-			
-			// Persist provenance
-			ResourceEntity provenanceEntity = new ResourceEntity();
-			provenanceEntity.setResourceJson(fhirParser.encodeResourceToString(provenance));
-			provenanceEntity.setResourceType(ResourceType.Provenance);
-			referralRequestEntity.addChild(provenanceEntity);
-									
-			// Persist practitioner
-			ResourceEntity practitionerEntity = new ResourceEntity();
-			practitionerEntity.setResourceJson(fhirParser.encodeResourceToString(practitioner));
-			practitionerEntity.setResourceType(ResourceType.Practitioner);
-			provenanceEntity.addChild(practitionerEntity);
-			
-			// Persist careAdvice1
-			ResourceEntity careAdviceEntity1 = new ResourceEntity();
-			careAdviceEntity1.setResourceJson(fhirParser.encodeResourceToString(careAdvice1));
-			careAdviceEntity1.setResourceType(ResourceType.CarePlan);
-			
-			// Persist careAdvice2
-			ResourceEntity careAdviceEntity2 = new ResourceEntity();
-			careAdviceEntity2.setResourceJson(fhirParser.encodeResourceToString(careAdvice2));
-			careAdviceEntity2.setResourceType(ResourceType.CarePlan);
-			
-			requestGroupEntity.addChild(careAdviceEntity1);
-			requestGroupEntity.addChild(careAdviceEntity2);
-			
-			if (serviceDefinitionId == 5l) {
-				ProcedureRequest procedureRequest = procedureRequestUtil.buildProcedureRequest();
-				
-				ResourceEntity procedureRequestEntity = new ResourceEntity ();
-				procedureRequestEntity.setResourceJson(fhirParser.encodeResourceToString(procedureRequest));
-				procedureRequestEntity.setResourceType(ResourceType.ProcedureRequest);
-				referralRequestEntity.addChild(procedureRequestEntity);
-			}
-		}
-		
-		requestGroupEntity.setResourceJson(fhirParser.encodeResourceToString(requestGroup));
-		requestGroupEntity.setResourceType(ResourceType.RequestGroup);
-		requestGroupEntity = resourceRepository.save(requestGroupEntity);
-		
-		requestGroup.setId("/RequestGroup/" + requestGroupEntity.getId());
-	}
-	
-	// Build an Interim Result for a guidanceResponse
-	private void setInterimResult(GuidanceResponse guidanceResponse) {
-		// Generate Fhir Resources - interim result/careadvice
-		RequestGroup requestGroup = requestGroupUtil.buildRequestGroup(RequestStatus.DRAFT, RequestIntent.ORDER);
-		CarePlan careAdvice1 = carePlanUtil.buildCarePlan1();
-		ReferralRequest referralRequest = referralRequestUtil.buildReferralRequest();
-		Provenance provenance = referralRequestUtil.buildProvenance();
-		Practitioner practitioner = referralRequestUtil.buildPractitioner();
-		
-		
-		// Build relationships
-		guidanceResponse.setResult(new Reference(requestGroup));
-		
-		// Persist ReferralRequest
-		ResourceEntity referralRequestEntity = new ResourceEntity();
-		referralRequestEntity.setResourceJson(fhirParser.encodeResourceToString(referralRequest));
-		referralRequestEntity.setResourceType(ResourceType.ReferralRequest);
-		
-		// Persist careAdvice1
-		ResourceEntity careAdviceEntity = new ResourceEntity();
-		careAdviceEntity.setResourceJson(fhirParser.encodeResourceToString(careAdvice1));
-		careAdviceEntity.setResourceType(ResourceType.CarePlan);
-		
-		// Persist provenance
-		ResourceEntity provenanceEntity = new ResourceEntity();
-		provenanceEntity.setResourceJson(fhirParser.encodeResourceToString(provenance));
-		provenanceEntity.setResourceType(ResourceType.Provenance);
-		
-		// Persist practitioner
-		ResourceEntity practitionerEntity = new ResourceEntity();
-		practitionerEntity.setResourceJson(fhirParser.encodeResourceToString(practitioner));
-		practitionerEntity.setResourceType(ResourceType.Practitioner);
-		
-		// Persist requestGroup
-		ResourceEntity requestGroupEntity = new ResourceEntity();
-		requestGroupEntity.addChild(referralRequestEntity);
-		referralRequestEntity.addChild(provenanceEntity);
-		provenanceEntity.addChild(practitionerEntity);
-		requestGroupEntity.addChild(careAdviceEntity);
-		requestGroupEntity.setResourceJson(fhirParser.encodeResourceToString(requestGroup));
-		requestGroupEntity.setResourceType(ResourceType.RequestGroup);
-		requestGroupEntity = resourceRepository.save(requestGroupEntity);
-		
-		requestGroup.setId("/RequestGroup/" + requestGroupEntity.getId());
-		
-	}
-	
-	// Build care advice for a guidanceResponse
-	private void setCareAdvice(GuidanceResponse guidanceResponse) {
-		// Generate Fhir Resources - careadvice
-		RequestGroup requestGroup = requestGroupUtil.buildRequestGroup(RequestStatus.ACTIVE, RequestIntent.ORDER);
-		CarePlan careAdvice1 = carePlanUtil.buildCarePlan1();
-		
-		// Build relationships
-		guidanceResponse.setResult(new Reference(requestGroup));
-		
-		// Persist careAdvice1
-		ResourceEntity careAdviceEntity = new ResourceEntity();
-		careAdviceEntity.setResourceJson(fhirParser.encodeResourceToString(careAdvice1));
-		careAdviceEntity.setResourceType(ResourceType.CarePlan);
-		
-		// Persist requestGroup
-		ResourceEntity requestGroupEntity = new ResourceEntity();
-		requestGroupEntity.addChild(careAdviceEntity);
-		requestGroupEntity.setResourceJson(fhirParser.encodeResourceToString(requestGroup));
-		requestGroupEntity.setResourceType(ResourceType.RequestGroup);
-		requestGroupEntity = resourceRepository.save(requestGroupEntity);
-		
-		requestGroup.setId("/RequestGroup/" + requestGroupEntity.getId());
-	}
+  private boolean checkMatchedDataRequirement(List<DataRequirementEntity> matchedDataRequirement, Long id) {
+    for (DataRequirementEntity dataRequirementEntity : matchedDataRequirement) {
+      if (dataRequirementEntity.getId().equals(id)) {
+        return true;
+      }
+    }
+    return false;
+  }
 
-	// used to add ReferralRequest to carePlan for result display.
-	private ReferralRequest addReferralRequest(GuidanceResponse guidanceResponse, CarePlan result,
-			String[] cheifConcernArray) {
-		ReferralRequest referralRequest = new ReferralRequest();
-		referralRequest.setStatus(ReferralRequest.ReferralRequestStatus.ACTIVE);
-		referralRequest.setPriority(ReferralRequest.ReferralPriority.ROUTINE);
+  // Build Result for a guidanceResponse
+  private void setDisposition(GuidanceResponse guidanceResponse, Long serviceDefinitionId) {
+    ResultEntity resultEntity = resultRepository.findDistinctByServiceDefinitionId(serviceDefinitionId);
+    ServiceDefinitionEntity serviceDefinitionEntity = serviceDefinitionRepository.findById(serviceDefinitionId).get();
+    String description = serviceDefinitionEntity.getDescription();
+    String[] cheifConcernArray = description.split("\\d\\D+");
 
-		referralRequest.setOccurrence(new DateTimeType(new Date()));
+    // Generate Fhir Resources - result/careadvice
+    CarePlan result = carePlanUtil.buildResultCarePlan(resultEntity);
 
-		String description = result.getActivityFirstRep().getOutcomeCodeableConceptFirstRep().getCodingFirstRep()
-				.getDisplay();
-		referralRequest.setDescription(description);
+    RequestGroup requestGroup = requestGroupUtil.buildRequestGroup(RequestStatus.ACTIVE, RequestIntent.ORDER);
 
-		Coding coding = new Coding().setCode("360");
-		coding.setSystem("SG");
-		referralRequest.addServiceRequested().setCoding(Collections.singletonList(coding));
+    guidanceResponse.setResult(new Reference(requestGroup));
 
-		Coding coding2 = new Coding().setCode("14023");
-		coding2.setSystem("SD");
-		referralRequest.addServiceRequested().setCoding(Collections.singletonList(coding2));
+    // Persist requestGroup
+    ResourceEntity requestGroupEntity = new ResourceEntity();
+    // at the end of the headache triage, add a ActivityDefinition sending the user to the mental health triage.
+    if (serviceDefinitionId == 2L) {
+      ServiceDefinition serviceDefinition = serviceDefinitionBuilder.createServiceDefinition(7L);
+      guidanceResponse.getDataRequirement().add(serviceDefinition.getTrigger().get(0).getEventData());
+    }
 
-		CodeableConcept codeableConcept = new CodeableConcept();
-		codeableConcept.addCoding().setCode("cardio");
+    if (serviceDefinitionId == 3L) {
+      CarePlan selfCare = carePlanUtil.buildResultCarePlan(resultEntity);
 
-		referralRequest.setSpecialty(codeableConcept);
-		String[] concernsArray = cheifConcernArray[0].split(" and ");
-		
-		Reference reference = new Reference();
-		try {
-			reference.setDisplay("Chief concern: " + concernsArray[0]);
-			referralRequest.addReasonReference(reference);
-			
-			referralRequest.addReasonCode(new CodeableConcept().addCoding(new Coding()
-					.setCode("439401001")
-					.setSystem("http://snomed.info/sct")
-					.setDisplay("Diagnosis")));
-		} catch (Exception e) {}
+      ResourceEntity careResult = new ResourceEntity();
+      careResult.setResourceJson(fhirParser.encodeResourceToString(selfCare));
+      careResult.setResourceType(ResourceType.CarePlan);
+      requestGroupEntity.addChild(careResult);
+    } else {
+      CarePlan careAdvice1 = carePlanUtil.buildCarePlan1();
+      CarePlan careAdvice2 = carePlanUtil.buildCarePlan2();
 
-		try {
-			referralRequest.addSupportingInfo().setDisplay("Chief concern: " + concernsArray[0]);
-		} catch (Exception e) {}
+      ReferralRequest referralRequest = addReferralRequest(guidanceResponse, result, cheifConcernArray);
+      Provenance provenance = referralRequestUtil.buildProvenance();
+      Practitioner practitioner = referralRequestUtil.buildPractitioner();
 
-		try {
-			referralRequest.addSupportingInfo().setDisplay("Secondary concern: " + concernsArray[1]);
-		} catch (Exception e) {}
+      Coding fhirCoding = new Coding().setCode(resultEntity.getCodedData().getCode())
+          .setSystem("https://www.hl7.org/fhir/stu3/valueset-c80-practice-codes.html")
+          .setDisplay(resultEntity.getCodedData().getDisplay());
 
-		referralRequest.addNote(new CareConnectAnnotation(new StringType("All okay")));
-		referralRequest.addRecipient().setReference("https://www.hl7.org/fhir/practitioner.html");
+      referralRequest.addServiceRequested().setCoding(Collections.singletonList(fhirCoding));
 
-		return referralRequest;
-	}
+      ResourceEntity referralRequestEntity = new ResourceEntity();
+      referralRequestEntity.setResourceJson(fhirParser.encodeResourceToString(referralRequest));
+      referralRequestEntity.setResourceType(ResourceType.ReferralRequest);
+      requestGroupEntity.addChild(referralRequestEntity);
+
+      // Persist provenance
+      ResourceEntity provenanceEntity = new ResourceEntity();
+      provenanceEntity.setResourceJson(fhirParser.encodeResourceToString(provenance));
+      provenanceEntity.setResourceType(ResourceType.Provenance);
+      referralRequestEntity.addChild(provenanceEntity);
+
+      // Persist practitioner
+      ResourceEntity practitionerEntity = new ResourceEntity();
+      practitionerEntity.setResourceJson(fhirParser.encodeResourceToString(practitioner));
+      practitionerEntity.setResourceType(ResourceType.Practitioner);
+      provenanceEntity.addChild(practitionerEntity);
+
+      // Persist careAdvice1
+      ResourceEntity careAdviceEntity1 = new ResourceEntity();
+      careAdviceEntity1.setResourceJson(fhirParser.encodeResourceToString(careAdvice1));
+      careAdviceEntity1.setResourceType(ResourceType.CarePlan);
+
+      // Persist careAdvice2
+      ResourceEntity careAdviceEntity2 = new ResourceEntity();
+      careAdviceEntity2.setResourceJson(fhirParser.encodeResourceToString(careAdvice2));
+      careAdviceEntity2.setResourceType(ResourceType.CarePlan);
+
+      requestGroupEntity.addChild(careAdviceEntity1);
+      requestGroupEntity.addChild(careAdviceEntity2);
+
+      if (serviceDefinitionId == 5L) {
+        ProcedureRequest procedureRequest = procedureRequestUtil.buildProcedureRequest();
+
+        ResourceEntity procedureRequestEntity = new ResourceEntity ();
+        procedureRequestEntity.setResourceJson(fhirParser.encodeResourceToString(procedureRequest));
+        procedureRequestEntity.setResourceType(ResourceType.ProcedureRequest);
+        referralRequestEntity.addChild(procedureRequestEntity);
+      }
+    }
+
+    requestGroupEntity.setResourceJson(fhirParser.encodeResourceToString(requestGroup));
+    requestGroupEntity.setResourceType(ResourceType.RequestGroup);
+    requestGroupEntity = resourceRepository.save(requestGroupEntity);
+
+    requestGroup.setId("/RequestGroup/" + requestGroupEntity.getId());
+  }
+
+  // Build an Interim Result for a guidanceResponse
+  private void setInterimResult(GuidanceResponse guidanceResponse) {
+    // Generate Fhir Resources - interim result/careadvice
+    RequestGroup requestGroup = requestGroupUtil.buildRequestGroup(RequestStatus.DRAFT, RequestIntent.ORDER);
+    CarePlan careAdvice1 = carePlanUtil.buildCarePlan1();
+    ReferralRequest referralRequest = referralRequestUtil.buildReferralRequest();
+    Provenance provenance = referralRequestUtil.buildProvenance();
+    Practitioner practitioner = referralRequestUtil.buildPractitioner();
+
+
+    // Build relationships
+    guidanceResponse.setResult(new Reference(requestGroup));
+
+    // Persist ReferralRequest
+    ResourceEntity referralRequestEntity = new ResourceEntity();
+    referralRequestEntity.setResourceJson(fhirParser.encodeResourceToString(referralRequest));
+    referralRequestEntity.setResourceType(ResourceType.ReferralRequest);
+
+    // Persist careAdvice1
+    ResourceEntity careAdviceEntity = new ResourceEntity();
+    careAdviceEntity.setResourceJson(fhirParser.encodeResourceToString(careAdvice1));
+    careAdviceEntity.setResourceType(ResourceType.CarePlan);
+
+    // Persist provenance
+    ResourceEntity provenanceEntity = new ResourceEntity();
+    provenanceEntity.setResourceJson(fhirParser.encodeResourceToString(provenance));
+    provenanceEntity.setResourceType(ResourceType.Provenance);
+
+    // Persist practitioner
+    ResourceEntity practitionerEntity = new ResourceEntity();
+    practitionerEntity.setResourceJson(fhirParser.encodeResourceToString(practitioner));
+    practitionerEntity.setResourceType(ResourceType.Practitioner);
+
+    // Persist requestGroup
+    ResourceEntity requestGroupEntity = new ResourceEntity();
+    requestGroupEntity.addChild(referralRequestEntity);
+    referralRequestEntity.addChild(provenanceEntity);
+    provenanceEntity.addChild(practitionerEntity);
+    requestGroupEntity.addChild(careAdviceEntity);
+    requestGroupEntity.setResourceJson(fhirParser.encodeResourceToString(requestGroup));
+    requestGroupEntity.setResourceType(ResourceType.RequestGroup);
+    requestGroupEntity = resourceRepository.save(requestGroupEntity);
+
+    requestGroup.setId("/RequestGroup/" + requestGroupEntity.getId());
+
+  }
+
+  // Build care advice for a guidanceResponse
+  private void setCareAdvice(GuidanceResponse guidanceResponse) {
+    // Generate Fhir Resources - careadvice
+    RequestGroup requestGroup = requestGroupUtil.buildRequestGroup(RequestStatus.ACTIVE, RequestIntent.ORDER);
+    CarePlan careAdvice1 = carePlanUtil.buildCarePlan1();
+
+    // Build relationships
+    guidanceResponse.setResult(new Reference(requestGroup));
+
+    // Persist careAdvice1
+    ResourceEntity careAdviceEntity = new ResourceEntity();
+    careAdviceEntity.setResourceJson(fhirParser.encodeResourceToString(careAdvice1));
+    careAdviceEntity.setResourceType(ResourceType.CarePlan);
+
+    // Persist requestGroup
+    ResourceEntity requestGroupEntity = new ResourceEntity();
+    requestGroupEntity.addChild(careAdviceEntity);
+    requestGroupEntity.setResourceJson(fhirParser.encodeResourceToString(requestGroup));
+    requestGroupEntity.setResourceType(ResourceType.RequestGroup);
+    requestGroupEntity = resourceRepository.save(requestGroupEntity);
+
+    requestGroup.setId("/RequestGroup/" + requestGroupEntity.getId());
+  }
+
+  // used to add ReferralRequest to carePlan for result display.
+  private ReferralRequest addReferralRequest(GuidanceResponse guidanceResponse, CarePlan result,
+      String[] chiefConcernArray) {
+    ReferralRequest referralRequest = new ReferralRequest();
+    referralRequest.setStatus(ReferralRequest.ReferralRequestStatus.ACTIVE);
+    referralRequest.setPriority(ReferralRequest.ReferralPriority.ROUTINE);
+
+    referralRequest.setOccurrence(new DateTimeType(new Date()));
+
+    String description = result.getActivityFirstRep().getOutcomeCodeableConceptFirstRep().getCodingFirstRep()
+        .getDisplay();
+    referralRequest.setDescription(description);
+
+    Coding coding = new Coding().setCode("360");
+    coding.setSystem("SG");
+    referralRequest.addServiceRequested().setCoding(Collections.singletonList(coding));
+
+    Coding coding2 = new Coding().setCode("14023");
+    coding2.setSystem("SD");
+    referralRequest.addServiceRequested().setCoding(Collections.singletonList(coding2));
+
+    CodeableConcept codeableConcept = new CodeableConcept();
+    codeableConcept.addCoding().setCode("cardio");
+
+    referralRequest.setSpecialty(codeableConcept);
+    String[] concernsArray = chiefConcernArray[0].split(" and ");
+
+    Reference reference = new Reference();
+    try {
+      reference.setDisplay("Chief concern: " + concernsArray[0]);
+      referralRequest.addReasonReference(reference);
+
+      referralRequest.addReasonCode(new CodeableConcept().addCoding(new Coding()
+          .setCode("439401001")
+          .setSystem("http://snomed.info/sct")
+          .setDisplay("Diagnosis")));
+    } catch (Exception e) {}
+
+    try {
+      referralRequest.addSupportingInfo().setDisplay("Chief concern: " + concernsArray[0]);
+    } catch (Exception e) {}
+
+    try {
+      referralRequest.addSupportingInfo().setDisplay("Secondary concern: " + concernsArray[1]);
+    } catch (Exception e) {}
+
+    referralRequest.addNote(new CareConnectAnnotation(new StringType("All okay")));
+    referralRequest.addRecipient().setReference("https://www.hl7.org/fhir/practitioner.html");
+
+    return referralRequest;
+  }
 }
