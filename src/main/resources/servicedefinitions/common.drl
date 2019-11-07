@@ -68,6 +68,7 @@ when
     Answered( $q.id; )
     not Answered( $q.next; )
     not Questionnaire( id == $q.next )
+    not CarePlan()
 then
     System.out.println("Have answer for " + $q.getId() + ": requesting questionnaire " + $q.getNext());
     insert( new Questionnaire($q.getNext()) );

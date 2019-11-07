@@ -49,7 +49,13 @@ public class ObservationTransformerImpl implements ObservationTransformer {
     var observation = new Observation();
 
     observation.setId(from.getId());
-    observation.setIssued(Date.from(from.getIssued()));
+
+    var isRecentlyCreated = from.getIssued() == null;
+    if (isRecentlyCreated) {
+      observation.setIssued(new Date());
+    } else {
+      observation.setIssued(Date.from(from.getIssued()));
+    }
 
     observation.setValue(typeTransformer.transform(from.getValue()));
     observation.setStatus(statusTransformer.transform(from.getStatus()));

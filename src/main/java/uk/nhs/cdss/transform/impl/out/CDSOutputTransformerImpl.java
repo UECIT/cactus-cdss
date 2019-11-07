@@ -50,7 +50,7 @@ public class CDSOutputTransformerImpl implements CDSOutputTransformer {
   private static CarePlan buildSelfCarePlan() {
     CarePlan plan = new CareConnectCarePlan();
     plan.setTitle("Self care");
-    plan.setId("#careAdvice1");
+    plan.setId("selfCare");
     plan.setStatus(CarePlanStatus.ACTIVE);
     plan.setIntent(CarePlanIntent.OPTION);
 
@@ -76,7 +76,7 @@ public class CDSOutputTransformerImpl implements CDSOutputTransformer {
   private static CarePlan buildCall999Plan() {
     CarePlan plan = new CareConnectCarePlan();
     plan.setTitle("Call 999");
-    plan.setId("#careAdvice2");
+    plan.setId("call999");
     plan.setStatus(CarePlanStatus.ACTIVE);
     plan.setIntent(CarePlanIntent.OPTION);
 

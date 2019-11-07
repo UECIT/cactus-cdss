@@ -51,7 +51,8 @@ public final class AssertionTransformerImpl implements AssertionTransformer {
         from.getId(),
         statusTransformer.transform(from.getStatus()));
 
-    assertion.setIssued(from.getIssued().toInstant());
+    // TODO: depends on the EMS populating it
+//    assertion.setIssued(from.getIssued().toInstant());
     assertion.setValue(valueTransformer.transform(from.getValue()));
 
     assertion.setCode(codeTransformer.transform(from.getCode()));

@@ -60,7 +60,7 @@ public class EvaluateService {
 
   @Obsolete
   public GuidanceResponse getGuidanceResponse(Bundle bundle, Long serviceDefinitionId) {
-    return getGuidanceResponse((Parameters)bundle.getEntry().get(0).getResource(), serviceDefinitionId);
+    return getGuidanceResponseNew((Parameters)bundle.getEntry().get(0).getResource(), serviceDefinitionId);
   }
 
   @Obsolete

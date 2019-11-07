@@ -67,7 +67,7 @@ public class ServiceDefinitionProvider implements IResourceProvider {
       @ResourceParam Resource resource) {
     return ResourceType.Parameters.equals(resource.getResourceType()) ?
         evaluateService
-            .getGuidanceResponse((Parameters) resource, serviceDefinitionId.getIdPartAsLong()) :
+            .getGuidanceResponseNew((Parameters) resource, serviceDefinitionId.getIdPartAsLong()) :
         evaluateService
             .getGuidanceResponse((Bundle) resource, serviceDefinitionId.getIdPartAsLong());
   }
