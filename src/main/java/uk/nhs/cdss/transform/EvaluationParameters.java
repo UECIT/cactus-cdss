@@ -12,6 +12,7 @@ import org.hl7.fhir.dstu3.model.Parameters.ParametersParameterComponent;
 import org.hl7.fhir.dstu3.model.QuestionnaireResponse;
 import org.hl7.fhir.dstu3.model.Reference;
 import org.hl7.fhir.dstu3.model.Resource;
+import org.hl7.fhir.dstu3.model.StringType;
 import uk.nhs.cdss.OperationOutcomeFactory;
 import uk.nhs.cdss.SystemCode;
 
@@ -30,7 +31,10 @@ public class EvaluationParameters {
     var parameters = source.getParameter();
 
     var requestIdParameter = getParameterByName(parameters, REQUEST_ID);
-    requestId = castToType(requestIdParameter.getValue(), IdType.class)
+    // TODO NCTH-111
+//    requestId = castToType(requestIdParameter.getValue(), IdType.class)
+//        .asStringValue();
+    requestId = castToType(requestIdParameter.getValue(), StringType.class)
         .asStringValue();
 
     // TODO: depends on the EMS providing an encounter
