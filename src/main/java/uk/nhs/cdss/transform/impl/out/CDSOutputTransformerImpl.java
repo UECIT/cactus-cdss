@@ -50,7 +50,7 @@ public class CDSOutputTransformerImpl implements CDSOutputTransformer {
   private static CarePlan buildSelfCarePlan() {
     CarePlan plan = new CareConnectCarePlan();
     plan.setTitle("Self care");
-    plan.setId("#careAdvice1");
+    plan.setId("selfCare");
     plan.setStatus(CarePlanStatus.ACTIVE);
     plan.setIntent(CarePlanIntent.OPTION);
 
@@ -76,7 +76,7 @@ public class CDSOutputTransformerImpl implements CDSOutputTransformer {
   private static CarePlan buildCall999Plan() {
     CarePlan plan = new CareConnectCarePlan();
     plan.setTitle("Call 999");
-    plan.setId("#careAdvice2");
+    plan.setId("call999");
     plan.setStatus(CarePlanStatus.ACTIVE);
     plan.setIntent(CarePlanIntent.OPTION);
 
@@ -198,12 +198,12 @@ public class CDSOutputTransformerImpl implements CDSOutputTransformer {
   public GuidanceResponse transform(CDSOutputBundle bundle) {
     var result = bundle.getOutput().getResult();
 
-    var serviceDefinition = serviceDefinitionBuilder.createServiceDefinition(
-        bundle.getServiceDefinitionId());
+    var serviceDefinition = new Reference(
+        "ServiceDefinition/" + bundle.getServiceDefinitionId());
     var response = new GuidanceResponse()
         .setOccurrenceDateTime(new Date())
         .setRequestId(bundle.getParameters().getRequestId())
-        .setModule(new Reference(serviceDefinition))
+        .setModule(serviceDefinition)
         .setContext(bundle.getParameters().getEncounter())
         .setStatus(statusTransformer.transform(result.getStatus()));
 

@@ -1,5 +1,6 @@
 package uk.nhs.cdss.transform.impl.out;
 
+import org.hl7.fhir.dstu3.model.Coding;
 import org.hl7.fhir.dstu3.model.Questionnaire.QuestionnaireItemOptionComponent;
 import org.hl7.fhir.dstu3.model.StringType;
 import org.hl7.fhir.dstu3.model.Type;
@@ -11,11 +12,17 @@ import uk.nhs.cdss.transform.Transformers.OptionTypeTransformer;
 public class OptionTypeTransformerImpl implements OptionTypeTransformer {
 
   private Type getType(OptionType option) {
-    if (option.hasStringValue()) {
-      return new StringType(option.getStringValue());
-    }
+    // TODO: required for compatibility with EMS expectations (for now)
+    return new Coding(
+        "defaultCoding.com",
+        option.getStringValue(),
+        option.getStringValue());
 
-    return null;
+//    if (option.hasStringValue()) {
+//      return new StringType(option.getStringValue());
+//    }
+//
+//    return null;
   }
 
   @Override

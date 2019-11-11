@@ -24,7 +24,7 @@ public final class CDSInputTransformerImpl implements CDSInputTransformer {
   public CDSInput transform(CDSInputBundle bundle) {
     var parameters = bundle.getParameters();
     var cdsInput = new CDSInput(
-        bundle.getServiceDefinitionIdString(),
+        bundle.getServiceDefinitionId(),
         parameters.getRequestId(),
         "",
         "");

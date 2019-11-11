@@ -20,6 +20,7 @@ import uk.nhs.cdss.domain.QuestionConstraint;
 import uk.nhs.cdss.domain.QuestionType;
 import uk.nhs.cdss.domain.QuestionnaireResponse;
 import uk.nhs.cdss.domain.Result;
+import uk.nhs.cdss.domain.ServiceDefinition;
 import uk.nhs.cdss.engine.CDSInput;
 import uk.nhs.cdss.transform.bundle.AnswerBundle;
 import uk.nhs.cdss.transform.bundle.CDSInputBundle;
@@ -84,4 +85,7 @@ public final class Transformers {
 
   public interface CDSOutputTransformer
       extends Transformer<CDSOutputBundle, GuidanceResponse> { }
+
+  public interface ServiceDefinitionTransformer
+      extends Transformer<ServiceDefinition, org.hl7.fhir.dstu3.model.ServiceDefinition> {}
 }

@@ -72,10 +72,8 @@ public class QuestionnaireResponseTransformerTest {
     var responseDTO = new org.hl7.fhir.dstu3.model.QuestionnaireResponse();
     responseDTO.setId(RESPONSE_ID);
 
-    var questionnaire = new Questionnaire();
-    questionnaire.setId(QUESTIONNAIRE_ID);
-
-    responseDTO.setQuestionnaire(new Reference(questionnaire));
+    responseDTO.setQuestionnaire(
+        new Reference("Questionnaire/" + QUESTIONNAIRE_ID));
     responseDTO.setStatus(QuestionnaireResponseStatus.COMPLETED);
 
     asList(

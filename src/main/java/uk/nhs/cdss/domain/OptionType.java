@@ -3,6 +3,8 @@ package uk.nhs.cdss.domain;
 public class OptionType {
   private String stringValue;
 
+  public OptionType() { }
+
   public OptionType(String stringValue) {
     this.stringValue = stringValue;
   }

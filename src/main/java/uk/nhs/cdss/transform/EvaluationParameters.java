@@ -33,8 +33,9 @@ public class EvaluationParameters {
     requestId = castToType(requestIdParameter.getValue(), IdType.class)
         .asStringValue();
 
-    var encounterParameter = getParameterByName(parameters, ENCOUNTER);
-    encounter = castToType(encounterParameter.getValue(), Reference.class);
+    // TODO: depends on the EMS providing an encounter
+//    var encounterParameter = getParameterByName(parameters, ENCOUNTER);
+//    encounter = castToType(encounterParameter.getValue(), Reference.class);
 
     inputData = getParametersByName(parameters, INPUT_DATA)
         .stream()

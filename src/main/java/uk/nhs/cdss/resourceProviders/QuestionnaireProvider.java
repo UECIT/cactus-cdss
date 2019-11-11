@@ -11,7 +11,7 @@ import org.hl7.fhir.dstu3.model.IdType;
 import org.hl7.fhir.dstu3.model.Questionnaire;
 import org.springframework.stereotype.Component;
 import uk.nhs.cdss.transform.bundle.QuestionnaireBundle;
-import uk.nhs.cdss.transform.impl.in.QuestionnaireTransformerImpl;
+import uk.nhs.cdss.transform.impl.out.QuestionnaireTransformerImpl;
 
 @Component
 public class QuestionnaireProvider implements IResourceProvider {

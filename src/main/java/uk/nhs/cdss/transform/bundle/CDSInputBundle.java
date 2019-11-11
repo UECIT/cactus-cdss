@@ -3,20 +3,18 @@ package uk.nhs.cdss.transform.bundle;
 import uk.nhs.cdss.transform.EvaluationParameters;
 
 public final class CDSInputBundle {
-  private final long serviceDefinitionId;
+  private final String serviceDefinitionId;
   private final EvaluationParameters parameters;
 
-  public CDSInputBundle(long serviceDefinitionId, EvaluationParameters parameters) {
+  public CDSInputBundle(
+      String serviceDefinitionId,
+      EvaluationParameters parameters) {
     this.serviceDefinitionId = serviceDefinitionId;
     this.parameters = parameters;
   }
 
-  public long getServiceDefinitionId() {
+  public String getServiceDefinitionId() {
     return serviceDefinitionId;
-  }
-
-  public String getServiceDefinitionIdString() {
-    return Long.toString(serviceDefinitionId);
   }
 
   public EvaluationParameters getParameters() {

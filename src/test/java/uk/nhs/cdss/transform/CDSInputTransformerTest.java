@@ -73,7 +73,8 @@ public class CDSInputTransformerTest {
     final var REQUEST_ID = 234;
 
     var parameters = new EvaluationParameters(buildParameters(REQUEST_ID));
-    var bundle = new CDSInputBundle(SERVICE_DEFINITION_ID, parameters);
+    var id = Long.toString(SERVICE_DEFINITION_ID);
+    var bundle = new CDSInputBundle(id, parameters);
     var expectedResponseIds = Arrays.asList("11", "22");
     var expectedAssertionIds = Arrays.asList("111", "222", "333");
 
