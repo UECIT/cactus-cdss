@@ -1,5 +1,6 @@
 package uk.nhs.cdss.transform.impl.in;
 
+import org.hl7.fhir.dstu3.model.Coding;
 import org.springframework.stereotype.Component;
 import uk.nhs.cdss.domain.Answer;
 import uk.nhs.cdss.transform.Transformers.AnswerTransformer;
@@ -17,13 +18,23 @@ public final class AnswerTransformerImpl implements AnswerTransformer {
 
   @Override
   public Answer transform(AnswerBundle bundle) {
-    var answer = new Answer(
+
+    // TODO: temporarily set for compatibility with the EMS
+    var answer = bundle.getAnswer();
+    Object value;
+    if (answer instanceof Coding) {
+      value = ((Coding) answer).getCode();
+    } else {
+      value = valueTransformer.transform(answer);
+    }
+
+    var answerObject = new Answer(
         bundle.getQuestionnaireId(),
         bundle.getQuestionId(),
-        valueTransformer.transform(bundle.getAnswer()));
+        value);
 
-    answer.setQuestionnaireResponse(bundle.getResponse());
+    answerObject.setQuestionnaireResponse(bundle.getResponse());
 
-    return answer;
+    return answerObject;
   }
 }

@@ -41,6 +41,7 @@ end
 
 // Results
 rule "Any symptoms"
+salience 30
 when
     $a: Assertion( value == true )
 then

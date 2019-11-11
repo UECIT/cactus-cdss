@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.http.annotation.Obsolete;
-import org.hl7.fhir.dstu3.model.Bundle;
 import org.hl7.fhir.dstu3.model.CodeableConcept;
 import org.hl7.fhir.dstu3.model.Coding;
 import org.hl7.fhir.dstu3.model.GuidanceResponse;
@@ -48,7 +47,9 @@ public class EvaluateService {
     this.dataRequirementRepository = dataRequirementRepository;
   }
 
-  public GuidanceResponse getGuidanceResponseNew(Parameters parameters, Long serviceDefinitionId)
+  public GuidanceResponse getGuidanceResponse(
+      Parameters parameters,
+      String serviceDefinitionId)
       throws ServiceDefinitionException {
     var evaluationParameters = new EvaluationParameters(parameters);
     var inputBundle = new CDSInputBundle(serviceDefinitionId, evaluationParameters);
@@ -61,12 +62,7 @@ public class EvaluateService {
   }
 
   @Obsolete
-  public GuidanceResponse getGuidanceResponse(Bundle bundle, Long serviceDefinitionId) {
-    return getGuidanceResponse((Parameters)bundle.getEntry().get(0).getResource(), serviceDefinitionId);
-  }
-
-  @Obsolete
-  public GuidanceResponse getGuidanceResponse(Parameters parameters, Long serviceDefinitionId) {
+  public GuidanceResponse getGuidanceResponseOld(Parameters parameters, Long serviceDefinitionId) {
     noSelection = false;
     var evaluationParameters = new EvaluationParameters(parameters);
 

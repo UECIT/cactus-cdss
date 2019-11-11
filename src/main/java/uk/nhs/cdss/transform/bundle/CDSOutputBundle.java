@@ -5,12 +5,12 @@ import uk.nhs.cdss.transform.EvaluationParameters;
 
 public class CDSOutputBundle {
   private final CDSOutput output;
-  private final long serviceDefinitionId;
+  private final String serviceDefinitionId;
   private final EvaluationParameters parameters;
 
   public CDSOutputBundle(
       CDSOutput output,
-      long serviceDefinitionId,
+      String serviceDefinitionId,
       EvaluationParameters parameters) {
     this.output = output;
     this.serviceDefinitionId = serviceDefinitionId;
@@ -21,7 +21,7 @@ public class CDSOutputBundle {
     return output;
   }
 
-  public long getServiceDefinitionId() {
+  public String getServiceDefinitionId() {
     return serviceDefinitionId;
   }
 

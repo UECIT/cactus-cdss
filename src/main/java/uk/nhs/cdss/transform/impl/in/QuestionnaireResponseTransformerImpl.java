@@ -5,6 +5,7 @@ import java.util.stream.Stream;
 import org.hl7.fhir.dstu3.model.Questionnaire;
 import org.hl7.fhir.dstu3.model.QuestionnaireResponse.QuestionnaireResponseItemComponent;
 import org.hl7.fhir.dstu3.model.QuestionnaireResponse.QuestionnaireResponseStatus;
+import org.hl7.fhir.dstu3.model.StringType;
 import org.springframework.stereotype.Component;
 import uk.nhs.cdss.domain.QuestionnaireResponse;
 import uk.nhs.cdss.domain.QuestionnaireResponse.Status;
@@ -64,8 +65,11 @@ public final class QuestionnaireResponseTransformerImpl
   @Override
   public QuestionnaireResponse transform(
       org.hl7.fhir.dstu3.model.QuestionnaireResponse from) {
-    var questionnaire = (Questionnaire) from.getQuestionnaire().getResource();
-    var response = new QuestionnaireResponse(from.getId(), questionnaire.getId());
+    var questionnaireId = from.getQuestionnaire()
+        .getReference()
+        .split("/")[1];
+
+    var response = new QuestionnaireResponse(from.getId(), questionnaireId);
 
     response.setStatus(statusTransformer.transform(from.getStatus()));
 

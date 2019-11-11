@@ -1,5 +1,6 @@
 package uk.nhs.cdss;
 
+import static org.hamcrest.Matchers.either;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasProperty;
 
@@ -9,21 +10,28 @@ import org.hl7.fhir.dstu3.model.Questionnaire.QuestionnaireItemOptionComponent;
 
 public final class ModelMatchers {
 
+  private ModelMatchers() { }
+
   public static <T> Matcher<T> answerIsForQuestion(String question) {
     return hasProperty("questionId", equalTo(question));
   }
 
+  public static <T> Matcher<T> hasValue(Matcher<?> matcher) {
+    return hasProperty("value", matcher);
+  }
   public static <T> Matcher<T> hasValue(String value) {
-    return hasProperty("value", equalTo(value));
+    return hasValue(equalTo(value));
   }
 
   public static Matcher<QuestionnaireItemEnableWhenComponent> isConstraint(String question) {
-    final var QUESTION = "question";
-    return hasProperty(QUESTION, equalTo(question));
+    return hasProperty("question", equalTo(question));
   }
 
   public static Matcher<QuestionnaireItemOptionComponent> isOption(String optionText) {
-    final var OPTION_VALUE = "value";
-    return hasProperty(OPTION_VALUE, hasValue(optionText));
+    return hasValue(either(hasValue(optionText)).or(isCoding(optionText)));
+  }
+
+  public static Matcher<? super Object> isCoding(String codeText) {
+    return hasProperty("code", equalTo(codeText));
   }
 }
