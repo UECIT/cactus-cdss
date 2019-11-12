@@ -1,24 +1,25 @@
 package uk.nhs.cdss.transform.impl.out;
 
-import static uk.nhs.cdss.SystemURL.SNOMED;
-
-import java.util.stream.Collectors;
-import org.hl7.fhir.dstu3.model.Coding;
 import org.hl7.fhir.dstu3.model.DataRequirement;
 import org.hl7.fhir.dstu3.model.ServiceDefinition;
 import org.hl7.fhir.dstu3.model.TriggerDefinition;
 import org.springframework.stereotype.Component;
 import uk.nhs.cdss.domain.CodableConcept;
 import uk.nhs.cdss.engine.CodeDirectory;
+import uk.nhs.cdss.transform.Transformers.DataRequirementTransformer;
 import uk.nhs.cdss.transform.Transformers.ServiceDefinitionTransformer;
 
 @Component
 public class ServiceDefinitionTransformerImpl implements ServiceDefinitionTransformer {
 
   private final CodeDirectory codeDirectory;
+  private final DataRequirementTransformer requirementTransformer;
 
-  public ServiceDefinitionTransformerImpl(CodeDirectory codeDirectory) {
+  public ServiceDefinitionTransformerImpl(
+      CodeDirectory codeDirectory,
+      DataRequirementTransformer requirementTransformer) {
     this.codeDirectory = codeDirectory;
+    this.requirementTransformer = requirementTransformer;
   }
 
   @Override
@@ -30,15 +31,15 @@ public class ServiceDefinitionTransformerImpl implements ServiceDefinitionTransf
     serviceDefinition.setUsage(domainServiceDefinition.getUsage());
     serviceDefinition.setPurpose(domainServiceDefinition.getPurpose());
 
-    serviceDefinition.setTrigger(domainServiceDefinition.getTriggers().stream()
+    domainServiceDefinition.getTriggers()
+        .stream()
         .map(this::transformTrigger)
-        .collect(Collectors.toList())
-    );
+        .forEach(serviceDefinition::addTrigger);
 
-    serviceDefinition.setDataRequirement(domainServiceDefinition.getDataRequirements().stream()
-        .map(this::transformDataRequirement)
-        .collect(Collectors.toList())
-    );
+    domainServiceDefinition.getDataRequirements()
+        .stream()
+        .map(requirementTransformer::transform)
+        .forEach(serviceDefinition::addDataRequirement);
 
     return serviceDefinition;
   }
@@ -57,27 +58,4 @@ public class ServiceDefinitionTransformerImpl implements ServiceDefinitionTransf
     triggerDefinition.setEventData(dataReq);
     return triggerDefinition;
   }
-
-  private DataRequirement transformDataRequirement(String type) {
-    DataRequirement dataRequirement = new DataRequirement();
-    switch (type) {
-      case "patient":
-        dataRequirement.setType("Patient");
-        dataRequirement
-            .addProfile("https://fhir.hl7.org.uk/STU3/StructureDefinition/CareConnect-Patient-1");
-        break;
-      case "organization":
-        dataRequirement.setType("Organization");
-        dataRequirement
-            .addProfile("https://fhir.hl7.org.uk/STU3/StructureDefinition/CareConnect-Organization-1");
-        break;
-      case "age":
-        dataRequirement.setType("Age");
-        break;
-      default:
-        throw new IllegalArgumentException("Unexpected data requirement: " + type);
-    }
-    return dataRequirement;
-  }
-
 }
