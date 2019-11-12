@@ -87,10 +87,13 @@ public class ServiceDefinitionProvider implements IResourceProvider {
 
   // TODO: remove when EMS no longer assumes numeric ids
   private String getServiceDefinitionId(IdType serviceDefinitionId) {
-    var legacyId = serviceDefinitionId.getIdPartAsLong();
-    if (legacyId != null && legacyId == 5) {
-      return "palpitations";
-    }
+	  try {
+      var legacyId = serviceDefinitionId.getIdPartAsLong();
+      if (legacyId != null && legacyId == 5) {
+        return "palpitations";
+      }
+    } catch (NumberFormatException ignored) { }
+
     return serviceDefinitionId.getIdPart();
   }
 

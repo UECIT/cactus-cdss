@@ -11,8 +11,40 @@
     "shoulderPain"
   ],
   "dataRequirements": [
-    "patient",
-    "organization",
-    "age"
+    { "type":  "Patient" },
+    { "type":  "Organization" },
+    { "type":  "Age" },
+    {
+      "type": "CareConnectObservation",
+      "coding": {
+        "system": "http://snomed.info/sct",
+        "code": "29857009",
+        "display": "Chest pain"
+      }
+    },
+    {
+      "type": "CareConnectObservation",
+      "coding": {
+        "system": "http://snomed.info/sct",
+        "code": "81680005",
+        "display": "Neck pain"
+      }
+    },
+    {
+      "type": "CareConnectObservation",
+      "coding": {
+        "system": "http://snomed.info/sct",
+        "code": "45326000",
+        "display": "Shoulder pain"
+      }
+    },
+    {
+      "type": "CareConnectObservation",
+      "coding": {
+        "system": "http://snomed.info/sct",
+        "code": "230145002",
+        "display": "Difficulty breathing"
+      }
+    }
   ]
 }

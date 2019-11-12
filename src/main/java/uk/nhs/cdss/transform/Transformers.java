@@ -14,6 +14,7 @@ import org.hl7.fhir.dstu3.model.Type;
 import uk.nhs.cdss.domain.Answer;
 import uk.nhs.cdss.domain.Assertion;
 import uk.nhs.cdss.domain.CodableConcept;
+import uk.nhs.cdss.domain.DataRequirement;
 import uk.nhs.cdss.domain.OptionType;
 import uk.nhs.cdss.domain.Question;
 import uk.nhs.cdss.domain.QuestionConstraint;
@@ -87,5 +88,8 @@ public final class Transformers {
       extends Transformer<CDSOutputBundle, GuidanceResponse> { }
 
   public interface ServiceDefinitionTransformer
-      extends Transformer<ServiceDefinition, org.hl7.fhir.dstu3.model.ServiceDefinition> {}
+      extends Transformer<ServiceDefinition, org.hl7.fhir.dstu3.model.ServiceDefinition> { }
+
+  public interface DataRequirementTransformer
+      extends Transformer<DataRequirement, org.hl7.fhir.dstu3.model.DataRequirement> { }
 }

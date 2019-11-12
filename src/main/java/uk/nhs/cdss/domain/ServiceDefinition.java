@@ -11,7 +11,7 @@ public class ServiceDefinition {
   private List<String> triggers;
 
   // TODO Find out if we should include questionnaires here
-  private List<String> dataRequirements;
+  private List<DataRequirement> dataRequirements;
 
   public ServiceDefinition() {
   }
@@ -68,11 +68,11 @@ public class ServiceDefinition {
     this.triggers = triggers;
   }
 
-  public List<String> getDataRequirements() {
+  public List<DataRequirement> getDataRequirements() {
     return dataRequirements;
   }
 
-  public void setDataRequirements(List<String> dataRequirements) {
+  public void setDataRequirements(List<DataRequirement> dataRequirements) {
     this.dataRequirements = dataRequirements;
   }
 }

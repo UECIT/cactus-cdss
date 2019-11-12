@@ -227,17 +227,19 @@ public class CDSOutputTransformerImpl implements CDSOutputTransformer {
         .map(this::buildDataRequirement)
         .forEach(response::addDataRequirement);
 
-    var carePlans = result.getCarePlanIds()
-        .stream()
-        .map(CDSOutputTransformerImpl::getPlan)
-        .collect(Collectors.toUnmodifiableList());
+    if (result.getStatus() != Status.DATA_REQUIRED) {
+      var carePlans = result.getCarePlanIds()
+          .stream()
+          .map(CDSOutputTransformerImpl::getPlan)
+          .collect(Collectors.toUnmodifiableList());
 
-    var requestGroup = requestGroupUtil.buildRequestGroup(
-        RequestStatus.ACTIVE,
-        RequestIntent.ORDER);
+      var requestGroup = requestGroupUtil.buildRequestGroup(
+          RequestStatus.ACTIVE,
+          RequestIntent.ORDER);
 
-    saveRequestGroup(requestGroup, carePlans);
-    response.setResult(new Reference(requestGroup));
+      saveRequestGroup(requestGroup, carePlans);
+      response.setResult(new Reference(requestGroup));
+    }
 
     return response;
   }
