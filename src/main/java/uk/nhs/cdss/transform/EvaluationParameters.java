@@ -9,10 +9,10 @@ import org.hl7.fhir.dstu3.model.Observation;
 import org.hl7.fhir.dstu3.model.OperationOutcome.IssueType;
 import org.hl7.fhir.dstu3.model.Parameters;
 import org.hl7.fhir.dstu3.model.Parameters.ParametersParameterComponent;
+import org.hl7.fhir.dstu3.model.PrimitiveType;
 import org.hl7.fhir.dstu3.model.QuestionnaireResponse;
 import org.hl7.fhir.dstu3.model.Reference;
 import org.hl7.fhir.dstu3.model.Resource;
-import org.hl7.fhir.dstu3.model.StringType;
 import uk.nhs.cdss.OperationOutcomeFactory;
 import uk.nhs.cdss.SystemCode;
 
@@ -31,10 +31,10 @@ public class EvaluationParameters {
     var parameters = source.getParameter();
 
     var requestIdParameter = getParameterByName(parameters, REQUEST_ID);
-    // TODO NCTH-111
+    // TODO NCTH-111 - EMS 1.0 sends StringType
 //    requestId = castToType(requestIdParameter.getValue(), IdType.class)
 //        .asStringValue();
-    requestId = castToType(requestIdParameter.getValue(), StringType.class)
+    requestId = castToType(requestIdParameter.getValue(), PrimitiveType.class)
         .asStringValue();
 
     // TODO: depends on the EMS providing an encounter
