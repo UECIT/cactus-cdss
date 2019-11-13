@@ -12,6 +12,13 @@ RUN mvn -B -Dmaven.repo.local=/app/.m2 package
 FROM openjdk:11-jre-slim
 WORKDIR /app
 VOLUME /tmp
+
+ADD https://s3.amazonaws.com/rds-downloads/rds-combined-ca-bundle.pem /app
+RUN keytool -importcert -alias RDS_CA_Cert \
+            -file /app/rds-combined-ca-bundle.pem \
+            -keystore /app/rds-truststore \
+            -storepass mypassword
+
 COPY --from=build /app/target/cdss-supplier-stub.war /app
 COPY --from=build /app/target/classes/application.properties /app
 
