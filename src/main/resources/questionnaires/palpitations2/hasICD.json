@@ -1,0 +1,16 @@
+{
+  "id": "palpitations2.hasICD",
+  "items": [
+    {
+      "id": "q",
+      "text": "Have you got an ICD (implanted cardiovascular defibrillator)?",
+      "type": "CHOICE",
+      "required": true,
+      "options": [
+        "Yes",
+        "No",
+        "Unsure"
+      ]
+    }
+  ]
+}

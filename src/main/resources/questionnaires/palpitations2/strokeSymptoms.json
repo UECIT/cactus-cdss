@@ -1,0 +1,54 @@
+{
+    "id": "palpitations2.strokeSymptoms",
+    "items": [
+      {
+        "id": "group",
+        "text": "Have you had any of the following symptoms of a stroke in the last 7 days?",
+        "type": "GROUP",
+        "items": [
+          {
+            "id": "q1",
+            "text": "Face had suddenly dropped on one side",
+            "type": "CHOICE",
+            "options": [
+              "Yes"
+            ]
+          },
+          {
+            "id": "q2",
+            "text": "Unable to lift arms up without one dropping down",
+            "type": "CHOICE",
+            "options": [
+              "Yes"
+            ]
+          },
+          {
+            "id": "q3",
+            "text": "Problems speaking, understanding or I′m slurring my words",
+            "type": "CHOICE",
+            "options": [
+              "Yes"
+            ]
+          },
+          {
+            "id": "q4",
+            "text": "Have you got the symptoms right now?",
+            "type": "CHOICE",
+            "options": [
+              "Yes",
+              "No"
+            ]
+          },
+          {
+            "id": "q5",
+            "text": "None of the above",
+            "type": "CHOICE",
+            "options": [
+              "Yes"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+  

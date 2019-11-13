@@ -1,0 +1,18 @@
+{
+  "id": "palpitations2",
+  "title":  "Palpitations Extended",
+  "description": "Palpitations 1st Party",
+  "usage": "To triage a patient who has palpitations",
+  "purpose": "To triage a patient who has palpitations",
+  "triggers": [
+    "palpitations",
+    "chestPain",
+    "neckPain",
+    "shoulderPain"
+  ],
+  "dataRequirements": [
+    "patient",
+    "organization",
+    "age"
+  ]
+}

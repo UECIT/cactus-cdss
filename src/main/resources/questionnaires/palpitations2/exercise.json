@@ -1,0 +1,15 @@
+{
+    "id": "palpitations2.exercise",
+    "items": [
+      {
+        "id": "q",
+        "text": "Onset of palpitations precipitated by exercise.",
+        "type": "CHOICE",
+        "required": true,
+        "options": [
+          "Yes",
+          "No"
+        ]
+      }
+    ]
+  }

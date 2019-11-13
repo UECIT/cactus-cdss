@@ -3,7 +3,6 @@ package uk.nhs.cdss.domain;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import org.hl7.fhir.dstu3.model.Coding;
 import java.util.Objects;
 
 public class CodableConcept {

@@ -45,12 +45,120 @@ public class CDSOutputTransformerImpl implements CDSOutputTransformer {
   static {
     knownCarePlans.add(buildSelfCarePlan());
     knownCarePlans.add(buildCall999Plan());
+    knownCarePlans.add(buildEDCarePlan());
+    knownCarePlans.add(buildUTCCarePlan());
+    knownCarePlans.add(buildGPCarePlan());
+    knownCarePlans.add(buildPharmacyCarePlan());
   }
 
   private static CarePlan buildSelfCarePlan() {
     CarePlan plan = new CareConnectCarePlan();
     plan.setTitle("Self care");
     plan.setId("selfCare");
+    plan.setStatus(CarePlanStatus.ACTIVE);
+    plan.setIntent(CarePlanIntent.OPTION);
+
+    CodeableConcept code = new CodeableConcept();
+    code.addCoding().setSystem("http://snomed.info/sct").setCode("907751000000109")
+        .setDisplay("After Care Instructions");
+    code.setText("After Care Instructions");
+
+    Narrative text2 = new Narrative();
+    text2 = text2.setStatus(NarrativeStatus.GENERATED);
+    text2.setDivAsString("After Care Instructions");
+
+    plan.getActivityFirstRep().getDetail().setCode(code);
+    plan.getActivityFirstRep().getDetail().setDescription(
+        "Try sitting cross-legged and taking a slow breath in through your"
+            + " nostrils and then out through your mouth."
+            + " Repeat until you feel calm.");
+    plan.setText(text2);
+
+    return plan;
+  }
+
+  private static CarePlan buildEDCarePlan() {
+    CarePlan plan = new CareConnectCarePlan();
+    plan.setTitle("ED");
+    plan.setId("ED");
+    plan.setStatus(CarePlanStatus.ACTIVE);
+    plan.setIntent(CarePlanIntent.OPTION);
+
+    CodeableConcept code = new CodeableConcept();
+    code.addCoding().setSystem("http://snomed.info/sct").setCode("907751000000109")
+        .setDisplay("After Care Instructions");
+    code.setText("After Care Instructions");
+
+    Narrative text2 = new Narrative();
+    text2 = text2.setStatus(NarrativeStatus.GENERATED);
+    text2.setDivAsString("After Care Instructions");
+
+    plan.getActivityFirstRep().getDetail().setCode(code);
+    plan.getActivityFirstRep().getDetail().setDescription(
+        "Try sitting cross-legged and taking a slow breath in through your"
+            + " nostrils and then out through your mouth."
+            + " Repeat until you feel calm.");
+    plan.setText(text2);
+
+    return plan;
+  }
+
+  private static CarePlan buildUTCCarePlan() {
+    CarePlan plan = new CareConnectCarePlan();
+    plan.setTitle("UTC");
+    plan.setId("UTC");
+    plan.setStatus(CarePlanStatus.ACTIVE);
+    plan.setIntent(CarePlanIntent.OPTION);
+
+    CodeableConcept code = new CodeableConcept();
+    code.addCoding().setSystem("http://snomed.info/sct").setCode("907751000000109")
+        .setDisplay("After Care Instructions");
+    code.setText("After Care Instructions");
+
+    Narrative text2 = new Narrative();
+    text2 = text2.setStatus(NarrativeStatus.GENERATED);
+    text2.setDivAsString("After Care Instructions");
+
+    plan.getActivityFirstRep().getDetail().setCode(code);
+    plan.getActivityFirstRep().getDetail().setDescription(
+        "Try sitting cross-legged and taking a slow breath in through your"
+            + " nostrils and then out through your mouth."
+            + " Repeat until you feel calm.");
+    plan.setText(text2);
+
+    return plan;
+  }
+
+  private static CarePlan buildGPCarePlan() {
+    CarePlan plan = new CareConnectCarePlan();
+    plan.setTitle("GP");
+    plan.setId("consultGP");
+    plan.setStatus(CarePlanStatus.ACTIVE);
+    plan.setIntent(CarePlanIntent.OPTION);
+
+    CodeableConcept code = new CodeableConcept();
+    code.addCoding().setSystem("http://snomed.info/sct").setCode("907751000000109")
+        .setDisplay("After Care Instructions");
+    code.setText("After Care Instructions");
+
+    Narrative text2 = new Narrative();
+    text2 = text2.setStatus(NarrativeStatus.GENERATED);
+    text2.setDivAsString("After Care Instructions");
+
+    plan.getActivityFirstRep().getDetail().setCode(code);
+    plan.getActivityFirstRep().getDetail().setDescription(
+        "Try sitting cross-legged and taking a slow breath in through your"
+            + " nostrils and then out through your mouth."
+            + " Repeat until you feel calm.");
+    plan.setText(text2);
+
+    return plan;
+  }
+
+  private static CarePlan buildPharmacyCarePlan() {
+    CarePlan plan = new CareConnectCarePlan();
+    plan.setTitle("Pharmacy");
+    plan.setId("pharmacy");
     plan.setStatus(CarePlanStatus.ACTIVE);
     plan.setIntent(CarePlanIntent.OPTION);
 
@@ -214,7 +322,9 @@ public class CDSOutputTransformerImpl implements CDSOutputTransformer {
         .map(observationTransformer::transform);
 
     var outputParameters = new Parameters();
-    Stream.concat(oldAssertions, newAssertions)
+    // New assertions overwrite old assertions
+    Stream.concat(newAssertions, oldAssertions)
+        .distinct()
         .map(this::buildParameter)
         .forEach(outputParameters::addParameter);
 

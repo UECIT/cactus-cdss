@@ -2,7 +2,6 @@ package uk.nhs.cdss.resourceBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.hl7.fhir.dstu3.model.BooleanType;
 import org.hl7.fhir.dstu3.model.CareConnectObservation;
 import org.hl7.fhir.dstu3.model.CodeableConcept;
@@ -15,8 +14,7 @@ import org.hl7.fhir.dstu3.model.Observation;
 import org.hl7.fhir.dstu3.model.Observation.ObservationStatus;
 import org.hl7.fhir.dstu3.model.Resource;
 import org.springframework.stereotype.Component;
-
-import uk.nhs.cdss.SystemURL;
+import uk.nhs.cdss.constants.SystemURL;
 import uk.nhs.cdss.entities.CodedDataEntity;
 
 @Component

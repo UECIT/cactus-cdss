@@ -6,13 +6,19 @@ import static org.junit.Assert.assertNotEquals;
 import org.junit.Before;
 import org.junit.Test;
 import uk.nhs.cdss.config.DroolsConfig;
+import uk.nhs.cdss.constants.SnomedConstants;
+import uk.nhs.cdss.constants.SystemURL;
 import uk.nhs.cdss.domain.Answer;
+import uk.nhs.cdss.domain.Assertion;
+import uk.nhs.cdss.domain.CodableConcept;
+import uk.nhs.cdss.domain.Coding;
 import uk.nhs.cdss.domain.QuestionnaireResponse;
 import uk.nhs.cdss.domain.Result.Status;
 
 public class DroolsCDSEngineTest {
 
   public static final String PALPITATIONS = "palpitations";
+  public static final String PALPITATIONS2 = "palpitations2";
   public static final String REQUEST_1 = "request1";
   public static final String ENCOUNTER_1 = "encounter1";
   public static final String SUPPLIER_1 = "supplier1";
@@ -103,7 +109,7 @@ public class DroolsCDSEngineTest {
   }
 
   @Test
-  public void chest_pain_answer_no_assertion() throws ServiceDefinitionException {
+  public void chest_pain_answer_single_assertion() throws ServiceDefinitionException {
     CDSInput input = new CDSInput(PALPITATIONS, REQUEST_1, ENCOUNTER_1, SUPPLIER_1);
     QuestionnaireResponse response = new QuestionnaireResponse("response",
         "palpitations.chestPain");
@@ -114,7 +120,7 @@ public class DroolsCDSEngineTest {
 
     CDSOutput output = engine.evaluate(input);
 
-    assertEquals(0, output.getAssertions().size());
+    assertEquals(1, output.getAssertions().size());
   }
 
   @Test
@@ -167,5 +173,213 @@ public class DroolsCDSEngineTest {
     assertEquals(Status.SUCCESS, output.getResult().getStatus());
     assertEquals(1, output.getResult().getCarePlanIds().size());
     assertEquals("selfCare", output.getResult().getCarePlanIds().get(0));
+  }
+
+  @Test
+  public void palpitations2_symptoms() throws ServiceDefinitionException {
+    CDSInput input = new CDSInput(PALPITATIONS2, REQUEST_1, ENCOUNTER_1, SUPPLIER_1);
+    QuestionnaireResponse response = new QuestionnaireResponse("response",
+        "palpitations2.symptoms");
+    Answer answer = new Answer("palpitations2.symptoms", "q1", "Yes");
+    answer.setQuestionnaireResponse(response);
+    response.getAnswers().add(answer);
+    input.getResponses().add(response);
+
+    CDSOutput output = engine.evaluate(input);
+
+    assertEquals(1, output.getAssertions().size());
+    assertEquals("palpitations2.symptoms#q1", output.getAssertions().get(0).getId());
+    assertEquals("chestPain", output.getAssertions().get(0).getCode().getText());
+    assertEquals(true, output.getAssertions().get(0).getValue());
+  }
+
+  @Test
+  public void palpitations2_complex_syncope_outcome() throws ServiceDefinitionException {
+    CDSInput input = new CDSInput(PALPITATIONS2, REQUEST_1, ENCOUNTER_1, SUPPLIER_1);
+
+    QuestionnaireResponse response = new QuestionnaireResponse("response",
+        "palpitations2.symptoms");
+    Answer answer = new Answer("palpitations2.hasPalpitations", "q", "No");
+    answer.setQuestionnaireResponse(response);
+    response.getAnswers().add(answer);
+    input.getResponses().add(response);
+
+    response = new QuestionnaireResponse("response", "palpitations2.lastExperienced");
+    answer = new Answer("palpitations2.lastExperienced", "q1", "Yes");
+    answer.setQuestionnaireResponse(response);
+    response.getAnswers().add(answer);
+    input.getResponses().add(response);
+
+    response = new QuestionnaireResponse("response", "palpitations2.syncope");
+    answer = new Answer("palpitations2.syncope", "q", "Yes");
+    answer.setQuestionnaireResponse(response);
+    response.getAnswers().add(answer);
+    input.getResponses().add(response);
+
+    CDSOutput output = engine.evaluate(input);
+
+    assertEquals("ED", output.getResult().getCarePlanIds().get(0));
+  }
+
+  @Test
+  public void palpitations2_complex_syncope_outcome2() throws ServiceDefinitionException {
+    CDSInput input = new CDSInput(PALPITATIONS2, REQUEST_1, ENCOUNTER_1, SUPPLIER_1);
+
+    QuestionnaireResponse response = new QuestionnaireResponse("response",
+        "palpitations2.symptoms");
+    Answer answer = new Answer("palpitations2.hasPalpitations", "q", "No");
+    answer.setQuestionnaireResponse(response);
+    response.getAnswers().add(answer);
+    input.getResponses().add(response);
+
+    response = new QuestionnaireResponse("response", "palpitations2.lastExperienced");
+    answer = new Answer("palpitations2.lastExperienced", "q1", "No");
+    answer.setQuestionnaireResponse(response);
+    response.getAnswers().add(answer);
+    input.getResponses().add(response);
+
+
+    response = new QuestionnaireResponse("response", "palpitations2.lastExperienced");
+    answer = new Answer("palpitations2.lastExperienced", "q2", "No");
+    answer.setQuestionnaireResponse(response);
+    response.getAnswers().add(answer);
+    input.getResponses().add(response);
+
+    response = new QuestionnaireResponse("response", "palpitations2.lastExperienced");
+    answer = new Answer("palpitations2.lastExperienced", "q3", "Yes");
+    answer.setQuestionnaireResponse(response);
+    response.getAnswers().add(answer);
+    input.getResponses().add(response);
+
+    response = new QuestionnaireResponse("response", "palpitations2.syncope");
+    answer = new Answer("palpitations2.syncope", "q", "Yes");
+    answer.setQuestionnaireResponse(response);
+    response.getAnswers().add(answer);
+    input.getResponses().add(response);
+
+    CDSOutput output = engine.evaluate(input);
+
+    assertEquals("consultGP", output.getResult().getCarePlanIds().get(0));
+
+  }
+
+  @Test
+  public void shouldNotAskMuteLogicUnderConditions() throws ServiceDefinitionException {
+    CDSInput input = new CDSInput(PALPITATIONS2, REQUEST_1, ENCOUNTER_1, SUPPLIER_1);
+
+    Assertion ageAssertion = new Assertion(null, Assertion.Status.FINAL);
+    ageAssertion.setCode(new CodableConcept(SnomedConstants.AGE, new Coding(SystemURL.SNOMED, SnomedConstants.AGE)));
+    ageAssertion.setValue("1900-12-25");
+
+    Assertion genderAssertion = new Assertion(null, Assertion.Status.FINAL);
+    genderAssertion.setCode(new CodableConcept(SnomedConstants.GENDER, new Coding(SystemURL.SNOMED, SnomedConstants.GENDER)));
+    genderAssertion.setValue("male");
+
+    input.getAssertions().add(ageAssertion);
+    input.getAssertions().add(genderAssertion);
+
+    QuestionnaireResponse response = new QuestionnaireResponse("response",
+        "palpitations2.symptoms");
+    Answer answer = new Answer("palpitations2.hasPalpitations", "q", "Yes");
+    answer.setQuestionnaireResponse(response);
+    response.getAnswers().add(answer);
+    input.getResponses().add(response);
+
+    response = new QuestionnaireResponse("response", "palpitations2.hasICD");
+    answer = new Answer("palpitations2.hasICD", "q", "No");
+    answer.setQuestionnaireResponse(response);
+    response.getAnswers().add(answer);
+    input.getResponses().add(response);
+
+    response = new QuestionnaireResponse("response", "palpitations2.symptoms");
+    answer = new Answer("palpitations2.symptoms", "q5", "Yes");
+    answer.setQuestionnaireResponse(response);
+    response.getAnswers().add(answer);
+    input.getResponses().add(response);
+
+    CDSOutput output = engine.evaluate(input);
+
+    assertEquals(1, output.getQuestionnaireIds().size());
+    assertEquals("palpitations2.personalHistory", output.getQuestionnaireIds().get(0));
+    assertEquals(5, output.getAssertions().size());
+    assertEquals(0, output.getResult().getCarePlanIds().size());
+  }
+
+  @Test
+  public void shouldAskMuteLogicUnderConditions() throws ServiceDefinitionException {
+    CDSInput input = new CDSInput(PALPITATIONS2, REQUEST_1, ENCOUNTER_1, SUPPLIER_1);
+
+    QuestionnaireResponse response = new QuestionnaireResponse("response",
+        "palpitations2.symptoms");
+    Answer answer = new Answer("palpitations2.hasPalpitations", "q", "Yes");
+    answer.setQuestionnaireResponse(response);
+    response.getAnswers().add(answer);
+    input.getResponses().add(response);
+
+    response = new QuestionnaireResponse("response", "palpitations2.hasICD");
+    answer = new Answer("palpitations2.hasICD", "q", "No");
+    answer.setQuestionnaireResponse(response);
+    response.getAnswers().add(answer);
+    input.getResponses().add(response);
+
+    response = new QuestionnaireResponse("response", "palpitations2.symptoms");
+    answer = new Answer("palpitations2.hasICD", "q5", "Yes");
+    answer.setQuestionnaireResponse(response);
+    response.getAnswers().add(answer);
+    input.getResponses().add(response);
+
+    response = new QuestionnaireResponse("response", "palpitations2.age");
+    answer = new Answer("palpitations2.age", "q", 35);
+    answer.setQuestionnaireResponse(response);
+    response.getAnswers().add(answer);
+    input.getResponses().add(response);
+
+    response = new QuestionnaireResponse("response", "palpitations2.gender");
+    answer = new Answer("palpitations2.gender", "q", "Female");
+    answer.setQuestionnaireResponse(response);
+    response.getAnswers().add(answer);
+    input.getResponses().add(response);
+
+    response = new QuestionnaireResponse("response", "palpitations2.pregnancy");
+    answer = new Answer("palpitations2.pregnancy", "q", "No");
+    answer.setQuestionnaireResponse(response);
+    response.getAnswers().add(answer);
+    input.getResponses().add(response);
+
+    response = new QuestionnaireResponse("response", "palpitations2.familyHistory");
+    answer = new Answer("palpitations2.familyHistory", "q", "Yes");
+    answer.setQuestionnaireResponse(response);
+    response.getAnswers().add(answer);
+    input.getResponses().add(response);
+
+    CDSOutput output = engine.evaluate(input);
+
+    assertEquals(9 , output.getAssertions().size());
+    assertEquals(1, output.getResult().getCarePlanIds().size());
+    assertEquals("ED", output.getResult().getCarePlanIds().get(0));
+  }
+
+  @Test
+  public void initialQuestionGivenAssertions() throws ServiceDefinitionException {
+    CDSInput input = new CDSInput(PALPITATIONS2, REQUEST_1, ENCOUNTER_1, SUPPLIER_1);
+
+    Assertion ageAssertion = new Assertion(null, Assertion.Status.FINAL);
+    ageAssertion.setCode(new CodableConcept(SnomedConstants.AGE, new Coding(SystemURL.SNOMED, SnomedConstants.AGE)));
+    ageAssertion.setValue("1900-12-25");
+
+    Assertion genderAssertion = new Assertion(null, Assertion.Status.FINAL);
+    genderAssertion.setCode(new CodableConcept(SnomedConstants.GENDER, new Coding(SystemURL.SNOMED, SnomedConstants.GENDER)));
+    genderAssertion.setValue("male");
+
+    input.getAssertions().add(ageAssertion);
+    input.getAssertions().add(genderAssertion);
+
+
+    CDSOutput output = engine.evaluate(input);
+
+    assertEquals(1, output.getQuestionnaireIds().size());
+    assertEquals("palpitations2.hasPalpitations", output.getQuestionnaireIds().get(0));
+    assertEquals(2, output.getAssertions().size());
+    assertEquals(0, output.getResult().getCarePlanIds().size());
   }
 }

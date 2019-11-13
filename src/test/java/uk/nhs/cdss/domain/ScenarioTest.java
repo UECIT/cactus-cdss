@@ -1,12 +1,7 @@
 package uk.nhs.cdss.domain;
 
-import static java.util.Arrays.asList;
-
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.hl7.fhir.dstu3.model.BooleanType;
-import org.hl7.fhir.dstu3.model.Coding;
-import org.hl7.fhir.dstu3.model.IntegerType;
 import org.junit.Test;
 import uk.nhs.cdss.domain.Assertion.Status;
 
@@ -40,8 +35,7 @@ public class ScenarioTest {
     // Assertions
     Assertion hasFlu = new Assertion("flu", Status.AMENDED);
     var coding = new Coding(
-        "test.system.com",
-        "1651",
+        "1651", "test.system.com",
         "flu");
     hasFlu.setCode(new CodableConcept("flu", coding));
     hasFlu.setValue(true);

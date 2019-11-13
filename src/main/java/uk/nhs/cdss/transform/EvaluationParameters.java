@@ -13,7 +13,7 @@ import org.hl7.fhir.dstu3.model.QuestionnaireResponse;
 import org.hl7.fhir.dstu3.model.Reference;
 import org.hl7.fhir.dstu3.model.Resource;
 import uk.nhs.cdss.OperationOutcomeFactory;
-import uk.nhs.cdss.SystemCode;
+import uk.nhs.cdss.constants.SystemCode;
 
 public class EvaluationParameters {
   private static final String INPUT_DATA = "inputData";

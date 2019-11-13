@@ -1,4 +1,4 @@
-package uk.nhs.cdss;
+package uk.nhs.cdss.constants;
 
 public final class SystemCode {
 

@@ -1,0 +1,16 @@
+{
+  "id": "palpitations2.personalHistory",
+  "items": [
+    {
+      "id": "q",
+      "text": "Have you had any cardiac problems in the past?",
+      "type": "CHOICE",
+      "required": true,
+      "options": [
+        "Yes",
+        "No",
+        "Unsure"
+      ]
+    }
+  ]
+}
