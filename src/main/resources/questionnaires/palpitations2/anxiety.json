@@ -1,0 +1,15 @@
+{
+    "id": "palpitations2.anxiety",
+    "items": [
+      {
+        "id": "q",
+        "text": "Do you have any issues with Anxiety or panic attacks?",
+        "type": "CHOICE",
+        "required": true,
+        "options": [
+          "Yes",
+          "No"
+        ]
+      }
+    ]
+  }

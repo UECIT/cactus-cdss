@@ -46,30 +46,40 @@ public class DroolsCDSEngine implements CDSEngine {
         ksession.insert(input.getPatient());
       }
 
+
+      System.out.println("---------------------------\nInput");
+
       // Add existing assertions
       input.getAssertions().stream()
           .filter(a -> a.getRelated().stream()
               .noneMatch(qr -> QuestionnaireResponse.Status.AMENDED.equals(qr.getStatus())))
+          .peek(System.out::println)
           .forEach(ksession::insert);
 
       // Add all answers
       input.getResponses().forEach(response -> {
         ksession.insert(response);
-        response.getAnswers().forEach(ksession::insert);
+        response.getAnswers().stream()
+            .peek(System.out::println)
+            .forEach(ksession::insert);
       });
 
       // Execute and collect results
+      System.out.println();
       ksession.fireAllRules();
       CDSOutput output = new CDSOutput();
 
+      System.out.println("\nOutput");
       // Query resulting assertions and questionnaires
       QueryResults assertions = ksession.getQueryResults(ASSERTIONS_QUERY);
       for (QueryResultsRow resultsRow : assertions) {
+        System.out.println("Assertion " + resultsRow.get(ASSERTION_ID) + " added to output");
         output.getAssertions().add((Assertion) resultsRow.get(ASSERTION_ID));
       }
 
       QueryResults questionnaires = ksession.getQueryResults(QUESTIONNAIRES_QUERY);
       for (QueryResultsRow resultsRow : questionnaires) {
+        System.out.println("Questionnaire " + resultsRow.get(QUESTIONNAIRE_ID) + " added to output");
         output.getQuestionnaireIds()
             .add(((Questionnaire) resultsRow.get(QUESTIONNAIRE_ID)).getId());
       }
@@ -78,6 +88,7 @@ public class DroolsCDSEngine implements CDSEngine {
 
       QueryResults carePlans = ksession.getQueryResults(CAREPLANS_QUERY);
       for (QueryResultsRow resultsRow : carePlans) {
+        System.out.println("CarePlan " + resultsRow.get(CAREPLAN_ID) + " added to output");
         result.getCarePlanIds().add(((CarePlan) resultsRow.get(CAREPLAN_ID)).getId());
       }
 

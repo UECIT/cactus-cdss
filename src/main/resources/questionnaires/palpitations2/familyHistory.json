@@ -1,0 +1,16 @@
+{
+  "id": "palpitations2.familyHistory",
+  "items": [
+    {
+      "id": "q",
+      "text": "Family history of sudden cardiac death under the age of 40 years?",
+      "type": "CHOICE",
+      "required": true,
+      "options": [
+        "Yes",
+        "No",
+        "Unsure"
+      ]
+    }
+  ]
+}

@@ -1,8 +1,12 @@
 package uk.nhs.cdss.rules.palpitations
 
+import java.util.Arrays
+
 import uk.nhs.cdss.rules.InitialQuestionnaire
-import uk.nhs.cdss.rules.QuestionFlow
+import uk.nhs.cdss.rules.NextQuestion
 import uk.nhs.cdss.rules.AnswerAssertion
+import uk.nhs.cdss.rules.OutcomeAnswerCondition
+import uk.nhs.cdss.rules.Outcome
 
 import uk.nhs.cdss.domain.Answer
 import uk.nhs.cdss.domain.Assertion
@@ -16,46 +20,57 @@ import uk.nhs.cdss.engine.CodeDirectory
 global CodeDirectory codeDirectory;
 
 rule "Init"
+salience 10000
 when
     eval( true )
 then
-    // Questions
-    insert( new InitialQuestionnaire("palpitations.chestPain") );
-    insert( new QuestionFlow("palpitations.chestPain", "palpitations.neckPain") );
-    insert( new QuestionFlow("palpitations.neckPain", "palpitations.breathing") );
-    insert( new QuestionFlow("palpitations.breathing", "palpitations.heartProblems") );
+    // Outcomes
+    CarePlan call999 = new CarePlan("call999");
+    CarePlan selfCare = new CarePlan("selfCare");
 
-    // Assertions
+    // Chest pains
+    insert( new InitialQuestionnaire("palpitations.chestPain") );
     insert( new AnswerAssertion("palpitations.chestPain", "q1", "Yes", codeDirectory.get("chestPain"), true));
     insert( new AnswerAssertion("palpitations.chestPain", "q1", "No", codeDirectory.get("chestPain"), false));
+    insert( new AnswerAssertion("palpitations.chestPain", "q1", "Unsure", codeDirectory.get("chestPain"), false));
 
+    insert( new Outcome("chestPains", call999));
+    insert( new OutcomeAnswerCondition("chestPains", "palpitations.chestPain", "q1", Arrays.asList("Yes") ));
+
+    insert( new NextQuestion("palpitations.neckPain", "palpitations.chestPain", "q1", Arrays.asList("No", "Unsure")) );
+
+    // Neck pains
     insert( new AnswerAssertion("palpitations.neckPain", "q2", "Yes", codeDirectory.get("neckPain"), true));
     insert( new AnswerAssertion("palpitations.neckPain", "q2", "No", codeDirectory.get("neckPain"), false));
+    insert( new AnswerAssertion("palpitations.neckPain", "q2", "Unsure", codeDirectory.get("neckPain"), false));
 
+    insert( new Outcome("neckPains", call999));
+    insert( new OutcomeAnswerCondition("neckPains", "palpitations.neckPain", "q2", Arrays.asList("Yes") ));
+
+    insert( new NextQuestion("palpitations.breathing", "palpitations.neckPain", "q2", Arrays.asList("No", "Unsure")) );
+
+    // Breathing
     insert( new AnswerAssertion("palpitations.breathing", "q3", "Yes", codeDirectory.get("breathingProblems"), true));
     insert( new AnswerAssertion("palpitations.breathing", "q3", "No", codeDirectory.get("breathingProblems"), false));
+    insert( new AnswerAssertion("palpitations.breathing", "q3", "Unsure", codeDirectory.get("breathingProblems"), false));
 
+    insert( new Outcome("breathing", call999));
+    insert( new OutcomeAnswerCondition("breathing", "palpitations.breathing", "q3", Arrays.asList("Yes") ));
+
+    insert( new NextQuestion("palpitations.heartProblems", "palpitations.breathing", "q3", Arrays.asList("No", "Unsure")) );
+
+    // Heart problems
     insert( new AnswerAssertion("palpitations.heartProblems", "q4", "Yes", codeDirectory.get("heartProblems"), true));
     insert( new AnswerAssertion("palpitations.heartProblems", "q4", "No", codeDirectory.get("heartProblems"), false));
-end
+    insert( new AnswerAssertion("palpitations.heartProblems", "q4", "Unsure", codeDirectory.get("heartProblems"), false));
 
-// Results
-rule "Any symptoms"
-salience 30
-when
-    $a: Assertion( value == true )
-then
-    System.out.println("Assertion present: " + $a);
-    System.out.println("Directing to 999");
-    insert( new CarePlan("call999") );
-end
+    insert( new Outcome("heartProblems", call999));
+    insert( new OutcomeAnswerCondition("heartProblems", "palpitations.heartProblems", "q4", Arrays.asList("Yes") ));
 
-rule "No symptoms"
-when
-    not Assertion( value == true )
-    not Questionnaire()
-then
-    System.out.println("Patient did not answer 'Yes' to any questions");
-    System.out.println("Directing to self care");
-    insert( new CarePlan("selfCare") );
+    // Answered no to all questions
+    insert( new Outcome("noSymptoms", selfCare));
+    insert( new OutcomeAnswerCondition("noSymptoms", "palpitations.heartProblems", "q4", Arrays.asList("No", "Unsure") ));
+    insert( new OutcomeAnswerCondition("noSymptoms", "palpitations.breathing", "q3", Arrays.asList("No", "Unsure") ));
+    insert( new OutcomeAnswerCondition("noSymptoms", "palpitations.neckPain", "q2", Arrays.asList("No", "Unsure") ));
+    insert( new OutcomeAnswerCondition("noSymptoms", "palpitations.chestPain", "q1", Arrays.asList("No", "Unsure") ));
 end

@@ -1,0 +1,11 @@
+{
+    "id": "palpitations2.age",
+    "items": [
+      {
+        "id": "q",
+        "text": "What is your age?",
+        "type": "INTEGER",
+        "required": true
+      }
+    ]
+  }

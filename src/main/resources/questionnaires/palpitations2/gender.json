@@ -1,0 +1,16 @@
+{
+    "id": "palpitations2.gender",
+    "items": [
+      {
+        "id": "q",
+        "text": "What is your gender?",
+        "type": "CHOICE",
+        "required": true,
+        "options": [
+          "Male",
+          "Female",
+          "Other"
+        ]
+      }
+    ]
+  }

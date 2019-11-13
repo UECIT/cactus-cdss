@@ -2,7 +2,6 @@ package uk.nhs.cdss.utils;
 
 import java.util.Collections;
 import java.util.Date;
-
 import org.hl7.fhir.dstu3.model.CareConnectAnnotation;
 import org.hl7.fhir.dstu3.model.CareConnectIdentifier;
 import org.hl7.fhir.dstu3.model.CareConnectPractitioner;
@@ -19,8 +18,7 @@ import org.hl7.fhir.dstu3.model.Reference;
 import org.hl7.fhir.dstu3.model.ReferralRequest;
 import org.hl7.fhir.dstu3.model.StringType;
 import org.springframework.stereotype.Component;
-
-import uk.nhs.cdss.SystemURL;
+import uk.nhs.cdss.constants.SystemURL;
 
 @Component
 public class ReferralRequestUtil {

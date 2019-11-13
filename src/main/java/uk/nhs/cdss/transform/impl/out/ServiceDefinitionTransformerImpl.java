@@ -1,10 +1,11 @@
 package uk.nhs.cdss.transform.impl.out;
 
+
+import org.hl7.fhir.dstu3.model.CodeableConcept;
 import org.hl7.fhir.dstu3.model.DataRequirement;
 import org.hl7.fhir.dstu3.model.ServiceDefinition;
 import org.hl7.fhir.dstu3.model.TriggerDefinition;
 import org.springframework.stereotype.Component;
-import uk.nhs.cdss.domain.CodableConcept;
 import uk.nhs.cdss.engine.CodeDirectory;
 import uk.nhs.cdss.transform.Transformers.DataRequirementTransformer;
 import uk.nhs.cdss.transform.Transformers.ServiceDefinitionTransformer;
@@ -14,12 +15,15 @@ public class ServiceDefinitionTransformerImpl implements ServiceDefinitionTransf
 
   private final CodeDirectory codeDirectory;
   private final DataRequirementTransformer requirementTransformer;
+  private final CodeableConceptTransformerImpl codeableConceptTransformer;
 
   public ServiceDefinitionTransformerImpl(
       CodeDirectory codeDirectory,
-      DataRequirementTransformer requirementTransformer) {
+      DataRequirementTransformer requirementTransformer,
+      CodeableConceptTransformerImpl codeableConceptTransformer) {
     this.codeDirectory = codeDirectory;
     this.requirementTransformer = requirementTransformer;
+    this.codeableConceptTransformer = codeableConceptTransformer;
   }
 
   @Override
@@ -45,7 +49,7 @@ public class ServiceDefinitionTransformerImpl implements ServiceDefinitionTransf
   }
 
   private TriggerDefinition transformTrigger(String code) {
-    CodableConcept codableConcept = codeDirectory.get(code);
+    CodeableConcept codableConcept = codeableConceptTransformer.transform(codeDirectory.get(code));
 
     TriggerDefinition triggerDefinition = new TriggerDefinition();
 

@@ -1,5 +1,7 @@
 package uk.nhs.cdss.rules
 
+import java.util.List;
+
 import uk.nhs.cdss.domain.Answer
 import uk.nhs.cdss.domain.Assertion
 import uk.nhs.cdss.domain.Assertion.Status
@@ -8,17 +10,44 @@ import uk.nhs.cdss.domain.CodableConcept
 import uk.nhs.cdss.domain.Questionnaire
 import uk.nhs.cdss.domain.QuestionnaireResponse
 
+declare Checkpoint
+    id: String
+end
+
 declare InitialQuestionnaire
     id: String @key
 end
 
-declare QuestionFlow
-    id: String @key
+declare NextQuestion
     next: String @key
+    questionnaireId: String @key
+    questionId: String @key
+    answers: List
+end
+
+declare HighPriorityNextQuestion
+    next: String @key
+    questionnaireId: String @key
+    questionId: String @key
+    answers: List
 end
 
 declare Answered
+    questionnaireId: String @key
+    questionId: String @key
+    value: Object
+end
+
+declare OutcomeAnswerCondition
     id: String @key
+    questionnaireId: String @key
+    questionId: String @key
+    answers: List
+end
+
+declare Outcome
+    id: String @key
+    outcome: Object @key
 end
 
 declare AnswerAssertion
@@ -26,7 +55,7 @@ declare AnswerAssertion
     questionId: String @key
     answer: String @key
 
-    code: CodableConcept
+    code: CodableConcept @key
     value: Object
 end
 
@@ -34,46 +63,86 @@ end
 rule "Answer present"
     salience 20
 when
-    Answer( $id := questionnaireId )
+    $a: Answer( $id := questionnaireId, $questionId := questionId )
 then
-    insert( new Answered($id) );
+    System.out.println("Have answer for "+ $id + " " + $questionId);
+    insert( new Answered($id, $questionId, $a.getValue()) );
 end
 
 rule "Assertion present"
     salience 20
 when
-    // TODO this is a little blunt - it assumes only one assertion per questionnaire
-    $aa: AnswerAssertion( $id := questionnaireId )
-    Assertion( code == $aa.code )
+    $aa: AnswerAssertion( $id := questionnaireId, $questionId := questionId, $value := value)
+    Assertion( code == $aa.code, $value == value)
 then
-    insert( new Answered($id) );
+    System.out.println("Answered question "+ $id + " " + $questionId + " = " + $aa.getAnswer() + " with assertion " + $aa.getCode() + " = " + $aa.getValue());
+    insert( new Answered($id, $questionId, $aa.getAnswer()) );
+end
+
+// If no value or answer provided in answer assertion, answer the question with the value of the assertion
+rule "Any assertion present"
+    salience 20
+when
+    $aa: AnswerAssertion( $id := questionnaireId, $questionId := questionId, value == null, answer == null)
+    Assertion( code == $aa.code, $value := value)
+then
+    System.out.println("Answered question "+ $id + " " + $questionId + " with assertion " + $aa.getCode() + " = " + $value);
+    insert( new Answered($id, $questionId, $value) );
 end
 
 
 // Question Flow
 rule "Ask first question"
-    salience 10
+    salience -1
 when
-    not Answered()
+    not Questionnaire()
+    not CarePlan()
     $q: InitialQuestionnaire()
 then
     System.out.println("No answers: requesting questionnaire " + $q.getId());
     insert( new Questionnaire($q.getId()) );
 end
 
-rule "Ask next question"
+rule "Next question from Answer"
     salience 10
 when
-    $q: QuestionFlow()
-    Answered( $q.id; )
-    not Answered( $q.next; )
-    not Questionnaire( id == $q.next )
+    NextQuestion( $questionnaireId := questionnaireId, $questionId := questionId, $next := next, $answers := answers )
+    $a: Answered( $questionnaireId := questionnaireId, $questionId := questionId, $answers == null || $answers.isEmpty() || value memberOf $answers)
+    not Answered( $next := questionnaireId )
+    not Questionnaire( )
     not CarePlan()
 then
-    System.out.println("Have answer for " + $q.getId() + ": requesting questionnaire " + $q.getNext());
-    insert( new Questionnaire($q.getNext()) );
+    System.out.println("Have answer for " + $questionnaireId + "#" + $questionId + " == " + $a.getValue() + ": requesting questionnaire " + $next);
+    insert( new Questionnaire($next) );
 end
 
+rule "High priority next question from Answer"
+    salience 15
+when
+    HighPriorityNextQuestion( $questionnaireId := questionnaireId, $questionId := questionId, $next := next, $answers := answers )
+    $a: Answered( $questionnaireId := questionnaireId, $questionId := questionId, $answers == null || $answers.isEmpty() || value memberOf $answers)
+    not Answered( $next := questionnaireId )
+    not Questionnaire( )
+    not CarePlan()
+then
+    System.out.println("Have answer for " + $questionnaireId + "#" + $questionId + " == " + $a.getValue() + ": requesting questionnaire " + $next);
+    insert( new Questionnaire($next) );
+end
+
+rule "CarePlan from Answers"
+    salience 200
+when
+    not CarePlan()
+    Outcome( $id := id, $outcome := outcome#CarePlan )
+    // Make sure all conditions for the outcome have been met with the valid answers in the 'Answered' object
+    (forall (
+        $oac : OutcomeAnswerCondition( $id := id, $questionnaireId := questionnaireId, $questionId := questionId, $answers := answers )
+        $a: Answered( $questionnaireId := questionnaireId, $questionId := questionId, $answers == null || $answers.isEmpty() || value memberOf $answers)
+    ))
+then
+    System.out.println("All conditions for outcome id " + $id + " met, inserting " + $outcome.getId());
+    insert($outcome);
+end
 
 // Simple assertions
 rule "Simple Assertions"

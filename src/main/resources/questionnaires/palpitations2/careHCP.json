@@ -1,0 +1,15 @@
+{
+    "id": "palpitations2.careHCP",
+    "items": [
+      {
+        "id": "q",
+        "text": "Are you under the care of a Healthcare professional?",
+        "type": "CHOICE",
+        "required": true,
+        "options": [
+          "Yes",
+          "No"
+        ]
+      }
+    ]
+  }
