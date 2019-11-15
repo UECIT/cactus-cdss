@@ -14,12 +14,14 @@ import org.hl7.fhir.dstu3.model.Type;
 import uk.nhs.cdss.domain.Answer;
 import uk.nhs.cdss.domain.Assertion;
 import uk.nhs.cdss.domain.CodableConcept;
+import uk.nhs.cdss.domain.Coding;
 import uk.nhs.cdss.domain.DataRequirement;
 import uk.nhs.cdss.domain.OptionType;
 import uk.nhs.cdss.domain.Question;
 import uk.nhs.cdss.domain.QuestionConstraint;
 import uk.nhs.cdss.domain.QuestionType;
 import uk.nhs.cdss.domain.QuestionnaireResponse;
+import uk.nhs.cdss.domain.Redirection;
 import uk.nhs.cdss.domain.Result;
 import uk.nhs.cdss.domain.ServiceDefinition;
 import uk.nhs.cdss.engine.CDSInput;
@@ -29,6 +31,8 @@ import uk.nhs.cdss.transform.bundle.CDSOutputBundle;
 import uk.nhs.cdss.transform.bundle.QuestionnaireBundle;
 
 public final class Transformers {
+
+  private Transformers() { }
 
   public interface AssertionTransformer
       extends Transformer<Observation, Assertion> { }
@@ -59,8 +63,9 @@ public final class Transformers {
   public interface QuestionTypeTransformer
       extends Transformer<QuestionType, QuestionnaireItemType> { }
 
-  public interface QuestionConstraintTransformer
-      extends Transformer<QuestionConstraint, QuestionnaireItemEnableWhenComponent> { }
+  public interface QuestionConstraintTransformer extends Transformer<
+      QuestionConstraint,
+      QuestionnaireItemEnableWhenComponent> { }
 
   public interface OptionTypeTransformer
       extends Transformer<OptionType, QuestionnaireItemOptionComponent> { }
@@ -92,4 +97,13 @@ public final class Transformers {
 
   public interface DataRequirementTransformer
       extends Transformer<DataRequirement, org.hl7.fhir.dstu3.model.DataRequirement> { }
+
+  public interface RedirectTransformer
+      extends Transformer<Redirection, org.hl7.fhir.dstu3.model.DataRequirement> { }
+
+  public interface CodingInTransformer
+      extends Transformer<org.hl7.fhir.dstu3.model.Coding, Coding> { }
+
+  public interface CodingOutTransformer
+      extends Transformer<Coding, org.hl7.fhir.dstu3.model.Coding> { }
 }

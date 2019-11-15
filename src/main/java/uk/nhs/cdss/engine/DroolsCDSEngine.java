@@ -9,6 +9,7 @@ import uk.nhs.cdss.domain.Assertion;
 import uk.nhs.cdss.domain.CarePlan;
 import uk.nhs.cdss.domain.Questionnaire;
 import uk.nhs.cdss.domain.QuestionnaireResponse;
+import uk.nhs.cdss.domain.Redirection;
 import uk.nhs.cdss.domain.Result;
 import uk.nhs.cdss.domain.Result.Status;
 
@@ -23,6 +24,9 @@ public class DroolsCDSEngine implements CDSEngine {
 
   public static final String CAREPLANS_QUERY = "carePlans";
   public static final String CAREPLAN_ID = "carePlan";
+
+  public static final String REDIRECTS_QUERY = "redirects";
+  public static final String REDIRECT_ID = "redirect";
 
   private final CDSKnowledgeBaseFactory knowledgeBaseFactory;
   private final CodeDirectory codeDirectory;
@@ -92,16 +96,27 @@ public class DroolsCDSEngine implements CDSEngine {
         result.getCarePlanIds().add(((CarePlan) resultsRow.get(CAREPLAN_ID)).getId());
       }
 
+      var redirects = ksession.getQueryResults(REDIRECTS_QUERY);
+      if (redirects.size() > 1) {
+        System.out.println("Invalid: more than 1 Redirect has been added");
+      } else if (redirects.size() == 1) {
+        var resultsRow = redirects.iterator().next();
+        System.out.println("Redirect " + resultsRow.get(REDIRECT_ID) + " added to output");
+        result.setRedirection((Redirection) resultsRow.get(REDIRECT_ID));
+      }
+
       // Determine result
       boolean dataRequested = !output.getQuestionnaireIds().isEmpty();
       boolean hasCarePlans = !result.getCarePlanIds().isEmpty();
+      boolean hasRedirection = result.getRedirection() != null;
+
       if (dataRequested) {
         if (hasCarePlans) {
           result.setStatus(Status.DATA_REQUESTED);
         } else {
           result.setStatus(Status.DATA_REQUIRED);
         }
-      } else if (!hasCarePlans) {
+      } else if (!hasCarePlans && !hasRedirection) {
         throw new IllegalStateException("Rules did not create care plan or request data");
       }
       output.setResult(result);

@@ -49,6 +49,6 @@ public class ScenarioTest {
 
     // Result with a redirection to another service definition
     Result result2 = new Result("result2", Result.Status.SUCCESS);
-    result2.setRedirection("serviceDefinition2");
+    result2.setRedirection(new Redirection("anxiety"));
   }
 }
