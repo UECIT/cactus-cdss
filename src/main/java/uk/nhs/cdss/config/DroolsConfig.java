@@ -52,6 +52,7 @@ public class DroolsConfig {
     codeDirectory.put("anxiety", buildCode("anxiety", "Issues with anxiety or panic attacks"));
     codeDirectory.put("careHCP", buildCode("careHCP", "Under care of health care professional"));
     codeDirectory.put("mentalHealthConcern", buildCode("mentalHealthConcern", "Mental health is a concern"));
+    codeDirectory.put("anxiety", buildCode("anxiety", "Concerned about anxiety"));
 
     //TEMP
     codeDirectory.put("tempSCDAge", buildCode("tempSCDAge", "TEMP SCD Age"));

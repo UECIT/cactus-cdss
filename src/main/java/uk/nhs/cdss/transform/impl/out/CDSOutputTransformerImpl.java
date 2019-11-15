@@ -30,10 +30,10 @@ import org.springframework.stereotype.Component;
 import uk.nhs.cdss.domain.Result.Status;
 import uk.nhs.cdss.entities.ResourceEntity;
 import uk.nhs.cdss.repos.ResourceRepository;
-import uk.nhs.cdss.resourceBuilder.ServiceDefinitionBuilder;
 import uk.nhs.cdss.transform.Transformers.CDSOutputTransformer;
 import uk.nhs.cdss.transform.Transformers.GuidanceResponseStatusTransformer;
 import uk.nhs.cdss.transform.Transformers.ObservationTransformer;
+import uk.nhs.cdss.transform.Transformers.RedirectTransformer;
 import uk.nhs.cdss.transform.bundle.CDSOutputBundle;
 import uk.nhs.cdss.utils.RequestGroupUtil;
 
@@ -233,22 +233,21 @@ public class CDSOutputTransformerImpl implements CDSOutputTransformer {
   private ResourceRepository resourceRepository;
   private ObservationTransformer observationTransformer;
   private GuidanceResponseStatusTransformer statusTransformer;
-  private ServiceDefinitionBuilder serviceDefinitionBuilder;
+  private RedirectTransformer redirectTransformer;
   private RequestGroupUtil requestGroupUtil;
   private IParser fhirParser;
 
   public CDSOutputTransformerImpl(
       ObservationTransformer observationTransformer,
       ResourceRepository resourceRepository,
-      IParser fhirParser,
+      RedirectTransformer redirectTransformer, IParser fhirParser,
       GuidanceResponseStatusTransformer statusTransformer,
-      ServiceDefinitionBuilder serviceDefinitionBuilder,
       RequestGroupUtil requestGroupUtil) {
     this.observationTransformer = observationTransformer;
     this.resourceRepository = resourceRepository;
+    this.redirectTransformer = redirectTransformer;
     this.fhirParser = fhirParser;
     this.statusTransformer = statusTransformer;
-    this.serviceDefinitionBuilder = serviceDefinitionBuilder;
     this.requestGroupUtil = requestGroupUtil;
   }
 
@@ -304,7 +303,8 @@ public class CDSOutputTransformerImpl implements CDSOutputTransformer {
 
   @Override
   public GuidanceResponse transform(CDSOutputBundle bundle) {
-    var result = bundle.getOutput().getResult();
+    final var output = bundle.getOutput();
+    final var result = output.getResult();
 
     var serviceDefinition = new Reference(
         "ServiceDefinition/" + bundle.getServiceDefinitionId());
@@ -316,8 +316,7 @@ public class CDSOutputTransformerImpl implements CDSOutputTransformer {
         .setStatus(statusTransformer.transform(result.getStatus()));
 
     var oldAssertions = bundle.getParameters().getObservations().stream();
-    var newAssertions = bundle.getOutput()
-        .getAssertions()
+    var newAssertions = output.getAssertions()
         .stream()
         .map(observationTransformer::transform);
 
@@ -331,13 +330,19 @@ public class CDSOutputTransformerImpl implements CDSOutputTransformer {
     saveParameters(outputParameters);
     response.setOutputParameters(new Reference(outputParameters));
 
-    bundle.getOutput()
-        .getQuestionnaireIds()
+    output.getQuestionnaireIds()
         .stream()
         .map(this::buildDataRequirement)
         .forEach(response::addDataRequirement);
 
-    if (result.getStatus() != Status.DATA_REQUIRED) {
+    if (result.getStatus() == Status.SUCCESS &&
+        result.getRedirection() != null) {
+      response.addDataRequirement(
+          redirectTransformer.transform(result.getRedirection()));
+    }
+
+    if (result.getStatus() != Status.DATA_REQUIRED &&
+        result.getRedirection() == null) {
       var carePlans = result.getCarePlanIds()
           .stream()
           .map(CDSOutputTransformerImpl::getPlan)

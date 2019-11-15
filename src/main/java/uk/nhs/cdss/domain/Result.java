@@ -14,7 +14,7 @@ public class Result {
   private final String id;
   private Status status;
   private String referralRequestId;
-  private String redirection;
+  private Redirection redirection;
 
   private final List<String> carePlanIds = new ArrayList<>();
 
@@ -47,11 +47,11 @@ public class Result {
     return carePlanIds;
   }
 
-  public void setRedirection(String serviceDefinitionId) {
-    this.redirection = serviceDefinitionId;
+  public void setRedirection(Redirection redirection) {
+    this.redirection = redirection;
   }
 
-  public String getRedirection() {
+  public Redirection getRedirection() {
     return redirection;
   }
 }

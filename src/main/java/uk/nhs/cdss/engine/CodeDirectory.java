@@ -12,6 +12,10 @@ public class CodeDirectory {
     return concepts.get(id);
   }
 
+  public boolean has(String id) {
+    return concepts.containsKey(id);
+  }
+
   public void put(String id, CodableConcept concept) {
     concepts.put(id, concept);
   }

@@ -1,0 +1,20 @@
+{
+  "id": "anxiety",
+  "title":  "Anxiety",
+  "description": "Anxiety 1st Party",
+  "usage": "To triage a patient suffering from anxiety",
+  "purpose": "To triage a patient suffering from anxiety",
+  "triggers": [
+    "anxiety"
+  ],
+  "dataRequirements": [
+    {
+      "type": "CareConnectObservation",
+      "coding": {
+        "system": "http://snomed.info/sct",
+        "code": "48694002",
+        "display": "Anxiety"
+      }
+    }
+  ]
+}

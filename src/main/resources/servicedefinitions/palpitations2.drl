@@ -18,6 +18,7 @@ import uk.nhs.cdss.domain.Answer
 import uk.nhs.cdss.domain.Assertion
 import uk.nhs.cdss.domain.Assertion.Status
 import uk.nhs.cdss.domain.CarePlan
+import uk.nhs.cdss.domain.Redirection
 import uk.nhs.cdss.domain.CodableConcept
 import uk.nhs.cdss.domain.Patient
 import uk.nhs.cdss.domain.Patient.Sex
@@ -45,6 +46,7 @@ then
     CarePlan gp = new CarePlan("consultGP");
     CarePlan selfCare = new CarePlan("selfCare");
     CarePlan pharmacy = new CarePlan("pharmacy");
+    Redirection anxiety = new Redirection("anxiety");
 
     // Are you experiencing palpitations now?
     insert( new InitialQuestionnaire("palpitations2.hasPalpitations") );
@@ -243,6 +245,10 @@ then
     // TODO transfer to anxiety
     insert( new NextQuestion("palpitations2.mentalHealthConcern", "palpitations2.careHCP", "q", Arrays.asList("No")) );
     insert( new AnswerAssertion("palpitations2.mentalHealthConcern", "q", "No", codeDirectory.get("mentalHealthConcern"), false));
+
+    //  Anxiety cause
+    insert( new Outcome("anxiety", anxiety));
+    insert( new OutcomeAnswerCondition("anxiety", "palpitations2.mentalHealthConcern", "q", Arrays.asList("Yes") ));
 
     // Do any of these apply to you?
     insert( new NextQuestion("palpitations2.causes", "palpitations2.mentalHealthConcern", "q", Arrays.asList("No")) );

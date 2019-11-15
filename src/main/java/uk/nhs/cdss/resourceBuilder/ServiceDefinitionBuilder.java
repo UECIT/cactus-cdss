@@ -3,7 +3,6 @@ package uk.nhs.cdss.resourceBuilder;
 import java.util.List;
 
 import org.hl7.fhir.dstu3.model.Coding;
-import org.hl7.fhir.dstu3.model.Enumerations.ResourceType;
 import org.hl7.fhir.dstu3.model.IdType;
 import org.hl7.fhir.dstu3.model.Identifier.IdentifierUse;
 import org.hl7.fhir.dstu3.model.Period;
@@ -62,7 +61,7 @@ public class ServiceDefinitionBuilder {
 		
 		DataRequirementEntity dataRequirement = 
 				dataRequirementRepository.findDistinctByServiceDefinitionIdAndCodedDataCodeAndCodedDataType(entity.getId(), trigger.getCode(), "Observation");
-				dataRequirementBuilder.buildTriggerDataRequirement(dataRequirement, serviceDefinition);
+		dataRequirementBuilder.buildTriggerDataRequirement(dataRequirement, serviceDefinition);
 	}
 
 	private void addTopic(ServiceDefinition serviceDefinition) {
@@ -76,7 +75,7 @@ public class ServiceDefinitionBuilder {
 	}
 
 	private void addUseContexts(ServiceDefinitionEntity entity, ServiceDefinition serviceDefinition) {
-		entity.getUseContexts().stream().forEach(ctx -> {
+		entity.getUseContexts().forEach(ctx -> {
 			serviceDefinition.addUseContext().setCode(new Coding().setVersion("1").setSystem(ctx.getSystem())
 					.setCode(ctx.getCode()).setDisplay(ctx.getDisplay()).setUserSelected(false));
 		});

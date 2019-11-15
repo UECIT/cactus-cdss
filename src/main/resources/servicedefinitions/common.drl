@@ -6,6 +6,7 @@ import uk.nhs.cdss.domain.Answer
 import uk.nhs.cdss.domain.Assertion
 import uk.nhs.cdss.domain.Assertion.Status
 import uk.nhs.cdss.domain.CarePlan
+import uk.nhs.cdss.domain.Redirection
 import uk.nhs.cdss.domain.CodableConcept
 import uk.nhs.cdss.domain.Questionnaire
 import uk.nhs.cdss.domain.QuestionnaireResponse
@@ -97,6 +98,7 @@ rule "Ask first question"
 when
     not Questionnaire()
     not CarePlan()
+    not Redirection()
     $q: InitialQuestionnaire()
 then
     System.out.println("No answers: requesting questionnaire " + $q.getId());
@@ -143,6 +145,20 @@ then
     System.out.println("All conditions for outcome id " + $id + " met, inserting " + $outcome.getId());
     insert($outcome);
 end
+rule "Redirection from Answers"
+    salience 200
+when
+    not Redirection()
+    Outcome( $id := id, $outcome := outcome#Redirection )
+    // Make sure all conditions for the outcome have been met with the valid answers in the 'Answered' object
+    (forall (
+        $oac : OutcomeAnswerCondition( $id := id, $questionnaireId := questionnaireId, $questionId := questionId, $answers := answers )
+        $a: Answered( $questionnaireId := questionnaireId, $questionId := questionId, $answers == null || $answers.isEmpty() || value memberOf $answers)
+    ))
+then
+    System.out.println("All conditions for outcome id " + $id + " met, inserting Redirection");
+    insert($outcome);
+end
 
 // Simple assertions
 rule "Simple Assertions"
@@ -172,4 +188,8 @@ end
 
 query "carePlans"
   carePlan: CarePlan()
+end
+
+query "redirects"
+  redirect: Redirection()
 end

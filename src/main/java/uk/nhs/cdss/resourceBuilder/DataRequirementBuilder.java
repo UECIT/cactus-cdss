@@ -51,7 +51,7 @@ public class DataRequirementBuilder {
 		List<Resource> resources = 
 				codedDataResourceBuilder.getCodedDataResources(entity.getCodedData(), false, false);
 		
-		resources.stream().forEach(resource -> 
+		resources.forEach(resource ->
 			buildDataRequirement(dataRequirement, resource, entity.getId()));
 		serviceDefinition.addTrigger().setEventData(dataRequirement);
 	}
@@ -77,9 +77,12 @@ public class DataRequirementBuilder {
 
 		serviceDefinition.addDataRequirement(dataRequirement);
 
-		List<Resource> resources = codedDataResourceBuilder.getCodedDataResources(entity.getCodedData(), false, false);
+		List<Resource> resources = codedDataResourceBuilder.getCodedDataResources(
+		    entity.getCodedData(),
+        false,
+        false);
 
-		resources.stream().forEach(resource -> 
+		resources.forEach(resource ->
 			serviceDefinition.addDataRequirement(
 					buildDataRequirement(resource, entity.getId())));
 
