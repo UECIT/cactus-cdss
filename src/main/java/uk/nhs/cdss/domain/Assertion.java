@@ -9,7 +9,7 @@ public class Assertion {
 
   public enum Status {FINAL, AMENDED}
 
-  private final String id;
+  private String id;
   private Status status;
   private CodableConcept code;
   private Instant issued;
@@ -18,6 +18,9 @@ public class Assertion {
   private final List<QuestionnaireResponse> related = new ArrayList<>();
   private final List<CodableConcept> components = new ArrayList<>();
 
+  public Assertion() {
+  }
+
   public Assertion(String id, Status status) {
     this.id = id;
     this.status = status;
@@ -25,6 +28,10 @@ public class Assertion {
 
   public String getId() {
     return id;
+  }
+
+  public void setId(String id) {
+    this.id = id;
   }
 
   public Status getStatus() {

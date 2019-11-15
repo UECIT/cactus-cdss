@@ -7,8 +7,11 @@ import java.util.Objects;
 
 public class CodableConcept {
 
-  private final List<Coding> coding;
-  private final String text;
+  private List<Coding> coding;
+  private String text;
+
+  public CodableConcept() {
+  }
 
   public CodableConcept(String text, List<Coding> coding) {
     this.coding = Collections.unmodifiableList(coding);
@@ -23,8 +26,16 @@ public class CodableConcept {
     return coding;
   }
 
+  public void setCoding(List<Coding> coding) {
+    this.coding = coding;
+  }
+
   public String getText() {
     return text;
+  }
+
+  public void setText(String text) {
+    this.text = text;
   }
 
   @Override

@@ -87,8 +87,8 @@ public class ServiceDefinitionProvider implements IResourceProvider {
 
   // TODO: remove when EMS no longer assumes numeric ids
   private String getServiceDefinitionId(IdType serviceDefinitionId) {
-    var legacyId = serviceDefinitionId.getIdPartAsLong();
-    switch (Long.toString(legacyId)) {
+    var legacyId = serviceDefinitionId.getIdPart();
+    switch (legacyId) {
       case "5":
         return "palpitations";
       case "6":
@@ -110,7 +110,7 @@ public class ServiceDefinitionProvider implements IResourceProvider {
       return serviceDefinitionTransformer.transform(domainServiceDefinition);
 
     } catch (IOException e) {
-      throw new ResourceNotFoundException(serviceDefinitionId);
+      throw new ResourceNotFoundException("Unable to load service definition " + serviceDefinitionId + ": " + e.getMessage());
     }
   }
 

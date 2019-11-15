@@ -49,7 +49,7 @@ public class DroolsConfig {
     codeDirectory.put("lastExperiencedMoreThan48", buildCode("lastExperiencedMoreThan48", "Last experienced palpitations over 48 hours ago"));
     codeDirectory.put("drugUse", buildCode("drugUse", "Has taken drugs"));
     codeDirectory.put("prescriptionUse", buildCode("prescriptionUse", "Has prescriptions"));
-    codeDirectory.put("anxiety", buildCode("anxiety", "Issues with anxiety or panic attacks"));
+    codeDirectory.put("anxiety", buildCode(SnomedConstants.ANXIETY, "Issues with anxiety or panic attacks"));
     codeDirectory.put("careHCP", buildCode("careHCP", "Under care of health care professional"));
     codeDirectory.put("mentalHealthConcern", buildCode("mentalHealthConcern", "Mental health is a concern"));
     codeDirectory.put("anxiety", buildCode("anxiety", "Concerned about anxiety"));
@@ -57,6 +57,14 @@ public class DroolsConfig {
     //TEMP
     codeDirectory.put("tempSCDAge", buildCode("tempSCDAge", "TEMP SCD Age"));
     codeDirectory.put("tempPregnancyAge", buildCode("tempPregnancyAge", "TEMP Pregnancy Age"));
+
+    // Outcomes
+    codeDirectory.put("call999", buildCode("call999", "Call 999"));
+    codeDirectory.put("selfCare", buildCode(SnomedConstants.SELF_CARE, "After Care Instructions"));
+
+    // Specialty
+    codeDirectory.put("cardio", buildCode("cardio", "Cardiology"));
+
 
     return codeDirectory;
   }

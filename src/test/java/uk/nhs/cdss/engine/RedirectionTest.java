@@ -51,26 +51,23 @@ public class RedirectionTest {
     var input = buildInput();
 
     asList(
-        buildResponse("hasPalpitations", "q","No"),
-        buildResponse("lastExperienced", "q1","No"),
-        buildResponse("lastExperienced", "q2","No"),
-        buildResponse("lastExperienced", "q3","Yes"),
-        buildResponse("syncope", "q","No"),
-        buildResponse("drugUse", "q","No"),
-        buildResponse("prescriptionUse", "q","No"),
-        buildResponse("anxiety", "q","Yes"),
-        buildResponse("careHCP", "q","No"),
-        buildResponse("mentalHealthConcern", "q","Yes"))
-      .forEach(input.getResponses()::add);
+        buildResponse("hasPalpitations", "q", "No"),
+        buildResponse("lastExperienced", "q1", "No"),
+        buildResponse("lastExperienced", "q2", "No"),
+        buildResponse("lastExperienced", "q3", "Yes"),
+        buildResponse("syncope", "q", "No"),
+        buildResponse("drugUse", "q", "No"),
+        buildResponse("prescriptionUse", "q", "No"),
+        buildResponse("anxiety", "q", "Yes"),
+        buildResponse("careHCP", "q", "No"),
+        buildResponse("mentalHealthConcern", "q", "Yes"))
+        .forEach(input.getResponses()::add);
 
     var output = engine.evaluate(input);
 
     assertEquals("has Success status", output.getResult().getStatus(), Status.SUCCESS);
     assertNull("has no referral", output.getResult().getReferralRequestId());
     assertThat("has no care plan", output.getResult().getCarePlanIds(), empty());
-    assertThat(
-        "redirect outcome",
-        output.getResult().getRedirection().codingIds,
-        contains(ANXIETY));
+    assertEquals("redirect outcome", ANXIETY, output.getResult().getRedirectionId());
   }
 }

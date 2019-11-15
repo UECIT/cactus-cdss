@@ -1,0 +1,22 @@
+{
+  "id": "selfCare",
+  "title": "Self care",
+  "status": "active",
+  "intent": "option",
+  "text": "After Care Instructions",
+  "activities": [
+    {
+      "code": {
+        "coding": [
+          {
+            "system": "http://snomed.info/sct",
+            "code": "907751000000109",
+            "display": "After Care Instructions"
+          }
+        ],
+        "text": "After Care Instructions"
+      },
+      "description": "Try sitting cross-legged and taking a slow breath in through your nostrils and then out through your mouth. Repeat until you feel calm."
+    }
+  ]
+}

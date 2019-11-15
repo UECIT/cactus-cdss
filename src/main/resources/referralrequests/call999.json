@@ -1,0 +1,13 @@
+{
+  "id": "call999",
+  "description": "Call 999",
+  "status": "draft",
+  "priority": "routine",
+  "intent": "plan",
+  "serviceRequested": "call999",
+  "occurrence": "8m",
+  "specialty": "cardio",
+  "reason": "Primary Concern: Acute Myocardial Infarction",
+  "note": ["A note"],
+  "carePlanIds": []
+}

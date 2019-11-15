@@ -1,0 +1,12 @@
+{
+  "id": "consultGP",
+  "description": "Consult GP",
+  "status": "draft",
+  "priority": "routine",
+  "intent": "plan",
+  "serviceRequested": "gp",
+  "occurrence": "now",
+  "specialty": "gp",
+  "note": ["A note"],
+  "carePlanIds": []
+}
