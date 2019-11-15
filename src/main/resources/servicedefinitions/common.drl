@@ -10,6 +10,7 @@ import uk.nhs.cdss.domain.Redirection
 import uk.nhs.cdss.domain.CodableConcept
 import uk.nhs.cdss.domain.Questionnaire
 import uk.nhs.cdss.domain.QuestionnaireResponse
+import uk.nhs.cdss.domain.Outcome
 
 declare Checkpoint
     id: String
@@ -46,9 +47,8 @@ declare OutcomeAnswerCondition
     answers: List
 end
 
-declare Outcome
+declare ActiveOutcome
     id: String @key
-    outcome: Object @key
 end
 
 declare AnswerAssertion
@@ -97,8 +97,7 @@ rule "Ask first question"
     salience -1
 when
     not Questionnaire()
-    not CarePlan()
-    not Redirection()
+    not ActiveOutcome()
     $q: InitialQuestionnaire()
 then
     System.out.println("No answers: requesting questionnaire " + $q.getId());
@@ -112,7 +111,7 @@ when
     $a: Answered( $questionnaireId := questionnaireId, $questionId := questionId, $answers == null || $answers.isEmpty() || value memberOf $answers)
     not Answered( $next := questionnaireId )
     not Questionnaire( )
-    not CarePlan()
+    not ActiveOutcome()
 then
     System.out.println("Have answer for " + $questionnaireId + "#" + $questionId + " == " + $a.getValue() + ": requesting questionnaire " + $next);
     insert( new Questionnaire($next) );
@@ -125,7 +124,7 @@ when
     $a: Answered( $questionnaireId := questionnaireId, $questionId := questionId, $answers == null || $answers.isEmpty() || value memberOf $answers)
     not Answered( $next := questionnaireId )
     not Questionnaire( )
-    not CarePlan()
+    not ActiveOutcome()
 then
     System.out.println("Have answer for " + $questionnaireId + "#" + $questionId + " == " + $a.getValue() + ": requesting questionnaire " + $next);
     insert( new Questionnaire($next) );
@@ -134,30 +133,16 @@ end
 rule "CarePlan from Answers"
     salience 200
 when
-    not CarePlan()
-    Outcome( $id := id, $outcome := outcome#CarePlan )
+    not ActiveOutcome()
+    Outcome( $id := id )
     // Make sure all conditions for the outcome have been met with the valid answers in the 'Answered' object
     (forall (
         $oac : OutcomeAnswerCondition( $id := id, $questionnaireId := questionnaireId, $questionId := questionId, $answers := answers )
         $a: Answered( $questionnaireId := questionnaireId, $questionId := questionId, $answers == null || $answers.isEmpty() || value memberOf $answers)
     ))
 then
-    System.out.println("All conditions for outcome id " + $id + " met, inserting " + $outcome.getId());
-    insert($outcome);
-end
-rule "Redirection from Answers"
-    salience 200
-when
-    not Redirection()
-    Outcome( $id := id, $outcome := outcome#Redirection )
-    // Make sure all conditions for the outcome have been met with the valid answers in the 'Answered' object
-    (forall (
-        $oac : OutcomeAnswerCondition( $id := id, $questionnaireId := questionnaireId, $questionId := questionId, $answers := answers )
-        $a: Answered( $questionnaireId := questionnaireId, $questionId := questionId, $answers == null || $answers.isEmpty() || value memberOf $answers)
-    ))
-then
-    System.out.println("All conditions for outcome id " + $id + " met, inserting Redirection");
-    insert($outcome);
+    System.out.println("All conditions for outcome id " + $id);
+    insert(new ActiveOutcome($id));
 end
 
 // Simple assertions
@@ -186,10 +171,7 @@ query "questionnaires"
   questionnaire : Questionnaire()
 end
 
-query "carePlans"
-  carePlan: CarePlan()
-end
-
-query "redirects"
-  redirect: Redirection()
+query "outcomes"
+  outcome: Outcome($id:=id)
+  ActiveOutcome($id:=id)
 end

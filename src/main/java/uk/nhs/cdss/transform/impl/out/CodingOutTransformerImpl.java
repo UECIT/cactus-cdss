@@ -12,6 +12,7 @@ public class CodingOutTransformerImpl implements CodingOutTransformer {
     var coding = new Coding();
     coding.setCode(from.getCode());
     coding.setSystem(from.getSystem());
+    coding.setDisplay(from.getDescription());
     return coding;
   }
 }

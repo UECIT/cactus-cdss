@@ -218,7 +218,7 @@ public class DroolsCDSEngineTest {
 
     CDSOutput output = engine.evaluate(input);
 
-    assertEquals("ED", output.getResult().getCarePlanIds().get(0));
+    assertEquals("ED", output.getResult().getReferralRequestId());
   }
 
   @Test
@@ -259,7 +259,7 @@ public class DroolsCDSEngineTest {
 
     CDSOutput output = engine.evaluate(input);
 
-    assertEquals("consultGP", output.getResult().getCarePlanIds().get(0));
+    assertEquals("consultGP", output.getResult().getReferralRequestId());
 
   }
 
@@ -355,8 +355,7 @@ public class DroolsCDSEngineTest {
     CDSOutput output = engine.evaluate(input);
 
     assertEquals(9 , output.getAssertions().size());
-    assertEquals(1, output.getResult().getCarePlanIds().size());
-    assertEquals("ED", output.getResult().getCarePlanIds().get(0));
+    assertEquals("ED", output.getResult().getReferralRequestId());
   }
 
   @Test
@@ -381,5 +380,124 @@ public class DroolsCDSEngineTest {
     assertEquals("palpitations2.hasPalpitations", output.getQuestionnaireIds().get(0));
     assertEquals(2, output.getAssertions().size());
     assertEquals(0, output.getResult().getCarePlanIds().size());
+  }
+
+  @Test
+  public void redirectOutcomeForTransfer() throws ServiceDefinitionException {
+    CDSInput input = new CDSInput(PALPITATIONS2, REQUEST_1, ENCOUNTER_1, SUPPLIER_1);
+
+    QuestionnaireResponse response = new QuestionnaireResponse("response",
+        "palpitations2.symptoms");
+    Answer answer = new Answer("palpitations2.hasPalpitations", "q", "No");
+    answer.setQuestionnaireResponse(response);
+    response.getAnswers().add(answer);
+    input.getResponses().add(response);
+
+    response = new QuestionnaireResponse("response", "palpitations2.lastExperienced");
+    answer = new Answer("palpitations2.lastExperienced", "q3", "Yes");
+    answer.setQuestionnaireResponse(response);
+    response.getAnswers().add(answer);
+    input.getResponses().add(response);
+
+    response = new QuestionnaireResponse("response", "palpitations2.syncope");
+    answer = new Answer("palpitations2.syncope", "q", "No");
+    answer.setQuestionnaireResponse(response);
+    response.getAnswers().add(answer);
+    input.getResponses().add(response);
+
+    response = new QuestionnaireResponse("response", "palpitations2.drugUse");
+    answer = new Answer("palpitations2.drugUse", "q", "No");
+    answer.setQuestionnaireResponse(response);
+    response.getAnswers().add(answer);
+    input.getResponses().add(response);
+
+    response = new QuestionnaireResponse("response", "palpitations2.prescriptionUse");
+    answer = new Answer("palpitations2.prescriptionUse", "q", "No");
+    answer.setQuestionnaireResponse(response);
+    response.getAnswers().add(answer);
+    input.getResponses().add(response);
+
+    response = new QuestionnaireResponse("response", "palpitations2.anxiety");
+    answer = new Answer("palpitations2.anxiety", "q", "Yes");
+    answer.setQuestionnaireResponse(response);
+    response.getAnswers().add(answer);
+    input.getResponses().add(response);
+
+    response = new QuestionnaireResponse("response", "palpitations2.careHCP");
+    answer = new Answer("palpitations2.careHCP", "q", "No");
+    answer.setQuestionnaireResponse(response);
+    response.getAnswers().add(answer);
+    input.getResponses().add(response);
+
+    response = new QuestionnaireResponse("response", "palpitations2.mentalHealthConcern");
+    answer = new Answer("palpitations2.mentalHealthConcern", "q", "Yes");
+    answer.setQuestionnaireResponse(response);
+    response.getAnswers().add(answer);
+    input.getResponses().add(response);
+
+    CDSOutput output = engine.evaluate(input);
+
+    assertEquals(7 , output.getAssertions().size());
+    assertEquals("anxiety", output.getResult().getRedirectionId());
+  }
+
+  @Test
+  public void carePlanOutcomeForSelfCare() throws ServiceDefinitionException {
+    CDSInput input = new CDSInput(PALPITATIONS2, REQUEST_1, ENCOUNTER_1, SUPPLIER_1);
+
+    QuestionnaireResponse response = new QuestionnaireResponse("response",
+        "palpitations2.symptoms");
+    Answer answer = new Answer("palpitations2.hasPalpitations", "q", "No");
+    answer.setQuestionnaireResponse(response);
+    response.getAnswers().add(answer);
+    input.getResponses().add(response);
+
+    response = new QuestionnaireResponse("response", "palpitations2.lastExperienced");
+    answer = new Answer("palpitations2.lastExperienced", "q3", "Yes");
+    answer.setQuestionnaireResponse(response);
+    response.getAnswers().add(answer);
+    input.getResponses().add(response);
+
+    response = new QuestionnaireResponse("response", "palpitations2.syncope");
+    answer = new Answer("palpitations2.syncope", "q", "No");
+    answer.setQuestionnaireResponse(response);
+    response.getAnswers().add(answer);
+    input.getResponses().add(response);
+
+    response = new QuestionnaireResponse("response", "palpitations2.drugUse");
+    answer = new Answer("palpitations2.drugUse", "q", "No");
+    answer.setQuestionnaireResponse(response);
+    response.getAnswers().add(answer);
+    input.getResponses().add(response);
+
+    response = new QuestionnaireResponse("response", "palpitations2.prescriptionUse");
+    answer = new Answer("palpitations2.prescriptionUse", "q", "No");
+    answer.setQuestionnaireResponse(response);
+    response.getAnswers().add(answer);
+    input.getResponses().add(response);
+
+    response = new QuestionnaireResponse("response", "palpitations2.anxiety");
+    answer = new Answer("palpitations2.anxiety", "q", "Yes");
+    answer.setQuestionnaireResponse(response);
+    response.getAnswers().add(answer);
+    input.getResponses().add(response);
+
+    response = new QuestionnaireResponse("response", "palpitations2.careHCP");
+    answer = new Answer("palpitations2.careHCP", "q", "Yes");
+    answer.setQuestionnaireResponse(response);
+    response.getAnswers().add(answer);
+    input.getResponses().add(response);
+
+    response = new QuestionnaireResponse("response", "palpitations2.hasCarePlan");
+    answer = new Answer("palpitations2.hasCarePlan", "q", "Yes");
+    answer.setQuestionnaireResponse(response);
+    response.getAnswers().add(answer);
+    input.getResponses().add(response);
+
+    CDSOutput output = engine.evaluate(input);
+
+    assertEquals(7 , output.getAssertions().size());
+    assertEquals(1, output.getResult().getCarePlanIds().size());
+    assertEquals("selfCare", output.getResult().getCarePlanIds().get(0));
   }
 }

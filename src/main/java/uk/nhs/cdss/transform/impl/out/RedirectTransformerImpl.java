@@ -39,11 +39,12 @@ public class RedirectTransformerImpl implements RedirectTransformer {
         "https://fhir.hl7.org.uk/STU3/StructureDefinition/CareConnect-CareConnectObservation-1";
 
     var requirement = new DataRequirement();
+    requirement.setId(from.getId());
     // TODO: this type must be documented as a difference between 1.0 and 1.POC of the spec
     // the guide still specifies this must be set to "TriggerDefinition"
     requirement.setType("CareConnectObservation");
 
-    from.codingIds.stream()
+    from.getCodingIds().stream()
         .filter(codeDirectory::has)
         .map(codeDirectory::get)
         .map(this::buildFilter)

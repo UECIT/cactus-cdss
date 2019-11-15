@@ -11,8 +11,8 @@
     "shoulderPain"
   ],
   "dataRequirements": [
-    "patient",
-    "organization",
-    "age"
+    { "type":  "Patient" },
+    { "type":  "Organization" },
+    { "type":  "Age" }
   ]
 }

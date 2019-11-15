@@ -8,6 +8,9 @@ public class Coding {
   private String system;
   private String description;
 
+  public Coding() {
+  }
+
   public Coding(String system, String code) {
     this(system, code, null);
   }

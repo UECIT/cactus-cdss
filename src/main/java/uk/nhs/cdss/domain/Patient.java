@@ -12,6 +12,9 @@ public class Patient {
 
   private Sex sex;
 
+  public Patient() {
+  }
+
   public Patient(int age, Sex sex) {
     this.age = age;
     this.sex = sex;

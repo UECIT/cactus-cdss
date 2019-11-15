@@ -1,32 +1,29 @@
 package uk.nhs.cdss.engine;
 
+import org.apache.commons.lang3.StringUtils;
 import org.drools.core.impl.InternalKnowledgeBase;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.rule.QueryResults;
 import org.kie.api.runtime.rule.QueryResultsRow;
 import org.springframework.stereotype.Component;
 import uk.nhs.cdss.domain.Assertion;
-import uk.nhs.cdss.domain.CarePlan;
+import uk.nhs.cdss.domain.Outcome;
 import uk.nhs.cdss.domain.Questionnaire;
 import uk.nhs.cdss.domain.QuestionnaireResponse;
-import uk.nhs.cdss.domain.Redirection;
 import uk.nhs.cdss.domain.Result;
 import uk.nhs.cdss.domain.Result.Status;
 
 @Component
 public class DroolsCDSEngine implements CDSEngine {
 
-  public static final String ASSERTIONS_QUERY = "assertions";
-  public static final String ASSERTION_ID = "assertion";
+  private static final String ASSERTIONS_QUERY = "assertions";
+  private static final String ASSERTION_ID = "assertion";
 
-  public static final String QUESTIONNAIRES_QUERY = "questionnaires";
-  public static final String QUESTIONNAIRE_ID = "questionnaire";
+  private static final String QUESTIONNAIRES_QUERY = "questionnaires";
+  private static final String QUESTIONNAIRE_ID = "questionnaire";
 
-  public static final String CAREPLANS_QUERY = "carePlans";
-  public static final String CAREPLAN_ID = "carePlan";
-
-  public static final String REDIRECTS_QUERY = "redirects";
-  public static final String REDIRECT_ID = "redirect";
+  private static final String OUTCOMES_QUERY = "outcomes";
+  private static final String OUTCOME_ID = "outcome";
 
   private final CDSKnowledgeBaseFactory knowledgeBaseFactory;
   private final CodeDirectory codeDirectory;
@@ -90,34 +87,29 @@ public class DroolsCDSEngine implements CDSEngine {
 
       Result result = new Result("result", Status.SUCCESS);
 
-      QueryResults carePlans = ksession.getQueryResults(CAREPLANS_QUERY);
-      for (QueryResultsRow resultsRow : carePlans) {
-        System.out.println("CarePlan " + resultsRow.get(CAREPLAN_ID) + " added to output");
-        result.getCarePlanIds().add(((CarePlan) resultsRow.get(CAREPLAN_ID)).getId());
-      }
-
-      var redirects = ksession.getQueryResults(REDIRECTS_QUERY);
-      if (redirects.size() > 1) {
-        System.out.println("Invalid: more than 1 Redirect has been added");
-      } else if (redirects.size() == 1) {
-        var resultsRow = redirects.iterator().next();
-        System.out.println("Redirect " + resultsRow.get(REDIRECT_ID) + " added to output");
-        result.setRedirection((Redirection) resultsRow.get(REDIRECT_ID));
+      QueryResults outcomes = ksession.getQueryResults(OUTCOMES_QUERY);
+      for (QueryResultsRow resultsRow : outcomes) {
+        System.out.println("Outcome " + resultsRow.get(OUTCOME_ID) + " added to output");
+        Outcome outcome = (Outcome) resultsRow.get(OUTCOME_ID);
+        if (outcome.getCarePlanIds() != null) {
+            result.getCarePlanIds().addAll(outcome.getCarePlanIds());
+        }
+        result.setReferralRequestId(outcome.getReferralRequestId());
+        result.setRedirectionId(outcome.getRedirectionId());
       }
 
       // Determine result
       boolean dataRequested = !output.getQuestionnaireIds().isEmpty();
-      boolean hasCarePlans = !result.getCarePlanIds().isEmpty();
-      boolean hasRedirection = result.getRedirection() != null;
+      boolean hasOutcome = outcomeExists(result);
 
       if (dataRequested) {
-        if (hasCarePlans) {
+        if (hasOutcome) {
           result.setStatus(Status.DATA_REQUESTED);
         } else {
           result.setStatus(Status.DATA_REQUIRED);
         }
-      } else if (!hasCarePlans && !hasRedirection) {
-        throw new IllegalStateException("Rules did not create care plan or request data");
+      } else if (!hasOutcome) {
+        throw new IllegalStateException("Rules did not create an outcome or request data");
       }
       output.setResult(result);
 
@@ -125,6 +117,12 @@ public class DroolsCDSEngine implements CDSEngine {
     } finally {
       ksession.dispose();
     }
+  }
+
+  private boolean outcomeExists(Result result) {
+    return !result.getCarePlanIds().isEmpty()
+        || result.getRedirectionId() != null
+        || StringUtils.isNotEmpty(result.getReferralRequestId());
   }
 
 }

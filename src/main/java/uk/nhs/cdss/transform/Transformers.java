@@ -13,6 +13,7 @@ import org.hl7.fhir.dstu3.model.QuestionnaireResponse.QuestionnaireResponseStatu
 import org.hl7.fhir.dstu3.model.Type;
 import uk.nhs.cdss.domain.Answer;
 import uk.nhs.cdss.domain.Assertion;
+import uk.nhs.cdss.domain.CarePlan;
 import uk.nhs.cdss.domain.CodableConcept;
 import uk.nhs.cdss.domain.Coding;
 import uk.nhs.cdss.domain.DataRequirement;
@@ -21,6 +22,7 @@ import uk.nhs.cdss.domain.Question;
 import uk.nhs.cdss.domain.QuestionConstraint;
 import uk.nhs.cdss.domain.QuestionType;
 import uk.nhs.cdss.domain.QuestionnaireResponse;
+import uk.nhs.cdss.domain.ReferralRequest;
 import uk.nhs.cdss.domain.Redirection;
 import uk.nhs.cdss.domain.Result;
 import uk.nhs.cdss.domain.ServiceDefinition;
@@ -63,9 +65,8 @@ public final class Transformers {
   public interface QuestionTypeTransformer
       extends Transformer<QuestionType, QuestionnaireItemType> { }
 
-  public interface QuestionConstraintTransformer extends Transformer<
-      QuestionConstraint,
-      QuestionnaireItemEnableWhenComponent> { }
+  public interface QuestionConstraintTransformer
+      extends Transformer<QuestionConstraint, QuestionnaireItemEnableWhenComponent> { }
 
   public interface OptionTypeTransformer
       extends Transformer<OptionType, QuestionnaireItemOptionComponent> { }
@@ -106,4 +107,10 @@ public final class Transformers {
 
   public interface CodingOutTransformer
       extends Transformer<Coding, org.hl7.fhir.dstu3.model.Coding> { }
+
+  public interface ReferralRequestTransformer
+      extends Transformer<ReferralRequest, org.hl7.fhir.dstu3.model.ReferralRequest> { }
+
+  public interface CarePlanTransformer
+      extends Transformer<CarePlan, org.hl7.fhir.dstu3.model.CarePlan> { }
 }
