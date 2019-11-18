@@ -12,21 +12,21 @@ import uk.nhs.cdss.domain.CarePlan;
 import uk.nhs.cdss.domain.CarePlan.Intent;
 import uk.nhs.cdss.domain.CarePlan.Status;
 import uk.nhs.cdss.domain.CarePlanActivity;
-import uk.nhs.cdss.domain.CodableConcept;
+import uk.nhs.cdss.domain.CodeableConcept;
 import uk.nhs.cdss.engine.CodeDirectory;
 import uk.nhs.cdss.transform.Transformers.CarePlanTransformer;
-import uk.nhs.cdss.transform.Transformers.CodeableConceptTransformer;
+import uk.nhs.cdss.transform.Transformers.CodeableConceptOutTransformer;
 
 @Component
 public class CarePlanTransformerImpl implements CarePlanTransformer {
 
-  private final CodeableConceptTransformer codeableConceptTransformer;
+  private final CodeableConceptOutTransformer codeableConceptOutTransformer;
   private final CodeDirectory codeDirectory;
 
   public CarePlanTransformerImpl(
-      CodeableConceptTransformer codeableConceptTransformer,
+      CodeableConceptOutTransformer codeableConceptOutTransformer,
       CodeDirectory codeDirectory) {
-    this.codeableConceptTransformer = codeableConceptTransformer;
+    this.codeableConceptOutTransformer = codeableConceptOutTransformer;
     this.codeDirectory = codeDirectory;
   }
 
@@ -48,8 +48,8 @@ public class CarePlanTransformerImpl implements CarePlanTransformer {
 
   private CarePlanActivityComponent transformCarePlanActivity(CarePlanActivity carePlanActivity) {
     CarePlanActivityComponent result = new CarePlanActivityComponent();
-    CodableConcept code = codeDirectory.get(carePlanActivity.getCode());
-    result.getDetail().setCode(codeableConceptTransformer.transform(code));
+    CodeableConcept code = codeDirectory.get(carePlanActivity.getCode());
+    result.getDetail().setCode(codeableConceptOutTransformer.transform(code));
     result.getDetail().setDescription(carePlanActivity.getDescription());
     return result;
   }

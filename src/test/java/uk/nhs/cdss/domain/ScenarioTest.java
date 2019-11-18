@@ -37,7 +37,7 @@ public class ScenarioTest {
     var coding = new Coding(
         "1651", "test.system.com",
         "flu");
-    hasFlu.setCode(new CodableConcept("flu", coding));
+    hasFlu.setCode(new CodeableConcept("flu", coding));
     hasFlu.setValue(true);
     hasFlu.getRelated().add(response);
 

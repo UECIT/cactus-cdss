@@ -1,10 +1,14 @@
 package uk.nhs.cdss.transform.impl.out;
 
+import com.google.common.base.Strings;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.hl7.fhir.dstu3.model.Annotation;
-import org.hl7.fhir.dstu3.model.CodeableConcept;
+import org.hl7.fhir.dstu3.model.Period;
 import org.hl7.fhir.dstu3.model.Reference;
 import org.hl7.fhir.dstu3.model.ReferralRequest;
 import org.hl7.fhir.dstu3.model.ReferralRequest.ReferralCategory;
@@ -15,39 +19,47 @@ import org.hl7.fhir.dstu3.model.Type;
 import org.springframework.stereotype.Component;
 import uk.nhs.cdss.domain.ActivityDefinition;
 import uk.nhs.cdss.domain.Assertion;
-import uk.nhs.cdss.domain.CodableConcept;
+import uk.nhs.cdss.domain.CodeableConcept;
 import uk.nhs.cdss.domain.ProcedureRequest;
 import uk.nhs.cdss.domain.ReferralRequest.Status;
 import uk.nhs.cdss.engine.CodeDirectory;
-import uk.nhs.cdss.transform.Transformers.CodeableConceptTransformer;
+import uk.nhs.cdss.transform.Transformers.CodeableConceptOutTransformer;
 import uk.nhs.cdss.transform.Transformers.ReferralRequestTransformer;
+import uk.nhs.cdss.transform.bundle.ReferralRequestBundle;
 
 @Component
 public class ReferralRequestTransformerImpl implements ReferralRequestTransformer {
 
-  private final CodeableConceptTransformer codeableConceptTransformer;
+  private final CodeableConceptOutTransformer codeableConceptOutTransformer;
   private final CodeDirectory codeDirectory;
 
   public ReferralRequestTransformerImpl(
-      CodeableConceptTransformer codeableConceptTransformer,
+      CodeableConceptOutTransformer codeableConceptOutTransformer,
       CodeDirectory codeDirectory) {
-    this.codeableConceptTransformer = codeableConceptTransformer;
+    this.codeableConceptOutTransformer = codeableConceptOutTransformer;
     this.codeDirectory = codeDirectory;
   }
 
   @Override
-  public ReferralRequest transform(uk.nhs.cdss.domain.ReferralRequest from) {
+  public ReferralRequest transform(ReferralRequestBundle bundle) {
 
     ReferralRequest result = new ReferralRequest();
+    var from = bundle.getReferralRequest();
 
     result.setId(from.getId());
     result.setDefinition(transformDefinition(from.getDefinition()));
     result.setBasedOn(transformProcedureRequest(from.getBasedOn()));
+    // replaces?
+    result.setGroupIdentifier(bundle.getRequestGroupIdentifier());
     result.setStatus(transformStatus(from.getStatus()));
     result.setIntent(transformIntent(from.getIntent()));
+    // type?
     result.setPriority(transformPriority(from.getPriority()));
     result.setServiceRequested(transformServiceRequested(from.getServiceRequested()));
+    result.setSubject(bundle.getSubject());
+    result.setContext(bundle.getContext());
     result.setOccurrence(transformOccurrence(from.getOccurrence()));
+    result.setAuthoredOn(from.getAuthoredOn());
     result.setSpecialty(transformSpecialty(from.getSpecialty()));
     result.setReasonReference(transformReason(from.getReason()));
     result.setDescription(from.getDescription());
@@ -61,9 +73,10 @@ public class ReferralRequestTransformerImpl implements ReferralRequestTransforme
     return result;
   }
 
-  private List<CodeableConcept> transformServiceRequested(String serviceRequested) {
+  private List<org.hl7.fhir.dstu3.model.CodeableConcept> transformServiceRequested(
+      String serviceRequested) {
     return Collections.singletonList(
-        codeableConceptTransformer.transform(codeDirectory.get(serviceRequested))
+        codeableConceptOutTransformer.transform(codeDirectory.get(serviceRequested))
     );
   }
 
@@ -77,13 +90,19 @@ public class ReferralRequestTransformerImpl implements ReferralRequestTransforme
     return Collections.emptyList();
   }
 
-  private CodeableConcept transformSpecialty(String specialty) {
-    CodableConcept code = codeDirectory.get(specialty);
-    return codeableConceptTransformer.transform(code);
+  private org.hl7.fhir.dstu3.model.CodeableConcept transformSpecialty(String specialty) {
+    CodeableConcept code = codeDirectory.get(specialty);
+    return codeableConceptOutTransformer.transform(code);
   }
 
   private Type transformOccurrence(String occurrence) {
-    // TODO
+    if (!Strings.isNullOrEmpty(occurrence)) {
+      Duration duration = Duration.parse(occurrence);
+      Instant now = Instant.now();
+      return new Period()
+          .setStart(Date.from(now))
+          .setEnd(Date.from(now.plus(duration)));
+    }
     return null;
   }
 

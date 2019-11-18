@@ -12,8 +12,8 @@ RUN mvn -B -Dmaven.repo.local=/app/.m2 package
 FROM openjdk:11-jre-slim
 WORKDIR /app
 VOLUME /tmp
-COPY --from=build /app/target/cdss-supplier-stub.war /app
+COPY --from=build /app/target/cds-test-engine.war /app
 COPY --from=build /app/target/classes/application.properties /app
 
-ENTRYPOINT [ "java", "-jar", "cdss-supplier-stub.war", "application.properties" ]
+ENTRYPOINT [ "java", "-jar", "cds-test-engine.war", "application.properties" ]
 EXPOSE 8080

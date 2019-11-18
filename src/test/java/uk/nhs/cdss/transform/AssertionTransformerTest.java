@@ -13,7 +13,7 @@ import org.junit.Test;
 import uk.nhs.cdss.domain.Assertion.Status;
 import uk.nhs.cdss.transform.impl.in.AssertionTransformerImpl;
 import uk.nhs.cdss.transform.impl.in.AssertionTransformerImpl.StatusTransformerImpl;
-import uk.nhs.cdss.transform.impl.in.CodableConceptTransformerImpl;
+import uk.nhs.cdss.transform.impl.in.CodeableConceptInTransformerImpl;
 import uk.nhs.cdss.transform.impl.in.CodingInTransformerImpl;
 import uk.nhs.cdss.transform.impl.in.ValueTransformerImpl;
 
@@ -44,7 +44,7 @@ public class AssertionTransformerTest {
     observation.setValue(new StringType(VALUE));
 
     var transformer = new AssertionTransformerImpl(
-        new CodableConceptTransformerImpl(new CodingInTransformerImpl()),
+        new CodeableConceptInTransformerImpl(new CodingInTransformerImpl()),
         new StatusTransformerImpl(),
         new ValueTransformerImpl());
 

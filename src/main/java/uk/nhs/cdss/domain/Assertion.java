@@ -3,7 +3,6 @@ package uk.nhs.cdss.domain;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import org.hl7.fhir.dstu3.model.Type;
 
 public class Assertion {
 
@@ -11,12 +10,12 @@ public class Assertion {
 
   private String id;
   private Status status;
-  private CodableConcept code;
+  private CodeableConcept code;
   private Instant issued;
   private Object value;
 
   private final List<QuestionnaireResponse> related = new ArrayList<>();
-  private final List<CodableConcept> components = new ArrayList<>();
+  private final List<CodeableConcept> components = new ArrayList<>();
 
   public Assertion() {
   }
@@ -42,11 +41,11 @@ public class Assertion {
     this.status = status;
   }
 
-  public CodableConcept getCode() {
+  public CodeableConcept getCode() {
     return code;
   }
 
-  public void setCode(CodableConcept code) {
+  public void setCode(CodeableConcept code) {
     this.code = code;
   }
 
@@ -70,7 +69,7 @@ public class Assertion {
     return related;
   }
 
-  public List<CodableConcept> getComponents() {
+  public List<CodeableConcept> getComponents() {
     return components;
   }
 

@@ -8,18 +8,18 @@ import uk.nhs.cdss.transform.Transformers.AssertionStatusTransformer;
 import uk.nhs.cdss.transform.Transformers.AssertionTransformer;
 import uk.nhs.cdss.domain.Assertion;
 import uk.nhs.cdss.domain.Assertion.Status;
-import uk.nhs.cdss.transform.Transformers.CodableConceptTransformer;
+import uk.nhs.cdss.transform.Transformers.CodeableConceptInTransformer;
 import uk.nhs.cdss.transform.Transformers.ValueTransformer;
 
 @Component
 public final class AssertionTransformerImpl implements AssertionTransformer {
 
-  private final CodableConceptTransformer codeTransformer;
+  private final CodeableConceptInTransformer codeTransformer;
   private final AssertionStatusTransformer statusTransformer;
   private final ValueTransformer valueTransformer;
 
   public AssertionTransformerImpl(
-      CodableConceptTransformer codeTransformer,
+      CodeableConceptInTransformer codeTransformer,
       AssertionStatusTransformer statusTransformer,
       ValueTransformer valueTransformer) {
     this.codeTransformer = codeTransformer;
