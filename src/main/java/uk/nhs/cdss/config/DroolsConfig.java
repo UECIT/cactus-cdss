@@ -4,16 +4,16 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import uk.nhs.cdss.constants.SnomedConstants;
 import uk.nhs.cdss.constants.SystemURL;
-import uk.nhs.cdss.domain.CodableConcept;
+import uk.nhs.cdss.domain.CodeableConcept;
 import uk.nhs.cdss.domain.Coding;
 import uk.nhs.cdss.engine.CodeDirectory;
 
 @Configuration
 public class DroolsConfig {
 
-  private CodableConcept buildCode(String id, String description) {
+  private CodeableConcept buildCode(String id, String description) {
     var coding = new Coding(SystemURL.SNOMED, id, description);
-    return new CodableConcept(id, coding);
+    return new CodeableConcept(id, coding);
   }
 
   @Bean

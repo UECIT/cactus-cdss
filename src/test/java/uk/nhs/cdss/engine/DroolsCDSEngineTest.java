@@ -10,7 +10,7 @@ import uk.nhs.cdss.constants.SnomedConstants;
 import uk.nhs.cdss.constants.SystemURL;
 import uk.nhs.cdss.domain.Answer;
 import uk.nhs.cdss.domain.Assertion;
-import uk.nhs.cdss.domain.CodableConcept;
+import uk.nhs.cdss.domain.CodeableConcept;
 import uk.nhs.cdss.domain.Coding;
 import uk.nhs.cdss.domain.QuestionnaireResponse;
 import uk.nhs.cdss.domain.Result.Status;
@@ -268,11 +268,11 @@ public class DroolsCDSEngineTest {
     CDSInput input = new CDSInput(PALPITATIONS2, REQUEST_1, ENCOUNTER_1, SUPPLIER_1);
 
     Assertion ageAssertion = new Assertion(null, Assertion.Status.FINAL);
-    ageAssertion.setCode(new CodableConcept(SnomedConstants.AGE, new Coding(SystemURL.SNOMED, SnomedConstants.AGE)));
+    ageAssertion.setCode(new CodeableConcept(SnomedConstants.AGE, new Coding(SystemURL.SNOMED, SnomedConstants.AGE)));
     ageAssertion.setValue("1900-12-25");
 
     Assertion genderAssertion = new Assertion(null, Assertion.Status.FINAL);
-    genderAssertion.setCode(new CodableConcept(SnomedConstants.GENDER, new Coding(SystemURL.SNOMED, SnomedConstants.GENDER)));
+    genderAssertion.setCode(new CodeableConcept(SnomedConstants.GENDER, new Coding(SystemURL.SNOMED, SnomedConstants.GENDER)));
     genderAssertion.setValue("male");
 
     input.getAssertions().add(ageAssertion);
@@ -363,11 +363,11 @@ public class DroolsCDSEngineTest {
     CDSInput input = new CDSInput(PALPITATIONS2, REQUEST_1, ENCOUNTER_1, SUPPLIER_1);
 
     Assertion ageAssertion = new Assertion(null, Assertion.Status.FINAL);
-    ageAssertion.setCode(new CodableConcept(SnomedConstants.AGE, new Coding(SystemURL.SNOMED, SnomedConstants.AGE)));
+    ageAssertion.setCode(new CodeableConcept(SnomedConstants.AGE, new Coding(SystemURL.SNOMED, SnomedConstants.AGE)));
     ageAssertion.setValue("1900-12-25");
 
     Assertion genderAssertion = new Assertion(null, Assertion.Status.FINAL);
-    genderAssertion.setCode(new CodableConcept(SnomedConstants.GENDER, new Coding(SystemURL.SNOMED, SnomedConstants.GENDER)));
+    genderAssertion.setCode(new CodeableConcept(SnomedConstants.GENDER, new Coding(SystemURL.SNOMED, SnomedConstants.GENDER)));
     genderAssertion.setValue("male");
 
     input.getAssertions().add(ageAssertion);

@@ -1,6 +1,7 @@
 package uk.nhs.cdss.domain;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class ReferralRequest {
@@ -65,6 +66,11 @@ public class ReferralRequest {
    * time (now) and end time (now+3 days, or now+four hours).
    */
   private String occurrence;
+
+  /**
+   * Date of creation/activation
+   */
+  private Date authoredOn;
 
   /**
    * This SHOULD be populated by the CDSS with the clinical specialty related to the patient's
@@ -169,6 +175,14 @@ public class ReferralRequest {
 
   public void setOccurrence(String occurrence) {
     this.occurrence = occurrence;
+  }
+
+  public Date getAuthoredOn() {
+    return authoredOn;
+  }
+
+  public void setAuthoredOn(Date authoredOn) {
+    this.authoredOn = authoredOn;
   }
 
   public String getSpecialty() {

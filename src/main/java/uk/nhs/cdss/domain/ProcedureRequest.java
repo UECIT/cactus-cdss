@@ -2,7 +2,7 @@ package uk.nhs.cdss.domain;
 
 public class ProcedureRequest {
   private String id;
-  private CodableConcept code;
+  private CodeableConcept code;
   private ActivityDefinition definition;
 
   public String getId() {
@@ -13,11 +13,11 @@ public class ProcedureRequest {
     this.id = id;
   }
 
-  public CodableConcept getCode() {
+  public CodeableConcept getCode() {
     return code;
   }
 
-  public void setCode(CodableConcept code) {
+  public void setCode(CodeableConcept code) {
     this.code = code;
   }
 }

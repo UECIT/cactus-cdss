@@ -17,6 +17,7 @@ import org.hl7.fhir.dstu3.model.DataRequirement;
 import org.hl7.fhir.dstu3.model.DataRequirement.DataRequirementCodeFilterComponent;
 import org.hl7.fhir.dstu3.model.GuidanceResponse;
 import org.hl7.fhir.dstu3.model.GuidanceResponse.GuidanceResponseStatus;
+import org.hl7.fhir.dstu3.model.Identifier;
 import org.hl7.fhir.dstu3.model.Narrative;
 import org.hl7.fhir.dstu3.model.Narrative.NarrativeStatus;
 import org.hl7.fhir.dstu3.model.Observation;
@@ -26,6 +27,7 @@ import org.hl7.fhir.dstu3.model.Reference;
 import org.hl7.fhir.dstu3.model.RequestGroup;
 import org.hl7.fhir.dstu3.model.RequestGroup.RequestIntent;
 import org.hl7.fhir.dstu3.model.RequestGroup.RequestStatus;
+import org.hl7.fhir.dstu3.model.Resource;
 import org.hl7.fhir.dstu3.model.ResourceType;
 import org.hl7.fhir.dstu3.model.StringType;
 import org.springframework.stereotype.Component;
@@ -45,6 +47,7 @@ import uk.nhs.cdss.transform.Transformers.ObservationTransformer;
 import uk.nhs.cdss.transform.Transformers.ReferralRequestTransformer;
 import uk.nhs.cdss.transform.Transformers.RedirectTransformer;
 import uk.nhs.cdss.transform.bundle.CDSOutputBundle;
+import uk.nhs.cdss.transform.bundle.ReferralRequestBundle;
 import uk.nhs.cdss.utils.RequestGroupUtil;
 
 @Component
@@ -334,16 +337,23 @@ public class CDSOutputTransformerImpl implements CDSOutputTransformer {
           redirectTransformer.transform(redirection));
     }
 
-    if (result.getStatus() != Status.DATA_REQUIRED &&
-        result.getRedirectionId() == null) {
-      var requestGroup = transformRequestGroup(result);
-      response.setResult(new Reference(requestGroup));
+    if (result.getStatus() != Status.DATA_REQUIRED && result.getRedirectionId() == null) {
+      response.setResult(new Reference(buildRequestGroup(bundle)));
     }
 
     return response;
   }
 
-  private RequestGroup transformRequestGroup(Result result) {
+  private RequestGroup buildRequestGroup(CDSOutputBundle bundle) {
+    Result result = bundle.getOutput().getResult();
+
+    // FIXME - not known until after request group has been stored
+    Identifier requestGroupIdentifier = null;
+
+    var requestGroup = requestGroupUtil.buildRequestGroup(
+        RequestStatus.ACTIVE,
+        RequestIntent.ORDER);
+
     List<String> carePlanIds = new ArrayList<>(result.getCarePlanIds());
 
     org.hl7.fhir.dstu3.model.ReferralRequest referralRequest = null;
@@ -351,16 +361,26 @@ public class CDSOutputTransformerImpl implements CDSOutputTransformer {
     if (referralRequestId != null) {
       var domainReferralRequest = getReferralRequest(referralRequestId);
       carePlanIds.addAll(domainReferralRequest.getCarePlanIds());
-      referralRequest = referralRequestTransformer.transform(domainReferralRequest);
+
+      var subject = bundle.getParameters().getInputData().stream()
+          .filter(resource -> resource.getResourceType() == ResourceType.Patient)
+          .findAny()
+          .map(Reference::new)
+          .orElse(null);
+
+      var context = bundle.getParameters().getEncounter();
+
+      referralRequest = referralRequestTransformer.transform(new ReferralRequestBundle(
+          requestGroupIdentifier,
+          domainReferralRequest,
+          subject,
+          context
+      ));
     }
 
     var carePlans = carePlanIds.stream()
         .map(this::getCarePlan)
         .collect(Collectors.toUnmodifiableList());
-
-    var requestGroup = requestGroupUtil.buildRequestGroup(
-        RequestStatus.ACTIVE,
-        RequestIntent.ORDER);
 
     saveRequestGroup(requestGroup, referralRequest, carePlans);
     return requestGroup;

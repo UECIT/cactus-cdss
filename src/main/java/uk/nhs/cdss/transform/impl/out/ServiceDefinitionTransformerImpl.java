@@ -15,12 +15,12 @@ public class ServiceDefinitionTransformerImpl implements ServiceDefinitionTransf
 
   private final CodeDirectory codeDirectory;
   private final DataRequirementTransformer requirementTransformer;
-  private final CodeableConceptTransformerImpl codeableConceptTransformer;
+  private final CodeableConceptOutTransformerImpl codeableConceptTransformer;
 
   public ServiceDefinitionTransformerImpl(
       CodeDirectory codeDirectory,
       DataRequirementTransformer requirementTransformer,
-      CodeableConceptTransformerImpl codeableConceptTransformer) {
+      CodeableConceptOutTransformerImpl codeableConceptTransformer) {
     this.codeDirectory = codeDirectory;
     this.requirementTransformer = requirementTransformer;
     this.codeableConceptTransformer = codeableConceptTransformer;

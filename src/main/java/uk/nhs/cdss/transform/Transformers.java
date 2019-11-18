@@ -1,6 +1,5 @@
 package uk.nhs.cdss.transform;
 
-import org.hl7.fhir.dstu3.model.CodeableConcept;
 import org.hl7.fhir.dstu3.model.GuidanceResponse;
 import org.hl7.fhir.dstu3.model.GuidanceResponse.GuidanceResponseStatus;
 import org.hl7.fhir.dstu3.model.Observation;
@@ -10,11 +9,12 @@ import org.hl7.fhir.dstu3.model.Questionnaire.QuestionnaireItemEnableWhenCompone
 import org.hl7.fhir.dstu3.model.Questionnaire.QuestionnaireItemOptionComponent;
 import org.hl7.fhir.dstu3.model.Questionnaire.QuestionnaireItemType;
 import org.hl7.fhir.dstu3.model.QuestionnaireResponse.QuestionnaireResponseStatus;
+import org.hl7.fhir.dstu3.model.ReferralRequest;
 import org.hl7.fhir.dstu3.model.Type;
 import uk.nhs.cdss.domain.Answer;
 import uk.nhs.cdss.domain.Assertion;
 import uk.nhs.cdss.domain.CarePlan;
-import uk.nhs.cdss.domain.CodableConcept;
+import uk.nhs.cdss.domain.CodeableConcept;
 import uk.nhs.cdss.domain.Coding;
 import uk.nhs.cdss.domain.DataRequirement;
 import uk.nhs.cdss.domain.OptionType;
@@ -22,7 +22,6 @@ import uk.nhs.cdss.domain.Question;
 import uk.nhs.cdss.domain.QuestionConstraint;
 import uk.nhs.cdss.domain.QuestionType;
 import uk.nhs.cdss.domain.QuestionnaireResponse;
-import uk.nhs.cdss.domain.ReferralRequest;
 import uk.nhs.cdss.domain.Redirection;
 import uk.nhs.cdss.domain.Result;
 import uk.nhs.cdss.domain.ServiceDefinition;
@@ -31,6 +30,7 @@ import uk.nhs.cdss.transform.bundle.AnswerBundle;
 import uk.nhs.cdss.transform.bundle.CDSInputBundle;
 import uk.nhs.cdss.transform.bundle.CDSOutputBundle;
 import uk.nhs.cdss.transform.bundle.QuestionnaireBundle;
+import uk.nhs.cdss.transform.bundle.ReferralRequestBundle;
 
 public final class Transformers {
 
@@ -45,8 +45,8 @@ public final class Transformers {
   public interface AnswerTransformer
       extends Transformer<AnswerBundle, Answer> { }
 
-  public interface CodableConceptTransformer
-      extends Transformer<CodeableConcept, CodableConcept> { }
+  public interface CodeableConceptInTransformer
+      extends Transformer<org.hl7.fhir.dstu3.model.CodeableConcept, CodeableConcept> { }
 
   public interface QuestionnaireResponseTransformer extends Transformer<
       org.hl7.fhir.dstu3.model.QuestionnaireResponse,
@@ -80,8 +80,8 @@ public final class Transformers {
   public interface ObservationStatusTransformer
       extends Transformer<Assertion.Status, Observation.ObservationStatus> { }
 
-  public interface CodeableConceptTransformer
-      extends Transformer<CodableConcept, CodeableConcept> { }
+  public interface CodeableConceptOutTransformer
+      extends Transformer<CodeableConcept, org.hl7.fhir.dstu3.model.CodeableConcept> { }
 
   public interface ValueTransformer extends Transformer<Type, Object> { }
 
@@ -109,7 +109,7 @@ public final class Transformers {
       extends Transformer<Coding, org.hl7.fhir.dstu3.model.Coding> { }
 
   public interface ReferralRequestTransformer
-      extends Transformer<ReferralRequest, org.hl7.fhir.dstu3.model.ReferralRequest> { }
+      extends Transformer<ReferralRequestBundle, ReferralRequest> { }
 
   public interface CarePlanTransformer
       extends Transformer<CarePlan, org.hl7.fhir.dstu3.model.CarePlan> { }
