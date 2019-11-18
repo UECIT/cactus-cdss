@@ -1,7 +1,9 @@
 package uk.nhs.cdss.engine;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -13,15 +15,14 @@ import uk.nhs.cdss.domain.Assertion;
 import uk.nhs.cdss.domain.CodeableConcept;
 import uk.nhs.cdss.domain.Coding;
 import uk.nhs.cdss.domain.QuestionnaireResponse;
-import uk.nhs.cdss.domain.Result.Status;
 
 public class DroolsCDSEngineTest {
 
-  public static final String PALPITATIONS = "palpitations";
-  public static final String PALPITATIONS2 = "palpitations2";
-  public static final String REQUEST_1 = "request1";
-  public static final String ENCOUNTER_1 = "encounter1";
-  public static final String SUPPLIER_1 = "supplier1";
+  private static final String PALPITATIONS = "palpitations";
+  private static final String PALPITATIONS2 = "palpitations2";
+  private static final String REQUEST_1 = "request1";
+  private static final String ENCOUNTER_1 = "encounter1";
+  private static final String SUPPLIER_1 = "supplier1";
   private DroolsCDSEngine engine;
 
   @Before
@@ -36,7 +37,6 @@ public class DroolsCDSEngineTest {
 
     CDSOutput output = engine.evaluate(input);
 
-    assertEquals(Status.DATA_REQUIRED, output.getResult().getStatus());
     assertEquals(0, output.getAssertions().size());
     assertEquals("palpitations.chestPain", output.getQuestionnaireIds().get(0));
   }
@@ -69,10 +69,8 @@ public class DroolsCDSEngineTest {
     input.getResponses().add(response);
 
     CDSOutput output = engine.evaluate(input);
-
-    assertNotEquals(Status.DATA_REQUIRED, output.getResult().getStatus());
-    assertEquals(1, output.getResult().getCarePlanIds().size());
-    assertEquals("call999", output.getResult().getCarePlanIds().get(0));
+    assertNotNull(output.getResult().getReferralRequestId());
+    assertEquals("call999", output.getResult().getReferralRequestId());
   }
 
   @Test
@@ -104,7 +102,6 @@ public class DroolsCDSEngineTest {
 
     CDSOutput output = engine.evaluate(input);
 
-    assertEquals(Status.DATA_REQUIRED, output.getResult().getStatus());
     assertEquals(0, output.getResult().getCarePlanIds().size());
   }
 
@@ -170,7 +167,6 @@ public class DroolsCDSEngineTest {
 
     CDSOutput output = engine.evaluate(input);
 
-    assertEquals(Status.SUCCESS, output.getResult().getStatus());
     assertEquals(1, output.getResult().getCarePlanIds().size());
     assertEquals("selfCare", output.getResult().getCarePlanIds().get(0));
   }

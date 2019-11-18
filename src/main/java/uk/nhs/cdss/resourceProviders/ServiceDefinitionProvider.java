@@ -32,8 +32,7 @@ import uk.nhs.cdss.entities.ServiceDefinitionEntity;
 import uk.nhs.cdss.repos.ServiceDefinitionRepository;
 import uk.nhs.cdss.resourceBuilder.ServiceDefinitionBuilder;
 import uk.nhs.cdss.services.EvaluateService;
-import uk.nhs.cdss.transform.Transformers.ServiceDefinitionTransformer;
-import uk.nhs.cdss.transform.impl.out.ServiceDefinitionTransformerImpl;
+import uk.nhs.cdss.transform.out.ServiceDefinitionTransformer;
 
 @RestController
 public class ServiceDefinitionProvider implements IResourceProvider {
@@ -49,7 +48,7 @@ public class ServiceDefinitionProvider implements IResourceProvider {
 	public ServiceDefinitionProvider(
 			EvaluateService evaluateService, ServiceDefinitionBuilder serviceDefinitionBuilder,
 			ServiceDefinitionRepository serviceDefinitionRepository,
-			ServiceDefinitionTransformerImpl serviceDefinitionTransformer,
+			ServiceDefinitionTransformer serviceDefinitionTransformer,
 			ObjectMapper objectMapper) {
 		this.evaluateService = evaluateService;
 		this.serviceDefinitionBuilder = serviceDefinitionBuilder;
@@ -93,6 +92,8 @@ public class ServiceDefinitionProvider implements IResourceProvider {
         return "palpitations";
       case "6":
         return "palpitations2";
+      case "7":
+        return "anxiety";
       default:
         throw new IllegalArgumentException();
     }

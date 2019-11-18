@@ -1,4 +1,7 @@
-package uk.nhs.cdss.transform.impl.out;
+package uk.nhs.cdss.transform.out;
+
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 import ca.uhn.fhir.parser.IParser;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
@@ -8,18 +11,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.hl7.fhir.dstu3.model.CareConnectCarePlan;
 import org.hl7.fhir.dstu3.model.CarePlan;
-import org.hl7.fhir.dstu3.model.CarePlan.CarePlanIntent;
-import org.hl7.fhir.dstu3.model.CarePlan.CarePlanStatus;
-import org.hl7.fhir.dstu3.model.CodeableConcept;
 import org.hl7.fhir.dstu3.model.DataRequirement;
 import org.hl7.fhir.dstu3.model.DataRequirement.DataRequirementCodeFilterComponent;
 import org.hl7.fhir.dstu3.model.GuidanceResponse;
 import org.hl7.fhir.dstu3.model.GuidanceResponse.GuidanceResponseStatus;
 import org.hl7.fhir.dstu3.model.Identifier;
-import org.hl7.fhir.dstu3.model.Narrative;
-import org.hl7.fhir.dstu3.model.Narrative.NarrativeStatus;
 import org.hl7.fhir.dstu3.model.Observation;
 import org.hl7.fhir.dstu3.model.Parameters;
 import org.hl7.fhir.dstu3.model.Parameters.ParametersParameterComponent;
@@ -27,148 +24,28 @@ import org.hl7.fhir.dstu3.model.Reference;
 import org.hl7.fhir.dstu3.model.RequestGroup;
 import org.hl7.fhir.dstu3.model.RequestGroup.RequestIntent;
 import org.hl7.fhir.dstu3.model.RequestGroup.RequestStatus;
-import org.hl7.fhir.dstu3.model.Resource;
 import org.hl7.fhir.dstu3.model.ResourceType;
 import org.hl7.fhir.dstu3.model.StringType;
 import org.springframework.stereotype.Component;
 import uk.nhs.cdss.domain.Redirection;
 import uk.nhs.cdss.domain.ReferralRequest;
 import uk.nhs.cdss.domain.Result;
-import uk.nhs.cdss.domain.Result.Status;
 import uk.nhs.cdss.entities.ResourceEntity;
 import uk.nhs.cdss.repos.ResourceRepository;
 import uk.nhs.cdss.services.CarePlanFactory;
 import uk.nhs.cdss.services.RedirectionFactory;
 import uk.nhs.cdss.services.ReferralRequestFactory;
-import uk.nhs.cdss.transform.Transformers.CDSOutputTransformer;
-import uk.nhs.cdss.transform.Transformers.CarePlanTransformer;
-import uk.nhs.cdss.transform.Transformers.GuidanceResponseStatusTransformer;
-import uk.nhs.cdss.transform.Transformers.ObservationTransformer;
-import uk.nhs.cdss.transform.Transformers.ReferralRequestTransformer;
-import uk.nhs.cdss.transform.Transformers.RedirectTransformer;
+import uk.nhs.cdss.transform.Transformer;
 import uk.nhs.cdss.transform.bundle.CDSOutputBundle;
 import uk.nhs.cdss.transform.bundle.ReferralRequestBundle;
 import uk.nhs.cdss.utils.RequestGroupUtil;
 
 @Component
-public class CDSOutputTransformerImpl implements CDSOutputTransformer {
-
-  private static List<CarePlan> knownCarePlans = new ArrayList<>();
-
-  static {
-    knownCarePlans.add(buildEDCarePlan());
-    knownCarePlans.add(buildUTCCarePlan());
-    knownCarePlans.add(buildGPCarePlan());
-    knownCarePlans.add(buildPharmacyCarePlan());
-  }
-
-  private static CarePlan buildEDCarePlan() {
-    CarePlan plan = new CareConnectCarePlan();
-    plan.setTitle("ED");
-    plan.setId("ED");
-    plan.setStatus(CarePlanStatus.ACTIVE);
-    plan.setIntent(CarePlanIntent.OPTION);
-
-    CodeableConcept code = new CodeableConcept();
-    code.addCoding().setSystem("http://snomed.info/sct").setCode("907751000000109")
-        .setDisplay("After Care Instructions");
-    code.setText("After Care Instructions");
-
-    Narrative text2 = new Narrative();
-    text2 = text2.setStatus(NarrativeStatus.GENERATED);
-    text2.setDivAsString("After Care Instructions");
-
-    plan.getActivityFirstRep().getDetail().setCode(code);
-    plan.getActivityFirstRep().getDetail().setDescription(
-        "Try sitting cross-legged and taking a slow breath in through your"
-            + " nostrils and then out through your mouth."
-            + " Repeat until you feel calm.");
-    plan.setText(text2);
-
-    return plan;
-  }
-
-  private static CarePlan buildUTCCarePlan() {
-    CarePlan plan = new CareConnectCarePlan();
-    plan.setTitle("UTC");
-    plan.setId("UTC");
-    plan.setStatus(CarePlanStatus.ACTIVE);
-    plan.setIntent(CarePlanIntent.OPTION);
-
-    CodeableConcept code = new CodeableConcept();
-    code.addCoding().setSystem("http://snomed.info/sct").setCode("907751000000109")
-        .setDisplay("After Care Instructions");
-    code.setText("After Care Instructions");
-
-    Narrative text2 = new Narrative();
-    text2 = text2.setStatus(NarrativeStatus.GENERATED);
-    text2.setDivAsString("After Care Instructions");
-
-    plan.getActivityFirstRep().getDetail().setCode(code);
-    plan.getActivityFirstRep().getDetail().setDescription(
-        "Try sitting cross-legged and taking a slow breath in through your"
-            + " nostrils and then out through your mouth."
-            + " Repeat until you feel calm.");
-    plan.setText(text2);
-
-    return plan;
-  }
-
-  private static CarePlan buildGPCarePlan() {
-    CarePlan plan = new CareConnectCarePlan();
-    plan.setTitle("GP");
-    plan.setId("consultGP");
-    plan.setStatus(CarePlanStatus.ACTIVE);
-    plan.setIntent(CarePlanIntent.OPTION);
-
-    CodeableConcept code = new CodeableConcept();
-    code.addCoding().setSystem("http://snomed.info/sct").setCode("907751000000109")
-        .setDisplay("After Care Instructions");
-    code.setText("After Care Instructions");
-
-    Narrative text2 = new Narrative();
-    text2 = text2.setStatus(NarrativeStatus.GENERATED);
-    text2.setDivAsString("After Care Instructions");
-
-    plan.getActivityFirstRep().getDetail().setCode(code);
-    plan.getActivityFirstRep().getDetail().setDescription(
-        "Try sitting cross-legged and taking a slow breath in through your"
-            + " nostrils and then out through your mouth."
-            + " Repeat until you feel calm.");
-    plan.setText(text2);
-
-    return plan;
-  }
-
-  private static CarePlan buildPharmacyCarePlan() {
-    CarePlan plan = new CareConnectCarePlan();
-    plan.setTitle("Pharmacy");
-    plan.setId("pharmacy");
-    plan.setStatus(CarePlanStatus.ACTIVE);
-    plan.setIntent(CarePlanIntent.OPTION);
-
-    CodeableConcept code = new CodeableConcept();
-    code.addCoding().setSystem("http://snomed.info/sct").setCode("907751000000109")
-        .setDisplay("After Care Instructions");
-    code.setText("After Care Instructions");
-
-    Narrative text2 = new Narrative();
-    text2 = text2.setStatus(NarrativeStatus.GENERATED);
-    text2.setDivAsString("After Care Instructions");
-
-    plan.getActivityFirstRep().getDetail().setCode(code);
-    plan.getActivityFirstRep().getDetail().setDescription(
-        "Try sitting cross-legged and taking a slow breath in through your"
-            + " nostrils and then out through your mouth."
-            + " Repeat until you feel calm.");
-    plan.setText(text2);
-
-    return plan;
-  }
+public class CDSOutputTransformer implements Transformer<CDSOutputBundle, GuidanceResponse> {
 
   private CarePlan getCarePlan(String id) {
     try {
-      uk.nhs.cdss.domain.CarePlan domainCarePlan = carePlanFactory.load(id);
+      var domainCarePlan = carePlanFactory.load(id);
       return carePlanTransformer.transform(domainCarePlan);
     } catch (IOException e) {
       throw new ResourceNotFoundException(
@@ -176,40 +53,18 @@ public class CDSOutputTransformerImpl implements CDSOutputTransformer {
     }
   }
 
-  @Component
-  public static class CDSOutputStatusTransformerImpl
-      implements GuidanceResponseStatusTransformer {
-
-    @Override
-    public GuidanceResponseStatus transform(Status from) {
-      switch (from) {
-        case SUCCESS:
-          return GuidanceResponseStatus.SUCCESS;
-        case DATA_REQUESTED:
-          return GuidanceResponseStatus.DATAREQUESTED;
-        case DATA_REQUIRED:
-          return GuidanceResponseStatus.DATAREQUIRED;
-        default:
-          return GuidanceResponseStatus.NULL;
-      }
-    }
-  }
-
-
   private final CarePlanFactory carePlanFactory;
   private final CarePlanTransformer carePlanTransformer;
   private final ReferralRequestFactory referralRequestFactory;
   private final ReferralRequestTransformer referralRequestTransformer;
   private final RedirectionFactory redirectionFactory;
   private final RedirectTransformer redirectTransformer;
+  private final ResourceRepository resourceRepository;
+  private final ObservationTransformer observationTransformer;
+  private final RequestGroupUtil requestGroupUtil;
+  private final IParser fhirParser;
 
-  private ResourceRepository resourceRepository;
-  private ObservationTransformer observationTransformer;
-  private GuidanceResponseStatusTransformer statusTransformer;
-  private RequestGroupUtil requestGroupUtil;
-  private IParser fhirParser;
-
-  public CDSOutputTransformerImpl(
+  public CDSOutputTransformer(
       CarePlanFactory carePlanFactory,
       CarePlanTransformer carePlanTransformer,
       ReferralRequestFactory referralRequestFactory,
@@ -217,8 +72,8 @@ public class CDSOutputTransformerImpl implements CDSOutputTransformer {
       RedirectionFactory redirectionFactory,
       ObservationTransformer observationTransformer,
       ResourceRepository resourceRepository,
-      RedirectTransformer redirectTransformer, IParser fhirParser,
-      GuidanceResponseStatusTransformer statusTransformer,
+      RedirectTransformer redirectTransformer,
+      IParser fhirParser,
       RequestGroupUtil requestGroupUtil) {
     this.carePlanFactory = carePlanFactory;
     this.carePlanTransformer = carePlanTransformer;
@@ -229,7 +84,6 @@ public class CDSOutputTransformerImpl implements CDSOutputTransformer {
     this.resourceRepository = resourceRepository;
     this.redirectTransformer = redirectTransformer;
     this.fhirParser = fhirParser;
-    this.statusTransformer = statusTransformer;
     this.requestGroupUtil = requestGroupUtil;
   }
 
@@ -308,8 +162,22 @@ public class CDSOutputTransformerImpl implements CDSOutputTransformer {
         .setOccurrenceDateTime(new Date())
         .setRequestId(bundle.getParameters().getRequestId())
         .setModule(serviceDefinition)
-        .setContext(bundle.getParameters().getEncounter())
-        .setStatus(statusTransformer.transform(result.getStatus()));
+        .setContext(bundle.getParameters().getEncounter());
+
+    boolean dataRequested = !output.getQuestionnaireIds().isEmpty();
+    boolean hasOutcome = outcomeExists(result);
+
+    if (dataRequested) {
+      if (hasOutcome) {
+        response.setStatus(GuidanceResponseStatus.DATAREQUESTED);
+      } else {
+        response.setStatus(GuidanceResponseStatus.DATAREQUIRED);
+      }
+    } else if (hasOutcome) {
+      response.setStatus(GuidanceResponseStatus.SUCCESS);
+    } else {
+      throw new IllegalStateException("Rules did not create an outcome or request data");
+    }
 
     var oldAssertions = bundle.getParameters().getObservations().stream();
     var newAssertions = output.getAssertions()
@@ -331,13 +199,12 @@ public class CDSOutputTransformerImpl implements CDSOutputTransformer {
         .map(this::buildDataRequirement)
         .forEach(response::addDataRequirement);
 
-    if (result.getStatus() == Status.SUCCESS && result.getRedirectionId() != null) {
+    if (!dataRequested && isNotEmpty(result.getRedirectionId())) {
       var redirection = getRedirection(result.getRedirectionId());
-      response.addDataRequirement(
-          redirectTransformer.transform(redirection));
+      response.addDataRequirement(redirectTransformer.transform(redirection));
     }
 
-    if (result.getStatus() != Status.DATA_REQUIRED && result.getRedirectionId() == null) {
+    if (hasOutcome && isEmpty(result.getRedirectionId())) {
       response.setResult(new Reference(buildRequestGroup(bundle)));
     }
 
@@ -402,5 +269,11 @@ public class CDSOutputTransformerImpl implements CDSOutputTransformer {
       throw new ResourceNotFoundException(
           "Unable to load Redirection " + id + ": " + e.getMessage());
     }
+  }
+
+  private boolean outcomeExists(Result result) {
+    return !result.getCarePlanIds().isEmpty()
+        || isNotEmpty(result.getRedirectionId())
+        || isNotEmpty(result.getReferralRequestId());
   }
 }

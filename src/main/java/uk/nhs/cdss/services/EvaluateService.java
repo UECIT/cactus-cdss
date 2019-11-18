@@ -19,10 +19,10 @@ import uk.nhs.cdss.entities.DataRequirementEntity;
 import uk.nhs.cdss.repos.DataRequirementRepository;
 import uk.nhs.cdss.resourceBuilder.GuidanceResponseBuilder;
 import uk.nhs.cdss.transform.EvaluationParameters;
-import uk.nhs.cdss.transform.Transformers.CDSInputTransformer;
-import uk.nhs.cdss.transform.Transformers.CDSOutputTransformer;
 import uk.nhs.cdss.transform.bundle.CDSInputBundle;
 import uk.nhs.cdss.transform.bundle.CDSOutputBundle;
+import uk.nhs.cdss.transform.in.CDSInputTransformer;
+import uk.nhs.cdss.transform.out.CDSOutputTransformer;
 
 @Service
 public class EvaluateService {

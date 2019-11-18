@@ -1,11 +1,11 @@
-package uk.nhs.cdss.transform.impl.out;
+package uk.nhs.cdss.transform.out;
 
 import org.hl7.fhir.dstu3.model.Coding;
 import org.springframework.stereotype.Component;
-import uk.nhs.cdss.transform.Transformers.CodingOutTransformer;
+import uk.nhs.cdss.transform.Transformer;
 
 @Component
-public class CodingOutTransformerImpl implements CodingOutTransformer {
+public class CodingOutTransformer implements Transformer<uk.nhs.cdss.domain.Coding, Coding> {
 
   @Override
   public Coding transform(uk.nhs.cdss.domain.Coding from) {

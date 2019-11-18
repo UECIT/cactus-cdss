@@ -11,17 +11,17 @@ import org.hl7.fhir.dstu3.model.IdType;
 import org.hl7.fhir.dstu3.model.Questionnaire;
 import org.springframework.stereotype.Component;
 import uk.nhs.cdss.transform.bundle.QuestionnaireBundle;
-import uk.nhs.cdss.transform.impl.out.QuestionnaireTransformerImpl;
+import uk.nhs.cdss.transform.out.QuestionnaireTransformer;
 
 @Component
 public class QuestionnaireProvider implements IResourceProvider {
 
-  private final QuestionnaireTransformerImpl questionnaireTransformer;
+  private final QuestionnaireTransformer questionnaireTransformer;
 
   private final ObjectMapper objectMapper;
 
   public QuestionnaireProvider(
-      QuestionnaireTransformerImpl questionnaireTransformer, ObjectMapper objectMapper) {
+      QuestionnaireTransformer questionnaireTransformer, ObjectMapper objectMapper) {
     this.questionnaireTransformer = questionnaireTransformer;
     this.objectMapper = objectMapper;
   }

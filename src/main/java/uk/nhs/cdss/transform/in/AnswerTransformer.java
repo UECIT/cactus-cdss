@@ -1,18 +1,17 @@
-package uk.nhs.cdss.transform.impl.in;
+package uk.nhs.cdss.transform.in;
 
 import org.hl7.fhir.dstu3.model.Coding;
 import org.springframework.stereotype.Component;
 import uk.nhs.cdss.domain.Answer;
-import uk.nhs.cdss.transform.Transformers.AnswerTransformer;
-import uk.nhs.cdss.transform.Transformers.ValueTransformer;
+import uk.nhs.cdss.transform.Transformer;
 import uk.nhs.cdss.transform.bundle.AnswerBundle;
 
 @Component
-public final class AnswerTransformerImpl implements AnswerTransformer {
+public final class AnswerTransformer implements Transformer<AnswerBundle, Answer> {
 
   private final ValueTransformer valueTransformer;
 
-  public AnswerTransformerImpl(ValueTransformer valueTransformer) {
+  public AnswerTransformer(ValueTransformer valueTransformer) {
     this.valueTransformer = valueTransformer;
   }
 

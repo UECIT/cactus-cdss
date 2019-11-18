@@ -1,26 +1,23 @@
-package uk.nhs.cdss.transform.impl.in;
+package uk.nhs.cdss.transform.in;
 
 import org.hl7.fhir.dstu3.model.Observation;
 import org.hl7.fhir.dstu3.model.Observation.ObservationComponentComponent;
 import org.hl7.fhir.dstu3.model.Observation.ObservationStatus;
 import org.springframework.stereotype.Component;
-import uk.nhs.cdss.transform.Transformers.AssertionStatusTransformer;
-import uk.nhs.cdss.transform.Transformers.AssertionTransformer;
+import uk.nhs.cdss.transform.Transformer;
 import uk.nhs.cdss.domain.Assertion;
 import uk.nhs.cdss.domain.Assertion.Status;
-import uk.nhs.cdss.transform.Transformers.CodeableConceptInTransformer;
-import uk.nhs.cdss.transform.Transformers.ValueTransformer;
 
 @Component
-public final class AssertionTransformerImpl implements AssertionTransformer {
+public final class AssertionTransformer implements Transformer<Observation, Assertion> {
 
   private final CodeableConceptInTransformer codeTransformer;
-  private final AssertionStatusTransformer statusTransformer;
+  private final StatusTransformer statusTransformer;
   private final ValueTransformer valueTransformer;
 
-  public AssertionTransformerImpl(
+  public AssertionTransformer(
       CodeableConceptInTransformer codeTransformer,
-      AssertionStatusTransformer statusTransformer,
+      StatusTransformer statusTransformer,
       ValueTransformer valueTransformer) {
     this.codeTransformer = codeTransformer;
     this.statusTransformer = statusTransformer;
@@ -28,8 +25,8 @@ public final class AssertionTransformerImpl implements AssertionTransformer {
   }
 
   @Component
-  public static final class StatusTransformerImpl
-      implements AssertionStatusTransformer {
+  public static final class StatusTransformer
+      implements Transformer<Observation.ObservationStatus, Assertion.Status> {
 
     @Override
     public Status transform(ObservationStatus from) {

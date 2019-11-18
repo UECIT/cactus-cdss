@@ -43,12 +43,12 @@ public class ScenarioTest {
 
     // Results
     // Result with a referral request and care plan
-    Result result1 = new Result("result1", Result.Status.SUCCESS);
+    Result result1 = new Result("result1");
     result1.getCarePlanIds().add("carePlan1");
     result1.setReferralRequestId("referralRequest");
 
     // Result with a redirection to another service definition
-    Result result2 = new Result("result2", Result.Status.SUCCESS);
+    Result result2 = new Result("result2");
     result2.setRedirectionId("anxiety");
   }
 }

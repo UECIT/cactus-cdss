@@ -13,7 +13,6 @@ import static uk.nhs.cdss.ModelMatchers.answerIsForQuestion;
 import static uk.nhs.cdss.ModelMatchers.hasValue;
 
 import java.util.Collection;
-import org.hl7.fhir.dstu3.model.Questionnaire;
 import org.hl7.fhir.dstu3.model.QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent;
 import org.hl7.fhir.dstu3.model.QuestionnaireResponse.QuestionnaireResponseItemComponent;
 import org.hl7.fhir.dstu3.model.QuestionnaireResponse.QuestionnaireResponseStatus;
@@ -21,10 +20,10 @@ import org.hl7.fhir.dstu3.model.Reference;
 import org.hl7.fhir.dstu3.model.StringType;
 import org.junit.Test;
 import uk.nhs.cdss.domain.QuestionnaireResponse.Status;
-import uk.nhs.cdss.transform.impl.in.AnswerTransformerImpl;
-import uk.nhs.cdss.transform.impl.in.QuestionnaireResponseTransformerImpl;
-import uk.nhs.cdss.transform.impl.in.QuestionnaireResponseTransformerImpl.StatusTransformerImpl;
-import uk.nhs.cdss.transform.impl.in.ValueTransformerImpl;
+import uk.nhs.cdss.transform.in.AnswerTransformer;
+import uk.nhs.cdss.transform.in.QuestionnaireResponseTransformer;
+import uk.nhs.cdss.transform.in.QuestionnaireResponseTransformer.StatusTransformer;
+import uk.nhs.cdss.transform.in.ValueTransformer;
 
 public class QuestionnaireResponseTransformerTest {
 
@@ -83,9 +82,9 @@ public class QuestionnaireResponseTransformerTest {
             buildItem(Q_22, asList("answer2.2[0]", "answer2.2[1]")))))
       .forEach(responseDTO::addItem);
 
-    var transformer = new QuestionnaireResponseTransformerImpl(
-        new AnswerTransformerImpl(new ValueTransformerImpl()),
-        new StatusTransformerImpl()
+    var transformer = new QuestionnaireResponseTransformer(
+        new AnswerTransformer(new ValueTransformer()),
+        new StatusTransformer()
     );
 
     var result = transformer.transform(responseDTO);

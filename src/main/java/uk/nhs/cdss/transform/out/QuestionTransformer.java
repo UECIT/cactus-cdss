@@ -1,24 +1,20 @@
-package uk.nhs.cdss.transform.impl.out;
+package uk.nhs.cdss.transform.out;
 
 import org.hl7.fhir.dstu3.model.Questionnaire.QuestionnaireItemComponent;
-import org.hl7.fhir.dstu3.model.StringType;
 import org.springframework.stereotype.Component;
 import uk.nhs.cdss.domain.Question;
-import uk.nhs.cdss.transform.Transformers.OptionTypeTransformer;
-import uk.nhs.cdss.transform.Transformers.QuestionConstraintTransformer;
-import uk.nhs.cdss.transform.Transformers.QuestionTransformer;
-import uk.nhs.cdss.transform.Transformers.QuestionTypeTransformer;
-import uk.nhs.cdss.transform.Transformers.TypeTransformer;
+import uk.nhs.cdss.transform.Transformer;
 
 @Component
-public class QuestionTransformerImpl implements QuestionTransformer {
+public class QuestionTransformer implements
+    Transformer<Question, QuestionnaireItemComponent> {
 
   private final QuestionTypeTransformer questionTypeTransformer;
   private final OptionTypeTransformer optionTransformer;
   private final QuestionConstraintTransformer constraintTransformer;
   private final TypeTransformer typeTransformer;
 
-  public QuestionTransformerImpl(
+  public QuestionTransformer(
       QuestionTypeTransformer questionTypeTransformer,
       OptionTypeTransformer optionTransformer,
       QuestionConstraintTransformer constraintTransformer,

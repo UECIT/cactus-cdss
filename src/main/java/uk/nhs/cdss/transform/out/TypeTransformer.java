@@ -1,14 +1,14 @@
-package uk.nhs.cdss.transform.impl.out;
+package uk.nhs.cdss.transform.out;
 
 import org.hl7.fhir.dstu3.model.BooleanType;
 import org.hl7.fhir.dstu3.model.IntegerType;
 import org.hl7.fhir.dstu3.model.StringType;
 import org.hl7.fhir.dstu3.model.Type;
 import org.springframework.stereotype.Component;
-import uk.nhs.cdss.transform.Transformers.TypeTransformer;
+import uk.nhs.cdss.transform.Transformer;
 
 @Component
-public class TypeTransformerImpl implements TypeTransformer {
+public class TypeTransformer implements Transformer<Object, Type> {
 
   @Override
   public Type transform(Object from) {

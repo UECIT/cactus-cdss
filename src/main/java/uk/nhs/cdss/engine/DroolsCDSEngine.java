@@ -1,6 +1,5 @@
 package uk.nhs.cdss.engine;
 
-import org.apache.commons.lang3.StringUtils;
 import org.drools.core.impl.InternalKnowledgeBase;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.rule.QueryResults;
@@ -11,7 +10,6 @@ import uk.nhs.cdss.domain.Outcome;
 import uk.nhs.cdss.domain.Questionnaire;
 import uk.nhs.cdss.domain.QuestionnaireResponse;
 import uk.nhs.cdss.domain.Result;
-import uk.nhs.cdss.domain.Result.Status;
 
 @Component
 public class DroolsCDSEngine implements CDSEngine {
@@ -85,7 +83,7 @@ public class DroolsCDSEngine implements CDSEngine {
             .add(((Questionnaire) resultsRow.get(QUESTIONNAIRE_ID)).getId());
       }
 
-      Result result = new Result("result", Status.SUCCESS);
+      Result result = new Result("result");
 
       QueryResults outcomes = ksession.getQueryResults(OUTCOMES_QUERY);
       for (QueryResultsRow resultsRow : outcomes) {
@@ -98,31 +96,12 @@ public class DroolsCDSEngine implements CDSEngine {
         result.setRedirectionId(outcome.getRedirectionId());
       }
 
-      // Determine result
-      boolean dataRequested = !output.getQuestionnaireIds().isEmpty();
-      boolean hasOutcome = outcomeExists(result);
-
-      if (dataRequested) {
-        if (hasOutcome) {
-          result.setStatus(Status.DATA_REQUESTED);
-        } else {
-          result.setStatus(Status.DATA_REQUIRED);
-        }
-      } else if (!hasOutcome) {
-        throw new IllegalStateException("Rules did not create an outcome or request data");
-      }
       output.setResult(result);
 
       return output;
     } finally {
       ksession.dispose();
     }
-  }
-
-  private boolean outcomeExists(Result result) {
-    return !result.getCarePlanIds().isEmpty()
-        || result.getRedirectionId() != null
-        || StringUtils.isNotEmpty(result.getReferralRequestId());
   }
 
 }
