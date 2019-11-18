@@ -2,7 +2,6 @@ package uk.nhs.cdss.engine;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -12,7 +11,6 @@ import org.junit.Test;
 import uk.nhs.cdss.config.DroolsConfig;
 import uk.nhs.cdss.domain.Answer;
 import uk.nhs.cdss.domain.QuestionnaireResponse;
-import uk.nhs.cdss.domain.Result.Status;
 
 public class RedirectionTest {
 
@@ -65,7 +63,6 @@ public class RedirectionTest {
 
     var output = engine.evaluate(input);
 
-    assertEquals("has Success status", output.getResult().getStatus(), Status.SUCCESS);
     assertNull("has no referral", output.getResult().getReferralRequestId());
     assertThat("has no care plan", output.getResult().getCarePlanIds(), empty());
     assertEquals("redirect outcome", ANXIETY, output.getResult().getRedirectionId());

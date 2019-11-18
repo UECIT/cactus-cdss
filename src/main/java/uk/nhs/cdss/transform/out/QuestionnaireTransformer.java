@@ -1,18 +1,17 @@
-package uk.nhs.cdss.transform.impl.out;
+package uk.nhs.cdss.transform.out;
 
 import org.hl7.fhir.dstu3.model.Enumerations.PublicationStatus;
 import org.hl7.fhir.dstu3.model.Questionnaire;
 import org.springframework.stereotype.Component;
-import uk.nhs.cdss.transform.Transformers.QuestionnaireTransformer;
+import uk.nhs.cdss.transform.Transformer;
 import uk.nhs.cdss.transform.bundle.QuestionnaireBundle;
-import uk.nhs.cdss.transform.impl.out.QuestionTransformerImpl;
 
 @Component
-public class QuestionnaireTransformerImpl implements QuestionnaireTransformer {
+public class QuestionnaireTransformer implements Transformer<QuestionnaireBundle, Questionnaire> {
 
-  private final QuestionTransformerImpl questionTransformer;
+  private final QuestionTransformer questionTransformer;
 
-  public QuestionnaireTransformerImpl(QuestionTransformerImpl questionTransformer) {
+  public QuestionnaireTransformer(QuestionTransformer questionTransformer) {
     this.questionTransformer = questionTransformer;
   }
 

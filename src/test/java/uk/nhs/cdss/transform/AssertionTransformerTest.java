@@ -11,11 +11,11 @@ import org.hl7.fhir.dstu3.model.Observation.ObservationStatus;
 import org.hl7.fhir.dstu3.model.StringType;
 import org.junit.Test;
 import uk.nhs.cdss.domain.Assertion.Status;
-import uk.nhs.cdss.transform.impl.in.AssertionTransformerImpl;
-import uk.nhs.cdss.transform.impl.in.AssertionTransformerImpl.StatusTransformerImpl;
-import uk.nhs.cdss.transform.impl.in.CodeableConceptInTransformerImpl;
-import uk.nhs.cdss.transform.impl.in.CodingInTransformerImpl;
-import uk.nhs.cdss.transform.impl.in.ValueTransformerImpl;
+import uk.nhs.cdss.transform.in.AssertionTransformer;
+import uk.nhs.cdss.transform.in.AssertionTransformer.StatusTransformer;
+import uk.nhs.cdss.transform.in.CodeableConceptInTransformer;
+import uk.nhs.cdss.transform.in.CodingInTransformer;
+import uk.nhs.cdss.transform.in.ValueTransformer;
 
 public class AssertionTransformerTest {
 
@@ -43,10 +43,10 @@ public class AssertionTransformerTest {
     observation.addComponent(new ObservationComponentComponent(buildCode(CODING_2)));
     observation.setValue(new StringType(VALUE));
 
-    var transformer = new AssertionTransformerImpl(
-        new CodeableConceptInTransformerImpl(new CodingInTransformerImpl()),
-        new StatusTransformerImpl(),
-        new ValueTransformerImpl());
+    var transformer = new AssertionTransformer(
+        new CodeableConceptInTransformer(new CodingInTransformer()),
+        new StatusTransformer(),
+        new ValueTransformer());
 
     var result = transformer.transform(observation);
 

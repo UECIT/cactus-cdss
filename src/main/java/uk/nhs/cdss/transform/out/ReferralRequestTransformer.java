@@ -1,4 +1,4 @@
-package uk.nhs.cdss.transform.impl.out;
+package uk.nhs.cdss.transform.out;
 
 import com.google.common.base.Strings;
 import java.time.Duration;
@@ -23,17 +23,17 @@ import uk.nhs.cdss.domain.CodeableConcept;
 import uk.nhs.cdss.domain.ProcedureRequest;
 import uk.nhs.cdss.domain.ReferralRequest.Status;
 import uk.nhs.cdss.engine.CodeDirectory;
-import uk.nhs.cdss.transform.Transformers.CodeableConceptOutTransformer;
-import uk.nhs.cdss.transform.Transformers.ReferralRequestTransformer;
+import uk.nhs.cdss.transform.Transformer;
 import uk.nhs.cdss.transform.bundle.ReferralRequestBundle;
 
 @Component
-public class ReferralRequestTransformerImpl implements ReferralRequestTransformer {
+public class ReferralRequestTransformer implements
+    Transformer<ReferralRequestBundle, ReferralRequest> {
 
   private final CodeableConceptOutTransformer codeableConceptOutTransformer;
   private final CodeDirectory codeDirectory;
 
-  public ReferralRequestTransformerImpl(
+  public ReferralRequestTransformer(
       CodeableConceptOutTransformer codeableConceptOutTransformer,
       CodeDirectory codeDirectory) {
     this.codeableConceptOutTransformer = codeableConceptOutTransformer;

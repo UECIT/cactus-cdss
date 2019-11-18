@@ -17,11 +17,11 @@ import uk.nhs.cdss.domain.OptionType;
 import uk.nhs.cdss.domain.Question;
 import uk.nhs.cdss.domain.QuestionConstraint;
 import uk.nhs.cdss.domain.QuestionType;
-import uk.nhs.cdss.transform.impl.out.OptionTypeTransformerImpl;
-import uk.nhs.cdss.transform.impl.out.QuestionConstraintTransformerImpl;
-import uk.nhs.cdss.transform.impl.out.QuestionTransformerImpl;
-import uk.nhs.cdss.transform.impl.out.QuestionTypeTransformerImpl;
-import uk.nhs.cdss.transform.impl.out.TypeTransformerImpl;
+import uk.nhs.cdss.transform.out.OptionTypeTransformer;
+import uk.nhs.cdss.transform.out.QuestionConstraintTransformer;
+import uk.nhs.cdss.transform.out.QuestionTransformer;
+import uk.nhs.cdss.transform.out.QuestionTypeTransformer;
+import uk.nhs.cdss.transform.out.TypeTransformer;
 
 public class QuestionTransformerTest {
 
@@ -50,11 +50,11 @@ public class QuestionTransformerTest {
     subQuestionId2.setType(QuestionType.STRING);
     question.getItems().addAll(asList(subQuestionId1, subQuestionId2));
 
-    var transformer = new QuestionTransformerImpl(
-        new QuestionTypeTransformerImpl(),
-        new OptionTypeTransformerImpl(),
-        new QuestionConstraintTransformerImpl(new TypeTransformerImpl()),
-        new TypeTransformerImpl());
+    var transformer = new QuestionTransformer(
+        new QuestionTypeTransformer(),
+        new OptionTypeTransformer(),
+        new QuestionConstraintTransformer(new TypeTransformer()),
+        new TypeTransformer());
 
     var result = transformer.transform(question);
 

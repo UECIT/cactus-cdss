@@ -1,36 +1,34 @@
-package uk.nhs.cdss.transform.impl.in;
+package uk.nhs.cdss.transform.in;
 
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.hl7.fhir.dstu3.model.Questionnaire;
 import org.hl7.fhir.dstu3.model.QuestionnaireResponse.QuestionnaireResponseItemComponent;
 import org.hl7.fhir.dstu3.model.QuestionnaireResponse.QuestionnaireResponseStatus;
-import org.hl7.fhir.dstu3.model.StringType;
 import org.springframework.stereotype.Component;
 import uk.nhs.cdss.domain.QuestionnaireResponse;
 import uk.nhs.cdss.domain.QuestionnaireResponse.Status;
-import uk.nhs.cdss.transform.Transformers.AnswerTransformer;
-import uk.nhs.cdss.transform.Transformers.QuestionnaireResponseStatusTransformer;
-import uk.nhs.cdss.transform.Transformers.QuestionnaireResponseTransformer;
+import uk.nhs.cdss.transform.Transformer;
 import uk.nhs.cdss.transform.bundle.AnswerBundle;
 
 @Component
-public final class QuestionnaireResponseTransformerImpl
-    implements QuestionnaireResponseTransformer {
+public final class QuestionnaireResponseTransformer implements Transformer<
+    org.hl7.fhir.dstu3.model.QuestionnaireResponse,
+    QuestionnaireResponse> {
 
   private final AnswerTransformer answerTransformer;
-  private final QuestionnaireResponseStatusTransformer statusTransformer;
+  private final StatusTransformer statusTransformer;
 
-  public QuestionnaireResponseTransformerImpl(
+  public QuestionnaireResponseTransformer(
       AnswerTransformer answerTransformer,
-      QuestionnaireResponseStatusTransformer statusTransformer) {
+      StatusTransformer statusTransformer) {
     this.answerTransformer = answerTransformer;
     this.statusTransformer = statusTransformer;
   }
 
   @Component
-  public static final class StatusTransformerImpl
-      implements QuestionnaireResponseStatusTransformer {
+  public static final class StatusTransformer implements Transformer<
+      QuestionnaireResponseStatus,
+      QuestionnaireResponse.Status> {
 
     @Override
     public Status transform(QuestionnaireResponseStatus from) {

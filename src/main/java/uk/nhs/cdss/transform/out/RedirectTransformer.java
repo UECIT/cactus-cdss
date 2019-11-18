@@ -1,4 +1,4 @@
-package uk.nhs.cdss.transform.impl.out;
+package uk.nhs.cdss.transform.out;
 
 import org.hl7.fhir.dstu3.model.DataRequirement;
 import org.hl7.fhir.dstu3.model.DataRequirement.DataRequirementCodeFilterComponent;
@@ -6,16 +6,15 @@ import org.springframework.stereotype.Component;
 import uk.nhs.cdss.domain.CodeableConcept;
 import uk.nhs.cdss.domain.Redirection;
 import uk.nhs.cdss.engine.CodeDirectory;
-import uk.nhs.cdss.transform.Transformers.CodingOutTransformer;
-import uk.nhs.cdss.transform.Transformers.RedirectTransformer;
+import uk.nhs.cdss.transform.Transformer;
 
 @Component
-public class RedirectTransformerImpl implements RedirectTransformer {
+public class RedirectTransformer implements Transformer<Redirection, DataRequirement> {
 
   private CodeDirectory codeDirectory;
   private CodingOutTransformer codingTransformer;
 
-  public RedirectTransformerImpl(
+  public RedirectTransformer(
       CodeDirectory codeDirectory,
       CodingOutTransformer codingTransformer) {
     this.codeDirectory = codeDirectory;

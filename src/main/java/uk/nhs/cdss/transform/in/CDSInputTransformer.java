@@ -1,19 +1,17 @@
-package uk.nhs.cdss.transform.impl.in;
+package uk.nhs.cdss.transform.in;
 
 import org.springframework.stereotype.Component;
 import uk.nhs.cdss.engine.CDSInput;
-import uk.nhs.cdss.transform.Transformers.AssertionTransformer;
-import uk.nhs.cdss.transform.Transformers.CDSInputTransformer;
-import uk.nhs.cdss.transform.Transformers.QuestionnaireResponseTransformer;
+import uk.nhs.cdss.transform.Transformer;
 import uk.nhs.cdss.transform.bundle.CDSInputBundle;
 
 @Component
-public final class CDSInputTransformerImpl implements CDSInputTransformer {
+public final class CDSInputTransformer implements Transformer<CDSInputBundle, CDSInput> {
 
   private final QuestionnaireResponseTransformer responseTransformer;
   private final AssertionTransformer assertionTransformer;
 
-  public CDSInputTransformerImpl(
+  public CDSInputTransformer(
       QuestionnaireResponseTransformer responseTransformer,
       AssertionTransformer assertionTransformer) {
     this.responseTransformer = responseTransformer;

@@ -5,34 +5,18 @@ import java.util.List;
 
 public class Result {
 
-  public enum Status {
-    SUCCESS,
-    DATA_REQUESTED,
-    DATA_REQUIRED
-  }
-
   private final String id;
-  private Status status;
   private String referralRequestId;
   private String redirectionId;
 
   private final List<String> carePlanIds = new ArrayList<>();
 
-  public Result(String id, Status status) {
+  public Result(String id) {
     this.id = id;
-    this.status = status;
   }
 
   public String getId() {
     return id;
-  }
-
-  public Status getStatus() {
-    return status;
-  }
-
-  public void setStatus(Status status) {
-    this.status = status;
   }
 
   public String getReferralRequestId() {

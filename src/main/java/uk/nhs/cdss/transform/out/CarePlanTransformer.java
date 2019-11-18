@@ -1,4 +1,4 @@
-package uk.nhs.cdss.transform.impl.out;
+package uk.nhs.cdss.transform.out;
 
 import java.util.stream.Collectors;
 import org.hl7.fhir.dstu3.model.CareConnectCarePlan;
@@ -14,16 +14,16 @@ import uk.nhs.cdss.domain.CarePlan.Status;
 import uk.nhs.cdss.domain.CarePlanActivity;
 import uk.nhs.cdss.domain.CodeableConcept;
 import uk.nhs.cdss.engine.CodeDirectory;
-import uk.nhs.cdss.transform.Transformers.CarePlanTransformer;
-import uk.nhs.cdss.transform.Transformers.CodeableConceptOutTransformer;
+import uk.nhs.cdss.transform.Transformer;
 
 @Component
-public class CarePlanTransformerImpl implements CarePlanTransformer {
+public class CarePlanTransformer
+    implements Transformer<CarePlan, org.hl7.fhir.dstu3.model.CarePlan> {
 
   private final CodeableConceptOutTransformer codeableConceptOutTransformer;
   private final CodeDirectory codeDirectory;
 
-  public CarePlanTransformerImpl(
+  public CarePlanTransformer(
       CodeableConceptOutTransformer codeableConceptOutTransformer,
       CodeDirectory codeDirectory) {
     this.codeableConceptOutTransformer = codeableConceptOutTransformer;

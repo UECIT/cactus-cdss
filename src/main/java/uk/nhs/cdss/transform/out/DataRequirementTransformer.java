@@ -1,15 +1,15 @@
-package uk.nhs.cdss.transform.impl.out;
+package uk.nhs.cdss.transform.out;
 
 import org.hl7.fhir.dstu3.model.DataRequirement;
 import org.hl7.fhir.dstu3.model.DataRequirement.DataRequirementCodeFilterComponent;
 import org.hl7.fhir.dstu3.model.StringType;
 import org.springframework.stereotype.Component;
 import uk.nhs.cdss.domain.DataRequirement.Type;
-import uk.nhs.cdss.transform.Transformers.DataRequirementTransformer;
+import uk.nhs.cdss.transform.Transformer;
 
 @Component
-public class DataRequirementTransformerImpl
-    implements DataRequirementTransformer {
+public class DataRequirementTransformer
+    implements Transformer<uk.nhs.cdss.domain.DataRequirement, DataRequirement> {
 
   @Override
   public DataRequirement transform(uk.nhs.cdss.domain.DataRequirement from) {
