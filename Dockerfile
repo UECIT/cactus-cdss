@@ -12,8 +12,9 @@ RUN mvn -B -Dmaven.repo.local=/app/.m2 package
 FROM openjdk:11-jre-slim
 WORKDIR /app
 VOLUME /tmp
-COPY --from=build /app/target/cds-test-engine.war /app
-COPY --from=build /app/target/classes/application.properties /app
-
-ENTRYPOINT [ "java", "-jar", "cds-test-engine.war", "application.properties" ]
+COPY run.sh /app
+RUN chmod +x run.sh
+ENTRYPOINT [ "/app/run.sh" ]
 EXPOSE 8080
+
+COPY --from=build /app/target/cds-test-engine.war /app

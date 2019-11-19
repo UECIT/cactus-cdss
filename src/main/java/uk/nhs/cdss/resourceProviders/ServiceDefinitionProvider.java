@@ -45,19 +45,19 @@ public class ServiceDefinitionProvider implements IResourceProvider {
   private final ServiceDefinitionTransformer serviceDefinitionTransformer;
   private final ObjectMapper objectMapper;
 
-	public ServiceDefinitionProvider(
-			EvaluateService evaluateService, ServiceDefinitionBuilder serviceDefinitionBuilder,
-			ServiceDefinitionRepository serviceDefinitionRepository,
-			ServiceDefinitionTransformer serviceDefinitionTransformer,
-			ObjectMapper objectMapper) {
-		this.evaluateService = evaluateService;
-		this.serviceDefinitionBuilder = serviceDefinitionBuilder;
-		this.serviceDefinitionRepository = serviceDefinitionRepository;
-		this.serviceDefinitionTransformer = serviceDefinitionTransformer;
-		this.objectMapper = objectMapper;
-	}
+  public ServiceDefinitionProvider(
+      EvaluateService evaluateService, ServiceDefinitionBuilder serviceDefinitionBuilder,
+      ServiceDefinitionRepository serviceDefinitionRepository,
+      ServiceDefinitionTransformer serviceDefinitionTransformer,
+      ObjectMapper objectMapper) {
+    this.evaluateService = evaluateService;
+    this.serviceDefinitionBuilder = serviceDefinitionBuilder;
+    this.serviceDefinitionRepository = serviceDefinitionRepository;
+    this.serviceDefinitionTransformer = serviceDefinitionTransformer;
+    this.objectMapper = objectMapper;
+  }
 
-	@Override
+  @Override
   public Class<ServiceDefinition> getResourceType() {
     return ServiceDefinition.class;
   }
@@ -67,36 +67,39 @@ public class ServiceDefinitionProvider implements IResourceProvider {
   public GuidanceResponse evaluate(
       @IdParam IdType serviceDefinitionId,
       @ResourceParam Resource resource) {
-	  var id = getServiceDefinitionId(serviceDefinitionId);
-	  try {
+    var id = getServiceDefinitionId(serviceDefinitionId);
+    try {
       return evaluateService.getGuidanceResponse(getParameters(resource), id);
     } catch (ServiceDefinitionException e) {
-	    throw new InternalErrorException(e);
+      throw new InternalErrorException(e);
     }
   }
 
   private Parameters getParameters(Resource resource) {
-	  if (ResourceType.Parameters.equals(resource.getResourceType())) {
-	    return (Parameters) resource;
+    if (ResourceType.Parameters.equals(resource.getResourceType())) {
+      return (Parameters) resource;
     }
 
-	  var bundle = (Bundle) resource;
-	  return (Parameters) bundle.getEntry().get(0).getResource();
+    var bundle = (Bundle) resource;
+    return (Parameters) bundle.getEntry().get(0).getResource();
   }
 
   // TODO: remove when EMS no longer assumes numeric ids
   private String getServiceDefinitionId(IdType serviceDefinitionId) {
-    var legacyId = serviceDefinitionId.getIdPart();
-    switch (legacyId) {
-      case "5":
-        return "palpitations";
-      case "6":
-        return "palpitations2";
-      case "7":
-        return "anxiety";
-      default:
-        throw new IllegalArgumentException();
+    var idPart = serviceDefinitionId.getIdPart();
+    if (idPart.matches("\\d+")) {
+      switch (idPart) {
+        case "5":
+          return "palpitations";
+        case "6":
+          return "palpitations2";
+        case "7":
+          return "anxiety";
+        default:
+          throw new IllegalArgumentException();
+      }
     }
+    return idPart;
   }
 
   @Read
@@ -111,7 +114,8 @@ public class ServiceDefinitionProvider implements IResourceProvider {
       return serviceDefinitionTransformer.transform(domainServiceDefinition);
 
     } catch (IOException e) {
-      throw new ResourceNotFoundException("Unable to load service definition " + serviceDefinitionId + ": " + e.getMessage());
+      throw new ResourceNotFoundException(
+          "Unable to load service definition " + serviceDefinitionId + ": " + e.getMessage());
     }
   }
 
