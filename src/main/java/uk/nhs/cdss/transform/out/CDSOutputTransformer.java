@@ -3,7 +3,7 @@ package uk.nhs.cdss.transform.out;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
-import ca.uhn.fhir.parser.IParser;
+import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import lombok.AllArgsConstructor;
 import org.hl7.fhir.dstu3.model.CarePlan;
 import org.hl7.fhir.dstu3.model.DataRequirement;
 import org.hl7.fhir.dstu3.model.DataRequirement.DataRequirementCodeFilterComponent;
@@ -22,16 +23,16 @@ import org.hl7.fhir.dstu3.model.Parameters;
 import org.hl7.fhir.dstu3.model.Parameters.ParametersParameterComponent;
 import org.hl7.fhir.dstu3.model.Reference;
 import org.hl7.fhir.dstu3.model.RequestGroup;
+import org.hl7.fhir.dstu3.model.RequestGroup.RequestGroupActionComponent;
 import org.hl7.fhir.dstu3.model.RequestGroup.RequestIntent;
 import org.hl7.fhir.dstu3.model.RequestGroup.RequestStatus;
 import org.hl7.fhir.dstu3.model.ResourceType;
 import org.hl7.fhir.dstu3.model.StringType;
+import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.springframework.stereotype.Component;
 import uk.nhs.cdss.domain.Redirection;
 import uk.nhs.cdss.domain.ReferralRequest;
 import uk.nhs.cdss.domain.Result;
-import uk.nhs.cdss.entities.ResourceEntity;
-import uk.nhs.cdss.repos.ResourceRepository;
 import uk.nhs.cdss.services.CarePlanFactory;
 import uk.nhs.cdss.services.RedirectionFactory;
 import uk.nhs.cdss.services.ReferralRequestFactory;
@@ -41,17 +42,8 @@ import uk.nhs.cdss.transform.bundle.ReferralRequestBundle;
 import uk.nhs.cdss.utils.RequestGroupUtil;
 
 @Component
+@AllArgsConstructor
 public class CDSOutputTransformer implements Transformer<CDSOutputBundle, GuidanceResponse> {
-
-  private CarePlan getCarePlan(String id) {
-    try {
-      var domainCarePlan = carePlanFactory.load(id);
-      return carePlanTransformer.transform(domainCarePlan);
-    } catch (IOException e) {
-      throw new ResourceNotFoundException(
-          "Unable to load CarePlan '" + id + "': " + e.getMessage());
-    }
-  }
 
   private final CarePlanFactory carePlanFactory;
   private final CarePlanTransformer carePlanTransformer;
@@ -59,33 +51,9 @@ public class CDSOutputTransformer implements Transformer<CDSOutputBundle, Guidan
   private final ReferralRequestTransformer referralRequestTransformer;
   private final RedirectionFactory redirectionFactory;
   private final RedirectTransformer redirectTransformer;
-  private final ResourceRepository resourceRepository;
   private final ObservationTransformer observationTransformer;
   private final RequestGroupUtil requestGroupUtil;
-  private final IParser fhirParser;
-
-  public CDSOutputTransformer(
-      CarePlanFactory carePlanFactory,
-      CarePlanTransformer carePlanTransformer,
-      ReferralRequestFactory referralRequestFactory,
-      ReferralRequestTransformer referralRequestTransformer,
-      RedirectionFactory redirectionFactory,
-      ObservationTransformer observationTransformer,
-      ResourceRepository resourceRepository,
-      RedirectTransformer redirectTransformer,
-      IParser fhirParser,
-      RequestGroupUtil requestGroupUtil) {
-    this.carePlanFactory = carePlanFactory;
-    this.carePlanTransformer = carePlanTransformer;
-    this.referralRequestFactory = referralRequestFactory;
-    this.referralRequestTransformer = referralRequestTransformer;
-    this.redirectionFactory = redirectionFactory;
-    this.observationTransformer = observationTransformer;
-    this.resourceRepository = resourceRepository;
-    this.redirectTransformer = redirectTransformer;
-    this.fhirParser = fhirParser;
-    this.requestGroupUtil = requestGroupUtil;
-  }
+  private final IGenericClient fhirClient;
 
   private DataRequirement buildDataRequirement(String questionnaireId) {
     var dataRequirement = new DataRequirement();
@@ -110,45 +78,18 @@ public class CDSOutputTransformer implements Transformer<CDSOutputBundle, Guidan
     return parameter;
   }
 
-  private void saveParameters(Parameters parameters) {
-    var outputParametersEntity = new ResourceEntity();
-    outputParametersEntity.setResourceJson(fhirParser.encodeResourceToString(parameters));
-    outputParametersEntity.setResourceType(ResourceType.Parameters);
-    outputParametersEntity = resourceRepository.save(outputParametersEntity);
-    parameters.setId("/Parameters/" + outputParametersEntity.getId());
-  }
-
-  private ResourceEntity buildCareAdviceEntity(CarePlan carePlan) {
-    var careAdviceEntity = new ResourceEntity();
-    careAdviceEntity.setResourceJson(fhirParser.encodeResourceToString(carePlan));
-    careAdviceEntity.setResourceType(ResourceType.CarePlan);
-    return careAdviceEntity;
-  }
-
-  private ResourceEntity buildReferralRequestEntity(
-      org.hl7.fhir.dstu3.model.ReferralRequest referralRequest) {
-    var referralRequestEntity = new ResourceEntity();
-    referralRequestEntity.setResourceJson(fhirParser.encodeResourceToString(referralRequest));
-    referralRequestEntity.setResourceType(ResourceType.ReferralRequest);
-    return referralRequestEntity;
-  }
-
   private void saveRequestGroup(RequestGroup group,
       org.hl7.fhir.dstu3.model.ReferralRequest referralRequest, List<CarePlan> carePlans) {
-    var requestGroupEntity = new ResourceEntity();
+    Stream.concat(Stream.of(referralRequest), carePlans.stream())
+        .map(this::createResource)
+        .map(id -> new RequestGroupActionComponent().setResource(new Reference(id)))
+        .forEach(group.getAction()::add);
 
-    carePlans.stream()
-        .map(this::buildCareAdviceEntity)
-        .forEach(requestGroupEntity::addChild);
+    group.setId(createResource(group));
+  }
 
-    if (referralRequest != null) {
-      requestGroupEntity.addChild(buildReferralRequestEntity(referralRequest));
-    }
-    requestGroupEntity.setResourceJson(fhirParser.encodeResourceToString(group));
-    requestGroupEntity.setResourceType(ResourceType.RequestGroup);
-    requestGroupEntity = resourceRepository.save(requestGroupEntity);
-
-    group.setId("/RequestGroup/" + requestGroupEntity.getId());
+  private String createResource(IBaseResource resource) {
+    return fhirClient.create().resource(resource).execute().getId().getValue();
   }
 
   @Override
@@ -191,7 +132,7 @@ public class CDSOutputTransformer implements Transformer<CDSOutputBundle, Guidan
         .map(this::buildParameter)
         .forEach(outputParameters::addParameter);
 
-    saveParameters(outputParameters);
+    outputParameters.setId(createResource(outputParameters));
     response.setOutputParameters(new Reference(outputParameters));
 
     output.getQuestionnaireIds()
@@ -251,6 +192,16 @@ public class CDSOutputTransformer implements Transformer<CDSOutputBundle, Guidan
 
     saveRequestGroup(requestGroup, referralRequest, carePlans);
     return requestGroup;
+  }
+
+  private CarePlan getCarePlan(String id) {
+    try {
+      var domainCarePlan = carePlanFactory.load(id);
+      return carePlanTransformer.transform(domainCarePlan);
+    } catch (IOException e) {
+      throw new ResourceNotFoundException(
+          "Unable to load CarePlan '" + id + "': " + e.getMessage());
+    }
   }
 
   private ReferralRequest getReferralRequest(String id) {

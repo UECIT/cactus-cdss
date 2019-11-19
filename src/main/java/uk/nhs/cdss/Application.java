@@ -1,5 +1,6 @@
 package uk.nhs.cdss;
 
+import ca.uhn.fhir.rest.client.api.IGenericClient;
 import java.util.Arrays;
 
 import org.hl7.fhir.dstu3.model.CareConnectCarePlan;
@@ -18,6 +19,7 @@ import org.hl7.fhir.dstu3.model.CareConnectProcedure;
 import org.hl7.fhir.dstu3.model.CareConnectProcedureRequest;
 import org.hl7.fhir.dstu3.model.CareConnectRelatedPerson;
 import org.hl7.fhir.dstu3.model.CareConnectSpecimen;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.ServletComponentScan;
@@ -31,15 +33,18 @@ import ca.uhn.fhir.parser.IParser;
 @SpringBootApplication
 public class Application {
 
+	@Value("${fhir.server:http://localhost:8084/fhir}")
+	private String fhirServer;
+
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
 	}
-	
+
 	@Bean
 	public FhirContext fhirContext() {
 		FhirContext fhirContext = FhirContext.forDstu3();
 		fhirContext.setDefaultTypeForProfile("http://hl7.org/fhir/StructureDefinition/CarePlan", CareConnectCarePlan.class);
-	
+
 		return fhirContext;
 	}
 
@@ -57,14 +62,19 @@ public class Application {
 			CareConnectMedication.class,
 			CareConnectObservation.class,
 			CareConnectOrganization.class,
-			CareConnectPatient.class, 
-			CareConnectPractitioner.class, 
+			CareConnectPatient.class,
+			CareConnectPractitioner.class,
 			CareConnectProcedure.class,
 			CareConnectProcedureRequest.class,
 			CareConnectRelatedPerson.class,
 			CareConnectSpecimen.class
 		));
-		
+
 		return fhirParser;
+	}
+
+	@Bean
+	public IGenericClient fhirClient() {
+		return fhirContext().newRestfulGenericClient(fhirServer);
 	}
 }
