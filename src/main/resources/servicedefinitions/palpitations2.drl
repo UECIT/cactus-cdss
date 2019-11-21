@@ -46,23 +46,23 @@ then
     insert( new NextQuestion("palpitations2.hasICD", "palpitations2.hasPalpitations", "q", Arrays.asList("Yes")) );
     insert( new AnswerAssertion("palpitations2.hasICD", "q", "Yes", codeDirectory.get("hasICD"), true));
     insert( new AnswerAssertion("palpitations2.hasICD", "q", "No", codeDirectory.get("hasICD"), false));
-    insert( Outcome.referralRequest("hasICD", "call999"));
+    insert( Outcome.referralRequest("hasICD", "call999-heartAttack-icd"));
     insert( new OutcomeAnswerCondition("hasICD", "palpitations2.hasICD", "q", Arrays.asList("Yes") ));
 
     // Have you had any of the following symptoms in the last 24 hours?
     insert( new NextQuestion("palpitations2.symptoms", "palpitations2.hasICD", "q", Arrays.asList("No", "Unsure")) );
     insert( new AnswerAssertion("palpitations2.symptoms", "q1", "Yes", codeDirectory.get("chestPain"), true));
-    insert( Outcome.referralRequest("chestPains", "call999"));
+    insert( Outcome.referralRequest("chestPains", "call999-heartAttack"));
     insert( new OutcomeAnswerCondition("chestPains", "palpitations2.symptoms", "q1", Arrays.asList("Yes") ));
     insert( new AnswerAssertion("palpitations2.symptoms", "q2", "Yes", codeDirectory.get("neckPain"), true));
-    insert( Outcome.referralRequest("neckPain", "call999"));
+    insert( Outcome.referralRequest("neckPain", "call999-heartAttack"));
     insert( new OutcomeAnswerCondition("neckPain", "palpitations2.symptoms", "q2", Arrays.asList("Yes") ));
     insert( new AnswerAssertion("palpitations2.symptoms", "q3", "Yes", codeDirectory.get("breathingProblems"), true));
-    insert( Outcome.referralRequest("breathingProblems", "call999"));
+    insert( Outcome.referralRequest("breathingProblems", "call999-heartAttack"));
     insert( new OutcomeAnswerCondition("breathingProblems", "palpitations2.symptoms", "q3", Arrays.asList("Yes") ));
     insert( new AnswerAssertion("palpitations2.symptoms", "q4", "Yes", codeDirectory.get("syncope"), true));
     insert( new AnswerAssertion("palpitations2.symptoms", "q4", "Unsure", codeDirectory.get("syncope"), true));
-    insert( Outcome.referralRequest("syncope", "call999"));
+    insert( Outcome.referralRequest("syncope", "call999-heartAttack"));
     insert( new OutcomeAnswerCondition("syncope", "palpitations2.symptoms", "q4", Arrays.asList("Yes", "Unsure") ));
     insert( new OutcomeAnswerCondition("syncope", "palpitations2.hasPalpitations", "q", Arrays.asList("Yes") ));
     insert( new AnswerAssertion("palpitations2.symptoms", "q5", "Yes", codeDirectory.get("noSymptoms"), true));
@@ -82,17 +82,21 @@ then
     insert( new AnswerAssertion("palpitations2.pregnancy", "q", "Yes", codeDirectory.get("pregnant"), true));
     insert( new AnswerAssertion("palpitations2.pregnancy", "q", "No", codeDirectory.get("pregnant"), false));
     insert( new AnswerAssertion("palpitations2.pregnancy", "q", "Unsure", codeDirectory.get("pregnant"), false));
-    insert( Outcome.referralRequest("pregnancy", "consultGP"));
-    insert( new OutcomeAnswerCondition("pregnancy", "palpitations2.pregnancy", "q", Arrays.asList("Yes") ));
+    insert( Outcome.referralRequest("pregnancy-hasPalpitations", "primaryCare-hypertension"));
+    insert( new OutcomeAnswerCondition("pregnancy-hasPalpitations", "palpitations2.pregnancy", "q", Arrays.asList("Yes") ));
+    insert( new OutcomeAnswerCondition("pregnancy-hasPalpitations", "palpitations2.hasPalpitations", "q", Arrays.asList("Yes") ));
+    insert( Outcome.referralRequest("pregnancy-noPalpitations", "consultGP-hypertension"));
+    insert( new OutcomeAnswerCondition("pregnancy-noPalpitations", "palpitations2.pregnancy", "q", Arrays.asList("Yes") ));
+    insert( new OutcomeAnswerCondition("pregnancy-noPalpitations", "palpitations2.hasPalpitations", "q", Arrays.asList("No") ));
 
     // Family history of sudden cardiac death under the age of 40 years
     insert( new AnswerAssertion("palpitations2.familyHistory", "q", "Yes", codeDirectory.get("familyHistorySCD"), true));
     insert( new AnswerAssertion("palpitations2.familyHistory", "q", "No", codeDirectory.get("familyHistorySCD"), false));
     insert( new AnswerAssertion("palpitations2.familyHistory", "q", "Unsure", codeDirectory.get("familyHistorySCD"), false));
-    insert( Outcome.referralRequest("palpitationsFamilyHistory", "ED"));
+    insert( Outcome.referralRequest("palpitationsFamilyHistory", "ed-heartAttack-familyHistory"));
     insert( new OutcomeAnswerCondition("palpitationsFamilyHistory", "palpitations2.familyHistory", "q", Arrays.asList("Yes") ));
     insert( new OutcomeAnswerCondition("palpitationsFamilyHistory", "palpitations2.hasPalpitations", "q", Arrays.asList("Yes") ));
-    insert( Outcome.referralRequest("noPalpitationsFamilyHistory", "UTC"));
+    insert( Outcome.referralRequest("noPalpitationsFamilyHistory", "utc-heartAttack-familyHistory"));
     insert( new OutcomeAnswerCondition("noPalpitationsFamilyHistory", "palpitations2.familyHistory", "q", Arrays.asList("Yes") ));
     insert( new OutcomeAnswerCondition("noPalpitationsFamilyHistory", "palpitations2.hasPalpitations", "q", Arrays.asList("No") ));
 
@@ -105,7 +109,7 @@ then
     insert( new NextQuestion("palpitations2.chestPain24", "palpitations2.personalHistory", "q", Arrays.asList("Yes")) );
     insert( new AnswerAssertion("palpitations2.chestPain24", "q", "Yes", codeDirectory.get("chestPain24"), true));
     insert( new AnswerAssertion("palpitations2.chestPain24", "q", "No", codeDirectory.get("chestPain24"), false));
-    insert( Outcome.referralRequest("palpitationsChestPain24", "ED"));
+    insert( Outcome.referralRequest("palpitationsChestPain24", "ed-heartAttack-personalHistory"));
     insert( new OutcomeAnswerCondition("palpitationsChestPain24", "palpitations2.chestPain24", "q", Arrays.asList("Yes") ));
 
     // Have you seen a healthcare professional in the last 7 days about your heart problems
@@ -116,7 +120,7 @@ then
     insert( new NextQuestion("palpitations2.hadECG", "palpitations2.seenHCP", "q", Arrays.asList("Yes")) );
     insert( new AnswerAssertion("palpitations2.hadECG", "q", "Yes", codeDirectory.get("hadECG"), true));
     insert( new AnswerAssertion("palpitations2.hadECG", "q", "No", codeDirectory.get("hadECG"), false));
-    insert( Outcome.referralRequest("hadECG", "consultGP"));
+    insert( Outcome.referralRequest("hadECG", "primaryCare-ecg"));
     insert( new OutcomeAnswerCondition("hadECG", "palpitations2.hadECG", "q", Arrays.asList("Yes") ));
 
     // Have you had any of the following symptoms of a stroke in the last 7 days?
@@ -126,27 +130,27 @@ then
     //  Face dropped
     insert( new AnswerAssertion("palpitations2.strokeSymptoms", "q1", "Yes", codeDirectory.get("faceDropped"), true));
     insert( new AnswerAssertion("palpitations2.strokeSymptoms", "q1", "No", codeDirectory.get("faceDropped"), false));
-    insert( Outcome.referralRequest("faceDropped", "UTC"));
+    insert( Outcome.referralRequest("faceDropped", "utc-stroke"));
     insert( new OutcomeAnswerCondition("faceDropped", "palpitations2.strokeSymptoms", "q1", Arrays.asList("Yes") ));
     insert( new OutcomeAnswerCondition("faceDropped", "palpitations2.strokeSymptoms", "q4", Arrays.asList("No") ));
 
     //  Arm lift problems
     insert( new AnswerAssertion("palpitations2.strokeSymptoms", "q2", "Yes", codeDirectory.get("armLiftProblems"), true));
     insert( new AnswerAssertion("palpitations2.strokeSymptoms", "q2", "No", codeDirectory.get("armLiftProblems"), false));
-    insert( Outcome.referralRequest("armListProblems", "UTC"));
+    insert( Outcome.referralRequest("armListProblems", "utc-stroke"));
     insert( new OutcomeAnswerCondition("armListProblems", "palpitations2.strokeSymptoms", "q2", Arrays.asList("Yes") ));
     insert( new OutcomeAnswerCondition("armListProblems", "palpitations2.strokeSymptoms", "q4", Arrays.asList("No") ));
 
     //  Speaking problems
     insert( new AnswerAssertion("palpitations2.strokeSymptoms", "q3", "Yes", codeDirectory.get("speakingProblems"), true));
     insert( new AnswerAssertion("palpitations2.strokeSymptoms", "q3", "No", codeDirectory.get("speakingProblems"), false));
-    insert( Outcome.referralRequest("speakingProblems", "UTC"));
+    insert( Outcome.referralRequest("speakingProblems", "utc-stroke"));
     insert( new OutcomeAnswerCondition("speakingProblems", "palpitations2.strokeSymptoms", "q3", Arrays.asList("Yes") ));
     insert( new OutcomeAnswerCondition("speakingProblems", "palpitations2.strokeSymptoms", "q4", Arrays.asList("No") ));
     //  Symptoms right now
     insert( new AnswerAssertion("palpitations2.strokeSymptoms", "q4", "Yes", codeDirectory.get("strokeSymptomsRightNow"), true));
     insert( new AnswerAssertion("palpitations2.strokeSymptoms", "q4", "No", codeDirectory.get("strokeSymptomsRightNow"), false));
-    insert( Outcome.referralRequest("strokeSymptomsRightNow", "call999"));
+    insert( Outcome.referralRequest("strokeSymptomsRightNow", "call999-stroke"));
     insert( new OutcomeAnswerCondition("strokeSymptomsRightNow", "palpitations2.strokeSymptoms", "q4", Arrays.asList("Yes") ));
 
     // Onset of palpitations precipitated by exercise
@@ -154,9 +158,9 @@ then
     insert( new NextQuestion("palpitations2.exercise", "palpitations2.strokeSymptoms", "q5", Arrays.asList("Yes")) );
     insert( new AnswerAssertion("palpitations2.exercise", "q", "Yes", codeDirectory.get("exerciseTriggered"), true));
     insert( new AnswerAssertion("palpitations2.exercise", "q", "No", codeDirectory.get("exerciseTriggered"), false));
-    insert( Outcome.referralRequest("exerciseTriggered", "ED"));
+    insert( Outcome.referralRequest("exerciseTriggered", "ed-arrhythmia-4h"));
     insert( new OutcomeAnswerCondition("exerciseTriggered", "palpitations2.exercise", "q", Arrays.asList("Yes") ));
-    insert( Outcome.referralRequest("notExerciseTriggered", "UTC"));
+    insert( Outcome.referralRequest("notExerciseTriggered", "utc-arrhythmia-4h"));
     insert( new OutcomeAnswerCondition("notExerciseTriggered", "palpitations2.exercise", "q", Arrays.asList("No") ));
 
     // When did you last experience palpitations
@@ -168,11 +172,11 @@ then
     //  If last experienced within 12 hours
     insert( new NextQuestion("palpitations2.syncope", "palpitations2.lastExperienced", "q1", Arrays.asList("Yes")));
     insert( new AnswerAssertion("palpitations2.lastExperienced", "q1", "Yes", codeDirectory.get("lastExperienced12Hrs"), true));
-    insert( Outcome.referralRequest("syncope12hrs", "ED"));
+    insert( Outcome.referralRequest("syncope12hrs", "ed-arrhythmia-urgent"));
     insert( new OutcomeAnswerCondition("syncope12hrs", "palpitations2.syncope", "q", Arrays.asList("Yes", "Unsure") ));
     insert( new OutcomeAnswerCondition("syncope12hrs", "palpitations2.lastExperienced", "q1", Arrays.asList("Yes") ));
     insert( new OutcomeAnswerCondition("syncope12hrs", "palpitations2.hasPalpitations", "q", Arrays.asList("No", "Unsure") ));
-    insert( Outcome.referralRequest("notSyncope12hrs", "UTC"));
+    insert( Outcome.referralRequest("notSyncope12hrs", "utc-arrhythmia-4h"));
     insert( new OutcomeAnswerCondition("notSyncope12hrs", "palpitations2.syncope", "q", Arrays.asList("No") ));
     insert( new OutcomeAnswerCondition("notSyncope12hrs", "palpitations2.lastExperienced", "q1", Arrays.asList("Yes") ));
     insert( new OutcomeAnswerCondition("notSyncope12hrs", "palpitations2.hasPalpitations", "q", Arrays.asList("No", "Unsure") ));
@@ -180,11 +184,11 @@ then
     //  If last experienced within 48 hours
     insert( new NextQuestion("palpitations2.syncope", "palpitations2.lastExperienced", "q2", Arrays.asList("Yes")));
     insert( new AnswerAssertion("palpitations2.lastExperienced", "q2", "Yes", codeDirectory.get("lastExperienced48Hrs"), true));
-    insert( Outcome.referralRequest("syncope48hrs", "UTC"));
+    insert( Outcome.referralRequest("syncope48hrs", "utc-arrhythmia-8h"));
     insert( new OutcomeAnswerCondition("syncope48hrs", "palpitations2.syncope", "q", Arrays.asList("Yes", "Unsure") ));
     insert( new OutcomeAnswerCondition("syncope48hrs", "palpitations2.lastExperienced", "q2", Arrays.asList("Yes") ));
     insert( new OutcomeAnswerCondition("syncope48hrs", "palpitations2.hasPalpitations", "q", Arrays.asList("No", "Unsure") ));
-    insert( Outcome.referralRequest("notSyncope48hrs", "consultGP"));
+    insert( Outcome.referralRequest("notSyncope48hrs", "consultGP-arrhythmia-24h"));
     insert( new OutcomeAnswerCondition("notSyncope48hrs", "palpitations2.syncope", "q", Arrays.asList("No") ));
     insert( new OutcomeAnswerCondition("notSyncope48hrs", "palpitations2.lastExperienced", "q2", Arrays.asList("Yes") ));
     insert( new OutcomeAnswerCondition("notSyncope48hrs", "palpitations2.hasPalpitations", "q", Arrays.asList("No", "Unsure") ));
@@ -194,7 +198,7 @@ then
     insert( new AnswerAssertion("palpitations2.lastExperienced", "q3", "Yes", codeDirectory.get("lastExperiencedMoreThan48"), true));
     insert( new AnswerAssertion("palpitations2.lastExperienced", "q3", "No", codeDirectory.get("lastExperiencedMoreThan48"), true));
     insert( new AnswerAssertion("palpitations2.lastExperienced", "q3", "Unsure", codeDirectory.get("lastExperiencedMoreThan48"), true));
-    insert( Outcome.referralRequest("syncopeOver48hrs", "consultGP"));
+    insert( Outcome.referralRequest("syncopeOver48hrs", "consultGP-arrhythmia-72h"));
     insert( new OutcomeAnswerCondition("syncopeOver48hrs", "palpitations2.syncope", "q", Arrays.asList("Yes", "Unsure") ));
     insert( new OutcomeAnswerCondition("syncopeOver48hrs", "palpitations2.lastExperienced", "q3", Arrays.asList("Yes") ));
     insert( new OutcomeAnswerCondition("syncopeOver48hrs", "palpitations2.hasPalpitations", "q", Arrays.asList("No", "Unsure") ));
@@ -203,13 +207,13 @@ then
     // cocaine, speed or marijuana. Solvents are things like glue, thinners, petrol or lighter fluid
     insert( new NextQuestion("palpitations2.drugUse", "palpitations2.syncope", "q", Arrays.asList("No")) );
     insert( new AnswerAssertion("palpitations2.drugUse", "q", "No", codeDirectory.get("drugUse"), false));
-    insert( Outcome.referralRequest("drugUse", "UTC"));
+    insert( Outcome.referralRequest("drugUse", "utc-adverseReaction"));
     insert( new OutcomeAnswerCondition("drugUse", "palpitations2.drugUse", "q", Arrays.asList("Yes") ));
 
     // Have you started any new prescribed medication or stopped any prescribed medication
     insert( new NextQuestion("palpitations2.prescriptionUse", "palpitations2.drugUse", "q", Arrays.asList("No")) );
     insert( new AnswerAssertion("palpitations2.prescriptionUse", "q", "No", codeDirectory.get("prescriptionUse"), false));
-    insert( Outcome.referralRequest("prescriptionUse", "consultGP"));
+    insert( Outcome.referralRequest("prescriptionUse", "consultGP-adverseReaction"));
     insert( new OutcomeAnswerCondition("prescriptionUse", "palpitations2.prescriptionUse", "q", Arrays.asList("Yes", "Unsure") ));
 
     // Do you have any issues with Anxiety or panic attacks
@@ -224,9 +228,9 @@ then
 
     // Do you have a care plan to follow
     insert( new NextQuestion("palpitations2.hasCarePlan", "palpitations2.careHCP", "q", Arrays.asList("Yes")) );
-    insert( Outcome.carePlan("hasCarePlan", "selfCare"));
+    insert( Outcome.carePlan("hasCarePlan", "selfCare-anxiety"));
     insert( new OutcomeAnswerCondition("hasCarePlan", "palpitations2.hasCarePlan", "q", Arrays.asList("Yes") ));
-    insert( Outcome.referralRequest("noCarePlan", "consultGP"));
+    insert( Outcome.referralRequest("noCarePlan", "consultGP-anxiety"));
     insert( new OutcomeAnswerCondition("noCarePlan", "palpitations2.hasCarePlan", "q", Arrays.asList("No") ));
 
     // Is your mental health a concern to you
@@ -244,23 +248,23 @@ then
     insert( new NextQuestion("palpitations2.causes", "palpitations2.anxiety", "q", Arrays.asList("No")) );
     
     //  Some foods cause
-    insert( Outcome.carePlan("someFoods", "selfCare"));
+    insert( Outcome.carePlan("someFoods", "selfCare-palpitations"));
     insert( new OutcomeAnswerCondition("someFoods", "palpitations2.causes", "q1", Arrays.asList("Yes") ));
 
     //  Some drinks cause
-    insert( Outcome.carePlan("someDrinks", "selfCare"));
+    insert( Outcome.carePlan("someDrinks", "selfCare-palpitations"));
     insert( new OutcomeAnswerCondition("someDrinks", "palpitations2.causes", "q2", Arrays.asList("Yes") ));
 
     //  Smoker
-    insert( Outcome.referralRequest("smoker", "pharmacy"));
+    insert( Outcome.referralRequest("smoker", "pharmacy-nicotine"));
     insert( new OutcomeAnswerCondition("smoker", "palpitations2.causes", "q3", Arrays.asList("Yes") ));
 
     //  No causes
-    insert( Outcome.referralRequest("noCausesMentalHealthRoute", "consultGP"));
+    insert( Outcome.referralRequest("noCausesMentalHealthRoute", "consultGP-noCauses"));
     insert( new OutcomeAnswerCondition("noCausesMentalHealthRoute", "palpitations2.causes", "q4", Arrays.asList("Yes") ));
     insert( new OutcomeAnswerCondition("noCausesMentalHealthRoute", "palpitations2.anxiety", "q", Arrays.asList("Yes") ));
 
-    insert( Outcome.carePlan("noCausesNotMentalHealthRoute", "selfCare"));
+    insert( Outcome.carePlan("noCausesNotMentalHealthRoute", "selfCare-noCauses"));
     insert( new OutcomeAnswerCondition("noCausesNotMentalHealthRoute", "palpitations2.causes", "q4", Arrays.asList("Yes") ));
     insert( new OutcomeAnswerCondition("noCausesNotMentalHealthRoute", "palpitations2.anxiety", "q", Arrays.asList("No") ));
 end

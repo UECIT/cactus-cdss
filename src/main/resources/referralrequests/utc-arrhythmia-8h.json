@@ -1,0 +1,12 @@
+{
+  "description": "UTC",
+  "status": "active",
+  "priority": "routine",
+  "intent": "plan",
+  "serviceRequested": "utc",
+  "occurrence": "PT8h",
+  "specialty": "primaryCareReview",
+  "reason": "arrhythmia",
+  "note": ["A note"],
+  "carePlanIds": []
+}

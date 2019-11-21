@@ -17,6 +17,8 @@ public class ReferralRequestFactory {
 
   public ReferralRequest load(String id) throws IOException {
     URL resource = getClass().getResource("/referralrequests/" + id + ".json");
-    return objectMapper.readValue(resource, ReferralRequest.class);
+    ReferralRequest referralRequest = objectMapper.readValue(resource, ReferralRequest.class);
+    referralRequest.setId(id);
+    return referralRequest;
   }
 }

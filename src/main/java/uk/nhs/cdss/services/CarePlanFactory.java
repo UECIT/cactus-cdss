@@ -1,5 +1,6 @@
 package uk.nhs.cdss.services;
 
+import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.net.URL;
@@ -17,6 +18,11 @@ public class CarePlanFactory {
 
   public CarePlan load(String id) throws IOException {
     URL resource = getClass().getResource("/careplans/" + id + ".json");
-    return objectMapper.readValue(resource, CarePlan.class);
+    if (resource == null) {
+      throw new ResourceNotFoundException("Careplan not found: " + id);
+    }
+    CarePlan carePlan = objectMapper.readValue(resource, CarePlan.class);
+    carePlan.setId(id);
+    return carePlan;
   }
 }

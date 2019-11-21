@@ -18,6 +18,7 @@ public class CarePlan {
   private Status status;
   private Intent intent;
   private String text;
+  private String description;
   private List<CarePlanActivity> activities;
 
   public CarePlan() {
@@ -65,6 +66,14 @@ public class CarePlan {
 
   public void setText(String text) {
     this.text = text;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
   }
 
   public List<CarePlanActivity> getActivities() {

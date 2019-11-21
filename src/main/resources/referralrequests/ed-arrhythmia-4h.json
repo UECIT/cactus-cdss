@@ -1,0 +1,12 @@
+{
+  "description": "ED",
+  "status": "active",
+  "priority": "routine",
+  "intent": "plan",
+  "serviceRequested": "ed",
+  "occurrence": "PT4h",
+  "specialty": "cardio",
+  "reason": "arrhythmia",
+  "note": ["A note"],
+  "carePlanIds": ["arrhythmia-urgent"]
+}

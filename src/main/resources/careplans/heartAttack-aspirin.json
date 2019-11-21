@@ -1,0 +1,13 @@
+{
+  "title": "Take Aspirin",
+  "status": "active",
+  "intent": "option",
+  "text": "Take 300mg Aspirin",
+  "description": "While waiting for an ambulance, it may help to chew and then swallow a tablet of aspirin (ideally 300mg), as long as the person having a heart attack is not allergic to aspirin.",
+  "activities": [
+    {
+      "code": "selfCare",
+      "description": "While waiting for an ambulance, it may help to chew and then swallow a tablet of aspirin (ideally 300mg), as long as the person having a heart attack is not allergic to aspirin."
+    }
+  ]
+}

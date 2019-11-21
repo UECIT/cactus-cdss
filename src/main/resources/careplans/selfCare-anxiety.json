@@ -1,0 +1,12 @@
+{
+  "title": "Self care",
+  "status": "active",
+  "intent": "option",
+  "text": "After Care Instructions",
+  "activities": [
+    {
+      "code": "selfCare",
+      "description": "Try sitting cross-legged and taking a slow breath in through your nostrils and then out through your mouth. Repeat until you feel calm."
+    }
+  ]
+}

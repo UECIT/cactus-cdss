@@ -39,6 +39,7 @@ public class CarePlanTransformer
     result.setStatus(transformStatus(from.getStatus()));
     result.setIntent(transformIntent(from.getIntent()));
     result.setText(transformNarrative(from.getText()));
+    result.setDescription(from.getDescription());
     result.setActivity(from.getActivities().stream()
         .map(this::transformCarePlanActivity)
         .collect(Collectors.toList()));
@@ -49,8 +50,10 @@ public class CarePlanTransformer
   private CarePlanActivityComponent transformCarePlanActivity(CarePlanActivity carePlanActivity) {
     CarePlanActivityComponent result = new CarePlanActivityComponent();
     CodeableConcept code = codeDirectory.get(carePlanActivity.getCode());
-    result.getDetail().setCode(codeableConceptOutTransformer.transform(code));
-    result.getDetail().setDescription(carePlanActivity.getDescription());
+    result.getDetail()
+        .setCategory(codeableConceptOutTransformer.transform(codeDirectory.get("activity-other")))
+        .setCode(codeableConceptOutTransformer.transform(code))
+        .setDescription(carePlanActivity.getDescription());
     return result;
   }
 

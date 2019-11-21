@@ -1,0 +1,10 @@
+{
+  "description": "Speak to Primary Care professional",
+  "status": "draft",
+  "priority": "routine",
+  "intent": "plan",
+  "serviceRequested": "primaryCare",
+  "specialty": "primaryCareReview",
+  "note": ["A note"],
+  "carePlanIds": []
+}

@@ -1,5 +1,6 @@
 package uk.nhs.cdss.domain;
 
+import java.util.Objects;
 import org.hl7.fhir.dstu3.model.Type;
 
 public class Answer {
@@ -38,5 +39,33 @@ public class Answer {
 
   public String getFullyQualifiedId() {
     return questionnaireId + "#" + questionId;
+  }
+
+  @Override
+  public String toString() {
+    return "Answer{" +
+        "questionnaireId='" + questionnaireId + '\'' +
+        ", questionId='" + questionId + '\'' +
+        ", value=" + value +
+        '}';
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    Answer answer = (Answer) o;
+    return Objects.equals(questionnaireId, answer.questionnaireId) &&
+        Objects.equals(questionId, answer.questionId) &&
+        Objects.equals(value, answer.value);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(questionnaireId, questionId, value);
   }
 }
