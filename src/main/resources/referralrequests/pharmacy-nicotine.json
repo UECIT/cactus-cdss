@@ -1,0 +1,12 @@
+{
+  "description": "Consult Pharmacy",
+  "status": "active",
+  "priority": "routine",
+  "intent": "plan",
+  "serviceRequested": "pharmacy",
+  "occurrence": "PT168H",
+  "specialty": "pharmacistReview",
+  "reason": "nicotine",
+  "note": ["A note"],
+  "carePlanIds": []
+}

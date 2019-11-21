@@ -1,0 +1,12 @@
+{
+  "description": "UTC",
+  "status": "active",
+  "priority": "routine",
+  "intent": "plan",
+  "serviceRequested": "utc",
+  "occurrence": "PT12h",
+  "specialty": "primaryCareReview",
+  "reason": "ami",
+  "note": ["A note"],
+  "carePlanIds": []
+}

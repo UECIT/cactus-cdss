@@ -19,6 +19,8 @@ public class RedirectionFactory {
 
   public Redirection load(String id) throws IOException {
     URL resource = getClass().getResource("/redirections/" + id + ".json");
-    return objectMapper.readValue(resource, Redirection.class);
+    Redirection redirection = objectMapper.readValue(resource, Redirection.class);
+    redirection.setId(id);
+    return redirection;
   }
 }

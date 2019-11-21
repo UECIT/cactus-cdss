@@ -1,0 +1,12 @@
+{
+  "description": "Consult GP",
+  "status": "draft",
+  "priority": "routine",
+  "intent": "plan",
+  "serviceRequested": "gp",
+  "occurrence": "PT24h",
+  "specialty": "gp",
+  "reason": "arrhythmia",
+  "note": ["A note"],
+  "carePlanIds": []
+}

@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
@@ -81,6 +82,7 @@ public class CDSOutputTransformer implements Transformer<CDSOutputBundle, Guidan
   private void saveRequestGroup(RequestGroup group,
       org.hl7.fhir.dstu3.model.ReferralRequest referralRequest, List<CarePlan> carePlans) {
     Stream.concat(Stream.of(referralRequest), carePlans.stream())
+        .filter(Objects::nonNull)
         .map(this::createResource)
         .map(id -> new RequestGroupActionComponent().setResource(new Reference(id)))
         .forEach(group.getAction()::add);

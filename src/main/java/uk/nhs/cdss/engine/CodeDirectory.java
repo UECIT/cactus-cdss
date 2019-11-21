@@ -17,6 +17,10 @@ public class CodeDirectory {
   }
 
   public void put(String id, CodeableConcept concept) {
+    if (concepts.containsKey(id)) {
+      throw new IllegalStateException(
+          "CodeDirectory already contains an alias " + id + " for " + concepts.get(id));
+    }
     concepts.put(id, concept);
   }
 }

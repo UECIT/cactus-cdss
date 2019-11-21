@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 import uk.nhs.cdss.domain.ActivityDefinition;
 import uk.nhs.cdss.domain.Assertion;
 import uk.nhs.cdss.domain.CodeableConcept;
+import uk.nhs.cdss.domain.Coding;
 import uk.nhs.cdss.domain.ProcedureRequest;
 import uk.nhs.cdss.domain.ReferralRequest.Status;
 import uk.nhs.cdss.engine.CodeDirectory;
@@ -107,9 +108,17 @@ public class ReferralRequestTransformer implements
   }
 
   private List<Reference> transformReason(String reason) {
-    // TODO Should be a reference to an assertion
+    CodeableConcept code = codeDirectory.get(reason);
+    if (code == null) {
+      return null;
+    }
+
+    // TODO Should be a reference to an Observation
     Reference reference = new Reference();
-    reference.setDisplay(reason);
+    reference.setDisplay("Primary Concern: " + code.getCoding().stream()
+        .findFirst().map(Coding::getDescription)
+        .orElseGet(code::getText));
+
     return Collections.singletonList(reference);
   }
 

@@ -29,7 +29,7 @@ then
     insert( new AnswerAssertion("palpitations.chestPain", "q1", "No", codeDirectory.get("chestPain"), false));
     insert( new AnswerAssertion("palpitations.chestPain", "q1", "Unsure", codeDirectory.get("chestPain"), false));
 
-    insert( Outcome.referralRequest("chestPains", "call999"));
+    insert( Outcome.referralRequest("chestPains", "call999-heartAttack"));
     insert( new OutcomeAnswerCondition("chestPains", "palpitations.chestPain", "q1", Arrays.asList("Yes") ));
 
     insert( new NextQuestion("palpitations.neckPain", "palpitations.chestPain", "q1", Arrays.asList("No", "Unsure")) );
@@ -39,7 +39,7 @@ then
     insert( new AnswerAssertion("palpitations.neckPain", "q2", "No", codeDirectory.get("neckPain"), false));
     insert( new AnswerAssertion("palpitations.neckPain", "q2", "Unsure", codeDirectory.get("neckPain"), false));
 
-    insert( Outcome.referralRequest("neckPains", "call999"));
+    insert( Outcome.referralRequest("neckPains", "call999-heartAttack"));
     insert( new OutcomeAnswerCondition("neckPains", "palpitations.neckPain", "q2", Arrays.asList("Yes") ));
 
     insert( new NextQuestion("palpitations.breathing", "palpitations.neckPain", "q2", Arrays.asList("No", "Unsure")) );
@@ -49,7 +49,7 @@ then
     insert( new AnswerAssertion("palpitations.breathing", "q3", "No", codeDirectory.get("breathingProblems"), false));
     insert( new AnswerAssertion("palpitations.breathing", "q3", "Unsure", codeDirectory.get("breathingProblems"), false));
 
-    insert( Outcome.referralRequest("breathing", "call999"));
+    insert( Outcome.referralRequest("breathing", "call999-heartAttack"));
     insert( new OutcomeAnswerCondition("breathing", "palpitations.breathing", "q3", Arrays.asList("Yes") ));
 
     insert( new NextQuestion("palpitations.heartProblems", "palpitations.breathing", "q3", Arrays.asList("No", "Unsure")) );
@@ -59,7 +59,7 @@ then
     insert( new AnswerAssertion("palpitations.heartProblems", "q4", "No", codeDirectory.get("heartProblems"), false));
     insert( new AnswerAssertion("palpitations.heartProblems", "q4", "Unsure", codeDirectory.get("heartProblems"), false));
 
-    insert( Outcome.referralRequest("heartProblems", "call999"));
+    insert( Outcome.referralRequest("heartProblems", "call999-heartAttack"));
     insert( new OutcomeAnswerCondition("heartProblems", "palpitations.heartProblems", "q4", Arrays.asList("Yes") ));
 
     // Answered no to all questions

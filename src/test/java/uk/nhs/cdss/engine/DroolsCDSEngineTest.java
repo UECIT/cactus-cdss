@@ -70,7 +70,7 @@ public class DroolsCDSEngineTest {
 
     CDSOutput output = engine.evaluate(input);
     assertNotNull(output.getResult().getReferralRequestId());
-    assertEquals("call999", output.getResult().getReferralRequestId());
+    assertEquals("call999-heartAttack", output.getResult().getReferralRequestId());
   }
 
   @Test
@@ -214,7 +214,7 @@ public class DroolsCDSEngineTest {
 
     CDSOutput output = engine.evaluate(input);
 
-    assertEquals("ED", output.getResult().getReferralRequestId());
+    assertEquals("ed-arrhythmia-urgent", output.getResult().getReferralRequestId());
   }
 
   @Test
@@ -255,7 +255,7 @@ public class DroolsCDSEngineTest {
 
     CDSOutput output = engine.evaluate(input);
 
-    assertEquals("consultGP", output.getResult().getReferralRequestId());
+    assertEquals("consultGP-arrhythmia-72h", output.getResult().getReferralRequestId());
 
   }
 
@@ -351,7 +351,7 @@ public class DroolsCDSEngineTest {
     CDSOutput output = engine.evaluate(input);
 
     assertEquals(9 , output.getAssertions().size());
-    assertEquals("ED", output.getResult().getReferralRequestId());
+    assertEquals("ed-heartAttack-familyHistory", output.getResult().getReferralRequestId());
   }
 
   @Test
@@ -494,6 +494,6 @@ public class DroolsCDSEngineTest {
 
     assertEquals(7 , output.getAssertions().size());
     assertEquals(1, output.getResult().getCarePlanIds().size());
-    assertEquals("selfCare", output.getResult().getCarePlanIds().get(0));
+    assertEquals("selfCare-anxiety", output.getResult().getCarePlanIds().get(0));
   }
 }
