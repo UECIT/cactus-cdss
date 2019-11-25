@@ -1,0 +1,12 @@
+{
+  "id": "chestPains",
+  "title":  "Chest Pains",
+  "description": "Chest pains 1st Party",
+  "usage": "To triage a patient who has chest pains",
+  "purpose": "To triage a patient who has chest pains",
+  "triggers": [
+    "chestPain"
+  ],
+  "dataRequirements": [
+  ]
+}
