@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.AllArgsConstructor;
 import org.hl7.fhir.dstu3.model.Bundle;
 import org.hl7.fhir.dstu3.model.Enumerations.PublicationStatus;
 import org.hl7.fhir.dstu3.model.GuidanceResponse;
@@ -35,6 +36,7 @@ import uk.nhs.cdss.services.EvaluateService;
 import uk.nhs.cdss.transform.out.ServiceDefinitionTransformer;
 
 @RestController
+@AllArgsConstructor
 public class ServiceDefinitionProvider implements IResourceProvider {
 
   private static final String EVALUATE = "$evaluate";
@@ -44,18 +46,6 @@ public class ServiceDefinitionProvider implements IResourceProvider {
   private final ServiceDefinitionRepository serviceDefinitionRepository;
   private final ServiceDefinitionTransformer serviceDefinitionTransformer;
   private final ObjectMapper objectMapper;
-
-  public ServiceDefinitionProvider(
-      EvaluateService evaluateService, ServiceDefinitionBuilder serviceDefinitionBuilder,
-      ServiceDefinitionRepository serviceDefinitionRepository,
-      ServiceDefinitionTransformer serviceDefinitionTransformer,
-      ObjectMapper objectMapper) {
-    this.evaluateService = evaluateService;
-    this.serviceDefinitionBuilder = serviceDefinitionBuilder;
-    this.serviceDefinitionRepository = serviceDefinitionRepository;
-    this.serviceDefinitionTransformer = serviceDefinitionTransformer;
-    this.objectMapper = objectMapper;
-  }
 
   @Override
   public Class<ServiceDefinition> getResourceType() {
@@ -67,7 +57,7 @@ public class ServiceDefinitionProvider implements IResourceProvider {
   public GuidanceResponse evaluate(
       @IdParam IdType serviceDefinitionId,
       @ResourceParam Resource resource) {
-    var id = getServiceDefinitionId(serviceDefinitionId);
+    var id =  ServiceDefinitionResource.nameFromId(serviceDefinitionId.getIdPart());
     try {
       return evaluateService.getGuidanceResponse(getParameters(resource), id);
     } catch (ServiceDefinitionException e) {
@@ -84,27 +74,9 @@ public class ServiceDefinitionProvider implements IResourceProvider {
     return (Parameters) bundle.getEntry().get(0).getResource();
   }
 
-  // TODO: remove when EMS no longer assumes numeric ids
-  private String getServiceDefinitionId(IdType serviceDefinitionId) {
-    var idPart = serviceDefinitionId.getIdPart();
-    if (idPart.matches("\\d+")) {
-      switch (idPart) {
-        case "5":
-          return "palpitations";
-        case "6":
-          return "palpitations2";
-        case "7":
-          return "anxiety";
-        default:
-          throw new IllegalArgumentException();
-      }
-    }
-    return idPart;
-  }
-
   @Read
   public ServiceDefinition getServiceDefinitionById(@IdParam IdType serviceDefinitionId) {
-    var serviceName = getServiceDefinitionId(serviceDefinitionId);
+    var serviceName =ServiceDefinitionResource.nameFromId(serviceDefinitionId.getIdPart());
 
     try {
       uk.nhs.cdss.domain.ServiceDefinition domainServiceDefinition = objectMapper
