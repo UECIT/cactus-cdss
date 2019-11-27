@@ -1,0 +1,19 @@
+{
+    "id": "chestPains.causedByInjury",
+    "items": [
+      {
+        "id": "q",
+        "text": "Has the pain in your chest been caused by an injury?",
+        "type": "CHOICE",
+        "required": true,
+        "options": [
+          {
+            "stringValue": "Yes"
+          },
+          {
+            "stringValue": "No"
+          }
+        ]
+      }
+    ]
+  }

@@ -1,0 +1,19 @@
+{
+    "id": "chestPains.conditions",
+    "items": [
+      {
+        "id": "q",
+        "text": "TODO - None of above/Display?? Does the patient have any of the following conditions: Aortic Aneurysm, Mafan Syndrome?",
+        "type": "CHOICE",
+        "required": true,
+        "options": [
+          {
+            "stringValue": "Yes"
+          },
+          {
+            "stringValue": "No"
+          }
+        ]
+      }
+    ]
+  }

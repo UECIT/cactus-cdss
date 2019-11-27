@@ -9,7 +9,8 @@ public enum ServiceDefinitionResource {
   PALPITATIONS("5", "palpitations"),
   PALPITATIONS_2("6", "palpitations2"),
   ANXIETY("7", "anxiety"),
-  CHEST_PAINS("8", "chestPains");
+  CHEST_PAINS("8", "chestPains"),
+  MUSCULOSKELETAL("9", "musculoskeletal");
 
   private String number;
   private String id;

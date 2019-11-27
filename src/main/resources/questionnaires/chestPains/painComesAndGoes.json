@@ -1,0 +1,22 @@
+{
+    "id": "chestPains.painComesAndGoes",
+    "items": [
+      {
+        "id": "q",
+        "text": "Does the pain come and go?",
+        "type": "CHOICE",
+        "required": true,
+        "options": [
+          {
+            "stringValue": "Yes"
+          },
+          {
+            "stringValue": "No"
+          },
+          {
+            "stringValue": "Unsure"
+          }
+        ]
+      }
+    ]
+  }

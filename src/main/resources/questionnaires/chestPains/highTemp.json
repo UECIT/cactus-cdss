@@ -1,0 +1,22 @@
+{
+    "id": "chestPains.highTemp",
+    "items": [
+      {
+        "id": "q",
+        "text": "Patient experiencing high temperature?",
+        "type": "CHOICE",
+        "required": true,
+        "options": [
+          {
+            "stringValue": "Yes"
+          },
+          {
+            "stringValue": "No"
+          },
+          {
+            "stringValue": "Unsure"
+          }
+        ]
+      }
+    ]
+  }

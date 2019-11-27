@@ -1,0 +1,19 @@
+{
+    "id": "chestPains.breathlessSymptom",
+    "items": [
+      {
+        "id": "q",
+        "text": "Patient experiencing breathlessness, even when resting?",
+        "type": "CHOICE",
+        "required": true,
+        "options": [
+          {
+            "stringValue": "Yes"
+          },
+          {
+            "stringValue": "No"
+          }
+        ]
+      }
+    ]
+  }

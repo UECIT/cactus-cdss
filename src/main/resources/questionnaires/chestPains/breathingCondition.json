@@ -1,0 +1,19 @@
+{
+    "id": "chestPains.breathingCondition",
+    "items": [
+      {
+        "id": "q",
+        "text": "TODO - None of above/Multi choice?? Has a doctor or other health care professional told you, you have any of the following that affects your breathing or chest wall function (select any which applies) COPD; Emphysema; Asthma; Chronic Bronchitis; Tuberculosis; Lung cancer; Acute Respiratory Distress Syndrome; Mesothelioma; Myasthenia; Gravis; Cystic Fibrosis",
+        "type": "CHOICE",
+        "required": true,
+        "options": [
+          {
+            "stringValue": "Yes"
+          },
+          {
+            "stringValue": "No"
+          }
+        ]
+      }
+    ]
+  }

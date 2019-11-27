@@ -1,0 +1,12 @@
+{
+    "title": "Record Temperature",
+    "status": "active",
+    "intent": "option",
+    "text": "Interim Care Advice",
+    "activities": [
+      {
+        "code": "selfCare",
+        "description": "Please record temperature"
+      }
+    ]
+  }

@@ -1,0 +1,22 @@
+{
+    "id": "chestPains.generallyUnwellSince",
+    "items": [
+      {
+        "id": "q",
+        "text": "Patient feeling generally unwell since the chest pain?",
+        "type": "CHOICE",
+        "required": true,
+        "options": [
+          {
+            "stringValue": "Yes"
+          },
+          {
+            "stringValue": "No"
+          },
+          {
+            "stringValue": "Unsure"
+          }
+        ]
+      }
+    ]
+  }

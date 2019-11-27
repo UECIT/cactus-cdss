@@ -93,6 +93,9 @@ public class ReferralRequestTransformer implements
 
   private org.hl7.fhir.dstu3.model.CodeableConcept transformSpecialty(String specialty) {
     CodeableConcept code = codeDirectory.get(specialty);
+    if (code == null) {
+      return null;
+    }
     return codeableConceptOutTransformer.transform(code);
   }
 

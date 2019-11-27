@@ -1,0 +1,13 @@
+{
+    "description": "ED",
+    "status": "active",
+    "priority": "routine",
+    "intent": "plan",
+    "serviceRequested": "ed",
+    "occurrence": "PT4h",
+    "specialty": "resusIntervention",
+    "reason": "pe",
+    "note": ["A note"],
+    "carePlanIds": []
+  }
+  

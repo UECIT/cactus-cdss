@@ -1,0 +1,19 @@
+{
+    "id": "chestPains.newCough",
+    "items": [
+      {
+        "id": "q",
+        "text": "Does the patient have a new cough?",
+        "type": "CHOICE",
+        "required": true,
+        "options": [
+          {
+            "stringValue": "Yes"
+          },
+          {
+            "stringValue": "No"
+          }
+        ]
+      }
+    ]
+  }

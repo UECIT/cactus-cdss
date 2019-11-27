@@ -1,0 +1,22 @@
+{
+    "id": "chestPains.heavyLifting",
+    "items": [
+      {
+        "id": "q",
+        "text": "Is the injury musculoskeletal in nature/caused by lifting heavy object e.g weight training or excessive upper arm activity involving the chest muscles such as gardening?",
+        "type": "CHOICE",
+        "required": true,
+        "options": [
+          {
+            "stringValue": "Yes"
+          },
+          {
+            "stringValue": "No"
+          },
+          {
+            "stringValue": "Unsure"
+          }
+        ]
+      }
+    ]
+  }

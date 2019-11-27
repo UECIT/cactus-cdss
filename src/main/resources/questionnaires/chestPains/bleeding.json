@@ -1,0 +1,19 @@
+{
+    "id": "chestPains.bleeding",
+    "items": [
+      {
+        "id": "q",
+        "text": "Bleeding from the injury?",
+        "type": "CHOICE",
+        "required": true,
+        "options": [
+          {
+            "stringValue": "Yes"
+          },
+          {
+            "stringValue": "No"
+          }
+        ]
+      }
+    ]
+  }

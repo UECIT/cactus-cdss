@@ -27,6 +27,21 @@ declare NextQuestion
     answers: List
 end
 
+declare ConditionalNextQuestion
+    id: String @key
+    next: String @key
+    questionnaireId: String @key
+    questionId: String @key
+    answers: List
+end
+
+declare NextQuestionCondition
+    id: String @key
+    questionnaireId: String @key
+    questionId: String @key
+    answers: List
+end
+
 declare HighPriorityNextQuestion
     next: String @key
     questionnaireId: String @key
@@ -114,6 +129,24 @@ when
     not Answered( $next := questionnaireId )
     not Questionnaire( )
     not ActiveOutcome( draft == false )
+then
+    System.out.println("Have answer for " + $questionnaireId + "#" + $questionId + " == " + $a.getValue() + ": requesting questionnaire " + $next);
+    insert( new Questionnaire($next) );
+end
+
+rule "Conditional next question from Answer"
+    salience 10
+when
+    ConditionalNextQuestion($id := id, $questionnaireId := questionnaireId, $questionId := questionId, $next := next, $answers := answers )
+    $a: Answered( $questionnaireId := questionnaireId, $questionId := questionId, $answers == null || $answers.isEmpty() || value memberOf $answers)
+    not Answered( $next := questionnaireId )
+    not Questionnaire( )
+    not ActiveOutcome()
+    // Make sure all conditions for the next question have been met with the valid answers in the 'Answered' object
+    (forall (
+        $oac : NextQuestionCondition( $id := id, $cquestionnaireId := questionnaireId, $cquestionId := questionId, $canswers := answers )
+        Answered( $cquestionnaireId := questionnaireId, $cquestionId := questionId, $canswers == null || $canswers.isEmpty() || value memberOf $canswers)
+    ))
 then
     System.out.println("Have answer for " + $questionnaireId + "#" + $questionId + " == " + $a.getValue() + ": requesting questionnaire " + $next);
     insert( new Questionnaire($next) );
