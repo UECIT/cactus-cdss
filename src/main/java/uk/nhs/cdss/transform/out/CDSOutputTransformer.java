@@ -31,9 +31,10 @@ import org.hl7.fhir.dstu3.model.ResourceType;
 import org.hl7.fhir.dstu3.model.StringType;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.springframework.stereotype.Component;
+import uk.nhs.cdss.domain.CarePlan.Status;
+import uk.nhs.cdss.domain.Outcome;
 import uk.nhs.cdss.domain.Redirection;
 import uk.nhs.cdss.domain.ReferralRequest;
-import uk.nhs.cdss.domain.Result;
 import uk.nhs.cdss.services.CarePlanFactory;
 import uk.nhs.cdss.services.RedirectionFactory;
 import uk.nhs.cdss.services.ReferralRequestFactory;
@@ -97,7 +98,7 @@ public class CDSOutputTransformer implements Transformer<CDSOutputBundle, Guidan
   @Override
   public GuidanceResponse transform(CDSOutputBundle bundle) {
     final var output = bundle.getOutput();
-    final var result = output.getResult();
+    final var outcome = output.getOutcome();
 
     var serviceDefinition = new Reference(
         "ServiceDefinition/" + bundle.getServiceDefinitionId());
@@ -108,15 +109,14 @@ public class CDSOutputTransformer implements Transformer<CDSOutputBundle, Guidan
         .setContext(bundle.getParameters().getEncounter());
 
     boolean dataRequested = !output.getQuestionnaireIds().isEmpty();
-    boolean hasOutcome = outcomeExists(result);
 
     if (dataRequested) {
-      if (hasOutcome) {
+      if (outcome != null) {
         response.setStatus(GuidanceResponseStatus.DATAREQUESTED);
       } else {
         response.setStatus(GuidanceResponseStatus.DATAREQUIRED);
       }
-    } else if (hasOutcome) {
+    } else if (outcome != null) {
       response.setStatus(GuidanceResponseStatus.SUCCESS);
     } else {
       throw new IllegalStateException("Rules did not create an outcome or request data");
@@ -142,12 +142,12 @@ public class CDSOutputTransformer implements Transformer<CDSOutputBundle, Guidan
         .map(this::buildDataRequirement)
         .forEach(response::addDataRequirement);
 
-    if (!dataRequested && isNotEmpty(result.getRedirectionId())) {
-      var redirection = getRedirection(result.getRedirectionId());
+    if (!dataRequested && isNotEmpty(outcome.getRedirectionId())) {
+      var redirection = getRedirection(outcome.getRedirectionId());
       response.addDataRequirement(redirectTransformer.transform(redirection));
     }
 
-    if (hasOutcome && isEmpty(result.getRedirectionId())) {
+    if (outcome != null && isEmpty(outcome.getRedirectionId())) {
       response.setResult(new Reference(buildRequestGroup(bundle)));
     }
 
@@ -155,7 +155,6 @@ public class CDSOutputTransformer implements Transformer<CDSOutputBundle, Guidan
   }
 
   private RequestGroup buildRequestGroup(CDSOutputBundle bundle) {
-    Result result = bundle.getOutput().getResult();
 
     // FIXME - not known until after request group has been stored
     Identifier requestGroupIdentifier = null;
@@ -164,12 +163,13 @@ public class CDSOutputTransformer implements Transformer<CDSOutputBundle, Guidan
         RequestStatus.ACTIVE,
         RequestIntent.ORDER);
 
-    List<String> carePlanIds = new ArrayList<>(result.getCarePlanIds());
+    Outcome outcome = bundle.getOutput().getOutcome();
+    List<String> carePlanIds = new ArrayList<>(outcome.getCarePlanIds());
 
     org.hl7.fhir.dstu3.model.ReferralRequest referralRequest = null;
-    String referralRequestId = result.getReferralRequestId();
+    String referralRequestId = outcome.getReferralRequestId();
     if (referralRequestId != null) {
-      var domainReferralRequest = getReferralRequest(referralRequestId);
+      var domainReferralRequest = getReferralRequest(referralRequestId, outcome.isDraft());
       carePlanIds.addAll(domainReferralRequest.getCarePlanIds());
 
       var subject = bundle.getParameters().getInputData().stream()
@@ -184,21 +184,23 @@ public class CDSOutputTransformer implements Transformer<CDSOutputBundle, Guidan
           requestGroupIdentifier,
           domainReferralRequest,
           subject,
-          context
+          context,
+          outcome.isDraft()
       ));
     }
 
     var carePlans = carePlanIds.stream()
-        .map(this::getCarePlan)
+        .map(id -> getCarePlan(id, outcome.isDraft()))
         .collect(Collectors.toUnmodifiableList());
 
     saveRequestGroup(requestGroup, referralRequest, carePlans);
     return requestGroup;
   }
 
-  private CarePlan getCarePlan(String id) {
+  private CarePlan getCarePlan(String id, boolean draft) {
     try {
       var domainCarePlan = carePlanFactory.load(id);
+      domainCarePlan.setStatus(draft ? Status.draft : Status.active);
       return carePlanTransformer.transform(domainCarePlan);
     } catch (IOException e) {
       throw new ResourceNotFoundException(
@@ -206,9 +208,12 @@ public class CDSOutputTransformer implements Transformer<CDSOutputBundle, Guidan
     }
   }
 
-  private ReferralRequest getReferralRequest(String id) {
+  private ReferralRequest getReferralRequest(String id, boolean draft) {
     try {
-      return referralRequestFactory.load(id);
+      ReferralRequest referralRequest = referralRequestFactory.load(id);
+      referralRequest
+          .setStatus(draft ? ReferralRequest.Status.draft : ReferralRequest.Status.active);
+      return referralRequest;
     } catch (IOException e) {
       throw new ResourceNotFoundException(
           "Unable to load ReferralRequest " + id + ": " + e.getMessage());
@@ -222,11 +227,5 @@ public class CDSOutputTransformer implements Transformer<CDSOutputBundle, Guidan
       throw new ResourceNotFoundException(
           "Unable to load Redirection " + id + ": " + e.getMessage());
     }
-  }
-
-  private boolean outcomeExists(Result result) {
-    return !result.getCarePlanIds().isEmpty()
-        || isNotEmpty(result.getRedirectionId())
-        || isNotEmpty(result.getReferralRequestId());
   }
 }

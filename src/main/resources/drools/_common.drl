@@ -48,7 +48,8 @@ declare OutcomeAnswerCondition
 end
 
 declare ActiveOutcome
-    id: String @key
+    id: String
+    draft: Boolean
 end
 
 declare AnswerAssertion
@@ -66,7 +67,7 @@ rule "Answer present"
 when
     $a: Answer( $id := questionnaireId, $questionId := questionId )
 then
-    System.out.println("Have answer for "+ $id + " " + $questionId);
+    System.out.println("Answered: "+ $id + " " + $questionId);
     insert( new Answered($id, $questionId, $a.getValue()) );
 end
 
@@ -75,6 +76,7 @@ rule "Assertion present"
 when
     $aa: AnswerAssertion( $id := questionnaireId, $questionId := questionId, $value := value)
     Assertion( code == $aa.code, $value == value)
+    not Answered( $id := questionnaireId, $questionId := questionId )
 then
     System.out.println("Answered question "+ $id + " " + $questionId + " = " + $aa.getAnswer() + " with assertion " + $aa.getCode() + " = " + $aa.getValue());
     insert( new Answered($id, $questionId, $aa.getAnswer()) );
@@ -97,7 +99,7 @@ rule "Ask first question"
     salience -1
 when
     not Questionnaire()
-    not ActiveOutcome()
+    not ActiveOutcome( draft == false )
     $q: InitialQuestionnaire()
 then
     System.out.println("No answers: requesting questionnaire " + $q.getId());
@@ -111,7 +113,7 @@ when
     $a: Answered( $questionnaireId := questionnaireId, $questionId := questionId, $answers == null || $answers.isEmpty() || value memberOf $answers)
     not Answered( $next := questionnaireId )
     not Questionnaire( )
-    not ActiveOutcome()
+    not ActiveOutcome( draft == false )
 then
     System.out.println("Have answer for " + $questionnaireId + "#" + $questionId + " == " + $a.getValue() + ": requesting questionnaire " + $next);
     insert( new Questionnaire($next) );
@@ -124,25 +126,25 @@ when
     $a: Answered( $questionnaireId := questionnaireId, $questionId := questionId, $answers == null || $answers.isEmpty() || value memberOf $answers)
     not Answered( $next := questionnaireId )
     not Questionnaire( )
-    not ActiveOutcome()
+    not ActiveOutcome( draft == false )
 then
     System.out.println("Have answer for " + $questionnaireId + "#" + $questionId + " == " + $a.getValue() + ": requesting questionnaire " + $next);
     insert( new Questionnaire($next) );
 end
 
-rule "CarePlan from Answers"
+rule "Outcome from Answers"
     salience 200
 when
-    not ActiveOutcome()
-    Outcome( $id := id )
+    not ActiveOutcome( draft == false )
+    $o: Outcome( $id := id )
     // Make sure all conditions for the outcome have been met with the valid answers in the 'Answered' object
     (forall (
         $oac : OutcomeAnswerCondition( $id := id, $questionnaireId := questionnaireId, $questionId := questionId, $answers := answers )
         $a: Answered( $questionnaireId := questionnaireId, $questionId := questionId, $answers == null || $answers.isEmpty() || value memberOf $answers)
     ))
 then
-    System.out.println("All conditions for outcome id " + $id);
-    insert(new ActiveOutcome($id));
+    System.out.println("All conditions for outcome " + $o);
+    insert( new ActiveOutcome($id, $o.isDraft()) );
 end
 
 // Simple assertions

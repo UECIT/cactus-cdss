@@ -29,10 +29,10 @@ then
     insert( new AnswerAssertion("palpitations.chestPain", "q1", "No", codeDirectory.get("chestPain"), false));
     insert( new AnswerAssertion("palpitations.chestPain", "q1", "Unsure", codeDirectory.get("chestPain"), false));
 
-    insert( Outcome.referralRequest("chestPains", "call999-heartAttack"));
+    insert( Outcome.referralRequest("chestPains", "call999-heartAttack").interim() );
     insert( new OutcomeAnswerCondition("chestPains", "palpitations.chestPain", "q1", Arrays.asList("Yes") ));
 
-    insert( new NextQuestion("palpitations.neckPain", "palpitations.chestPain", "q1", Arrays.asList("No", "Unsure")) );
+    insert( new NextQuestion("palpitations.neckPain", "palpitations.chestPain", "q1") );
 
     // Neck pains
     insert( new AnswerAssertion("palpitations.neckPain", "q2", "Yes", codeDirectory.get("neckPain"), true));
@@ -42,7 +42,7 @@ then
     insert( Outcome.referralRequest("neckPains", "call999-heartAttack"));
     insert( new OutcomeAnswerCondition("neckPains", "palpitations.neckPain", "q2", Arrays.asList("Yes") ));
 
-    insert( new NextQuestion("palpitations.breathing", "palpitations.neckPain", "q2", Arrays.asList("No", "Unsure")) );
+    insert( new NextQuestion("palpitations.breathing", "palpitations.neckPain", "q2") );
 
     // Breathing
     insert( new AnswerAssertion("palpitations.breathing", "q3", "Yes", codeDirectory.get("breathingProblems"), true));
@@ -52,7 +52,7 @@ then
     insert( Outcome.referralRequest("breathing", "call999-heartAttack"));
     insert( new OutcomeAnswerCondition("breathing", "palpitations.breathing", "q3", Arrays.asList("Yes") ));
 
-    insert( new NextQuestion("palpitations.heartProblems", "palpitations.breathing", "q3", Arrays.asList("No", "Unsure")) );
+    insert( new NextQuestion("palpitations.heartProblems", "palpitations.breathing", "q3") );
 
     // Heart problems
     insert( new AnswerAssertion("palpitations.heartProblems", "q4", "Yes", codeDirectory.get("heartProblems"), true));

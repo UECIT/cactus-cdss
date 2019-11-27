@@ -2,6 +2,7 @@ package uk.nhs.cdss.domain;
 
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.junit.Assert;
 import org.junit.Test;
 import uk.nhs.cdss.domain.Assertion.Status;
 
@@ -42,13 +43,12 @@ public class ScenarioTest {
     hasFlu.getRelated().add(response);
 
     // Results
-    // Result with a referral request and care plan
-    Result result1 = new Result("result1");
-    result1.getCarePlanIds().add("carePlan1");
-    result1.setReferralRequestId("referralRequest");
+    // Result with a referral request
+    Outcome result1 = Outcome.referralRequest("result1", "referralRequest");
+    Assert.assertEquals("referralRequest", result1.getReferralRequestId());
 
-    // Result with a redirection to another service definition
-    Result result2 = new Result("result2");
-    result2.setRedirectionId("anxiety");
+    // Outcome with a redirection to another service definition
+    Outcome result2 = Outcome.redirect("result2", "anxiety");
+    Assert.assertEquals("anxiety", result2.getRedirectionId());
   }
 }

@@ -2,8 +2,7 @@ package uk.nhs.cdss.engine;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNull;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -28,7 +27,7 @@ public class DroolsCDSEngineTest {
   @Before
   public void setup() {
     DroolsConfig droolsConfig = new DroolsConfig();
-    engine = new DroolsCDSEngine(new CDSKnowledgeBaseFactory(), droolsConfig.codeDirectory());
+    engine = new DroolsCDSEngine(new CDSKnowledgeBaseFactory(false), droolsConfig.codeDirectory());
   }
 
   @Test
@@ -69,8 +68,8 @@ public class DroolsCDSEngineTest {
     input.getResponses().add(response);
 
     CDSOutput output = engine.evaluate(input);
-    assertNotNull(output.getResult().getReferralRequestId());
-    assertEquals("call999-heartAttack", output.getResult().getReferralRequestId());
+    assertNotNull(output.getOutcome().getReferralRequestId());
+    assertEquals("call999-heartAttack", output.getOutcome().getReferralRequestId());
   }
 
   @Test
@@ -102,7 +101,7 @@ public class DroolsCDSEngineTest {
 
     CDSOutput output = engine.evaluate(input);
 
-    assertEquals(0, output.getResult().getCarePlanIds().size());
+    assertNull(output.getOutcome());
   }
 
   @Test
@@ -167,8 +166,8 @@ public class DroolsCDSEngineTest {
 
     CDSOutput output = engine.evaluate(input);
 
-    assertEquals(1, output.getResult().getCarePlanIds().size());
-    assertEquals("selfCare", output.getResult().getCarePlanIds().get(0));
+    assertEquals(1, output.getOutcome().getCarePlanIds().size());
+    assertEquals("selfCare", output.getOutcome().getCarePlanIds().get(0));
   }
 
   @Test
@@ -214,7 +213,7 @@ public class DroolsCDSEngineTest {
 
     CDSOutput output = engine.evaluate(input);
 
-    assertEquals("ed-arrhythmia-urgent", output.getResult().getReferralRequestId());
+    assertEquals("ed-arrhythmia-urgent", output.getOutcome().getReferralRequestId());
   }
 
   @Test
@@ -233,7 +232,6 @@ public class DroolsCDSEngineTest {
     answer.setQuestionnaireResponse(response);
     response.getAnswers().add(answer);
     input.getResponses().add(response);
-
 
     response = new QuestionnaireResponse("response", "palpitations2.lastExperienced");
     answer = new Answer("palpitations2.lastExperienced", "q2", "No");
@@ -255,7 +253,7 @@ public class DroolsCDSEngineTest {
 
     CDSOutput output = engine.evaluate(input);
 
-    assertEquals("consultGP-arrhythmia-72h", output.getResult().getReferralRequestId());
+    assertEquals("consultGP-arrhythmia-72h", output.getOutcome().getReferralRequestId());
 
   }
 
@@ -264,11 +262,13 @@ public class DroolsCDSEngineTest {
     CDSInput input = new CDSInput(PALPITATIONS2, REQUEST_1, ENCOUNTER_1, SUPPLIER_1);
 
     Assertion ageAssertion = new Assertion(null, Assertion.Status.FINAL);
-    ageAssertion.setCode(new CodeableConcept(SnomedConstants.AGE, new Coding(SystemURL.SNOMED, SnomedConstants.AGE)));
+    ageAssertion.setCode(new CodeableConcept(SnomedConstants.AGE,
+        new Coding(SystemURL.SNOMED, SnomedConstants.AGE)));
     ageAssertion.setValue("1900-12-25");
 
     Assertion genderAssertion = new Assertion(null, Assertion.Status.FINAL);
-    genderAssertion.setCode(new CodeableConcept(SnomedConstants.GENDER, new Coding(SystemURL.SNOMED, SnomedConstants.GENDER)));
+    genderAssertion.setCode(new CodeableConcept(SnomedConstants.GENDER,
+        new Coding(SystemURL.SNOMED, SnomedConstants.GENDER)));
     genderAssertion.setValue("male");
 
     input.getAssertions().add(ageAssertion);
@@ -298,7 +298,7 @@ public class DroolsCDSEngineTest {
     assertEquals(1, output.getQuestionnaireIds().size());
     assertEquals("palpitations2.personalHistory", output.getQuestionnaireIds().get(0));
     assertEquals(5, output.getAssertions().size());
-    assertEquals(0, output.getResult().getCarePlanIds().size());
+    assertNull(output.getOutcome());
   }
 
   @Test
@@ -350,8 +350,8 @@ public class DroolsCDSEngineTest {
 
     CDSOutput output = engine.evaluate(input);
 
-    assertEquals(9 , output.getAssertions().size());
-    assertEquals("ed-heartAttack-familyHistory", output.getResult().getReferralRequestId());
+    assertEquals(9, output.getAssertions().size());
+    assertEquals("ed-heartAttack-familyHistory", output.getOutcome().getReferralRequestId());
   }
 
   @Test
@@ -359,23 +359,24 @@ public class DroolsCDSEngineTest {
     CDSInput input = new CDSInput(PALPITATIONS2, REQUEST_1, ENCOUNTER_1, SUPPLIER_1);
 
     Assertion ageAssertion = new Assertion(null, Assertion.Status.FINAL);
-    ageAssertion.setCode(new CodeableConcept(SnomedConstants.AGE, new Coding(SystemURL.SNOMED, SnomedConstants.AGE)));
+    ageAssertion.setCode(new CodeableConcept(SnomedConstants.AGE,
+        new Coding(SystemURL.SNOMED, SnomedConstants.AGE)));
     ageAssertion.setValue("1900-12-25");
 
     Assertion genderAssertion = new Assertion(null, Assertion.Status.FINAL);
-    genderAssertion.setCode(new CodeableConcept(SnomedConstants.GENDER, new Coding(SystemURL.SNOMED, SnomedConstants.GENDER)));
+    genderAssertion.setCode(new CodeableConcept(SnomedConstants.GENDER,
+        new Coding(SystemURL.SNOMED, SnomedConstants.GENDER)));
     genderAssertion.setValue("male");
 
     input.getAssertions().add(ageAssertion);
     input.getAssertions().add(genderAssertion);
-
 
     CDSOutput output = engine.evaluate(input);
 
     assertEquals(1, output.getQuestionnaireIds().size());
     assertEquals("palpitations2.hasPalpitations", output.getQuestionnaireIds().get(0));
     assertEquals(2, output.getAssertions().size());
-    assertEquals(0, output.getResult().getCarePlanIds().size());
+    assertNull(output.getOutcome());
   }
 
   @Test
@@ -433,8 +434,8 @@ public class DroolsCDSEngineTest {
 
     CDSOutput output = engine.evaluate(input);
 
-    assertEquals(7 , output.getAssertions().size());
-    assertEquals("anxiety", output.getResult().getRedirectionId());
+    assertEquals(7, output.getAssertions().size());
+    assertEquals("anxiety", output.getOutcome().getRedirectionId());
   }
 
   @Test
@@ -492,8 +493,8 @@ public class DroolsCDSEngineTest {
 
     CDSOutput output = engine.evaluate(input);
 
-    assertEquals(7 , output.getAssertions().size());
-    assertEquals(1, output.getResult().getCarePlanIds().size());
-    assertEquals("selfCare-anxiety", output.getResult().getCarePlanIds().get(0));
+    assertEquals(7, output.getAssertions().size());
+    assertEquals(1, output.getOutcome().getCarePlanIds().size());
+    assertEquals("selfCare-anxiety", output.getOutcome().getCarePlanIds().get(0));
   }
 }
