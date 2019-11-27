@@ -1,4 +1,4 @@
-package uk.nhs.cdss.rules.palpitations
+package uk.nhs.cdss.rules.anxiety
 
 import uk.nhs.cdss.rules.InitialQuestionnaire
 import uk.nhs.cdss.rules.QuestionFlow

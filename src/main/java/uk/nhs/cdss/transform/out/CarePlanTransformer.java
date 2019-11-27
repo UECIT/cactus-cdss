@@ -77,6 +77,8 @@ public class CarePlanTransformer
     switch (status) {
       case active:
         return CarePlanStatus.ACTIVE;
+      case draft:
+        return CarePlanStatus.DRAFT;
       default:
         throw new IllegalArgumentException("Unexpected CarePlan Status: " + status);
     }

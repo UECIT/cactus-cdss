@@ -1,65 +1,39 @@
 package uk.nhs.cdss.domain;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
+@AllArgsConstructor
+@Getter
+@Setter
 public class Outcome {
 
   private String id;
   private List<String> carePlanIds;
   private String referralRequestId;
   private String redirectionId;
-
-  public Outcome(String id, List<String> carePlanIds,
-                 String referralRequestId, String redirectionId) {
-    this.id = id;
-    this.carePlanIds = carePlanIds;
-    this.referralRequestId = referralRequestId;
-    this.redirectionId = redirectionId;
-  }
+  private boolean draft;
 
   public static Outcome carePlan(String id, String... carePlanIds) {
-    return new Outcome(id, Arrays.asList(carePlanIds), null, null);
+    return new Outcome(id, Arrays.asList(carePlanIds), null, null, false);
   }
 
   public static Outcome referralRequest(String id, String referralRequestId) {
-    return new Outcome(id, null, referralRequestId, null);
+    return new Outcome(id, Collections.emptyList(), referralRequestId, null, false);
   }
 
   public static Outcome redirect(String id, String redirectionId) {
-    return new Outcome(id, null, null, redirectionId);
+    return new Outcome(id, Collections.emptyList(), null, redirectionId, false);
   }
 
-  public List<String> getCarePlanIds() {
-    return carePlanIds;
-  }
-
-  public void setCarePlanIds(List<String> carePlanIds) {
-    this.carePlanIds = carePlanIds;
-  }
-
-  public String getId() {
-    return id;
-  }
-
-  public void setId(String id) {
-    this.id = id;
-  }
-
-  public String getReferralRequestId() {
-    return referralRequestId;
-  }
-
-  public void setReferralRequestId(String referralRequestId) {
-    this.referralRequestId = referralRequestId;
-  }
-
-  public String getRedirectionId() {
-    return redirectionId;
-  }
-
-  public void setRedirectionId(String redirectionId) {
-    this.redirectionId = redirectionId;
+  public Outcome interim() {
+    setDraft(true);
+    return this;
   }
 
   @Override
@@ -69,6 +43,7 @@ public class Outcome {
         ", carePlanIds=" + carePlanIds +
         ", referralRequestId='" + referralRequestId + '\'' +
         ", redirectId='" + redirectionId + '\'' +
+        ", draft='" + draft + '\'' +
         '}';
   }
 }

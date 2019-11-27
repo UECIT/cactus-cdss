@@ -30,6 +30,14 @@ public class CDSKnowledgeBaseFactory {
       .build(CacheLoader.from(this::loadKnowledgeBase));
 
   public CDSKnowledgeBaseFactory() {
+    this(true);
+  }
+
+  public CDSKnowledgeBaseFactory(boolean preload) {
+    if (!preload) {
+      return;
+    }
+
     try {
       PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
       Resource[] resources = resolver.getResources("/drools/*");

@@ -4,12 +4,13 @@ import org.drools.core.impl.InternalKnowledgeBase;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.rule.QueryResults;
 import org.kie.api.runtime.rule.QueryResultsRow;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import uk.nhs.cdss.domain.Assertion;
 import uk.nhs.cdss.domain.Outcome;
 import uk.nhs.cdss.domain.Questionnaire;
 import uk.nhs.cdss.domain.QuestionnaireResponse;
-import uk.nhs.cdss.domain.Result;
 
 @Component
 public class DroolsCDSEngine implements CDSEngine {
@@ -23,10 +24,13 @@ public class DroolsCDSEngine implements CDSEngine {
   private static final String OUTCOMES_QUERY = "outcomes";
   private static final String OUTCOME_ID = "outcome";
 
+  private final Logger log = LoggerFactory.getLogger(getClass());
+
   private final CDSKnowledgeBaseFactory knowledgeBaseFactory;
   private final CodeDirectory codeDirectory;
 
-  public DroolsCDSEngine(CDSKnowledgeBaseFactory knowledgeBaseFactory, CodeDirectory codeDirectory) {
+  public DroolsCDSEngine(CDSKnowledgeBaseFactory knowledgeBaseFactory,
+      CodeDirectory codeDirectory) {
     this.knowledgeBaseFactory = knowledgeBaseFactory;
     this.codeDirectory = codeDirectory;
   }
@@ -45,58 +49,54 @@ public class DroolsCDSEngine implements CDSEngine {
         ksession.insert(input.getPatient());
       }
 
-
-      System.out.println("---------------------------\nInput");
+      log.info("---------------------------");
+      log.info("Input");
 
       // Add existing assertions
       input.getAssertions().stream()
           .filter(a -> a.getRelated().stream()
               .noneMatch(qr -> QuestionnaireResponse.Status.AMENDED.equals(qr.getStatus())))
-          .peek(System.out::println)
+          .peek(assertion -> log.info("{}", assertion))
           .forEach(ksession::insert);
 
       // Add all answers
       input.getResponses().forEach(response -> {
         ksession.insert(response);
         response.getAnswers().stream()
-            .peek(System.out::println)
+            .peek(answer -> log.info("{}", answer))
             .forEach(ksession::insert);
       });
 
       // Execute and collect results
-      System.out.println();
+      log.info("");
       ksession.fireAllRules();
       CDSOutput output = new CDSOutput();
 
-      System.out.println("\nOutput");
+      log.info("Output");
       // Query resulting assertions and questionnaires
       QueryResults assertions = ksession.getQueryResults(ASSERTIONS_QUERY);
       for (QueryResultsRow resultsRow : assertions) {
-        System.out.println("Assertion " + resultsRow.get(ASSERTION_ID) + " added to output");
-        output.getAssertions().add((Assertion) resultsRow.get(ASSERTION_ID));
+        Assertion assertion = (Assertion) resultsRow.get(ASSERTION_ID);
+        output.getAssertions().add(assertion);
+        log.info("Assertion {} added to output", assertion);
       }
 
       QueryResults questionnaires = ksession.getQueryResults(QUESTIONNAIRES_QUERY);
       for (QueryResultsRow resultsRow : questionnaires) {
-        System.out.println("Questionnaire " + resultsRow.get(QUESTIONNAIRE_ID) + " added to output");
-        output.getQuestionnaireIds()
-            .add(((Questionnaire) resultsRow.get(QUESTIONNAIRE_ID)).getId());
+        Questionnaire questionnaire = (Questionnaire) resultsRow.get(QUESTIONNAIRE_ID);
+        output.getQuestionnaireIds().add(questionnaire.getId());
+        log.info("Questionnaire {} added to output", questionnaire);
       }
-
-      Result result = new Result("result");
 
       QueryResults outcomes = ksession.getQueryResults(OUTCOMES_QUERY);
-      for (QueryResultsRow resultsRow : outcomes) {
-        System.out.println("Outcome " + resultsRow.get(OUTCOME_ID) + " added to output");
-        Outcome outcome = (Outcome) resultsRow.get(OUTCOME_ID);
-        if (outcome.getCarePlanIds() != null) {
-            result.getCarePlanIds().addAll(outcome.getCarePlanIds());
+      if (outcomes.size() > 0) {
+        Outcome outcome = (Outcome) outcomes.iterator().next().get(OUTCOME_ID);
+        output.setOutcome(outcome);
+        log.info("Outcome {} added to output", outcome);
+        if (outcomes.size() > 1) {
+          log.warn("Multiple outcomes found in output");
         }
-        result.setReferralRequestId(outcome.getReferralRequestId());
-        result.setRedirectionId(outcome.getRedirectionId());
       }
-
-      output.setResult(result);
 
       return output;
     } finally {

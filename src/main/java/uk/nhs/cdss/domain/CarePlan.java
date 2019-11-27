@@ -1,18 +1,26 @@
 package uk.nhs.cdss.domain;
 
 import java.util.List;
-import java.util.Objects;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@NoArgsConstructor
+@Getter
+@Setter
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class CarePlan {
 
   public enum Status {
-    active
+    draft, active
   }
 
   public enum Intent {
     option
   }
 
+  @EqualsAndHashCode.Include
   private String id;
   private String title;
   private Status status;
@@ -21,84 +29,8 @@ public class CarePlan {
   private String description;
   private List<CarePlanActivity> activities;
 
-  public CarePlan() {
-  }
-
   public CarePlan(String id) {
     this.id = id;
-  }
-
-  public String getId() {
-    return id;
-  }
-
-  public void setId(String id) {
-    this.id = id;
-  }
-
-  public String getTitle() {
-    return title;
-  }
-
-  public void setTitle(String title) {
-    this.title = title;
-  }
-
-  public Status getStatus() {
-    return status;
-  }
-
-  public void setStatus(Status status) {
-    this.status = status;
-  }
-
-  public Intent getIntent() {
-    return intent;
-  }
-
-  public void setIntent(Intent intent) {
-    this.intent = intent;
-  }
-
-  public String getText() {
-    return text;
-  }
-
-  public void setText(String text) {
-    this.text = text;
-  }
-
-  public String getDescription() {
-    return description;
-  }
-
-  public void setDescription(String description) {
-    this.description = description;
-  }
-
-  public List<CarePlanActivity> getActivities() {
-    return activities;
-  }
-
-  public void setActivities(List<CarePlanActivity> activities) {
-    this.activities = activities;
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    CarePlan carePlan = (CarePlan) o;
-    return Objects.equals(id, carePlan.id);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(id);
   }
 
   @Override

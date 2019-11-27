@@ -63,8 +63,8 @@ public class RedirectionTest {
 
     var output = engine.evaluate(input);
 
-    assertNull("has no referral", output.getResult().getReferralRequestId());
-    assertThat("has no care plan", output.getResult().getCarePlanIds(), empty());
-    assertEquals("redirect outcome", ANXIETY, output.getResult().getRedirectionId());
+    assertNull("has no referral", output.getOutcome().getReferralRequestId());
+    assertThat("has no care plan", output.getOutcome().getCarePlanIds(), empty());
+    assertEquals("redirect outcome", ANXIETY, output.getOutcome().getRedirectionId());
   }
 }
