@@ -1,0 +1,22 @@
+{
+    "id": "chestPains.bleedingStopped",
+    "items": [
+      {
+        "id": "q",
+        "text": "Has the bleeding stopped?",
+        "type": "CHOICE",
+        "required": true,
+        "options": [
+          {
+            "stringValue": "Yes"
+          },
+          {
+            "stringValue": "No"
+          },
+          {
+            "stringValue": "Unsure"
+          }
+        ]
+      }
+    ]
+  }

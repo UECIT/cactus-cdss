@@ -1,0 +1,19 @@
+{
+    "id": "chestPains.painsNow",
+    "items": [
+      {
+        "id": "q",
+        "text": "Are you having chest pain now?",
+        "type": "CHOICE",
+        "required": true,
+        "options": [
+          {
+            "stringValue": "Yes"
+          },
+          {
+            "stringValue": "No"
+          }
+        ]
+      }
+    ]
+  }

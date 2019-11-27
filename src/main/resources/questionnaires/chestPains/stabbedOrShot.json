@@ -1,0 +1,19 @@
+{
+    "id": "chestPains.stabbedOrShot",
+    "items": [
+      {
+        "id": "q",
+        "text": "Have you been stabbed or shot by a gun? Other examples include arrow or nail gun.",
+        "type": "CHOICE",
+        "required": true,
+        "options": [
+          {
+            "stringValue": "Yes"
+          },
+          {
+            "stringValue": "No"
+          }
+        ]
+      }
+    ]
+  }

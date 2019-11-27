@@ -1,0 +1,13 @@
+{
+    "description": "Next day appointment at GP Practice",
+    "status": "draft",
+    "priority": "routine",
+    "intent": "plan",
+    "serviceRequested": "gp",
+    "occurrence": "PT24h",
+    "specialty": "gpreviewCardiology",
+    "reason": "angina",
+    "note": ["A note"],
+    "carePlanIds": []
+  }
+  

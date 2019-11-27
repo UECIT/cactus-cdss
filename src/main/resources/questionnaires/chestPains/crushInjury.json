@@ -1,0 +1,53 @@
+{
+    "id": "chestPains.crushInjury",
+    "items": [
+      {
+        "id": "group",
+        "text": "Do any of these apply to you?",
+        "type": "GROUP",
+        "items": [
+          {
+            "id": "q1",
+            "text": "Did you have a crush injury?",
+            "type": "CHOICE",
+            "required": true,
+            "options": [
+              "Yes",
+              "No"
+            ]
+          },
+          {
+            "id": "q2",
+            "text": "Have you fallen from a significant height?",
+            "type": "CHOICE",
+            "required": true,
+            "options": [
+              "Yes",
+              "No"
+            ]
+          },
+          {
+            "id": "q3",
+            "text": "Where you hit by a moving vehicle?",
+            "type": "CHOICE",
+            "required": true,
+            "options": [
+              "Yes",
+              "No"
+            ]
+          },
+          {
+            "id": "q4",
+            "text": "Where you hit by a high velocity material/object?",
+            "type": "CHOICE",
+            "required": true,
+            "options": [
+              "Yes",
+              "No"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+  

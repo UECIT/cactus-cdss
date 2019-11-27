@@ -1,0 +1,22 @@
+{
+    "id": "chestPains.coughingBlood",
+    "items": [
+      {
+        "id": "q",
+        "text": "Patient coughing up blood?",
+        "type": "CHOICE",
+        "required": true,
+        "options": [
+          {
+            "stringValue": "Yes"
+          },
+          {
+            "stringValue": "No"
+          },
+          {
+            "stringValue": "Unsure"
+          }
+        ]
+      }
+    ]
+  }

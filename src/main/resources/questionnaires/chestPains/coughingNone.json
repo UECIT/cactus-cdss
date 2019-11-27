@@ -1,0 +1,22 @@
+{
+    "id": "chestPains.coughingNone",
+    "items": [
+      {
+        "id": "q",
+        "text": "Patient coughing up none of the above?",
+        "type": "CHOICE",
+        "required": true,
+        "options": [
+          {
+            "stringValue": "Yes"
+          },
+          {
+            "stringValue": "No"
+          },
+          {
+            "stringValue": "Unsure"
+          }
+        ]
+      }
+    ]
+  }

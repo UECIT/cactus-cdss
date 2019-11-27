@@ -1,0 +1,22 @@
+{
+    "id": "chestPains.bruisingOrSwelling",
+    "items": [
+      {
+        "id": "q",
+        "text": "Is there bruising, swelling or haematoma around the entry point?",
+        "type": "CHOICE",
+        "required": true,
+        "options": [
+          {
+            "stringValue": "Yes"
+          },
+          {
+            "stringValue": "No"
+          },
+          {
+            "stringValue": "Unsure"
+          }
+        ]
+      }
+    ]
+  }

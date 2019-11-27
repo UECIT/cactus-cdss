@@ -1,0 +1,19 @@
+{
+    "id": "chestPains.breathingWorse",
+    "items": [
+      {
+        "id": "q",
+        "text": "Does the patients breathing feel worse than normal?",
+        "type": "CHOICE",
+        "required": true,
+        "options": [
+          {
+            "stringValue": "Yes"
+          },
+          {
+            "stringValue": "No"
+          }
+        ]
+      }
+    ]
+  }

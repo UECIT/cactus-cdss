@@ -1,0 +1,19 @@
+{
+    "id": "chestPains.immuneCompromised",
+    "items": [
+      {
+        "id": "q",
+        "text": "Is the patient immune compromised?",
+        "type": "CHOICE",
+        "required": true,
+        "options": [
+          {
+            "stringValue": "Yes"
+          },
+          {
+            "stringValue": "No"
+          }
+        ]
+      }
+    ]
+  }

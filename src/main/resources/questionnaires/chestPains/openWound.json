@@ -1,0 +1,22 @@
+{
+    "id": "chestPains.openWound",
+    "items": [
+      {
+        "id": "q",
+        "text": "Can you see an open wound?",
+        "type": "CHOICE",
+        "required": true,
+        "options": [
+          {
+            "stringValue": "Yes"
+          },
+          {
+            "stringValue": "No"
+          },
+          {
+            "stringValue": "Unsure"
+          }
+        ]
+      }
+    ]
+  }

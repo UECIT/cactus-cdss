@@ -1,0 +1,22 @@
+{
+    "id": "chestPains.stillPain",
+    "items": [
+      {
+        "id": "q",
+        "text": "Patient still has pain from the injury?",
+        "type": "CHOICE",
+        "required": true,
+        "options": [
+          {
+            "stringValue": "Yes"
+          },
+          {
+            "stringValue": "No"
+          },
+          {
+            "stringValue": "Unsure"
+          }
+        ]
+      }
+    ]
+  }

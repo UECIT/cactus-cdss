@@ -1,0 +1,26 @@
+package uk.nhs.cdss.rules.palpitations
+
+import java.util.Arrays
+
+import uk.nhs.cdss.rules.InitialQuestionnaire
+import uk.nhs.cdss.rules.AnswerAssertion
+import uk.nhs.cdss.rules.OutcomeAnswerCondition
+
+import uk.nhs.cdss.domain.Questionnaire
+import uk.nhs.cdss.domain.Outcome
+
+import uk.nhs.cdss.engine.CodeDirectory
+
+global CodeDirectory codeDirectory;
+
+rule "Init"
+salience 10000
+when
+    eval( true )
+then
+    insert( new InitialQuestionnaire("muskuloskeletal.muskuloskeletal") );
+    insert( new AnswerAssertion("muskuloskeletal.muskuloskeletal", "q", "Yes", codeDirectory.get("muskuloskeletal"), true));
+    insert( new AnswerAssertion("muskuloskeletal.muskuloskeletal", "q", "No", codeDirectory.get("muskuloskeletal"), false));
+    insert( Outcome.referralRequest("muskuloskeletal", "call999-heartAttack")); //Temporary - this is not the right outcome
+    insert( new OutcomeAnswerCondition("muskuloskeletal", "muskuloskeletal.muskuloskeletal", "q", Arrays.asList("Yes", "No") ));
+end

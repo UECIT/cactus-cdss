@@ -1,0 +1,19 @@
+{
+    "id": "chestPains.breathlessness",
+    "items": [
+      {
+        "id": "q",
+        "text": "Patient experiencing any breathlessness?",
+        "type": "CHOICE",
+        "required": true,
+        "options": [
+          {
+            "stringValue": "Yes"
+          },
+          {
+            "stringValue": "No"
+          }
+        ]
+      }
+    ]
+  }

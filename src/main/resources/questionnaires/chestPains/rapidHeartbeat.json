@@ -1,0 +1,22 @@
+{
+    "id": "chestPains.rapidHeartbeat",
+    "items": [
+      {
+        "id": "q",
+        "text": "Patient experiencing rapid heartbeat?",
+        "type": "CHOICE",
+        "required": true,
+        "options": [
+          {
+            "stringValue": "Yes"
+          },
+          {
+            "stringValue": "No"
+          },
+          {
+            "stringValue": "Unsure"
+          }
+        ]
+      }
+    ]
+  }
