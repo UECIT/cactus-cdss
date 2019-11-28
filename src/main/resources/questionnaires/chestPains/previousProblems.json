@@ -1,0 +1,10 @@
+{
+    "id": "chestPains.previousProblems",
+    "items": [
+      {
+        "id": "q",
+        "text": "Previous heart problems",
+        "type": "DISPLAY"
+      }
+    ]
+  }
