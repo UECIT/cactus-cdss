@@ -1,23 +1,22 @@
 package uk.nhs.cdss.domain;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Builder
 public class OptionType {
+
   private String stringValue;
-
-  public OptionType() { }
-
-  public OptionType(String stringValue) {
-    this.stringValue = stringValue;
-  }
+  private String code;
+  private boolean exclusive;
 
   public boolean hasStringValue() {
     return stringValue != null;
   }
 
-  public String getStringValue() {
-    return stringValue;
-  }
-
-  public void setStringValue(String stringValue) {
-    this.stringValue = stringValue;
-  }
 }

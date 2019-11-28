@@ -3,15 +3,27 @@
     "items": [
       {
         "id": "q",
-        "text": "TODO - None of above/Display?? Is the patient experiencing any of the following symptoms: Crushing or severe aching in the chest, upper back or upper abdomen; Pain radiating in to arm, shoulder, neck or jaw; Have you vomited or felt sick at the same time as having the pain?",
+        "text": "Is the patient experiencing any of the following symptoms:",
         "type": "CHOICE",
         "required": true,
+        "repeats": true,
         "options": [
           {
-            "stringValue": "Yes"
+            "stringValue": "Crushing or severe aching in the chest, upper back or upper abdomen",
+            "code": "chest"
           },
           {
-            "stringValue": "No"
+            "stringValue": "Pain radiating in to arm, shoulder, neck or jaw",
+            "code": "arm"
+          },
+          {
+            "stringValue": "Vomited or felt sick at the same time as having the pain",
+            "code": "sick"
+          },
+          {
+            "stringValue": "None of the above",
+            "code": "none",
+            "exclusive": true
           }
         ]
       }

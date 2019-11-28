@@ -1,13 +1,14 @@
 package uk.nhs.cdss.domain;
 
 import java.util.Objects;
-import org.hl7.fhir.dstu3.model.Type;
 
 public class Answer {
 
   private final String questionnaireId;
   private final String questionId;
   private final Object value;
+
+  public final static Object MISSING = new Object();
 
   private QuestionnaireResponse questionnaireResponse;
 
