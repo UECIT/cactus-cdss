@@ -10,11 +10,13 @@
         "options": [
           {
             "stringValue": " Aortic Aneurysm",
-            "code": "aneurysm"
+            "code": "aneurysm",
+            "contextHelp": "Patient must have a clinical diagnosis"
           },
           {
             "stringValue": "Mafan Syndrome",
-            "code": "mafan"
+            "code": "mafan",
+            "contextHelp": "Patient must have a clinical diagnosis"
           },
           {
             "stringValue": "None of the above",

@@ -34,9 +34,9 @@ public class QuestionTransformerTest {
     question.setPrefix("questionPrefix");
 
     var options = asList(
-        new OptionType("option1", null, true),
-        new OptionType("option2", null,true),
-        new OptionType("option3", null, true));
+        new OptionType("option1", null, true, ""),
+        new OptionType("option2", null,true, ""),
+        new OptionType("option3", null, true, ""));
     question.getOptions().addAll(options);
 
     var constraints = asList(

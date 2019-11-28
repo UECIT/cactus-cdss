@@ -16,7 +16,8 @@
           {
             "stringValue": "Unsure"
           }
-        ]
+        ],
+        "contextHelp": "You are not looking for the symptom of cough, just haemoptysis"
       }
     ]
   }

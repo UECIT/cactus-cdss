@@ -14,7 +14,8 @@
             "options": [
               "Yes",
               "No"
-            ]
+            ],
+            "contextHelp": "A crush injury occurs when force or pressure is put on a body part. This type of injury most often happens when part of the body is squeezed between two heavy objects."
           },
           {
             "id": "q2",
@@ -24,7 +25,8 @@
             "options": [
               "Yes",
               "No"
-            ]
+            ],
+            "contextHelp": "Significant height of fall 20 ft"
           },
           {
             "id": "q3",
@@ -44,7 +46,8 @@
             "options": [
               "Yes",
               "No"
-            ]
+            ],
+            "contextHelp": "Debris from an explosion, rubber bullets are high velocity."
           }
         ]
       }

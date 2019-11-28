@@ -25,7 +25,8 @@
             "code": "none",
             "exclusive": true
           }
-        ]
+        ],
+        "contextHelp": "Symptoms suggestive of heart attack. One positive answer is required."
       }
     ]
   }

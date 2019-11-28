@@ -1,0 +1,10 @@
+{
+    "id": "chestPains.feelingUnwell",
+    "items": [
+      {
+        "id": "q",
+        "text": "Feeling generally unwell",
+        "type": "DISPLAY"
+      }
+    ]
+  }
