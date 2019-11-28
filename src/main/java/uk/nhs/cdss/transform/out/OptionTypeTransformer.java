@@ -1,5 +1,8 @@
 package uk.nhs.cdss.transform.out;
 
+import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
+
+import org.hl7.fhir.dstu3.model.BooleanType;
 import org.hl7.fhir.dstu3.model.Coding;
 import org.hl7.fhir.dstu3.model.Questionnaire.QuestionnaireItemOptionComponent;
 import org.hl7.fhir.dstu3.model.Type;
@@ -15,7 +18,7 @@ public class OptionTypeTransformer implements
     // TODO: required for compatibility with EMS expectations (for now)
     return new Coding(
         "defaultCoding.com",
-        option.getStringValue(),
+        defaultIfNull(option.getCode(), option.getStringValue()),
         option.getStringValue());
 
 //    if (option.hasStringValue()) {
@@ -27,6 +30,13 @@ public class OptionTypeTransformer implements
 
   @Override
   public QuestionnaireItemOptionComponent transform(OptionType option) {
-    return new QuestionnaireItemOptionComponent(getType(option));
+
+    QuestionnaireItemOptionComponent optionComponent = new QuestionnaireItemOptionComponent(getType(option));
+
+    if (option.isExclusive()) {
+      optionComponent.addExtension("http://hl7.org/fhir/StructureDefinition/questionnaire-optionExclusive", new BooleanType(true));
+    }
+
+    return optionComponent;
   }
 }

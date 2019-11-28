@@ -1,20 +1,20 @@
 {
-    "id": "chestPains.conditions",
+    "id": "chestPains.coughingUpAny",
     "items": [
       {
         "id": "q",
-        "text": "Does the patient have any of the following conditions:",
+        "text": "Patient coughing up any of the following:",
         "type": "CHOICE",
         "required": true,
         "repeats": true,
         "options": [
           {
-            "stringValue": " Aortic Aneurysm",
-            "code": "aneurysm"
+            "stringValue": "Blood",
+            "code": "blood"
           },
           {
-            "stringValue": "Mafan Syndrome",
-            "code": "mafan"
+            "stringValue": "Green or discoloured phlegm",
+            "code": "phlegm"
           },
           {
             "stringValue": "None of the above",

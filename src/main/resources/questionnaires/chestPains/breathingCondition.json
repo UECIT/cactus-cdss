@@ -3,17 +3,59 @@
     "items": [
       {
         "id": "q",
-        "text": "TODO - None of above/Multi choice?? Has a doctor or other health care professional told you, you have any of the following that affects your breathing or chest wall function (select any which applies) COPD; Emphysema; Asthma; Chronic Bronchitis; Tuberculosis; Lung cancer; Acute Respiratory Distress Syndrome; Mesothelioma; Myasthenia; Gravis; Cystic Fibrosis",
+        "text": "Has a doctor or other health care professional told you, you have any of the following that affects your breathing or chest wall function (select any which applies)",
         "type": "CHOICE",
-        "required": true,
+        "repeats": true,
         "options": [
           {
-            "stringValue": "Yes"
+            "stringValue": "COPD",
+            "code": "hasBreathingCondition"
           },
           {
-            "stringValue": "No"
+            "stringValue": "Emphysema",
+            "code": "hasBreathingCondition"
+          },
+          {
+            "stringValue": "Asthma",
+            "code": "hasBreathingCondition"
+          },
+          {
+            "stringValue": "Chronic Bronchitis",
+            "code": "hasBreathingCondition"
+          },
+          {
+            "stringValue": "Tuberculosis",
+            "code": "hasBreathingCondition"
+          },
+          {
+            "stringValue": "Lung cancer",
+            "code": "hasBreathingCondition"
+          },
+          {
+            "stringValue": "Acute Respiratory Distress Syndrome",
+            "code": "hasBreathingCondition"
+          },
+          {
+            "stringValue": "Mesothelioma",
+            "code": "hasBreathingCondition"
+          },
+          {
+            "stringValue": "Myasthenia",
+            "code": "hasBreathingCondition"
+          },
+          {
+            "stringValue": "Gravis",
+            "code": "hasBreathingCondition"
+          },
+          {
+            "stringValue": "Cystic Fibrosis",
+            "code": "hasBreathingCondition"
+          },
+          {
+            "stringValue": "None of the above (TODO: remove once EMS can handle no answers)",
+            "code": "none"
           }
         ]
       }
     ]
-  }
+}

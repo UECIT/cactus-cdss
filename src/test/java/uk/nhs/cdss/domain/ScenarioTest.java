@@ -18,7 +18,7 @@ public class ScenarioTest {
     symptomsDurationQuestion.setText("How many days have you been ill?");
     symptomsDurationQuestion.setType(QuestionType.CHOICE);
     var options = Stream.of("1", "2", "3 or more")
-        .map(OptionType::new)
+        .map(answer -> new OptionType(answer, null, false))
         .collect(Collectors.toUnmodifiableList());
     symptomsDurationQuestion.getOptions().addAll(options);
     symptoms.getItems().add(symptomsDurationQuestion);

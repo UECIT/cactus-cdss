@@ -2,6 +2,7 @@ package uk.nhs.cdss.transform.in;
 
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.apache.commons.collections4.CollectionUtils;
 import org.hl7.fhir.dstu3.model.QuestionnaireResponse.QuestionnaireResponseItemComponent;
 import org.hl7.fhir.dstu3.model.QuestionnaireResponse.QuestionnaireResponseStatus;
 import org.springframework.stereotype.Component;
@@ -51,6 +52,10 @@ public final class QuestionnaireResponseTransformer implements Transformer<
 
     var answers = item.getAnswer().stream().map(a ->
         new AnswerBundle(response, questionId, a));
+
+    if (CollectionUtils.isEmpty(item.getAnswer())) {
+      answers = Stream.of(new AnswerBundle(response, questionId, null));
+    }
     var descendants = Stream
         .concat(
             item.getItem().stream(),

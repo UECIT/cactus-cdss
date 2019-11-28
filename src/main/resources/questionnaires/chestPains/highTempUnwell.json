@@ -3,18 +3,23 @@
     "items": [
       {
         "id": "q",
-        "text": "Does patient have any of the following symptoms: High Temperature; Feeling generally unwell?",
+        "text": "Does patient have any of the following symptoms:",
         "type": "CHOICE",
         "required": true,
+        "repeats": true,
         "options": [
           {
-            "stringValue": "Yes"
+            "stringValue": "High Temperature",
+            "code": "highTemp"
           },
           {
-            "stringValue": "No"
+            "stringValue": "Feeling generally unwell",
+            "code": "unwell"
           },
           {
-            "stringValue": "Unsure"
+            "stringValue": "None of the above",
+            "exclusive": true,
+            "code": "none"
           }
         ]
       }
