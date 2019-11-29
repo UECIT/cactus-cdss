@@ -167,7 +167,7 @@ public class DroolsCDSEngineTest {
     CDSOutput output = engine.evaluate(input);
 
     assertEquals(1, output.getOutcome().getCarePlanIds().size());
-    assertEquals("selfCare", output.getOutcome().getCarePlanIds().get(0));
+    assertEquals("selfCare-palpitations", output.getOutcome().getCarePlanIds().get(0));
   }
 
   @Test

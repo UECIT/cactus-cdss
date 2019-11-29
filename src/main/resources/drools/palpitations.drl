@@ -63,7 +63,7 @@ then
     insert( new OutcomeAnswerCondition("heartProblems", "palpitations.heartProblems", "q4", Arrays.asList("Yes") ));
 
     // Answered no to all questions
-    insert( Outcome.carePlan("noSymptoms", "selfCare"));
+    insert( Outcome.carePlan("noSymptoms", "selfCare-palpitations"));
     insert( new OutcomeAnswerCondition("noSymptoms", "palpitations.heartProblems", "q4", Arrays.asList("No", "Unsure") ));
     insert( new OutcomeAnswerCondition("noSymptoms", "palpitations.breathing", "q3", Arrays.asList("No", "Unsure") ));
     insert( new OutcomeAnswerCondition("noSymptoms", "palpitations.neckPain", "q2", Arrays.asList("No", "Unsure") ));
