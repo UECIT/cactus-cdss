@@ -164,7 +164,7 @@ then
     insert( new OutcomeAnswerCondition("notExerciseTriggered", "palpitations2.exercise", "q", Arrays.asList("No") ));
 
     // When did you last experience palpitations
-    insert( new NextQuestion("palpitations2.lastExperienced", "palpitations2.hasPalpitations", "q", Arrays.asList("No")) ); //yes path?
+    insert( new NextQuestion("palpitations2.lastExperienced", "palpitations2.hasPalpitations", "q", Arrays.asList("No", "Unsure")) );
 
     // Syncope or near syncope
     insert( new AnswerAssertion("palpitations2.syncope", "q", "Yes", codeDirectory.get("syncope"), true));
