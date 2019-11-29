@@ -74,6 +74,7 @@ public class DroolsConfig {
     codeDirectory.put("highTempUnwell", snomed("highTempUnwell", "Patient feels generally unwell or has a high temperature"));
     codeDirectory.put("weakImmuneSystem", snomed("weakImmuneSystem", "Patient has a weak immune system"));
     codeDirectory.put("breathAtTime", snomed("breathAtTime", "Patient had short breath at time of the pain"));
+    codeDirectory.put("previousProblems", snomed("previousProblems", "Previous heart problems"));
 
     // Concerns
     codeDirectory.put("haemorrhageTrauma", snomed("haemorrhageTrauma", "Haemorrhage and Internal organ trauma"));

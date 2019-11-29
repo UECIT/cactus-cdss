@@ -20,10 +20,7 @@ public final class AnswerTransformer implements Transformer<AnswerBundle, Answer
     var answer = bundle.getAnswer();
     Object value;
 
-    if (answer == null) {
-      value = Answer.MISSING;
-    }
-    else if (answer instanceof Coding) {
+    if (answer instanceof Coding) {
       value = ((Coding) answer).getCode();
     } else {
       value = valueTransformer.transform(answer);

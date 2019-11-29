@@ -8,7 +8,7 @@ public class Answer {
   private final String questionId;
   private final Object value;
 
-  public static final Object MISSING = new Object();
+  public static final String MISSING = "thisanswerismissing";
 
   private QuestionnaireResponse questionnaireResponse;
 

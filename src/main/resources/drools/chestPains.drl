@@ -8,10 +8,12 @@ import uk.nhs.cdss.rules.ConditionalNextQuestion
 import uk.nhs.cdss.rules.NextQuestionCondition
 import uk.nhs.cdss.rules.AnswerAssertion
 import uk.nhs.cdss.rules.OutcomeAnswerCondition
+import uk.nhs.cdss.rules.AnswersOptional
 
 import uk.nhs.cdss.domain.Questionnaire
 import uk.nhs.cdss.domain.Outcome
 import uk.nhs.cdss.domain.Answer
+import uk.nhs.cdss.domain.QuestionnaireResponse
 
 import uk.nhs.cdss.engine.CodeDirectory
 
@@ -165,6 +167,7 @@ then
 
     // Previous heart problems (Display)
     insert( new NextQuestion("chestPains.previousProblems", "chestPains.symptoms", "q", Arrays.asList("chest", "arm", "sick")));
+    insert( new AnswersOptional("chestPains.previousProblems", "q"));
     insert( Outcome.referralRequest("previousProblems", "ed-acute_coronary_syndrome-intervention_cardiology"));
     insert( new OutcomeAnswerCondition("previousProblems", "chestPains.previousProblems", "q", Arrays.asList(Answer.MISSING) ));
 
@@ -175,10 +178,11 @@ then
     insert( new AnswerAssertion("chestPains.breathlessness", "q", "Yes", codeDirectory.get("breathlessness"), true));
     insert( new AnswerAssertion("chestPains.breathlessness", "q", "No", codeDirectory.get("breathlessness"), false));
 
-    // Underlying condition that affects breathing (TODO: This should be multichoice - remove none answer)
+    // Underlying condition that affects breathing
     insert( new NextQuestion("chestPains.breathingCondition", "chestPains.breathlessness", "q", Arrays.asList("Yes")));
+    insert( new AnswersOptional("chestPains.breathingCondition", "q"));
     insert( new AnswerAssertion("chestPains.breathingCondition", "q", "hasBreathingCondition", codeDirectory.get("breathingCondition"), true));
-    insert( new AnswerAssertion("chestPains.breathingCondition", "q", "none", codeDirectory.get("breathingCondition"), false));
+    insert( new AnswerAssertion("chestPains.breathingCondition", "q", Answer.MISSING, codeDirectory.get("breathingCondition"), false));
 
     // Does the patients breathing feel worse than normal?
     insert( new NextQuestion("chestPains.breathingWorse", "chestPains.breathingCondition", "q", Arrays.asList("hasBreathingCondition")));
@@ -228,7 +232,7 @@ then
     insert( Outcome.referralRequest("coughingBloodBreathlessNoConditions", "ed-pe-resus_intervention_vq_scan_bloods_ct4h"));
     insert( new OutcomeAnswerCondition("coughingBloodBreathlessNoConditions", "chestPains.breathlessness", "q", Arrays.asList("Yes") ));
     insert( new OutcomeAnswerCondition("coughingBloodBreathlessNoConditions", "chestPains.coughingBlood", "q", Arrays.asList("Yes") ));
-    insert( new OutcomeAnswerCondition("coughingBloodBreathlessNoConditions", "chestPains.breathingCondition", "q", Arrays.asList("none") ));
+    insert( new OutcomeAnswerCondition("coughingBloodBreathlessNoConditions", "chestPains.breathingCondition", "q", Arrays.asList(Answer.MISSING) ));
     insert( Outcome.referralRequest("notCoughingBloodBreathlessNewCough", "consultGP-comorbids_full"));
     insert( new OutcomeAnswerCondition("notCoughingBloodBreathlessNewCough", "chestPains.breathlessness", "q", Arrays.asList("Yes") ));
     insert( new OutcomeAnswerCondition("notCoughingBloodBreathlessNewCough", "chestPains.newCough", "q", Arrays.asList("No") ));
@@ -255,7 +259,7 @@ then
 
 
     // Does the chest pain come and go?
-    insert( new NextQuestion("chestPains.painComesAndGoes", "chestPains.breathingCondition", "q", Arrays.asList("none")));
+    insert( new NextQuestion("chestPains.painComesAndGoes", "chestPains.breathingCondition", "q", Arrays.asList(Answer.MISSING)));
     insert( new NextQuestion("chestPains.painComesAndGoes", "chestPains.breathlessness", "q", Arrays.asList("No")));
     insert( new AnswerAssertion("chestPains.painComesAndGoes", "q", "Yes", codeDirectory.get("painComesAndGoes"), true));
     insert( new AnswerAssertion("chestPains.painComesAndGoes", "q", "No", codeDirectory.get("painComesAndGoes"), false));
@@ -273,6 +277,7 @@ then
     
     // Feeling generally unwell
     insert( new NextQuestion("chestPains.feelingUnwell", "chestPains.breathlessSymptom", "q", Arrays.asList("Yes")));
+    insert( new AnswersOptional("chestPains.feelingUnwell", "q"));
     insert( Outcome.referralRequest("feelingUnwell", "consultGP-progressive_respiratory_infection"));
     insert( new OutcomeAnswerCondition("feelingUnwell", "chestPains.feelingUnwell", "q", Arrays.asList(Answer.MISSING) ));
 
@@ -338,3 +343,4 @@ then
     insert( Outcome.referralRequest("notGenerallyUnwellSince", "utc-asses_acute_coronary_syndrome-clinical_intervention"));
     insert( new OutcomeAnswerCondition("notGenerallyUnwellSince", "chestPains.generallyUnwellSince", "q", Arrays.asList("No", "Unsure") ));
 end
+
