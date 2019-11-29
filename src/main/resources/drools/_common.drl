@@ -42,6 +42,11 @@ declare NextQuestionCondition
     answers: List
 end
 
+declare AnswersOptional
+    questionnaireId: String @key
+    questionId: String @key
+end
+
 declare HighPriorityNextQuestion
     next: String @key
     questionnaireId: String @key
@@ -106,6 +111,15 @@ when
 then
     System.out.println("Answered question "+ $id + " " + $questionId + " with assertion " + $aa.getCode() + " = " + $value);
     insert( new Answered($id, $questionId, $value) );
+end
+
+rule "No answer question"
+salience 30
+when
+    AnswersOptional($questionnaireId := questionnaireId, $questionId := questionId)
+    $qr: QuestionnaireResponse($questionnaireId := questionnaireId, answers.isEmpty())
+then
+    insert( new Answer($questionnaireId, $questionId, Answer.MISSING));
 end
 
 

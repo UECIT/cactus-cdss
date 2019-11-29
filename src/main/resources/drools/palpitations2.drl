@@ -236,6 +236,7 @@ then
     // Is your mental health a concern to you
     insert( new NextQuestion("palpitations2.mentalHealthConcern", "palpitations2.careHCP", "q", Arrays.asList("No")) );
     insert( new AnswerAssertion("palpitations2.mentalHealthConcern", "q", "No", codeDirectory.get("mentalHealthConcern"), false));
+    insert( new AnswerAssertion("palpitations2.mentalHealthConcern", "q", "Yes", codeDirectory.get("mentalHealthConcern"), true));
     insert( Outcome.redirect("mentalHealthConcern", "anxiety"));
     insert( new OutcomeAnswerCondition("mentalHealthConcern", "palpitations2.mentalHealthConcern", "q", Arrays.asList("Yes") ));
 

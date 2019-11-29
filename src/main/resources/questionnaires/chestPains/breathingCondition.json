@@ -50,10 +50,6 @@
           {
             "stringValue": "Cystic Fibrosis",
             "code": "hasBreathingCondition"
-          },
-          {
-            "stringValue": "None of the above (TODO: remove once EMS can handle no answers)",
-            "code": "none"
           }
         ]
       }
