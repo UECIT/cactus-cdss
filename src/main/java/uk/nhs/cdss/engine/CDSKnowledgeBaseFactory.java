@@ -19,14 +19,14 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Service;
 
 /**
- * Creates and caches Drools KnowlegeBase instances for each ServiceDefinition
+ * Creates and caches Drools KnowledgeBase instances for each ServiceDefinition
  */
 @Service
 public class CDSKnowledgeBaseFactory {
 
-  private Logger log = LoggerFactory.getLogger(getClass());
+  private final Logger log = LoggerFactory.getLogger(getClass());
 
-  private LoadingCache<String, InternalKnowledgeBase> cache = CacheBuilder.newBuilder()
+  private final LoadingCache<String, InternalKnowledgeBase> cache = CacheBuilder.newBuilder()
       .build(CacheLoader.from(this::loadKnowledgeBase));
 
   public CDSKnowledgeBaseFactory() {
@@ -59,17 +59,17 @@ public class CDSKnowledgeBaseFactory {
     }
   }
 
-  public InternalKnowledgeBase getKnowledgeBase(String serviceDefintionId)
+  public InternalKnowledgeBase getKnowledgeBase(String serviceDefinitionId)
       throws ServiceDefinitionException {
     try {
-      return cache.get(serviceDefintionId);
+      return cache.get(serviceDefinitionId);
     } catch (ExecutionException e) {
       throw new ServiceDefinitionException(
-          "Unable to load service definition " + serviceDefintionId, e);
+          "Unable to load service definition " + serviceDefinitionId, e);
     }
   }
 
-  private InternalKnowledgeBase loadKnowledgeBase(String serviceDefintionId) {
+  private InternalKnowledgeBase loadKnowledgeBase(String serviceDefinitionId) {
     InternalKnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
 
     KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
@@ -77,7 +77,7 @@ public class CDSKnowledgeBaseFactory {
         ResourceFactory.newClassPathResource("drools/_common.drl"),
         ResourceType.DRL);
     kbuilder.add(
-        ResourceFactory.newClassPathResource("drools/" + serviceDefintionId + ".drl"),
+        ResourceFactory.newClassPathResource("drools/" + serviceDefinitionId + ".drl"),
         ResourceType.DRL);
 
     if (kbuilder.hasErrors()) {

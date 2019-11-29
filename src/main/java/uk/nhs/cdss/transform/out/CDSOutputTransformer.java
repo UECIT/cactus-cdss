@@ -41,7 +41,6 @@ import uk.nhs.cdss.services.ReferralRequestFactory;
 import uk.nhs.cdss.transform.Transformer;
 import uk.nhs.cdss.transform.bundle.CDSOutputBundle;
 import uk.nhs.cdss.transform.bundle.ReferralRequestBundle;
-import uk.nhs.cdss.utils.RequestGroupUtil;
 
 @Component
 @AllArgsConstructor
@@ -54,7 +53,6 @@ public class CDSOutputTransformer implements Transformer<CDSOutputBundle, Guidan
   private final RedirectionFactory redirectionFactory;
   private final RedirectTransformer redirectTransformer;
   private final ObservationTransformer observationTransformer;
-  private final RequestGroupUtil requestGroupUtil;
   private final IGenericClient fhirClient;
 
   private DataRequirement buildDataRequirement(String questionnaireId) {
@@ -159,9 +157,9 @@ public class CDSOutputTransformer implements Transformer<CDSOutputBundle, Guidan
     // FIXME - not known until after request group has been stored
     Identifier requestGroupIdentifier = null;
 
-    var requestGroup = requestGroupUtil.buildRequestGroup(
-        RequestStatus.ACTIVE,
-        RequestIntent.ORDER);
+    var requestGroup = new RequestGroup();
+    requestGroup.setStatus(RequestStatus.ACTIVE);
+    requestGroup.setIntent(RequestIntent.ORDER);
 
     Outcome outcome = bundle.getOutput().getOutcome();
     List<String> carePlanIds = new ArrayList<>(outcome.getCarePlanIds());

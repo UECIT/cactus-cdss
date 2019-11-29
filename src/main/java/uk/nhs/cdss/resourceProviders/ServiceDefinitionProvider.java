@@ -1,9 +1,12 @@
 package uk.nhs.cdss.resourceProviders;
 
+import static uk.nhs.cdss.resourceProviders.ServiceDefinitionResource.nameFromId;
+
 import ca.uhn.fhir.rest.annotation.IdParam;
 import ca.uhn.fhir.rest.annotation.Operation;
 import ca.uhn.fhir.rest.annotation.OptionalParam;
 import ca.uhn.fhir.rest.annotation.Read;
+import ca.uhn.fhir.rest.annotation.RequiredParam;
 import ca.uhn.fhir.rest.annotation.ResourceParam;
 import ca.uhn.fhir.rest.annotation.Search;
 import ca.uhn.fhir.rest.param.DateRangeParam;
@@ -12,8 +15,6 @@ import ca.uhn.fhir.rest.param.TokenParam;
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import ca.uhn.fhir.rest.server.exceptions.InternalErrorException;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -33,6 +34,7 @@ import uk.nhs.cdss.entities.ServiceDefinitionEntity;
 import uk.nhs.cdss.repos.ServiceDefinitionRepository;
 import uk.nhs.cdss.resourceBuilder.ServiceDefinitionBuilder;
 import uk.nhs.cdss.services.EvaluateService;
+import uk.nhs.cdss.services.ServiceDefinitionRegistry;
 import uk.nhs.cdss.transform.out.ServiceDefinitionTransformer;
 
 @RestController
@@ -45,21 +47,21 @@ public class ServiceDefinitionProvider implements IResourceProvider {
   private final ServiceDefinitionBuilder serviceDefinitionBuilder;
   private final ServiceDefinitionRepository serviceDefinitionRepository;
   private final ServiceDefinitionTransformer serviceDefinitionTransformer;
-  private final ObjectMapper objectMapper;
+  private final ServiceDefinitionRegistry serviceDefinitionRegistry;
 
   @Override
   public Class<ServiceDefinition> getResourceType() {
     return ServiceDefinition.class;
   }
 
-
   @Operation(name = EVALUATE, idempotent = true, type = Parameters.class)
   public GuidanceResponse evaluate(
       @IdParam IdType serviceDefinitionId,
       @ResourceParam Resource resource) {
-    var id =  ServiceDefinitionResource.nameFromId(serviceDefinitionId.getIdPart());
     try {
-      return evaluateService.getGuidanceResponse(getParameters(resource), id);
+      return evaluateService.getGuidanceResponse(
+          getParameters(resource),
+          nameFromId(serviceDefinitionId));
     } catch (ServiceDefinitionException e) {
       throw new InternalErrorException(e);
     }
@@ -75,20 +77,22 @@ public class ServiceDefinitionProvider implements IResourceProvider {
   }
 
   @Read
-  public ServiceDefinition getServiceDefinitionById(@IdParam IdType serviceDefinitionId) {
-    var serviceName =ServiceDefinitionResource.nameFromId(serviceDefinitionId.getIdPart());
+  public ServiceDefinition getServiceDefinitionById(@IdParam IdType id) {
+    return serviceDefinitionRegistry
+        .getById(nameFromId(id))
+        .map(serviceDefinitionTransformer::transform)
+        .orElseThrow(() -> new ResourceNotFoundException(
+            "Unable to load service definition " + id));
+  }
 
-    try {
-      uk.nhs.cdss.domain.ServiceDefinition domainServiceDefinition = objectMapper
-          .readValue(getClass().getResource("/servicedefinitions/" + serviceName + ".json"),
-              uk.nhs.cdss.domain.ServiceDefinition.class);
-
-      return serviceDefinitionTransformer.transform(domainServiceDefinition);
-
-    } catch (IOException e) {
-      throw new ResourceNotFoundException(
-          "Unable to load service definition " + serviceDefinitionId + ": " + e.getMessage());
-    }
+  @Search
+  public Collection<ServiceDefinition> findServiceDefinitionById(
+      @RequiredParam(name = ServiceDefinition.SP_RES_ID) String id) {
+    return serviceDefinitionRegistry
+        .getById(nameFromId(id))
+        .map(serviceDefinitionTransformer::transform)
+        .stream()
+        .collect(Collectors.toList());
   }
 
   @Search
@@ -136,5 +140,4 @@ public class ServiceDefinitionProvider implements IResourceProvider {
 
     return serviceDefinitions;
   }
-
 }
