@@ -29,6 +29,7 @@ public class ServiceDefinitionTransformer implements
   @Override
   public ServiceDefinition transform(uk.nhs.cdss.domain.ServiceDefinition domainServiceDefinition) {
     var serviceDefinition = new ServiceDefinition();
+    serviceDefinition.setId(domainServiceDefinition.getId());
     serviceDefinition.setName(domainServiceDefinition.getId());
     serviceDefinition.setTitle(domainServiceDefinition.getTitle());
     serviceDefinition.setDescription(domainServiceDefinition.getDescription());
