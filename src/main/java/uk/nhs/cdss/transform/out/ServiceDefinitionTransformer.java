@@ -55,6 +55,10 @@ public class ServiceDefinitionTransformer implements
     TriggerDefinition triggerDefinition = new TriggerDefinition();
 
     DataRequirement dataReq = new DataRequirement();
+    dataReq.setId(code);
+    // TODO: this type must be documented as a difference between 1.0 and 1.POC of the spec
+    // the guide still specifies this must be set to "TriggerDefinition"
+    dataReq.setType("CareConnectObservation");
     dataReq.addProfile(
         "https://fhir.hl7.org.uk/STU3/StructureDefinition/CareConnect-CareConnectObservation-1");
     dataReq.addCodeFilter()
