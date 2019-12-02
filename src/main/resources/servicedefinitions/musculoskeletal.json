@@ -8,5 +8,13 @@
     "musculoskeletal"
   ],
   "dataRequirements": [
+    {
+      "type": "CareConnectObservation",
+      "coding": {
+        "system": "http://snomed.info/sct",
+        "code": "48694002",
+        "display": "Musculoskeletal"
+      }
+    }
   ]
 }
