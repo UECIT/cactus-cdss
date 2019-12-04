@@ -4,6 +4,15 @@
   "description": "Palpitations 1st Party",
   "usage": "To triage a patient who has palpitations",
   "purpose": "To triage a patient who has palpitations",
+  "status": "ACTIVE",
+  "experimental": false,
+  "effectivePeriod": {
+    "start": "2019-01-01",
+    "end": "2119-01-01"
+  },
+  "jurisdictions": [
+    "GB"
+  ],
   "triggers": [
     "palpitations",
     "chestPain",
@@ -16,35 +25,19 @@
     { "type":  "Age" },
     {
       "type": "CareConnectObservation",
-      "coding": {
-        "system": "http://snomed.info/sct",
-        "code": "29857009",
-        "display": "Chest pain"
-      }
+      "code": "chestPain"
     },
     {
       "type": "CareConnectObservation",
-      "coding": {
-        "system": "http://snomed.info/sct",
-        "code": "81680005",
-        "display": "Neck pain"
-      }
+      "code": "neckPain"
     },
     {
       "type": "CareConnectObservation",
-      "coding": {
-        "system": "http://snomed.info/sct",
-        "code": "45326000",
-        "display": "Shoulder pain"
-      }
+      "code": "shoulderPain"
     },
     {
       "type": "CareConnectObservation",
-      "coding": {
-        "system": "http://snomed.info/sct",
-        "code": "230145002",
-        "display": "Difficulty breathing"
-      }
+      "code": "breathingProblems"
     }
   ]
 }

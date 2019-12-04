@@ -1,78 +1,24 @@
 package uk.nhs.cdss.domain;
 
+import java.util.ArrayList;
 import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 public class ServiceDefinition {
   private String id;
   private String title;
   private String description;
   private String purpose;
   private String usage;
-  private List<String> triggers;
+  private PublicationStatus status;
+  private Boolean experimental;
+  private DateRange effectivePeriod;
 
-  // TODO Find out if we should include questionnaires here
-  private List<DataRequirement> dataRequirements;
-
-  public ServiceDefinition() {
-  }
-
-  public ServiceDefinition(String id) {
-    this.id = id;
-  }
-
-  public String getId() {
-    return id;
-  }
-
-  public void setId(String id) {
-    this.id = id;
-  }
-
-  public String getTitle() {
-    return title;
-  }
-
-  public void setTitle(String title) {
-    this.title = title;
-  }
-
-  public String getDescription() {
-    return description;
-  }
-
-  public void setDescription(String description) {
-    this.description = description;
-  }
-
-  public String getPurpose() {
-    return purpose;
-  }
-
-  public void setPurpose(String purpose) {
-    this.purpose = purpose;
-  }
-
-  public String getUsage() {
-    return usage;
-  }
-
-  public void setUsage(String usage) {
-    this.usage = usage;
-  }
-
-  public List<String> getTriggers() {
-    return triggers;
-  }
-
-  public void setTriggers(List<String> triggers) {
-    this.triggers = triggers;
-  }
-
-  public List<DataRequirement> getDataRequirements() {
-    return dataRequirements;
-  }
-
-  public void setDataRequirements(List<DataRequirement> dataRequirements) {
-    this.dataRequirements = dataRequirements;
-  }
+  private List<UsageContext> useContext = new ArrayList<>();
+  private List<String> jurisdictions = new ArrayList<>();
+  private List<String> triggers = new ArrayList<>();
+  private List<DataRequirement> dataRequirements = new ArrayList<>();
 }

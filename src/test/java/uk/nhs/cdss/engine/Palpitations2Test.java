@@ -51,12 +51,12 @@ public class Palpitations2Test extends BaseDroolsCDSEngineTest {
   public void shouldNotAskMuteLogicUnderConditions() throws ServiceDefinitionException {
     Assertion ageAssertion = new Assertion(null, Assertion.Status.FINAL);
     ageAssertion.setCode(new CodeableConcept(SnomedConstants.AGE,
-        new Coding(SystemURL.SNOMED, SnomedConstants.AGE)));
+        new Coding(SystemURL.CS_SNOMED, SnomedConstants.AGE)));
     ageAssertion.setValue("1900-12-25");
 
     Assertion genderAssertion = new Assertion(null, Assertion.Status.FINAL);
     genderAssertion.setCode(new CodeableConcept(SnomedConstants.GENDER,
-        new Coding(SystemURL.SNOMED, SnomedConstants.GENDER)));
+        new Coding(SystemURL.CS_SNOMED, SnomedConstants.GENDER)));
     genderAssertion.setValue("male");
 
     input.getAssertions().add(ageAssertion);
@@ -94,12 +94,12 @@ public class Palpitations2Test extends BaseDroolsCDSEngineTest {
   public void initialQuestionGivenAssertions() throws ServiceDefinitionException {
     Assertion ageAssertion = new Assertion(null, Assertion.Status.FINAL);
     ageAssertion.setCode(new CodeableConcept(SnomedConstants.AGE,
-        new Coding(SystemURL.SNOMED, SnomedConstants.AGE)));
+        new Coding(SystemURL.CS_SNOMED, SnomedConstants.AGE)));
     ageAssertion.setValue("1900-12-25");
 
     Assertion genderAssertion = new Assertion(null, Assertion.Status.FINAL);
     genderAssertion.setCode(new CodeableConcept(SnomedConstants.GENDER,
-        new Coding(SystemURL.SNOMED, SnomedConstants.GENDER)));
+        new Coding(SystemURL.CS_SNOMED, SnomedConstants.GENDER)));
     genderAssertion.setValue("male");
 
     input.getAssertions().add(ageAssertion);
