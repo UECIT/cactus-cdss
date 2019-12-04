@@ -33,8 +33,8 @@ public class PalpitationsTest extends BaseDroolsCDSEngineTest {
     answerQuestion("chestPain", "q1", "Yes");
 
     evaluate();
-    assertNotNull(output.getOutcome().getReferralRequestId());
-    assertEquals("call999-heartAttack", output.getOutcome().getReferralRequestId());
+    assertNotNull(output.getOutcome().getReferralRequest());
+    assertEquals("call999" , output.getOutcome().getReferralRequest().getServiceRequested());
   }
 
   @Test
@@ -85,8 +85,8 @@ public class PalpitationsTest extends BaseDroolsCDSEngineTest {
 
     evaluate();
 
-    assertEquals(1, output.getOutcome().getCarePlanIds().size());
-    assertEquals("selfCare-palpitations", output.getOutcome().getCarePlanIds().get(0));
+    assertEquals(1, output.getOutcome().getCarePlans().size());
+    assertEquals("Self Care", output.getOutcome().getCarePlans().get(0).getTitle());
   }
 
   @Override

@@ -23,8 +23,8 @@ public class NoAnswersTest extends BaseDroolsCDSEngineTest {
 
     evaluate();
 
-    assertThat(output.getOutcome().getReferralRequestId(),
-        is("consultGP-progressive_respiratory_infection"));
+    assertThat(output.getOutcome().getReferralRequest().getId(),
+        is("gp-progressive_respiratory_infection"));
   }
 
   @Override

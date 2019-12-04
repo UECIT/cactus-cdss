@@ -8,17 +8,16 @@ import org.hl7.fhir.dstu3.model.CarePlan.CarePlanStatus;
 import org.hl7.fhir.dstu3.model.Narrative;
 import org.hl7.fhir.dstu3.model.Narrative.NarrativeStatus;
 import org.springframework.stereotype.Component;
-import uk.nhs.cdss.domain.CarePlan;
 import uk.nhs.cdss.domain.CarePlan.Intent;
-import uk.nhs.cdss.domain.CarePlan.Status;
 import uk.nhs.cdss.domain.CarePlanActivity;
 import uk.nhs.cdss.domain.CodeableConcept;
 import uk.nhs.cdss.engine.CodeDirectory;
 import uk.nhs.cdss.transform.Transformer;
+import uk.nhs.cdss.transform.bundle.CarePlanBundle;
 
 @Component
 public class CarePlanTransformer
-    implements Transformer<CarePlan, org.hl7.fhir.dstu3.model.CarePlan> {
+    implements Transformer<CarePlanBundle, org.hl7.fhir.dstu3.model.CarePlan> {
 
   private final CodeableConceptOutTransformer codeableConceptOutTransformer;
   private final CodeDirectory codeDirectory;
@@ -31,12 +30,13 @@ public class CarePlanTransformer
   }
 
   @Override
-  public CareConnectCarePlan transform(CarePlan from) {
+  public CareConnectCarePlan transform(CarePlanBundle bundle) {
     CareConnectCarePlan result = new CareConnectCarePlan();
+    var from = bundle.getCarePlan();
 
     result.setId(from.getId());
     result.setTitle(from.getTitle());
-    result.setStatus(transformStatus(from.getStatus()));
+    result.setStatus(bundle.isDraft() ? CarePlanStatus.DRAFT : CarePlanStatus.ACTIVE);
     result.setIntent(transformIntent(from.getIntent()));
     result.setText(transformNarrative(from.getText()));
     result.setDescription(from.getDescription());
@@ -73,14 +73,4 @@ public class CarePlanTransformer
     }
   }
 
-  private CarePlanStatus transformStatus(Status status) {
-    switch (status) {
-      case active:
-        return CarePlanStatus.ACTIVE;
-      case draft:
-        return CarePlanStatus.DRAFT;
-      default:
-        throw new IllegalArgumentException("Unexpected CarePlan Status: " + status);
-    }
-  }
 }

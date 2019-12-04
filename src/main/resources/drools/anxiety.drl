@@ -7,6 +7,7 @@ import uk.nhs.cdss.rules.AnswerAssertion
 import uk.nhs.cdss.rules.OutcomeAnswerCondition
 
 import uk.nhs.cdss.domain.Outcome
+import uk.nhs.cdss.domain.ReferralRequest
 
 import uk.nhs.cdss.engine.CodeDirectory
 
@@ -21,6 +22,15 @@ then
     insert( new AnswerAssertion("anxiety.anxiety", "q", "Yes", codeDirectory.get("anxiety"), true));
     insert( new AnswerAssertion("anxiety.anxiety", "q", "No", codeDirectory.get("anxiety"), false));
 
-    insert( Outcome.referralRequest("anxiety", "consultGP-anxiety"));
+    insert( Outcome.of("anxiety",
+        ReferralRequest.builder()
+            .id("gp-anxiety-72h")
+            .description("Consult GP")
+            .serviceRequested("gp")
+            .occurrence("PT72h")
+            .specialty("gp")
+            .reason("anxiety")
+            .note("A note")
+            .build()));
     insert( new OutcomeAnswerCondition("anxiety", "anxiety.anxiety", "q", Arrays.asList("Yes", "No") ));
 end

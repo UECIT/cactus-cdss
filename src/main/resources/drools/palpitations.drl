@@ -13,6 +13,9 @@ import uk.nhs.cdss.domain.Assertion.Status
 import uk.nhs.cdss.domain.CodeableConcept
 import uk.nhs.cdss.domain.Questionnaire
 import uk.nhs.cdss.domain.Outcome
+import uk.nhs.cdss.domain.CarePlan
+import uk.nhs.cdss.domain.CarePlanActivity
+import uk.nhs.cdss.domain.ReferralRequest
 
 import uk.nhs.cdss.engine.CodeDirectory
 
@@ -29,7 +32,7 @@ then
     insert( new AnswerAssertion("palpitations.chestPain", "q1", "No", codeDirectory.get("chestPain"), false));
     insert( new AnswerAssertion("palpitations.chestPain", "q1", "Unsure", codeDirectory.get("chestPain"), false));
 
-    insert( Outcome.referralRequest("chestPains", "call999-heartAttack").interim() );
+    insert( call999("chestPains").interim() );
     insert( new OutcomeAnswerCondition("chestPains", "palpitations.chestPain", "q1", Arrays.asList("Yes") ));
 
     insert( new NextQuestion("palpitations.neckPain", "palpitations.chestPain", "q1") );
@@ -39,7 +42,7 @@ then
     insert( new AnswerAssertion("palpitations.neckPain", "q2", "No", codeDirectory.get("neckPain"), false));
     insert( new AnswerAssertion("palpitations.neckPain", "q2", "Unsure", codeDirectory.get("neckPain"), false));
 
-    insert( Outcome.referralRequest("neckPains", "call999-heartAttack"));
+    insert( call999("neckPains"));
     insert( new OutcomeAnswerCondition("neckPains", "palpitations.neckPain", "q2", Arrays.asList("Yes") ));
 
     insert( new NextQuestion("palpitations.breathing", "palpitations.neckPain", "q2") );
@@ -49,7 +52,7 @@ then
     insert( new AnswerAssertion("palpitations.breathing", "q3", "No", codeDirectory.get("breathingProblems"), false));
     insert( new AnswerAssertion("palpitations.breathing", "q3", "Unsure", codeDirectory.get("breathingProblems"), false));
 
-    insert( Outcome.referralRequest("breathing", "call999-heartAttack"));
+    insert( call999("breathing"));
     insert( new OutcomeAnswerCondition("breathing", "palpitations.breathing", "q3", Arrays.asList("Yes") ));
 
     insert( new NextQuestion("palpitations.heartProblems", "palpitations.breathing", "q3") );
@@ -59,13 +62,48 @@ then
     insert( new AnswerAssertion("palpitations.heartProblems", "q4", "No", codeDirectory.get("heartProblems"), false));
     insert( new AnswerAssertion("palpitations.heartProblems", "q4", "Unsure", codeDirectory.get("heartProblems"), false));
 
-    insert( Outcome.referralRequest("heartProblems", "call999-heartAttack"));
+    insert( call999("heartProblems"));
     insert( new OutcomeAnswerCondition("heartProblems", "palpitations.heartProblems", "q4", Arrays.asList("Yes") ));
 
     // Answered no to all questions
-    insert( Outcome.carePlan("noSymptoms", "selfCare-palpitations"));
+    insert( Outcome.of("noSymptoms", CarePlan.builder()
+        .id("selfCare")
+        .title("Self Care")
+        .text("After Care Instructions")
+        .activity(new CarePlanActivity("selfCare", "Try sitting cross-legged and taking a slow breath in through your nostrils and then out through your mouth. Repeat until you feel calm."))
+        .build()));
     insert( new OutcomeAnswerCondition("noSymptoms", "palpitations.heartProblems", "q4", Arrays.asList("No", "Unsure") ));
     insert( new OutcomeAnswerCondition("noSymptoms", "palpitations.breathing", "q3", Arrays.asList("No", "Unsure") ));
     insert( new OutcomeAnswerCondition("noSymptoms", "palpitations.neckPain", "q2", Arrays.asList("No", "Unsure") ));
     insert( new OutcomeAnswerCondition("noSymptoms", "palpitations.chestPain", "q1", Arrays.asList("No", "Unsure") ));
 end
+
+function Outcome call999(String id) {
+    return Outcome.of(id, 
+        ReferralRequest.builder()
+            .id("call999-cardio-ami-8m")
+            .serviceRequested("call999")
+            .description("Call 999")
+            .occurrence("PT8m")
+            .specialty("cardio")
+            .reason("ami")
+            .note("A note")
+            .build(),
+        CarePlan.builder()
+            .id("aspirin")
+            .title("Take Aspirin")
+            .text("Take 300mg Aspirin")
+            .activity(new CarePlanActivity("selfCare", "While waiting for an ambulance, it may help to chew and then swallow a tablet of aspirin (ideally 300mg), as long as the person having a heart attack is not allergic to aspirin."))
+            .build(),
+        CarePlan.builder()
+            .id("waitForAmbulence")
+            .title("Wait for an ambulance")
+            .text("Care advice")
+            .activity(new CarePlanActivity("selfCare", "Try to get someone to sit with you until the ambulance arrives"))
+            .activity(new CarePlanActivity("selfCare", "Unlock doors"))
+            .activity(new CarePlanActivity("selfCare", "If you have a dog put them in another room"))
+            .activity(new CarePlanActivity("selfCare", "Collect any medications to take to the hospital"))
+            .activity(new CarePlanActivity("selfCare", "Take a mobile phone if you have one"))
+            .build()
+    );
+}
