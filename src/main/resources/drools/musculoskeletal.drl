@@ -8,6 +8,7 @@ import uk.nhs.cdss.rules.OutcomeAnswerCondition
 
 import uk.nhs.cdss.domain.Questionnaire
 import uk.nhs.cdss.domain.Outcome
+import uk.nhs.cdss.domain.ReferralRequest
 
 import uk.nhs.cdss.engine.CodeDirectory
 
@@ -18,9 +19,18 @@ salience 10000
 when
     eval( true )
 then
-    insert( new InitialQuestionnaire("muskuloskeletal.muskuloskeletal") );
-    insert( new AnswerAssertion("muskuloskeletal.muskuloskeletal", "q", "Yes", codeDirectory.get("muskuloskeletal"), true));
-    insert( new AnswerAssertion("muskuloskeletal.muskuloskeletal", "q", "No", codeDirectory.get("muskuloskeletal"), false));
-    insert( Outcome.referralRequest("muskuloskeletal", "call999-heartAttack")); //Temporary - this is not the right outcome
-    insert( new OutcomeAnswerCondition("muskuloskeletal", "muskuloskeletal.muskuloskeletal", "q", Arrays.asList("Yes", "No") ));
+    insert( new InitialQuestionnaire("musculoskeletal.musculoskeletal") );
+    insert( new AnswerAssertion("musculoskeletal.musculoskeletal", "q", "Yes", codeDirectory.get("musculoskeletal"), true));
+    insert( new AnswerAssertion("musculoskeletal.musculoskeletal", "q", "No", codeDirectory.get("musculoskeletal"), false));
+    insert(  Outcome.of("musculoskeletal",
+        ReferralRequest.builder()
+            .id("musculoskeletal")
+            .description("PLACEHOLDER REFERRAL")
+            .serviceRequested("call999")
+            .occurrence("PT8m")
+            .specialty("cardio")
+            .reason("ami")
+            .note("A note")
+            .build())); //Temporary - this is not the right outcome
+    insert( new OutcomeAnswerCondition("musculoskeletal", "musculoskeletal.musculoskeletal", "q", Arrays.asList("Yes", "No") ));
 end

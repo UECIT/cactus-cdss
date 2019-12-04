@@ -24,9 +24,9 @@ public class RedirectionTest extends BaseDroolsCDSEngineTest {
 
     evaluate();
 
-    assertNull("has no referral", output.getOutcome().getReferralRequestId());
-    assertThat("has no care plan", output.getOutcome().getCarePlanIds(), empty());
-    assertEquals("redirect outcome", ANXIETY, output.getOutcome().getRedirectionId());
+    assertNull("has no referral", output.getOutcome().getReferralRequest());
+    assertThat("has no care plan", output.getOutcome().getCarePlans(), empty());
+    assertEquals("redirect outcome", ANXIETY, output.getOutcome().getRedirection().getId());
   }
 
   @Override

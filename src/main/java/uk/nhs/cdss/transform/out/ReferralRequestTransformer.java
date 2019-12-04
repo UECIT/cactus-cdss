@@ -22,7 +22,6 @@ import uk.nhs.cdss.domain.Assertion;
 import uk.nhs.cdss.domain.CodeableConcept;
 import uk.nhs.cdss.domain.Coding;
 import uk.nhs.cdss.domain.ProcedureRequest;
-import uk.nhs.cdss.domain.ReferralRequest.Status;
 import uk.nhs.cdss.engine.CodeDirectory;
 import uk.nhs.cdss.transform.Transformer;
 import uk.nhs.cdss.transform.bundle.ReferralRequestBundle;
@@ -52,7 +51,7 @@ public class ReferralRequestTransformer implements
     result.setBasedOn(transformProcedureRequest(from.getBasedOn()));
     // replaces?
     result.setGroupIdentifier(bundle.getRequestGroupIdentifier());
-    result.setStatus(transformStatus(from.getStatus()));
+    result.setStatus(bundle.isDraft() ? ReferralRequestStatus.DRAFT :ReferralRequestStatus.ACTIVE);
     result.setIntent(transformIntent(from.getIntent()));
     // type?
     result.setPriority(transformPriority(from.getPriority()));
@@ -143,17 +142,6 @@ public class ReferralRequestTransformer implements
   private List<Reference> transformDefinition(ActivityDefinition definition) {
     // TODO
     return Collections.emptyList();
-  }
-
-  private ReferralRequestStatus transformStatus(Status status) {
-    switch (status) {
-      case draft:
-        return ReferralRequestStatus.DRAFT;
-      case active:
-        return ReferralRequestStatus.ACTIVE;
-      default:
-        throw new IllegalArgumentException("Unexpected referral status: " + status);
-    }
   }
 
   private ReferralPriority transformPriority(String priority) {

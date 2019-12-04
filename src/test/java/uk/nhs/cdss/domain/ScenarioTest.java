@@ -1,8 +1,9 @@
 package uk.nhs.cdss.domain;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.junit.Assert;
 import org.junit.Test;
 import uk.nhs.cdss.domain.Assertion.Status;
 
@@ -44,11 +45,15 @@ public class ScenarioTest {
 
     // Results
     // Result with a referral request
-    Outcome result1 = Outcome.referralRequest("result1", "referralRequest");
-    Assert.assertEquals("referralRequest", result1.getReferralRequestId());
+    Outcome result1 = Outcome.of("result1", ReferralRequest.builder()
+        .id("referralRequest")
+        .build());
+    assertEquals("referralRequest", result1.getReferralRequest().getId());
 
     // Outcome with a redirection to another service definition
-    Outcome result2 = Outcome.redirect("result2", "anxiety");
-    Assert.assertEquals("anxiety", result2.getRedirectionId());
+    Outcome result2 = Outcome.of("result2", Redirection.builder()
+        .id("anxiety")
+        .build());
+    assertEquals("anxiety", result2.getRedirection().getId());
   }
 }
