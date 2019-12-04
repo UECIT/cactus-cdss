@@ -4,6 +4,15 @@
   "description": "Palpitations 1st Party",
   "usage": "To triage a patient who has palpitations",
   "purpose": "To triage a patient who has palpitations",
+  "status": "ACTIVE",
+  "experimental": false,
+  "effectivePeriod": {
+    "start": "2019-01-01",
+    "end": "2119-01-01"
+  },
+  "jurisdictions": [
+    "GB"
+  ],
   "triggers": [
     "palpitations",
     "chestPain",

@@ -25,7 +25,6 @@ public final class SystemURL {
 	public static final String SD_GPC_OPERATIONOUTCOME = "https://fhir.nhs.uk/STU3/StructureDefinition/GPConnect-OperationOutcome-1";
 
 	// Structure Definition Extensions
-	// Structure Definition ExteISnsions
 	public static final String SD_CC_EXT_NHS_NUMBER_VERIF = "https://fhir.nhs.uk/STU3/StructureDefinition/Extension-CareConnect-GPC-NHSNumberVerificationStatus-1";
 	public static final String SD_CC_EXT_REGISTRATION_PERIOD = "registrationPeriod";
 	public static final String SD_EXTENSION_CC_REG_DETAILS = "https://fhir.nhs.uk/STU3/StructureDefinition/Extension-CareConnect-GPC-RegistrationDetails-1";
@@ -55,12 +54,14 @@ public final class SystemURL {
 	public static final String VS_SYMPTOM = "http://hl7.org/fhir/stu3/valueset-manifestation-or-symptom.html";
 	public static final String VS_CONDITION_CATEGORY = " https://fhir.nhs.uk/STU3/ValueSet/CareConnect-ConditionCategory-1";
 
-	// Code System Constants
+	// Code Systems
 	public static final String CS_CC_NHS_NUMBER_VERIF = "https://fhir.nhs.uk/CareConnect-NHSNumberVerificationStatus-1";
 	public static final String CS_REGISTRATION_TYPE = "https://fhir.nhs.uk/STU3/ValueSet/CareConnect-RegistrationType-1";
 	public static final String CS_UNITS_OF_MEASURE = "http://unitsofmeasure.org";
 	public static final String CS_LIST_ORDER = "http://hl7.org/fhir/codesystem-list-order.html";
-	public static final String SNOMED = "http://snomed.info/sct";
+	public static final String CS_SNOMED = "http://snomed.info/sct";
 	public static final String GR_RES_STATUS = "http://hl7.org/fhir/guidance-response-status";
-
+	public static final String CS_CONTEXT_TYPE = "http://hl7.org/fhir/usage-context-type";
+	public static final String CS_GENDER = "http://hl7.org/fhir/administrative-gender";
+	public static final String CS_PROVIDER_TAXONOMY = "http://nucc.org/provider-taxonomy";
 }

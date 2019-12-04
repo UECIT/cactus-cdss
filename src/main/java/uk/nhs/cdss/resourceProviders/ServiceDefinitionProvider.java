@@ -9,19 +9,17 @@ import ca.uhn.fhir.rest.annotation.Read;
 import ca.uhn.fhir.rest.annotation.RequiredParam;
 import ca.uhn.fhir.rest.annotation.ResourceParam;
 import ca.uhn.fhir.rest.annotation.Search;
-import ca.uhn.fhir.rest.param.DateRangeParam;
-import ca.uhn.fhir.rest.param.TokenAndListParam;
+import ca.uhn.fhir.rest.param.CompositeAndListParam;
+import ca.uhn.fhir.rest.param.DateParam;
+import ca.uhn.fhir.rest.param.QuantityParam;
 import ca.uhn.fhir.rest.param.TokenParam;
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import ca.uhn.fhir.rest.server.exceptions.InternalErrorException;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import org.hl7.fhir.dstu3.model.Bundle;
-import org.hl7.fhir.dstu3.model.Enumerations.PublicationStatus;
 import org.hl7.fhir.dstu3.model.GuidanceResponse;
 import org.hl7.fhir.dstu3.model.IdType;
 import org.hl7.fhir.dstu3.model.Parameters;
@@ -30,10 +28,8 @@ import org.hl7.fhir.dstu3.model.ResourceType;
 import org.hl7.fhir.dstu3.model.ServiceDefinition;
 import org.springframework.web.bind.annotation.RestController;
 import uk.nhs.cdss.engine.ServiceDefinitionException;
-import uk.nhs.cdss.entities.ServiceDefinitionEntity;
-import uk.nhs.cdss.repos.ServiceDefinitionRepository;
-import uk.nhs.cdss.resourceBuilder.ServiceDefinitionBuilder;
 import uk.nhs.cdss.services.EvaluateService;
+import uk.nhs.cdss.services.ServiceDefinitionConditionBuilderFactory;
 import uk.nhs.cdss.services.ServiceDefinitionRegistry;
 import uk.nhs.cdss.transform.out.ServiceDefinitionTransformer;
 
@@ -43,11 +39,16 @@ public class ServiceDefinitionProvider implements IResourceProvider {
 
   private static final String EVALUATE = "$evaluate";
 
+  private static final String SP_EXPERIMENTAL = "experimental";
+  private static final String SP_TYPE_CODE = "type-code";
+  private static final String SP_CONTEXT_VALUE = "context-value";
+  private static final String SP_CONTEXT_QUANTITY = "context-quantity";
+  private static final String SP_CONTEXT_RANGE = "context-range";
+
   private final EvaluateService evaluateService;
-  private final ServiceDefinitionBuilder serviceDefinitionBuilder;
-  private final ServiceDefinitionRepository serviceDefinitionRepository;
   private final ServiceDefinitionTransformer serviceDefinitionTransformer;
   private final ServiceDefinitionRegistry serviceDefinitionRegistry;
+  private final ServiceDefinitionConditionBuilderFactory conditionBuilderFactory;
 
   @Override
   public Class<ServiceDefinition> getResourceType() {
@@ -92,52 +93,61 @@ public class ServiceDefinitionProvider implements IResourceProvider {
         .getById(nameFromId(id))
         .map(serviceDefinitionTransformer::transform)
         .stream()
-        .collect(Collectors.toList());
+        .collect(Collectors.toUnmodifiableList());
   }
 
   @Search
-  public Collection<ServiceDefinition> findServiceDefinitions(
+  public Collection<ServiceDefinition> findAllServiceDefinitions() {
+    return serviceDefinitionRegistry
+        .getAll()
+        .stream()
+        .map(serviceDefinitionTransformer::transform)
+        .collect(Collectors.toUnmodifiableList());
+  }
+
+  @Search(queryName = "triage")
+  public Collection<ServiceDefinition> findTriageServiceDefinitions(
       @OptionalParam(name = ServiceDefinition.SP_STATUS) TokenParam status,
-      @OptionalParam(name = "experimental") TokenParam experimental,
-      @OptionalParam(name = ServiceDefinition.SP_EFFECTIVE) DateRangeParam effective,
-      @OptionalParam(name = "useContext-code") TokenAndListParam useContextCode,
-      @OptionalParam(name = "useContext-valueconcept") TokenAndListParam useContext,
+      @OptionalParam(name = SP_EXPERIMENTAL) TokenParam experimental,
+      @OptionalParam(name = ServiceDefinition.SP_EFFECTIVE) DateParam effective,
       @OptionalParam(name = ServiceDefinition.SP_JURISDICTION) TokenParam jurisdiction,
-      @OptionalParam(name = "trigger-eventdata-id") TokenAndListParam triggerId) {
+      @OptionalParam(
+          name = SP_CONTEXT_VALUE,
+          compositeTypes = {TokenParam.class, TokenParam.class})
+            CompositeAndListParam<TokenParam, TokenParam> useContextConcept,
+      @OptionalParam(
+          name = SP_CONTEXT_QUANTITY,
+          compositeTypes = {TokenParam.class, QuantityParam.class})
+            CompositeAndListParam<TokenParam, QuantityParam> useContextQuantity,
+      @OptionalParam(name = SP_CONTEXT_RANGE,
+          compositeTypes = {TokenParam.class, QuantityParam.class})
+            CompositeAndListParam<TokenParam, QuantityParam> useContextRange,
+      @OptionalParam(name = SP_TYPE_CODE, compositeTypes = {TokenParam.class, TokenParam.class})
+          CompositeAndListParam<TokenParam, TokenParam> triggerTypeCode) {
 
-    List<String> useContexts = useContext == null ?
-        new ArrayList<>() : useContext.getValuesAsQueryTokens().stream().map(tokenList ->
-        tokenList.getValuesAsQueryTokens().get(0).getValue()).collect(Collectors.toList());
+    var builder = conditionBuilderFactory.load();
 
-    List<String> triggerIds = triggerId == null ?
-        new ArrayList<>() : triggerId.getValuesAsQueryTokens().stream().map(tokenList ->
-        tokenList.getValuesAsQueryTokens().get(0).getValue()).collect(Collectors.toList());
+    builder.addStatusConditions(status);
+    builder.addExperimentalConditions(experimental);
+    builder.addEffectivePeriodConditions(effective);
+    builder.addJurisdictionConditions(jurisdiction);
+    builder.addUseContextCodeConditions(useContextConcept);
+    builder.addAgeConditions(useContextQuantity, useContextRange);
+    builder.addTriggerConditions(triggerTypeCode);
 
-    List<ServiceDefinitionEntity> entities = useContexts.isEmpty() ?
-        serviceDefinitionRepository.search(
-            status == null ? null : PublicationStatus.valueOf(status.getValue().toUpperCase()),
-            effective == null ? null : effective.getLowerBoundAsInstant(),
-            effective == null ? null : effective.getUpperBoundAsInstant(),
-            jurisdiction == null ? null : jurisdiction.getValue().toUpperCase(),
-            triggerIds, (long) triggerIds.size(),
-            experimental == null ? null : !"FALSE".equalsIgnoreCase(experimental.getValue())) :
-        serviceDefinitionRepository.search(
-            status == null ? null : PublicationStatus.valueOf(status.getValue().toUpperCase()),
-            effective == null ? null : effective.getLowerBoundAsInstant(),
-            effective == null ? null : effective.getUpperBoundAsInstant(),
-            jurisdiction == null ? null : jurisdiction.getValue().toUpperCase(),
-            useContexts, (long) useContexts.size(),
-            triggerIds, (long) triggerIds.size(),
-            experimental == null ? null : !"FALSE".equalsIgnoreCase(experimental.getValue()));
+    return serviceDefinitionRegistry
+        .getAll()
+        .stream()
+        .filter(builder.getConditions())
+        .max(this::triggerCount)
+        .map(serviceDefinitionTransformer::transform)
+        .stream()
+        .collect(Collectors.toUnmodifiableList());
+  }
 
-    Collection<ServiceDefinition> serviceDefinitions = new ArrayList<>();
-
-    entities.stream()
-        .map(entity -> serviceDefinitionBuilder.createServiceDefinition(
-            entity,
-            true))
-        .forEach(serviceDefinitions::add);
-
-    return serviceDefinitions;
+  private int triggerCount(
+      uk.nhs.cdss.domain.ServiceDefinition a,
+      uk.nhs.cdss.domain.ServiceDefinition b) {
+    return Integer.compare(a.getTriggers().size(), b.getTriggers().size());
   }
 }

@@ -4,9 +4,16 @@
   "description": "Chest pains 1st Party",
   "usage": "To triage a patient who has chest pains",
   "purpose": "To triage a patient who has chest pains",
+  "status": "ACTIVE",
+  "experimental": false,
+  "effectivePeriod": {
+    "start": "2019-01-01",
+    "end": "2119-01-01"
+  },
+  "jurisdictions": [
+    "GB"
+  ],
   "triggers": [
     "chestPain"
-  ],
-  "dataRequirements": [
   ]
 }

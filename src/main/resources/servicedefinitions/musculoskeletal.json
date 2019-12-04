@@ -4,17 +4,22 @@
   "description": "Musculoskeletal Problems 1st Party",
   "usage": "To triage a patient who has musculoskeletal problems",
   "purpose": "To triage a patient who has musculoskeletal problems",
+  "status": "ACTIVE",
+  "experimental": false,
+  "effectivePeriod": {
+    "start": "2019-01-01",
+    "end": "2119-01-01"
+  },
+  "jurisdictions": [
+    "GB"
+  ],
   "triggers": [
     "musculoskeletal"
   ],
   "dataRequirements": [
     {
       "type": "CareConnectObservation",
-      "coding": {
-        "system": "http://snomed.info/sct",
-        "code": "48694002",
-        "display": "Musculoskeletal"
-      }
+      "code": "musculoskeletal"
     }
   ]
 }

@@ -3,6 +3,7 @@ package uk.nhs.cdss.engine;
 import java.util.HashMap;
 import java.util.Map;
 import uk.nhs.cdss.domain.CodeableConcept;
+import uk.nhs.cdss.domain.Coding;
 
 public class CodeDirectory {
 
@@ -22,5 +23,9 @@ public class CodeDirectory {
           "CodeDirectory already contains an alias " + id + " for " + concepts.get(id));
     }
     concepts.put(id, concept);
+  }
+
+  public Coding getCode(String id) {
+    return get(id).getCoding().get(0);
   }
 }

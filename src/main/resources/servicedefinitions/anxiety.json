@@ -4,17 +4,32 @@
   "description": "Anxiety 1st Party",
   "usage": "To triage a patient suffering from anxiety",
   "purpose": "To triage a patient suffering from anxiety",
+  "status": "ACTIVE",
+  "experimental": false,
+  "effectivePeriod": {
+    "start": "2019-01-01",
+    "end": "2119-01-01"
+  },
+  "jurisdictions": [
+    "GB"
+  ],
+  "useContext": [
+    {
+      "code": "gender",
+      "valueCodeableConcept": "female"
+    },
+    {
+      "code": "user",
+      "valueCodeableConcept": "103TP2700X"
+    }
+  ],
   "triggers": [
     "anxiety"
   ],
   "dataRequirements": [
     {
       "type": "CareConnectObservation",
-      "coding": {
-        "system": "http://snomed.info/sct",
-        "code": "48694002",
-        "display": "Anxiety"
-      }
+      "code": "anxiety"
     }
   ]
 }

@@ -12,7 +12,16 @@ import uk.nhs.cdss.engine.CodeDirectory;
 public class DroolsConfig {
 
   private CodeableConcept snomed(String id, String description) {
-    return buildCode(SystemURL.SNOMED, id, description);
+    return buildCode(SystemURL.CS_SNOMED, id, description);
+  }
+  private CodeableConcept contextType(String id, String description) {
+    return buildCode(SystemURL.CS_CONTEXT_TYPE, id, description);
+  }
+  private CodeableConcept gender(String id, String description) {
+    return buildCode(SystemURL.CS_GENDER, id, description);
+  }
+  private CodeableConcept provider(String id, String description) {
+    return buildCode(SystemURL.CS_PROVIDER_TAXONOMY, id, description);
   }
   private CodeableConcept buildCode(String systemURL, String id, String description) {
     var coding = new Coding(systemURL, id, description);
@@ -25,6 +34,33 @@ public class DroolsConfig {
 
     palpitations(codeDirectory);
     chestPains(codeDirectory);
+
+    // Jurisdictions
+    codeDirectory.put("GB", buildCode(
+        "urn:iso:std:iso:3166",
+        "GB",
+        "United Kingdom of Great Britain and Northern Ireland (the)"));
+
+    // Usage contexts
+    codeDirectory.put("gender", contextType("gender", "Gender"));
+    codeDirectory.put("age", contextType("age", "Age Range"));
+    codeDirectory.put("focus", contextType("focus", "Clinical Focus"));
+    codeDirectory.put("user", contextType("user", "User Type"));
+    codeDirectory.put("workflow", contextType("workflow", "Workflow Setting"));
+    codeDirectory.put("task", contextType("task", "Workflow Task"));
+    codeDirectory.put("venue", contextType("venue", "Clinical Venue"));
+    codeDirectory.put("species", contextType("species", "Species"));
+
+    // Usage context: gender
+    codeDirectory.put("female", gender("female", "Female"));
+    codeDirectory.put("male", gender("male", "Male"));
+    codeDirectory.put("other", gender("other", "Other"));
+    codeDirectory.put("unknown", gender("unknown", "Unknown"));
+
+    // Usage context: user
+    codeDirectory.put("103TP0016X", provider("103TP0016X", "Prescribing (Medical)"));
+    codeDirectory.put("103TP2700X", provider("103TP2700X", "Psychotherapy"));
+    codeDirectory.put("183500000X", provider("183500000X", "Pharmacist"));
 
     // Outcomes
     codeDirectory.put("call999", snomed("call999", "Call 999"));
