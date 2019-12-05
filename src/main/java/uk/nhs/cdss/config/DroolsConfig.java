@@ -155,6 +155,8 @@ public class DroolsConfig {
 
   private void palpitations(CodeDirectory codeDirectory) {
     codeDirectory.put("palpitations", snomed("palpitations", "Experiencing heart palpitations"));
+    codeDirectory.put("simplePalpitations", snomed("simplePalpitations", "Experiencing heart palpitations"));
+    codeDirectory.put("extendedPalpitations", snomed("extendedPalpitations", "Experiencing heart palpitations"));
     codeDirectory.put("hasICD", snomed("hasICD", "Has implanted cardioverter defibrillator"));
     codeDirectory.put("chestPain", snomed("chestPain", "Feeling pain in chest"));
     codeDirectory.put("neckPain", snomed("neckPain", "Feeling pain in neck area"));

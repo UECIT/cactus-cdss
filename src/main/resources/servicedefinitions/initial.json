@@ -1,0 +1,16 @@
+{
+  "id": "initial",
+  "title":  "Initial scenario",
+  "description": "Initial triage questions",
+  "usage": "To determine which service definition would be appropriate for the patient",
+  "purpose": "To determine which service definition would be appropriate for the patient",
+  "status": "ACTIVE",
+  "experimental": false,
+  "effectivePeriod": {
+    "start": "2019-01-01",
+    "end": "2119-01-01"
+  },
+  "jurisdictions": [
+    "GB"
+  ]
+}

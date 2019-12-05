@@ -1,0 +1,25 @@
+{
+  "id": "initial.initial",
+  "items": [
+    {
+      "id": "q",
+      "text": "What best describes your presenting complaint",
+      "type": "CHOICE",
+      "required": true,
+      "options": [
+        {
+          "stringValue": "Pain in the chest",
+          "code": "chestPain"
+        },
+        {
+          "stringValue": "Palpitations",
+          "code": "extendedPalpitations"
+        },
+        {
+          "stringValue": "Simple palpitations",
+          "code": "simplePalpitations"
+        }
+      ]
+    }
+  ]
+}

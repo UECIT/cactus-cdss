@@ -1,0 +1,43 @@
+package uk.nhs.cdss.rules.initial
+
+import java.util.Arrays
+
+import uk.nhs.cdss.rules.InitialQuestionnaire
+import uk.nhs.cdss.rules.AnswerAssertion
+import uk.nhs.cdss.rules.OutcomeAnswerCondition
+
+import uk.nhs.cdss.domain.Outcome
+import uk.nhs.cdss.domain.ReferralRequest
+import uk.nhs.cdss.domain.Redirection
+
+import uk.nhs.cdss.engine.CodeDirectory
+
+global CodeDirectory codeDirectory;
+
+function Outcome singleCodeRedirection(String id, String code) {
+    return Outcome.of(id, Redirection.builder()
+            .id(code)
+            .code(code)
+            .build());
+}
+
+rule "Init"
+when
+    eval( true )
+then
+    insert( new InitialQuestionnaire("initial.initial") );
+
+    insert( new AnswerAssertion("initial.initial", "q", "chestPain", codeDirectory.get("chestPain"), true));
+    insert( new AnswerAssertion("initial.initial", "q", "extendedPalpitations", codeDirectory.get("extendedPalpitations"), true));
+    insert( new AnswerAssertion("initial.initial", "q", "simplePalpitations", codeDirectory.get("simplePalpitations"), true));
+
+    insert( singleCodeRedirection("chestPains", "chestPain"));
+    insert( new OutcomeAnswerCondition("chestPains", "initial.initial", "q", Arrays.asList("chestPain") ));
+
+    insert( singleCodeRedirection("extendedPalpitations", "extendedPalpitations"));
+    insert( new OutcomeAnswerCondition("extendedPalpitations", "initial.initial", "q", Arrays.asList("extendedPalpitations") ));
+
+    insert( singleCodeRedirection("simplePalpitations", "simplePalpitations"));
+    insert( new OutcomeAnswerCondition("simplePalpitations", "initial.initial", "q", Arrays.asList("simplePalpitations") ));
+
+end

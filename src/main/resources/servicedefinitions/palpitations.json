@@ -14,10 +14,7 @@
     "GB"
   ],
   "triggers": [
-    "palpitations",
-    "chestPain",
-    "neckPain",
-    "shoulderPain"
+    "simplePalpitations"
   ],
   "dataRequirements": [
     { "type":  "Patient" },

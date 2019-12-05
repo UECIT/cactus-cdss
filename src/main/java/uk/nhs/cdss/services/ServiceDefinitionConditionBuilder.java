@@ -6,16 +6,19 @@ import ca.uhn.fhir.rest.param.CompositeAndListParam;
 import ca.uhn.fhir.rest.param.CompositeOrListParam;
 import ca.uhn.fhir.rest.param.CompositeParam;
 import ca.uhn.fhir.rest.param.DateParam;
+import ca.uhn.fhir.rest.param.ParamPrefixEnum;
 import ca.uhn.fhir.rest.param.QuantityParam;
 import ca.uhn.fhir.rest.param.TokenParam;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.Getter;
+import uk.nhs.cdss.domain.DateRange;
 import uk.nhs.cdss.domain.ServiceDefinition;
 import uk.nhs.cdss.domain.UsageContext;
 
@@ -46,9 +49,8 @@ public class ServiceDefinitionConditionBuilder {
       return;
     }
 
-    addCondition(sd -> sd.getEffectivePeriod() == null || (
-        effective.getValueAsInstantDt().after(sd.getEffectivePeriod().getStart()) &&
-        effective.getValueAsInstantDt().before(sd.getEffectivePeriod().getEnd())));
+    addCondition(sd -> sd.getEffectivePeriod() == null ||
+        matchDateRange (effective, sd.getEffectivePeriod()));
   }
 
   public void addJurisdictionConditions(TokenParam jurisdiction) {
@@ -186,6 +188,26 @@ public class ServiceDefinitionConditionBuilder {
       default:
         throw new IllegalArgumentException(
             "Numeric search params cannot have non-standard prefixes");
+    }
+  }
+  private boolean matchDateRange(DateParam dateParam, DateRange range) {
+    var date = dateParam.getValueAsInstantDt();
+    var prefix = Optional.ofNullable(dateParam.getPrefix()).orElse(ParamPrefixEnum.EQUAL);
+
+    switch (prefix) {
+      case EQUAL:
+        return date.after(range.getStart()) && date.before(range.getEnd());
+      case NOT_EQUAL:
+        return date.before(range.getStart()) || date.after(range.getEnd());
+      case GREATERTHAN:
+      case GREATERTHAN_OR_EQUALS:
+        return date.before(range.getEnd());
+      case LESSTHAN:
+      case LESSTHAN_OR_EQUALS:
+        return date.after(range.getStart());
+      default:
+        throw new IllegalArgumentException(
+            "Date search params cannot have non-standard prefixes");
     }
   }
   private boolean matchCode(TokenParam codeParam, UsageContext context) {
