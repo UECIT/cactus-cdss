@@ -21,7 +21,6 @@ when
 then
     insert( new InitialQuestionnaire("musculoskeletal.musculoskeletal") );
     insert( new AnswerAssertion("musculoskeletal.musculoskeletal", "q", "Yes", codeDirectory.get("musculoskeletal"), true));
-    insert( new AnswerAssertion("musculoskeletal.musculoskeletal", "q", "No", codeDirectory.get("musculoskeletal"), false));
     insert(  Outcome.of("musculoskeletal",
         ReferralRequest.builder()
             .id("musculoskeletal")

@@ -38,17 +38,6 @@ public class PalpitationsTest extends BaseDroolsCDSEngineTest {
   }
 
   @Test
-  public void chest_pain_answer_negative_assertion() throws ServiceDefinitionException {
-    answerQuestion("chestPain", "q1", "No");
-
-    evaluate();
-
-    assertEquals(1, output.getAssertions().size());
-    assertEquals("palpitations.chestPain#q1", output.getAssertions().get(0).getId());
-    assertEquals(false, output.getAssertions().get(0).getValue());
-  }
-
-  @Test
   public void chest_pain_answer_negative_result() throws ServiceDefinitionException {
     answerQuestion("chestPain", "q1", "No");
 
@@ -58,12 +47,12 @@ public class PalpitationsTest extends BaseDroolsCDSEngineTest {
   }
 
   @Test
-  public void chest_pain_answer_single_assertion() throws ServiceDefinitionException {
+  public void chest_pain_answer_no_assertion() throws ServiceDefinitionException {
     answerQuestion("chestPain", "q1", "Unsure");
 
     evaluate();
 
-    assertEquals(1, output.getAssertions().size());
+    assertEquals(0, output.getAssertions().size());
   }
 
   @Test

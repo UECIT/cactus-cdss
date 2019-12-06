@@ -70,7 +70,7 @@ public class Palpitations2Test extends BaseDroolsCDSEngineTest {
 
     assertEquals(1, output.getQuestionnaireIds().size());
     assertEquals("palpitations2.personalHistory", output.getQuestionnaireIds().get(0));
-    assertEquals(5, output.getAssertions().size());
+    assertEquals(4, output.getAssertions().size());
     assertNull(output.getOutcome());
   }
 
@@ -86,7 +86,7 @@ public class Palpitations2Test extends BaseDroolsCDSEngineTest {
 
     evaluate();
 
-    assertEquals(9, output.getAssertions().size());
+    assertEquals(7, output.getAssertions().size());
     assertEquals("ed-cardio-mi-8m", output.getOutcome().getReferralRequest().getId());
   }
 
@@ -126,7 +126,7 @@ public class Palpitations2Test extends BaseDroolsCDSEngineTest {
 
     evaluate();
 
-    assertEquals(8, output.getAssertions().size());
+    assertEquals(3, output.getAssertions().size());
     assertEquals("anxiety", output.getOutcome().getRedirection().getId());
   }
 
@@ -143,7 +143,7 @@ public class Palpitations2Test extends BaseDroolsCDSEngineTest {
 
     evaluate();
 
-    assertEquals(7, output.getAssertions().size());
+    assertEquals(3, output.getAssertions().size());
     assertEquals(1, output.getOutcome().getCarePlans().size());
     assertEquals("carePlan", output.getOutcome().getCarePlans().get(0).getId());
   }
