@@ -29,8 +29,6 @@ then
     // Chest pains
     insert( new InitialQuestionnaire("palpitations.chestPain") );
     insert( new AnswerAssertion("palpitations.chestPain", "q1", "Yes", codeDirectory.get("chestPain"), true));
-    insert( new AnswerAssertion("palpitations.chestPain", "q1", "No", codeDirectory.get("chestPain"), false));
-    insert( new AnswerAssertion("palpitations.chestPain", "q1", "Unsure", codeDirectory.get("chestPain"), false));
 
     insert( call999("chestPains").interim() );
     insert( new OutcomeAnswerCondition("chestPains", "palpitations.chestPain", "q1", Arrays.asList("Yes") ));
@@ -39,8 +37,6 @@ then
 
     // Neck pains
     insert( new AnswerAssertion("palpitations.neckPain", "q2", "Yes", codeDirectory.get("neckPain"), true));
-    insert( new AnswerAssertion("palpitations.neckPain", "q2", "No", codeDirectory.get("neckPain"), false));
-    insert( new AnswerAssertion("palpitations.neckPain", "q2", "Unsure", codeDirectory.get("neckPain"), false));
 
     insert( call999("neckPains"));
     insert( new OutcomeAnswerCondition("neckPains", "palpitations.neckPain", "q2", Arrays.asList("Yes") ));
@@ -49,8 +45,6 @@ then
 
     // Breathing
     insert( new AnswerAssertion("palpitations.breathing", "q3", "Yes", codeDirectory.get("breathingProblems"), true));
-    insert( new AnswerAssertion("palpitations.breathing", "q3", "No", codeDirectory.get("breathingProblems"), false));
-    insert( new AnswerAssertion("palpitations.breathing", "q3", "Unsure", codeDirectory.get("breathingProblems"), false));
 
     insert( call999("breathing"));
     insert( new OutcomeAnswerCondition("breathing", "palpitations.breathing", "q3", Arrays.asList("Yes") ));
@@ -59,8 +53,6 @@ then
 
     // Heart problems
     insert( new AnswerAssertion("palpitations.heartProblems", "q4", "Yes", codeDirectory.get("heartProblems"), true));
-    insert( new AnswerAssertion("palpitations.heartProblems", "q4", "No", codeDirectory.get("heartProblems"), false));
-    insert( new AnswerAssertion("palpitations.heartProblems", "q4", "Unsure", codeDirectory.get("heartProblems"), false));
 
     insert( call999("heartProblems"));
     insert( new OutcomeAnswerCondition("heartProblems", "palpitations.heartProblems", "q4", Arrays.asList("Yes") ));

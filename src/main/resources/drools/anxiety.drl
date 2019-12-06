@@ -18,10 +18,7 @@ when
     eval( true )
 then
     insert( new InitialQuestionnaire("anxiety.anxiety") );
-
     insert( new AnswerAssertion("anxiety.anxiety", "q", "Yes", codeDirectory.get("anxiety"), true));
-    insert( new AnswerAssertion("anxiety.anxiety", "q", "No", codeDirectory.get("anxiety"), false));
-
     insert( Outcome.of("anxiety",
         ReferralRequest.builder()
             .id("gp-anxiety-72h")
