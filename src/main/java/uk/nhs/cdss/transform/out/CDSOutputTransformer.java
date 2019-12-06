@@ -16,6 +16,8 @@ import org.hl7.fhir.dstu3.model.Identifier;
 import org.hl7.fhir.dstu3.model.Observation;
 import org.hl7.fhir.dstu3.model.Parameters;
 import org.hl7.fhir.dstu3.model.Parameters.ParametersParameterComponent;
+import org.hl7.fhir.dstu3.model.QuestionnaireResponse;
+import org.hl7.fhir.dstu3.model.QuestionnaireResponse.QuestionnaireResponseStatus;
 import org.hl7.fhir.dstu3.model.Reference;
 import org.hl7.fhir.dstu3.model.RequestGroup;
 import org.hl7.fhir.dstu3.model.RequestGroup.RequestGroupActionComponent;
@@ -61,6 +63,14 @@ public class CDSOutputTransformer implements Transformer<CDSOutputBundle, Guidan
     final var NAME = "outputData";
     var parameter = new ParametersParameterComponent(new StringType(NAME));
     parameter.setResource(observation);
+    return parameter;
+  }
+
+  private ParametersParameterComponent buildParameter(QuestionnaireResponse response) {
+    final var NAME = "outputData";
+    var parameter = new ParametersParameterComponent(new StringType(NAME));
+    response.setStatus(QuestionnaireResponseStatus.COMPLETED);
+    parameter.setResource(response);
     return parameter;
   }
 
@@ -115,6 +125,10 @@ public class CDSOutputTransformer implements Transformer<CDSOutputBundle, Guidan
     // New assertions overwrite old assertions
     Stream.concat(newAssertions, oldAssertions)
         .distinct()
+        .map(this::buildParameter)
+        .forEach(outputParameters::addParameter);
+
+    bundle.getParameters().getResponses().stream()
         .map(this::buildParameter)
         .forEach(outputParameters::addParameter);
 
