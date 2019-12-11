@@ -40,6 +40,11 @@ public class DroolsConfig {
         "urn:iso:std:iso:3166",
         "GB",
         "United Kingdom of Great Britain and Northern Ireland (the)"));
+    codeDirectory.put("TK", buildCode(
+        "urn:iso:std:iso:3166",
+        "TK",
+        "Tokelau"
+    ));
 
     // Usage contexts
     codeDirectory.put("gender", contextType("gender", "Gender"));
