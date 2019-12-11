@@ -1,0 +1,16 @@
+{
+  "id": "initialTokelau",
+  "title":  "Initial scenario",
+  "description": "Initial triage questions tokelau",
+  "usage": "To determine which service definition would be appropriate for the patient",
+  "purpose": "This service definition should only appear for searches in the tokelau jurisdiction (or with no jurisdiction defined)",
+  "status": "ACTIVE",
+  "experimental": false,
+  "effectivePeriod": {
+    "start": "2019-01-01",
+    "end": "2119-01-01"
+  },
+  "jurisdictions": [
+    "TK"
+  ]
+}
