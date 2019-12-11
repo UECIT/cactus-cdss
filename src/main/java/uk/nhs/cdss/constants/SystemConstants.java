@@ -25,4 +25,13 @@ public final class SystemConstants {
 	public static final String INCLUDE_RESOLVED_ALLERGIES = "includeResolvedAllergies";
 	public static final String INCLUDE_ALLERGIES = "includeAllergies";
 	public static final String INCLUDE_MEDICATION = "includeMedication";
+
+	// Parameters
+	public static final String INPUT_DATA = "inputData";
+	public static final String REQUEST_ID = "requestId";
+	public static final String ENCOUNTER = "encounter";
+	public static final String USER_TYPE = "userType";
+	public static final String SETTING = "setting";
+	public static final String USER_LANGUAGE = "userLanguage";
+	public static final String USER_TASK = "userTaskContext";
 }

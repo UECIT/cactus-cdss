@@ -67,6 +67,10 @@ public class DroolsCDSEngine implements CDSEngine {
             .forEach(ksession::insert);
       });
 
+      // Add context
+      ksession.insert(input.getContext());
+      log.info("{}", input.getContext());
+
       // Execute and collect results
       log.info("");
       ksession.fireAllRules();

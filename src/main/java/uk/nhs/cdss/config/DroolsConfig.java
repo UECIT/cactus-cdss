@@ -50,6 +50,7 @@ public class DroolsConfig {
     codeDirectory.put("task", contextType("task", "Workflow Task"));
     codeDirectory.put("venue", contextType("venue", "Clinical Venue"));
     codeDirectory.put("species", contextType("species", "Species"));
+    codeDirectory.put("setting", contextType("setting", "Setting"));
 
     // Usage context: gender
     codeDirectory.put("female", gender("female", "Female"));
@@ -57,10 +58,20 @@ public class DroolsConfig {
     codeDirectory.put("other", gender("other", "Other"));
     codeDirectory.put("unknown", gender("unknown", "Unknown"));
 
-    // Usage context: user
+    // Usage context: user type
     codeDirectory.put("103TP0016X", provider("103TP0016X", "Prescribing (Medical)"));
     codeDirectory.put("103TP2700X", provider("103TP2700X", "Psychotherapy"));
     codeDirectory.put("183500000X", provider("183500000X", "Pharmacist"));
+
+    /* In EMS */
+    codeDirectory.put("CL", provider("CL", "Clinician"));
+    codeDirectory.put("CH", provider("CH", "Call Handler"));
+    codeDirectory.put("MH", provider("MH", "Mental Health Specialist"));
+    codeDirectory.put("PA", provider("PA", "Patient"));
+
+    // Usage context: setting
+    codeDirectory.put("phone", provider("phone", "Phone call"));
+    codeDirectory.put("online", provider("online", "Online"));
 
     // Outcomes
     codeDirectory.put("call999", snomed("call999", "Call 999"));

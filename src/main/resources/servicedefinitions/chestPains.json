@@ -15,5 +15,15 @@
   ],
   "triggers": [
     "chestPain"
+  ],
+  "useContext": [
+    {
+      "code": "setting",
+      "valueCodeableConcept": "online"
+    },
+    {
+      "code": "setting",
+      "valueCodeableConcept": "phone"
+    }
   ]
 }

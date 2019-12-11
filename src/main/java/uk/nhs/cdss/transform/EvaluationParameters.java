@@ -1,9 +1,29 @@
 package uk.nhs.cdss.transform;
 
+import static org.hl7.fhir.dstu3.model.OperationOutcome.IssueType.INVALID;
+import static uk.nhs.cdss.OperationOutcomeFactory.buildOperationOutcomeException;
+import static uk.nhs.cdss.constants.SystemCode.BAD_REQUEST;
+import static uk.nhs.cdss.constants.SystemConstants.INPUT_DATA;
+import static uk.nhs.cdss.constants.SystemConstants.REQUEST_ID;
+import static uk.nhs.cdss.constants.SystemConstants.SETTING;
+import static uk.nhs.cdss.constants.SystemConstants.USER_LANGUAGE;
+import static uk.nhs.cdss.constants.SystemConstants.USER_TASK;
+import static uk.nhs.cdss.constants.SystemConstants.USER_TYPE;
+
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Singular;
+import org.hl7.fhir.dstu3.model.CodeableConcept;
 import org.hl7.fhir.dstu3.model.IdType;
 import org.hl7.fhir.dstu3.model.Observation;
 import org.hl7.fhir.dstu3.model.OperationOutcome.IssueType;
@@ -15,16 +35,22 @@ import org.hl7.fhir.dstu3.model.Resource;
 import uk.nhs.cdss.OperationOutcomeFactory;
 import uk.nhs.cdss.constants.SystemCode;
 
+@Getter
+@Builder
+@AllArgsConstructor
 public class EvaluationParameters {
-  private static final String INPUT_DATA = "inputData";
-  private static final String REQUEST_ID = "requestId";
-  private static final String ENCOUNTER = "encounter";
+
 
   private String requestId;
   private Reference encounter;
+  @Singular("input")
   private List<Resource> inputData;
+  @Singular
   private List<QuestionnaireResponse> responses;
+  @Singular
   private List<Observation> observations;
+  @Singular
+  private Map<String, CodeableConcept> contexts;
 
   public EvaluationParameters(Parameters source) {
     var parameters = source.getParameter();
@@ -44,41 +70,49 @@ public class EvaluationParameters {
 
     responses = filterOfType(inputData, QuestionnaireResponse.class);
     observations = filterOfType(inputData, Observation.class);
+
+    setContextParameters(parameters);
   }
 
-  public String getRequestId() {
-    return requestId;
-  }
+  private void setContextParameters(List<ParametersParameterComponent> parameters) {
+    contexts = new HashMap<>();
 
-  public List<Resource> getInputData() {
-    return inputData;
-  }
+    var role = getParameterByName(parameters, USER_TYPE);
+    var roleCode = castToType(role.getValue(), CodeableConcept.class);
+    contexts.put(USER_TYPE, roleCode);
 
-  public Reference getEncounter() {
-    return encounter;
-  }
+    var setting = getParameterByName(parameters, SETTING);
+    var settingCode = castToType(setting.getValue(), CodeableConcept.class);
+    contexts.put(SETTING, settingCode);
 
-  public List<QuestionnaireResponse> getResponses() {
-    return responses;
-  }
+    var language = getOptionalParameter(parameters, USER_LANGUAGE);
+    if (language.isPresent()) {
+      var languageCode = castToType(language.get().getValue(), CodeableConcept.class);
+      contexts.put(USER_LANGUAGE, languageCode);
+    }
 
-  public List<Observation> getObservations() {
-    return observations;
+    var task = getOptionalParameter(parameters, USER_TASK);
+    if (task.isPresent()) {
+      var taskCode = castToType(task.get().getValue(), CodeableConcept.class);
+      contexts.put(USER_TASK, taskCode);
+    }
   }
 
   private static ParametersParameterComponent getParameterByName(
       List<ParametersParameterComponent> parameters,
       String parameterName) {
+    var parameter = getOptionalParameter(parameters, parameterName);
+    var message = "The parameter " + parameterName + " must be set exactly once";
+
+    return parameter.orElseThrow(() -> buildOperationOutcomeException(
+        new InvalidRequestException(message), BAD_REQUEST, INVALID));
+  }
+
+  private static Optional<ParametersParameterComponent> getOptionalParameter(
+      List<ParametersParameterComponent> parameters,
+      String parameterName) {
     var filteredParameters = getParametersByName(parameters, parameterName);
-
-    if (filteredParameters == null || filteredParameters.size() != 1) {
-      var message = "The parameter " + parameterName + " must be set exactly once";
-      throw OperationOutcomeFactory.buildOperationOutcomeException(
-          new InvalidRequestException(message),
-          SystemCode.BAD_REQUEST, IssueType.INVALID);
-    }
-
-    return filteredParameters.get(0);
+    return filteredParameters.stream().findFirst();
   }
 
   private static List<ParametersParameterComponent> getParametersByName(
@@ -94,9 +128,9 @@ public class EvaluationParameters {
     if (type.isInstance(object)) {
       return type.cast(object);
     }
-    throw OperationOutcomeFactory.buildOperationOutcomeException(
+    throw buildOperationOutcomeException(
         new InvalidRequestException("Invalid parameter type in request body. Should be " + type.toString()),
-        SystemCode.BAD_REQUEST, IssueType.INVALID);
+        BAD_REQUEST, INVALID);
   }
 
   private static <T> List<T> filterOfType(Collection<?> list, Class<T> type) {

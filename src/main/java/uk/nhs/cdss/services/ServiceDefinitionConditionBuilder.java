@@ -163,7 +163,7 @@ public class ServiceDefinitionConditionBuilder {
     }
     return contextCode
         .stream()
-        .filter(c -> expectedContext == null || !expectedContext.equals(c))
+        .filter(c -> expectedContext == null || expectedContext.equals(c))
         .findAny()
         .orElseThrow(() -> wrongCodesException);
   }
@@ -172,9 +172,11 @@ public class ServiceDefinitionConditionBuilder {
     var range = context.getValueRange();
     var age = ageParam.getValue().intValueExact();
 
-    switch (ageParam.getPrefix()) {
+    var prefix = Optional.ofNullable(ageParam.getPrefix()).orElse(ParamPrefixEnum.EQUAL);
+
+    switch (prefix) {
       case EQUAL:
-        return range.getLow() < age && age < range.getHigh();
+        return range.getLow() <= age && age <= range.getHigh();
       case NOT_EQUAL:
         return age < range.getLow() || range.getHigh() < age;
       case GREATERTHAN:
