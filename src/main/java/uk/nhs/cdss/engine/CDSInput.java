@@ -2,60 +2,27 @@ package uk.nhs.cdss.engine;
 
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import uk.nhs.cdss.domain.Assertion;
+import uk.nhs.cdss.domain.CodeableConcept;
+import uk.nhs.cdss.domain.EvaluateContext;
 import uk.nhs.cdss.domain.Patient;
 import uk.nhs.cdss.domain.QuestionnaireResponse;
 
+@Getter
+@Builder
 public class CDSInput {
   private final String serviceDefinitionId;
   private final String requestId;
   private final String encounterId;
   private final String supplierId;
 
-  private Patient patient;
+  private final Patient patient;
   private final List<Assertion> assertions = new ArrayList<>();
   private final List<QuestionnaireResponse> responses = new ArrayList<>();
+  private final EvaluateContext context;
 
-  public CDSInput(
-      String serviceDefinitionId,
-      String requestId,
-      String encounterId,
-      String supplierId) {
-    this.serviceDefinitionId = serviceDefinitionId;
-    this.requestId = requestId;
-    this.encounterId = encounterId;
-    this.supplierId = supplierId;
-  }
-
-  public String getServiceDefinitionId() {
-    return serviceDefinitionId;
-  }
-
-  public String getRequestId() {
-    return requestId;
-  }
-
-  public String getEncounterId() {
-    return encounterId;
-  }
-
-  public String getSupplierId() {
-    return supplierId;
-  }
-
-  public Patient getPatient() {
-    return patient;
-  }
-
-  public void setPatient(Patient patient) {
-    this.patient = patient;
-  }
-
-  public List<Assertion> getAssertions() {
-    return assertions;
-  }
-
-  public List<QuestionnaireResponse> getResponses() {
-    return responses;
-  }
 }

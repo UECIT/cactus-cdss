@@ -14,7 +14,12 @@ public abstract class BaseDroolsCDSEngineTest {
   protected DroolsCDSEngine engine;
   protected CDSOutput output;
 
-  protected CDSInput input = new CDSInput(getServiceDefinition(), REQUEST_1, ENCOUNTER_1, SUPPLIER_1);
+  protected CDSInput input = CDSInput.builder()
+      .serviceDefinitionId(getServiceDefinition())
+      .requestId(REQUEST_1)
+      .encounterId(ENCOUNTER_1)
+      .supplierId(SUPPLIER_1)
+      .build();
 
   @Before
   public void setup() {
