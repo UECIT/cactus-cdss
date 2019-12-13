@@ -1,5 +1,6 @@
 package uk.nhs.cdss.transform.in;
 
+import java.util.stream.Collectors;
 import org.hl7.fhir.dstu3.model.Observation;
 import org.hl7.fhir.dstu3.model.Observation.ObservationComponentComponent;
 import org.hl7.fhir.dstu3.model.Observation.ObservationStatus;
@@ -44,23 +45,22 @@ public final class AssertionTransformer implements Transformer<Observation, Asse
 
   @Override
   public Assertion transform(Observation from) {
-    var assertion = new Assertion(
-        from.getId(),
-        statusTransformer.transform(from.getStatus()));
+    var assertion = Assertion.builder()
+        .id(from.getId())
+        .status(statusTransformer.transform(from.getStatus()));
 
     if (from.getIssued() != null) {
-      assertion.setIssued(from.getIssued().toInstant());
+      assertion = assertion.issued(from.getIssued().toInstant());
     }
 
-    assertion.setValue(valueTransformer.transform(from.getValue()));
-    assertion.setCode(codeTransformer.transform(from.getCode()));
-
-    from.getComponent()
-        .stream()
-        .map(ObservationComponentComponent::getCode)
-        .map(codeTransformer::transform)
-        .forEach(assertion.getComponents()::add);
-
-    return assertion;
+    return assertion
+        .value(valueTransformer.transform(from.getValue()))
+        .code(codeTransformer.transform(from.getCode()))
+        .components(from.getComponent()
+            .stream()
+            .map(ObservationComponentComponent::getCode)
+            .map(codeTransformer::transform)
+            .collect(Collectors.toUnmodifiableList()))
+        .build();
   }
 }

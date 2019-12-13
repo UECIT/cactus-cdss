@@ -1,0 +1,19 @@
+{
+    "id": "vaginalDischarge.herpes",
+    "items": [
+      {
+        "id": "q",
+        "text": "Has the patient had a previous diagnosis of Herpes?",
+        "type": "CHOICE",
+        "required": true,
+        "options": [
+          {
+            "stringValue": "Yes"
+          },
+          {
+            "stringValue": "No"
+          }
+        ]
+      }
+    ]
+  }

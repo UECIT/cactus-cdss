@@ -87,6 +87,8 @@ public class ReferralRequest {
    */
   private String description;
 
+  private String secondaryReason;
+
   /**
    * This SHOULD be populated by the CDSS. Secondary concerns SHOULD be be carried in this element.
    */

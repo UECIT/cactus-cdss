@@ -11,10 +11,10 @@ public class ConditionalNextQuestionTest extends BaseDroolsCDSEngineTest {
     answerQuestion("causedByInjury", "q", "No");
     answerQuestion("painsNow", "q", "Yes");
     answerQuestion("heartAttackInPast", "q", "No");
-    answerQuestion("symptoms", "q", "No");
-    answerQuestion("conditions", "q", "No");
+    answerQuestion("symptoms", "q", "none");
+    answerQuestion("conditions", "q", "none");
     answerQuestion("breathlessness", "q", "Yes");
-    answerQuestion("breathingCondition", "q", "No");
+    dontAnswerQuestion("breathingCondition");
     answerQuestion("painComesAndGoes", "q", "No");
     answerQuestion("coughingBlood", "q", "No");
 
@@ -29,8 +29,8 @@ public class ConditionalNextQuestionTest extends BaseDroolsCDSEngineTest {
     answerQuestion("causedByInjury", "q", "No");
     answerQuestion("painsNow", "q", "Yes");
     answerQuestion("heartAttackInPast", "q", "No");
-    answerQuestion("symptoms", "q", "No");
-    answerQuestion("conditions", "q", "No");
+    answerQuestion("symptoms", "q", "none");
+    answerQuestion("conditions", "q", "none");
     answerQuestion("breathlessness", "q", "No");
     answerQuestion("painComesAndGoes", "q", "Yes");
     answerQuestion("coughingBlood", "q", "No");

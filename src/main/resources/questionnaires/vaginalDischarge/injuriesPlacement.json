@@ -1,0 +1,17 @@
+{
+    "id": "vaginalDischarge.injuriesPlacement",
+    "items": [
+      {
+        "id": "q",
+        "text": "Can you tell me where the injuries are?",
+        "type": "CHOICE",
+        "required": true,
+        "options": [
+          {
+            "stringValue": "Clinician would annotate on chart any injuries",
+            "code": "Yes"
+          }
+        ]
+      }
+    ]
+  }

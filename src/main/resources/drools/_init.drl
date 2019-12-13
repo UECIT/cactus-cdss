@@ -1,0 +1,24 @@
+package uk.nhs.cdss.rules
+
+import java.util.List;
+
+import uk.nhs.cdss.constants.SnomedConstants
+
+import uk.nhs.cdss.domain.Assertion
+
+import uk.nhs.cdss.engine.CodeDirectory
+
+global CodeDirectory codeDirectory;
+
+rule "Init common"
+    salience 10001
+when
+then
+    insert( new AnswerAssertion("common.gender", "q", "Male", codeDirectory.get(SnomedConstants.GENDER), "male"));
+    insert( new AnswerAssertion("common.gender", "q", "Female", codeDirectory.get(SnomedConstants.GENDER), "female"));
+    insert( new AnswerAssertion("common.gender", "q", "Other", codeDirectory.get(SnomedConstants.GENDER), "other"));
+
+    // Is there any possibility of pregnancy?
+    insert( new AnswerAssertion("common.pregnant", "q", "Yes", codeDirectory.get("pregnant"), true));
+
+end

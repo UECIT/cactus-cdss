@@ -35,13 +35,15 @@ public class ScenarioTest {
     response.getAnswers().add(symptomsDurationAnswer);
 
     // Assertions
-    Assertion hasFlu = new Assertion("flu", Status.AMENDED);
     var coding = new Coding(
         "1651", "test.system.com",
         "flu");
-    hasFlu.setCode(new CodeableConcept("flu", coding));
-    hasFlu.setValue(true);
-    hasFlu.getRelated().add(response);
+    var hasFlu = Assertion.builder()
+        .id("flu")
+        .status(Status.AMENDED)
+        .code(new CodeableConcept("flu", coding))
+        .value(true)
+        .oneRelated(response);
 
     // Results
     // Result with a referral request

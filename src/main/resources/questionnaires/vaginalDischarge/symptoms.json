@@ -1,0 +1,38 @@
+{
+  "id": "vaginalDischarge.symptoms",
+  "items": [
+    {
+      "id": "q",
+      "text": "Can the patient describe what they are experiencing?",
+      "type": "CHOICE",
+      "required": true,
+      "options": [
+        {
+          "stringValue": "Burning",
+          "code": "burningOrStinging"
+        },
+        {
+          "stringValue": "Stinging",
+          "code": "burningOrStinging"
+        },
+        {
+          "stringValue": "Dribbling incontinence",
+          "code": "burningOrStinging"
+        },
+        {
+          "stringValue": "Unable to pass urine",
+          "code": "urineUnable"
+        },
+        {
+          "stringValue": "Pain when voiding",
+          "code": "urineUnable"
+        },
+        {
+          "stringValue": "None of the above",
+          "code": "none",
+          "exclusive": true
+        }
+      ]
+    }
+  ]
+}

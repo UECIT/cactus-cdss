@@ -5,6 +5,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import org.drools.core.impl.InternalKnowledgeBase;
 import org.drools.core.impl.KnowledgeBaseFactory;
@@ -44,7 +45,8 @@ public class CDSKnowledgeBaseFactory {
 
       Arrays.stream(resources)
           .map(Resource::getFilename)
-          .filter(file -> !"_common.drl".equals(file))
+          .filter(Objects::nonNull)
+          .filter(file -> !file.startsWith("_"))
           .forEach(file -> {
             log.info("Loading Drools definitions for " + file);
             try {
@@ -69,22 +71,24 @@ public class CDSKnowledgeBaseFactory {
     }
   }
 
+  private void addFile(KnowledgeBuilder builder, String name) {
+    builder.add(
+        ResourceFactory.newClassPathResource("drools/" + name + ".drl"),
+        ResourceType.DRL);
+  }
+
   private InternalKnowledgeBase loadKnowledgeBase(String serviceDefinitionId) {
-    InternalKnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
+    var builder = KnowledgeBuilderFactory.newKnowledgeBuilder();
+    addFile(builder, "_common");
+    addFile(builder, "_init");
+    addFile(builder, serviceDefinitionId);
 
-    KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
-    kbuilder.add(
-        ResourceFactory.newClassPathResource("drools/_common.drl"),
-        ResourceType.DRL);
-    kbuilder.add(
-        ResourceFactory.newClassPathResource("drools/" + serviceDefinitionId + ".drl"),
-        ResourceType.DRL);
-
-    if (kbuilder.hasErrors()) {
-      System.err.println(kbuilder.getErrors().toString());
+    if (builder.hasErrors()) {
+      log.error(builder.getErrors().toString());
     }
 
-    kbase.addPackages(kbuilder.getKnowledgePackages());
-    return kbase;
+    var knowledgeBase = KnowledgeBaseFactory.newKnowledgeBase();
+    knowledgeBase.addPackages(builder.getKnowledgePackages());
+    return knowledgeBase;
   }
 }

@@ -12,8 +12,8 @@ public class NoAnswersTest extends BaseDroolsCDSEngineTest {
     answerQuestion("causedByInjury", "q", "No");
     answerQuestion("painsNow", "q", "Yes");
     answerQuestion("heartAttackInPast", "q", "No");
-    answerQuestion("symptoms", "q", "No");
-    answerQuestion("conditions", "q", "No");
+    answerQuestion("symptoms", "q", "none");
+    answerQuestion("conditions", "q", "none");
     answerQuestion("breathlessness", "q", "Yes");
     dontAnswerQuestion("breathingCondition");
     answerQuestion("painComesAndGoes", "q", "No");

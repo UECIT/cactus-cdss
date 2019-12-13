@@ -3,7 +3,7 @@
   "items": [
     {
       "id": "q",
-      "text": "What best describes your presenting complaint",
+      "text": "What best describes your presenting complaint?",
       "type": "CHOICE",
       "required": true,
       "options": [
@@ -13,11 +13,11 @@
         },
         {
           "stringValue": "Palpitations",
-          "code": "extendedPalpitations"
+          "code": "palpitations"
         },
         {
-          "stringValue": "Simple palpitations",
-          "code": "simplePalpitations"
+          "stringValue": "Female genitoUrinary problems",
+          "code": "genitoUrinaryProblems"
         }
       ]
     }

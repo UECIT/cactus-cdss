@@ -30,6 +30,7 @@ import uk.nhs.cdss.transform.bundle.ReferralRequestBundle;
 public class ReferralRequestTransformer implements
     Transformer<ReferralRequestBundle, ReferralRequest> {
 
+  private static final Duration routineAppointmentOccurrence = Duration.parse("P7D");
   private final CodeableConceptOutTransformer codeableConceptOutTransformer;
   private final CodeDirectory codeDirectory;
 
@@ -99,14 +100,18 @@ public class ReferralRequestTransformer implements
   }
 
   private Type transformOccurrence(String occurrence) {
-    if (!Strings.isNullOrEmpty(occurrence)) {
-      Duration duration = Duration.parse(occurrence);
-      Instant now = Instant.now();
-      return new Period()
-          .setStart(Date.from(now))
-          .setEnd(Date.from(now.plus(duration)));
+    if (Strings.isNullOrEmpty(occurrence)) {
+      return null;
     }
-    return null;
+
+    var duration = "routine".equalsIgnoreCase(occurrence)
+        ? routineAppointmentOccurrence
+        : Duration.parse(occurrence);
+
+    var now = Instant.now();
+    return new Period()
+        .setStart(Date.from(now))
+        .setEnd(Date.from(now.plus(duration)));
   }
 
   private List<Reference> transformReason(String reason) {

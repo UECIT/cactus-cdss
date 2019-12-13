@@ -120,9 +120,9 @@ function Outcome immunity(String id, String occurrence) {
                 .build());     
 }
 
-function CarePlan waitForAmbulence() {
+function CarePlan waitForAmbulance() {
     return CarePlan.builder()
-            .id("waitForAmbulence")
+            .id("waitForAmbulance")
             .title("Wait for an ambulance")
             .text("Care advice")
             .activity(new CarePlanActivity("selfCare", "Try to get someone to sit with you until the ambulance arrives"))
@@ -202,7 +202,7 @@ then
                 .note("A note")
                 .build(),
             applyPressureSitUpright(),
-            waitForAmbulence())
+            waitForAmbulance())
             .interim());    
     insert( new OutcomeAnswerCondition("bleedingIR", "chestPains.bleeding", "q", Arrays.asList("Yes") ));
 
@@ -384,7 +384,6 @@ then
     // Cough for more than three weeks?
     insert( new NextQuestion("chestPains.threeWeeksCough", "chestPains.newCough", "q", Arrays.asList("Yes")));
     insert( new AnswerAssertion("chestPains.threeWeeksCough", "q", "Yes", codeDirectory.get("threeWeeksCough"), true));
-    insert( new AnswerAssertion("chestPains.threeWeeksCough", "q", "No", codeDirectory.get("threeWeeksCough"), false));
     insert( Outcome.of("threeWeeksCough", ReferralRequest.builder()
                 .id("gp-malignancy")
                 .description("Contact GP Practice Today")
@@ -526,7 +525,7 @@ then
     insert( new ConditionalNextQuestion("highTempUnwellNotBreathlessFromCoughingBlood", "chestPains.highTempUnwell", "chestPains.coughingBlood", "q", Arrays.asList("No")));
     insert( new NextQuestionCondition("highTempUnwellNotBreathlessFromCoughingBlood", "chestPains.breathlessness", "q", Arrays.asList("No")));
     insert( new ConditionalNextQuestion("highTempUnwellNotBreathlessFromPainComesAndGoes", "chestPains.highTempUnwell", "chestPains.painComesAndGoes", "q", Arrays.asList("No")));
-    insert( new NextQuestionCondition("highTempUnwellNotBreathlessFromPainComesAndGoes", "chestPains.breathlessness", "q", Arrays.asList("No")));  
+    insert( new NextQuestionCondition("highTempUnwellNotBreathlessFromPainComesAndGoes", "chestPains.breathlessness", "q", Arrays.asList("No")));
     insert( new AnswerAssertion("chestPains.highTempUnwell", "q", "highTemp", codeDirectory.get("highTempUnwell"), true));
     insert( new AnswerAssertion("chestPains.highTempUnwell", "q", "unwell", codeDirectory.get("highTempUnwell"), true));
     insert( hcp("notHighTempUnwell", "PT48h", "Appointment at GP practice within next 3 working days"));

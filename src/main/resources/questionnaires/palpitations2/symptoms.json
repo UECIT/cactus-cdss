@@ -2,51 +2,32 @@
   "id": "palpitations2.symptoms",
   "items": [
     {
-      "id": "group",
+      "id": "q",
       "text": "Have you had any of the following symptoms in the last 24 hours?",
-      "type": "GROUP",
-      "items": [
+      "type": "CHOICE",
+      "required": true,
+      "repeats": true,
+      "options": [
         {
-          "id": "q1",
-          "text": "Crushing or intense aching pain in the chest, upper back or upper abdominal area",
-          "type": "CHOICE",
-          "options": [
-            "Yes"
-          ]
+          "stringValue": "Crushing or intense aching pain in the chest, upper back or upper abdominal area",
+          "code": "chestPains"
         },
         {
-          "id": "q2",
-          "text": "Aching pain radiating from chest that goes to arm, neck or jaw",
-          "type": "CHOICE",
-          "options": [
-            "Yes"
-          ]
+          "stringValue": "Aching pain radiating from chest that goes to arm, neck or jaw",
+          "code": "neckPain"
         },
         {
-          "id": "q3",
-          "text": "Significant breathlessnes",
-          "type": "CHOICE",
-          "options": [
-            "Yes"
-          ]
+          "stringValue": "Significant breathlessness",
+          "code": "breathingProblems"
         },
         {
-          "id": "q4",
-          "text": "Syncope or near syncope",
-          "type": "CHOICE",
-          "options": [
-            "Yes",
-            "Unsure"
-          ]
+          "stringValue": "Syncope or near syncope",
+          "code": "syncope"
         },
         {
-          "id": "q5",
-          "text": "None of the above",
-          "type": "CHOICE",
-          "options": [
-            "Yes",
-            "Unsure"
-          ]
+          "stringValue": "None of the above",
+          "code": "none",
+          "exclusive": true
         }
       ]
     }

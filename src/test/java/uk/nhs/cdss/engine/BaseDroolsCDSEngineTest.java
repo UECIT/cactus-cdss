@@ -2,19 +2,25 @@ package uk.nhs.cdss.engine;
 
 import org.junit.Before;
 import uk.nhs.cdss.config.DroolsConfig;
+import uk.nhs.cdss.constants.SnomedConstants;
+import uk.nhs.cdss.constants.SystemURL;
 import uk.nhs.cdss.domain.Answer;
+import uk.nhs.cdss.domain.Assertion;
+import uk.nhs.cdss.domain.Assertion.Status;
+import uk.nhs.cdss.domain.CodeableConcept;
+import uk.nhs.cdss.domain.Coding;
 import uk.nhs.cdss.domain.QuestionnaireResponse;
 
 public abstract class BaseDroolsCDSEngineTest {
 
-  protected static final String REQUEST_1 = "request1";
-  protected static final String ENCOUNTER_1 = "encounter1";
-  protected static final String SUPPLIER_1 = "supplier1";
+  private static final String REQUEST_1 = "request1";
+  private static final String ENCOUNTER_1 = "encounter1";
+  private static final String SUPPLIER_1 = "supplier1";
 
-  protected DroolsCDSEngine engine;
+  private DroolsCDSEngine engine;
   protected CDSOutput output;
 
-  protected CDSInput input = CDSInput.builder()
+  private CDSInput input = CDSInput.builder()
       .serviceDefinitionId(getServiceDefinition())
       .requestId(REQUEST_1)
       .encounterId(ENCOUNTER_1)
@@ -26,6 +32,13 @@ public abstract class BaseDroolsCDSEngineTest {
     DroolsConfig droolsConfig = new DroolsConfig();
     engine = new DroolsCDSEngine(new CDSKnowledgeBaseFactory(false), droolsConfig.codeDirectory());
   }
+
+  protected void answerCommonQuestion(String questionnaire, String question, Object answerValue) {
+  String qid = "common." + questionnaire;
+  QuestionnaireResponse response = new QuestionnaireResponse("response", qid);
+  Answer answer = new Answer(qid, question, answerValue);
+  addToInput(response, answer);
+}
 
   protected void answerQuestion(String questionnaire, String question, Object answerValue) {
     String qid = getServiceDefinition() + "." + questionnaire;
@@ -46,6 +59,31 @@ public abstract class BaseDroolsCDSEngineTest {
       response.getAnswers().add(answer);
     }
     input.getResponses().add(response);
+  }
+
+  protected void addGenderAssertion(String gender) {
+    var code = new CodeableConcept(
+        SnomedConstants.GENDER,
+        new Coding(SystemURL.CS_SNOMED, SnomedConstants.GENDER));
+    var genderAssertion = Assertion.builder()
+        .status(Status.FINAL)
+        .code(code)
+        .value(gender)
+        .build();
+    input.getAssertions().add(genderAssertion);
+  }
+
+  protected void addAgeAssertion(String dateOfBirth) {
+    var code = new CodeableConcept(
+        SnomedConstants.AGE,
+        new Coding(SystemURL.CS_SNOMED, SnomedConstants.AGE));
+    var ageAssertion = Assertion.builder()
+        .status(Assertion.Status.FINAL)
+        .code(code)
+        .value(dateOfBirth)
+        .build();
+
+    input.getAssertions().add(ageAssertion);
   }
 
   protected abstract String getServiceDefinition();

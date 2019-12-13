@@ -1,0 +1,19 @@
+{
+    "id": "vaginalDischarge.assault",
+    "items": [
+      {
+        "id": "q",
+        "text": "Have you been sexually assaulted?",
+        "type": "CHOICE",
+        "required": true,
+        "options": [
+          {
+            "stringValue": "Yes"
+          },
+          {
+            "stringValue": "No"
+          }
+        ]
+      }
+    ]
+  }

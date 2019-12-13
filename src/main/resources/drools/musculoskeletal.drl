@@ -6,7 +6,6 @@ import uk.nhs.cdss.rules.InitialQuestionnaire
 import uk.nhs.cdss.rules.AnswerAssertion
 import uk.nhs.cdss.rules.OutcomeAnswerCondition
 
-import uk.nhs.cdss.domain.Questionnaire
 import uk.nhs.cdss.domain.Outcome
 import uk.nhs.cdss.domain.ReferralRequest
 
@@ -15,9 +14,7 @@ import uk.nhs.cdss.engine.CodeDirectory
 global CodeDirectory codeDirectory;
 
 rule "Init"
-salience 10000
 when
-    eval( true )
 then
     insert( new InitialQuestionnaire("musculoskeletal.musculoskeletal") );
     insert( new AnswerAssertion("musculoskeletal.musculoskeletal", "q", "Yes", codeDirectory.get("musculoskeletal"), true));

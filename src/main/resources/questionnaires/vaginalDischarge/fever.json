@@ -1,0 +1,19 @@
+{
+    "id": "vaginalDischarge.fever",
+    "items": [
+      {
+        "id": "q",
+        "text": "Has the patient had any fever and feeling shivery?",
+        "type": "CHOICE",
+        "required": true,
+        "options": [
+          {
+            "stringValue": "Yes"
+          },
+          {
+            "stringValue": "No"
+          }
+        ]
+      }
+    ]
+  }
