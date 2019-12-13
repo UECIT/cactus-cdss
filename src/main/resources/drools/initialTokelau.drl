@@ -23,21 +23,24 @@ function Outcome singleCodeRedirection(String id, String code) {
 
 rule "Init"
 when
-    eval( true )
 then
     insert( new InitialQuestionnaire("initial.initial") );
 
     insert( new AnswerAssertion("initial.initial", "q", "chestPain", codeDirectory.get("chestPain"), true));
-    insert( new AnswerAssertion("initial.initial", "q", "extendedPalpitations", codeDirectory.get("extendedPalpitations"), true));
-    insert( new AnswerAssertion("initial.initial", "q", "simplePalpitations", codeDirectory.get("simplePalpitations"), true));
+    insert( new AnswerAssertion("initial.initial", "q", "palpitations", codeDirectory.get("palpitations"), true));
+    insert( new AnswerAssertion("initial.initial", "q", "genitoUrinaryProblems", codeDirectory.get("genitoUrinaryProblems"), true));
 
-    insert( singleCodeRedirection("chestPains", "chestPain"));
-    insert( new OutcomeAnswerCondition("chestPains", "initial.initial", "q", Arrays.asList("chestPain") ));
+    insert( singleCodeRedirection("chestPain", "chestPain"));
+    insert( new OutcomeAnswerCondition("chestPain", "initial.initial", "q", Arrays.asList("chestPain") ));
 
-    insert( singleCodeRedirection("extendedPalpitations", "extendedPalpitations"));
-    insert( new OutcomeAnswerCondition("extendedPalpitations", "initial.initial", "q", Arrays.asList("extendedPalpitations") ));
+    insert( singleCodeRedirection("palpitations", "palpitations"));
+    insert( new OutcomeAnswerCondition("palpitations", "initial.initial", "q", Arrays.asList("palpitations") ));
 
-    insert( singleCodeRedirection("simplePalpitations", "simplePalpitations"));
-    insert( new OutcomeAnswerCondition("simplePalpitations", "initial.initial", "q", Arrays.asList("simplePalpitations") ));
+    insert( Outcome.of("genitoUrinaryProblems", Redirection.builder()
+            .id("genitoUrinaryProblems")
+            .code("genitoUrinaryProblems")
+            .code("isFemale")
+            .build()) );
+    insert( new OutcomeAnswerCondition("genitoUrinaryProblems", "initial.initial", "q", Arrays.asList("genitoUrinaryProblems") ));
 
 end

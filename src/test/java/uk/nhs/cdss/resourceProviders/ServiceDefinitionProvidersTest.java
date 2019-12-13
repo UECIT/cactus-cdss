@@ -160,10 +160,10 @@ public class ServiceDefinitionProvidersTest {
         new Object[] { null, null, null, token("GB"), null, null, null, trigger("chestPain"), "chestPains" },
         new Object[] { null, null, date("2020-12-20"), null, null, null, null, trigger("musculoskeletal"), "musculoskeletal" },
         new Object[] { token("ACTIVE"), token("false"), null, null, null, null, null, null, "initial" },
-        new Object[] { token("ACTIVE"), token("false"), null, null, null, null, null, trigger("simplePalpitations"), "palpitations" },
-        new Object[] { token("ACTIVE"), token("false"), date("lt2040-12-20"), null, null, null, null, trigger("simplePalpitations"), "palpitations" },
-        new Object[] { null, token("false"), date("ge2040-12-20"), null, null, null, null, trigger("extendedPalpitations"), "palpitations2" },
-        new Object[] { null, token("false"), null, null, null, null, null, trigger("extendedPalpitations"), "palpitations2" }
+        new Object[] { token("ACTIVE"), token("false"), null, null, null, null, null, trigger("palpitations", "debug"), "palpitations" },
+        new Object[] { token("ACTIVE"), token("false"), date("lt2040-12-20"), null, null, null, null, trigger("palpitations", "debug"), "palpitations" },
+        new Object[] { null, token("false"), date("ge2040-12-20"), null, null, null, null, trigger("palpitations"), "palpitations2" },
+        new Object[] { null, token("false"), null, null, null, null, null, trigger("palpitations"), "palpitations2" }
     };
   }
 

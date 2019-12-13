@@ -1,9 +1,9 @@
 package uk.nhs.cdss.engine;
 
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 import org.drools.core.impl.InternalKnowledgeBase;
 import org.kie.api.runtime.KieSession;
-import org.kie.api.runtime.rule.QueryResults;
-import org.kie.api.runtime.rule.QueryResultsRow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -15,14 +15,9 @@ import uk.nhs.cdss.domain.QuestionnaireResponse;
 @Component
 public class DroolsCDSEngine implements CDSEngine {
 
-  private static final String ASSERTIONS_QUERY = "assertions";
-  private static final String ASSERTION_ID = "assertion";
-
-  private static final String QUESTIONNAIRES_QUERY = "questionnaires";
-  private static final String QUESTIONNAIRE_ID = "questionnaire";
-
-  private static final String OUTCOMES_QUERY = "outcomes";
-  private static final String OUTCOME_ID = "outcome";
+  private static final DroolsQuery<Assertion> ASSERTIONS = DroolsQuery.forType(Assertion.class);
+  private static final DroolsQuery<Questionnaire> QUESTIONNAIRES = DroolsQuery.forType(Questionnaire.class);
+  private static final DroolsQuery<Outcome> OUTCOMES = DroolsQuery.forType(Outcome.class);
 
   private final Logger log = LoggerFactory.getLogger(getClass());
 
@@ -33,6 +28,15 @@ public class DroolsCDSEngine implements CDSEngine {
       CodeDirectory codeDirectory) {
     this.knowledgeBaseFactory = knowledgeBaseFactory;
     this.codeDirectory = codeDirectory;
+  }
+
+  private <T> Stream<T> getQueryResults(KieSession session, DroolsQuery<T> query) {
+    var queryResults = session.getQueryResults(query.getName());
+    return StreamSupport.stream(queryResults.spliterator(), false)
+        .map(qr -> qr.get(query.getEntity()))
+        .peek(e -> log.info("{} {} added to output", query.getEntity(), e))
+        .filter(query.getType()::isInstance)
+        .map(query.getType()::cast);
   }
 
   @Override
@@ -77,30 +81,17 @@ public class DroolsCDSEngine implements CDSEngine {
       CDSOutput output = new CDSOutput();
 
       log.info("Output");
-      // Query resulting assertions and questionnaires
-      QueryResults assertions = ksession.getQueryResults(ASSERTIONS_QUERY);
-      for (QueryResultsRow resultsRow : assertions) {
-        Assertion assertion = (Assertion) resultsRow.get(ASSERTION_ID);
-        output.getAssertions().add(assertion);
-        log.info("Assertion {} added to output", assertion);
-      }
 
-      QueryResults questionnaires = ksession.getQueryResults(QUESTIONNAIRES_QUERY);
-      for (QueryResultsRow resultsRow : questionnaires) {
-        Questionnaire questionnaire = (Questionnaire) resultsRow.get(QUESTIONNAIRE_ID);
-        output.getQuestionnaireIds().add(questionnaire.getId());
-        log.info("Questionnaire {} added to output", questionnaire);
-      }
+      getQueryResults(ksession, ASSERTIONS)
+          .forEach(output.getAssertions()::add);
 
-      QueryResults outcomes = ksession.getQueryResults(OUTCOMES_QUERY);
-      if (outcomes.size() > 0) {
-        Outcome outcome = (Outcome) outcomes.iterator().next().get(OUTCOME_ID);
-        output.setOutcome(outcome);
-        log.info("Outcome {} added to output", outcome);
-        if (outcomes.size() > 1) {
-          log.warn("Multiple outcomes found in output");
-        }
-      }
+      getQueryResults(ksession, QUESTIONNAIRES)
+          .map(Questionnaire::getId)
+          .forEach(output.getQuestionnaireIds()::add);
+
+      getQueryResults(ksession, OUTCOMES)
+          .findFirst()
+          .ifPresent(output::setOutcome);
 
       return output;
     } finally {

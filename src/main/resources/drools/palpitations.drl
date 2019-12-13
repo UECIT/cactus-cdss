@@ -33,7 +33,7 @@ then
     insert( call999("chestPains").interim() );
     insert( new OutcomeAnswerCondition("chestPains", "palpitations.chestPain", "q1", Arrays.asList("Yes") ));
 
-    insert( new NextQuestion("palpitations.neckPain", "palpitations.chestPain", "q1") );
+    insert( new NextQuestion("palpitations.neckPain", "palpitations.chestPain") );
 
     // Neck pains
     insert( new AnswerAssertion("palpitations.neckPain", "q2", "Yes", codeDirectory.get("neckPain"), true));
@@ -41,7 +41,7 @@ then
     insert( call999("neckPains"));
     insert( new OutcomeAnswerCondition("neckPains", "palpitations.neckPain", "q2", Arrays.asList("Yes") ));
 
-    insert( new NextQuestion("palpitations.breathing", "palpitations.neckPain", "q2") );
+    insert( new NextQuestion("palpitations.breathing", "palpitations.neckPain") );
 
     // Breathing
     insert( new AnswerAssertion("palpitations.breathing", "q3", "Yes", codeDirectory.get("breathingProblems"), true));
@@ -49,7 +49,7 @@ then
     insert( call999("breathing"));
     insert( new OutcomeAnswerCondition("breathing", "palpitations.breathing", "q3", Arrays.asList("Yes") ));
 
-    insert( new NextQuestion("palpitations.heartProblems", "palpitations.breathing", "q3") );
+    insert( new NextQuestion("palpitations.heartProblems", "palpitations.breathing") );
 
     // Heart problems
     insert( new AnswerAssertion("palpitations.heartProblems", "q4", "Yes", codeDirectory.get("heartProblems"), true));
@@ -88,7 +88,7 @@ function Outcome call999(String id) {
             .activity(new CarePlanActivity("selfCare", "While waiting for an ambulance, it may help to chew and then swallow a tablet of aspirin (ideally 300mg), as long as the person having a heart attack is not allergic to aspirin."))
             .build(),
         CarePlan.builder()
-            .id("waitForAmbulence")
+            .id("waitForAmbulance")
             .title("Wait for an ambulance")
             .text("Care advice")
             .activity(new CarePlanActivity("selfCare", "Try to get someone to sit with you until the ambulance arrives"))

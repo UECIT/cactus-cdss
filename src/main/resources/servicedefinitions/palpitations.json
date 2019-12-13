@@ -14,7 +14,8 @@
     "GB"
   ],
   "triggers": [
-    "simplePalpitations"
+    "palpitations",
+    "debug"
   ],
   "dataRequirements": [
     { "type":  "Patient" },

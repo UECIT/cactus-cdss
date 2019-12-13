@@ -1,16 +1,13 @@
 package uk.nhs.cdss.rules.palpitations2
 
 import java.util.Arrays
-import java.time.LocalDate;
-import java.time.Period;
-import java.time.format.DateTimeFormatter;
 
 import uk.nhs.cdss.rules.InitialQuestionnaire
 import uk.nhs.cdss.rules.NextQuestion
-import uk.nhs.cdss.rules.HighPriorityNextQuestion
+import uk.nhs.cdss.rules.ConditionalNextQuestion
+import uk.nhs.cdss.rules.NextQuestionCondition
 import uk.nhs.cdss.rules.AnswerAssertion
 import uk.nhs.cdss.rules.Answered
-import uk.nhs.cdss.rules.Checkpoint
 import uk.nhs.cdss.rules.OutcomeAnswerCondition
 
 import uk.nhs.cdss.domain.Answer
@@ -28,6 +25,7 @@ import uk.nhs.cdss.domain.ReferralRequest
 import uk.nhs.cdss.domain.Redirection
 
 import uk.nhs.cdss.engine.CodeDirectory
+import uk.nhs.cdss.engine.Constraints
 
 global CodeDirectory codeDirectory;
 
@@ -132,9 +130,9 @@ function CarePlan defaultCarePlan() {
         .build();
 }
 
-function CarePlan waitForAmbulence() {
+function CarePlan waitForAmbulance() {
     return CarePlan.builder()
-            .id("waitForAmbulence")
+            .id("waitForAmbulance")
             .title("Wait for an ambulance")
             .text("Care advice")
             .activity(new CarePlanActivity("selfCare", "Try to get someone to sit with you until the ambulance arrives"))
@@ -172,44 +170,56 @@ then
     // Have you got an ICD (implanted cardiovascular defibrillator)?
     insert( new NextQuestion("palpitations2.hasICD", "palpitations2.hasPalpitations", "q", Arrays.asList("Yes")) );
     insert( new AnswerAssertion("palpitations2.hasICD", "q", "Yes", codeDirectory.get("hasICD"), true));
-    insert( heartAttack("hasICD", new CarePlan[]{waitForAmbulence(), aspirin()}) );
+    insert( heartAttack("hasICD", new CarePlan[]{waitForAmbulance(), aspirin()}) );
     insert( new OutcomeAnswerCondition("hasICD", "palpitations2.hasICD", "q", Arrays.asList("Yes") ));
 
     // Have you had any of the following symptoms in the last 24 hours?
     insert( new NextQuestion("palpitations2.symptoms", "palpitations2.hasICD", "q", Arrays.asList("No", "Unsure")) );
-    insert( new AnswerAssertion("palpitations2.symptoms", "q1", "Yes", codeDirectory.get("chestPain"), true));
-    insert( heartAttack("chestPains", new CarePlan[]{waitForAmbulence()}) );
-    insert( new OutcomeAnswerCondition("chestPains", "palpitations2.symptoms", "q1", Arrays.asList("Yes") ));
-    insert( new AnswerAssertion("palpitations2.symptoms", "q2", "Yes", codeDirectory.get("neckPain"), true));
-    insert( heartAttack("neckPain", new CarePlan[]{waitForAmbulence()}) );
-    insert( new OutcomeAnswerCondition("neckPain", "palpitations2.symptoms", "q2", Arrays.asList("Yes") ));
-    insert( new AnswerAssertion("palpitations2.symptoms", "q3", "Yes", codeDirectory.get("breathingProblems"), true));
-    insert( heartAttack("breathingProblems", new CarePlan[]{waitForAmbulence()}) );
-    insert( new OutcomeAnswerCondition("breathingProblems", "palpitations2.symptoms", "q3", Arrays.asList("Yes") ));
-    insert( new AnswerAssertion("palpitations2.symptoms", "q4", "Yes", codeDirectory.get("syncope"), true));
-    insert( new AnswerAssertion("palpitations2.symptoms", "q4", "Unsure", codeDirectory.get("syncope"), true));
-    insert( heartAttack("syncope", new CarePlan[]{waitForAmbulence()}) );
-    insert( new OutcomeAnswerCondition("syncope", "palpitations2.symptoms", "q4", Arrays.asList("Yes", "Unsure") ));
-    insert( new OutcomeAnswerCondition("syncope", "palpitations2.hasPalpitations", "q", Arrays.asList("Yes") ));
-    insert( new AnswerAssertion("palpitations2.symptoms", "q5", "Yes", codeDirectory.get("noSymptoms"), true));
-    insert( new AnswerAssertion("palpitations2.symptoms", "q5", "Unsure", codeDirectory.get("unsureSymptoms"), true));
+    insert( new AnswerAssertion("palpitations2.symptoms", "q", "chestPains", codeDirectory.get("chestPain"), true));
+    insert( new AnswerAssertion("palpitations2.symptoms", "q", "neckPain", codeDirectory.get("neckPain"), true));
+    insert( new AnswerAssertion("palpitations2.symptoms", "q", "breathingProblems", codeDirectory.get("breathingProblems"), true));
+    insert( new AnswerAssertion("palpitations2.symptoms", "q", "syncope", codeDirectory.get("syncope"), true));
+    insert( new AnswerAssertion("palpitations2.symptoms", "q", "none", codeDirectory.get("noSymptoms"), true));
+    insert( heartAttack("symptoms", new CarePlan[]{waitForAmbulance()}) );
+    insert( new OutcomeAnswerCondition("symptoms", "palpitations2.symptoms", "q", Arrays.asList("chestPains", "neckPain", "breathingProblems", "syncope") ));
 
-    // Age and gender assertions
-    insert( new AnswerAssertion("palpitations2.age", "q", null, codeDirectory.get(SnomedConstants.AGE)));
-    insert( new AnswerAssertion("palpitations2.gender", "q", "Male", codeDirectory.get(SnomedConstants.GENDER), "male"));
-    insert( new AnswerAssertion("palpitations2.gender", "q", "Female", codeDirectory.get(SnomedConstants.GENDER), "female"));
-    insert( new AnswerAssertion("palpitations2.gender", "q", "Other", codeDirectory.get(SnomedConstants.GENDER), "other"));
-    //TODO: remove when EMS supports string assertions
-    insert( new AnswerAssertion("palpitations2.gender", "q", "Female", codeDirectory.get("isFemale"), true));
+    insert( new NextQuestion("palpitations2.ageRange", "palpitations2.symptoms", "q", Arrays.asList("none")));
+    insert( new AnswerAssertion("palpitations2.ageRange", "q", "<12", codeDirectory.get("under12"), true));
+    insert( new AnswerAssertion("palpitations2.ageRange", "q", "12-45", codeDirectory.get("between12and45"), true));
+    insert( new AnswerAssertion("palpitations2.ageRange", "q", "45-50", codeDirectory.get("between45and50"), true));
+    insert( new AnswerAssertion("palpitations2.ageRange", "q", ">50", codeDirectory.get("over50"), true));
 
-    // Is there any possibility of pregnancy?
-    insert( new AnswerAssertion("palpitations2.pregnancy", "q", "Yes", codeDirectory.get("pregnant"), true));
+    insert( new NextQuestion("common.gender", "palpitations2.ageRange"));
+
+    insert( new ConditionalNextQuestion("genderToPregnant", "common.pregnant", "common.gender", "q", Arrays.asList("Female")) );
+    insert( new NextQuestionCondition("genderToPregnant", "palpitations2.ageRange", "q", Arrays.asList("12-45", "45-50")) );
+
+    insert( new ConditionalNextQuestion("genderToFamilyHistoryUnder12", "palpitations2.familyHistory", "common.gender") );
+    insert( new NextQuestionCondition("genderToFamilyHistoryUnder12", "palpitations2.ageRange", "q", Arrays.asList("<12")) );
+    insert( new ConditionalNextQuestion("genderToFamilyHistoryOver12", "palpitations2.familyHistory", "common.gender") );
+    insert( new NextQuestionCondition("genderToFamilyHistoryOver12", "palpitations2.ageRange", "q", Arrays.asList("12-45")) );
+    insert( new NextQuestionCondition("genderToFamilyHistoryOver12", "common.gender", "q", Arrays.asList("Male")) );
+
+    insert( new ConditionalNextQuestion("genderToPersonalHistoryOver50", "palpitations2.personalHistory", "common.gender") );
+    insert( new NextQuestionCondition("genderToPersonalHistoryOver50", "palpitations2.ageRange", "q", Arrays.asList(">50")) );
+    insert( new NextQuestionCondition("genderToPersonalHistoryOver50", "palpitations2.hasPalpitations", "q", Arrays.asList("Yes") ));
+    insert( new ConditionalNextQuestion("genderToPersonalHistoryOver12", "palpitations2.personalHistory", "common.gender") );
+    insert( new NextQuestionCondition("genderToPersonalHistoryOver12", "palpitations2.ageRange", "q", Arrays.asList("45-50")) );
+    insert( new NextQuestionCondition("genderToPersonalHistoryOver12", "common.gender", "q", Arrays.asList("Male")) );
+    insert( new NextQuestionCondition("genderToPersonalHistoryOver12", "palpitations2.hasPalpitations", "q", Arrays.asList("Yes") ));
+
     insert( hypertension("pregnancy-hasPalpitations", "Speak to Primary Care professional", "primaryCare"));
-    insert( new OutcomeAnswerCondition("pregnancy-hasPalpitations", "palpitations2.pregnancy", "q", Arrays.asList("Yes") ));
+    insert( new OutcomeAnswerCondition("pregnancy-hasPalpitations", "common.pregnant", "q", Arrays.asList("Yes") ));
     insert( new OutcomeAnswerCondition("pregnancy-hasPalpitations", "palpitations2.hasPalpitations", "q", Arrays.asList("Yes") ));
     insert( hypertension("pregnancy-noPalpitations", "Consult GP", "gp"));
-    insert( new OutcomeAnswerCondition("pregnancy-noPalpitations", "palpitations2.pregnancy", "q", Arrays.asList("Yes") ));
+    insert( new OutcomeAnswerCondition("pregnancy-noPalpitations", "common.pregnant", "q", Arrays.asList("Yes") ));
     insert( new OutcomeAnswerCondition("pregnancy-noPalpitations", "palpitations2.hasPalpitations", "q", Arrays.asList("No") ));
+
+    insert( new ConditionalNextQuestion("pregnancyToFamilyHistory", "palpitations2.familyHistory", "common.pregnant", "q", Arrays.asList("No", "Unsure")) );
+    insert( new NextQuestionCondition("pregnancyToFamilyHistory", "palpitations2.ageRange", "q", Arrays.asList("12-45")) );
+    insert( new ConditionalNextQuestion("pregnancyToPersonalHistory", "palpitations2.personalHistory", "common.pregnant", "q", Arrays.asList("No", "Unsure")) );
+    insert( new NextQuestionCondition("pregnancyToPersonalHistory", "palpitations2.ageRange", "q", Arrays.asList("45-50")) );
+    insert( new NextQuestionCondition("pregnancyToPersonalHistory", "palpitations2.hasPalpitations", "q", Arrays.asList("Yes") ));
 
     // Family history of sudden cardiac death under the age of 40 years
     insert( new AnswerAssertion("palpitations2.familyHistory", "q", "Yes", codeDirectory.get("familyHistorySCD"), true));
@@ -227,6 +237,9 @@ then
                 .build()));
     insert( new OutcomeAnswerCondition("noPalpitationsFamilyHistory", "palpitations2.familyHistory", "q", Arrays.asList("Yes") ));
     insert( new OutcomeAnswerCondition("noPalpitationsFamilyHistory", "palpitations2.hasPalpitations", "q", Arrays.asList("No") ));
+
+    insert( new ConditionalNextQuestion("familyHistoryToPersonalHistory", "palpitations2.personalHistory", "palpitations2.familyHistory", "q", Arrays.asList("No", "Unsure")) );
+    insert( new NextQuestionCondition("familyHistoryToPersonalHistory", "palpitations2.hasPalpitations", "q", Arrays.asList("Yes")) );
 
     // Have you had any cardiac problems in the past?
     insert( new AnswerAssertion("palpitations2.personalHistory", "q", "Yes", codeDirectory.get("personalHistory"), true));
@@ -323,7 +336,7 @@ then
                 .reason("arrhythmia")
                 .note("A note")
                 .build(),
-            waitForAmbulence()));
+            waitForAmbulance()));
     insert( new OutcomeAnswerCondition("syncope12hrs", "palpitations2.syncope", "q", Arrays.asList("Yes", "Unsure") ));
     insert( new OutcomeAnswerCondition("syncope12hrs", "palpitations2.lastExperienced", "q1", Arrays.asList("Yes") ));
     insert( new OutcomeAnswerCondition("syncope12hrs", "palpitations2.hasPalpitations", "q", Arrays.asList("No", "Unsure") ));
@@ -416,8 +429,24 @@ then
 
     // Do any of these apply to you?
     insert( new NextQuestion("palpitations2.causes", "palpitations2.mentalHealthConcern", "q", Arrays.asList("No")) );
-    insert( new NextQuestion("palpitations2.causes", "palpitations2.anxiety", "q", Arrays.asList("No")) );
-    
+
+    insert( new NextQuestion("palpitations2.ageRange", "palpitations2.anxiety", "q", Arrays.asList("No")));
+
+    insert( new ConditionalNextQuestion("genderToCausesOver50", "palpitations2.causes", "common.gender") );
+    insert( new NextQuestionCondition("genderToCausesOver50", "palpitations2.ageRange", "q", Arrays.asList(">50")) );
+    insert( new NextQuestionCondition("genderToCausesOver50", "palpitations2.hasPalpitations", "q", Arrays.asList("No", "Unsure") ));
+    insert( new ConditionalNextQuestion("genderToCausesOver12", "palpitations2.causes", "common.gender") );
+    insert( new NextQuestionCondition("genderToCausesOver12", "palpitations2.ageRange", "q", Arrays.asList("45-50")) );
+    insert( new NextQuestionCondition("genderToCausesOver12", "common.gender", "q", Arrays.asList("Male")) );
+    insert( new NextQuestionCondition("genderToCausesOver12", "palpitations2.hasPalpitations", "q", Arrays.asList("No", "Unsure") ));
+
+    insert( new ConditionalNextQuestion("pregnancyToCauses", "palpitations2.causes", "common.pregnant", "q", Arrays.asList("No", "Unsure")) );
+    insert( new NextQuestionCondition("pregnancyToCauses", "palpitations2.ageRange", "q", Arrays.asList("45-50")) );
+    insert( new NextQuestionCondition("pregnancyToCauses", "palpitations2.hasPalpitations", "q", Arrays.asList("No", "Unsure") ));
+
+    insert( new ConditionalNextQuestion("familyHistoryToCauses", "palpitations2.causes", "palpitations2.familyHistory", "q", Arrays.asList("No", "Unsure")) );
+    insert( new NextQuestionCondition("familyHistoryToCauses", "palpitations2.hasPalpitations", "q", Arrays.asList("No", "Unsure")) );
+
     //  Some foods cause
     insert( Outcome.of("someFoods", defaultCarePlan()));
     insert( new OutcomeAnswerCondition("someFoods", "palpitations2.causes", "q1", Arrays.asList("Yes") ));
@@ -454,126 +483,32 @@ then
     insert( new OutcomeAnswerCondition("noCausesNotMentalHealthRoute", "palpitations2.anxiety", "q", Arrays.asList("No") ));
 end
 
-function int convertAge(Object dateOfBirthOrAge) {
-
-    if (dateOfBirthOrAge instanceof String) {
-
-        try {
-            LocalDate dateOfBirth = LocalDate.parse((String)dateOfBirthOrAge, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-            LocalDate now = LocalDate.now();
-
-            Period p = Period.between(dateOfBirth, now);
-
-            return p.getYears();
-        } catch (Exception e) {
-            return Integer.parseInt((String)dateOfBirthOrAge);
-        }
-    }
-    else if (dateOfBirthOrAge instanceof Integer) {
-        return (Integer) dateOfBirthOrAge;
-    }
-    throw new IllegalArgumentException("Expected String but was " + dateOfBirthOrAge);
-}
-
-rule "Check for age"
-    salience 15
-when
-    (Answered(questionnaireId == "palpitations2.symptoms", questionId == "q5")
-    or 
-    Answered(questionnaireId == "palpitations2.anxiety", questionId == "q", value == "No"))
-    and not 
-    Assertion( code == codeDirectory.get("tempSCDAge"))
-then
-    // Age
-    System.out.println("Activating Age Route");
-    insert ( new HighPriorityNextQuestion("palpitations2.age", "palpitations2.symptoms", "q5") );
-    insert ( new HighPriorityNextQuestion("palpitations2.age", "palpitations2.anxiety", "q", Arrays.asList("No")) );
-end
-
-rule "Check for gender"
-    salience 15
-when
-    Answered(questionnaireId == "palpitations2.symptoms", questionId == "q5")
-    or 
-    Answered(questionnaireId == "palpitations2.anxiety", questionId == "q", value == "No")
-then
-    // Age
-    System.out.println("Activating Gender Route");
-    insert ( new HighPriorityNextQuestion("palpitations2.gender", "palpitations2.age", "q" ));
-
-    insert ( new NextQuestion("palpitations2.personalHistory", "palpitations2.familyHistory", "q", Arrays.asList("No", "Unsure")) );
-    insert ( new NextQuestion("palpitations2.personalHistory", "palpitations2.pregnancy", "q", Arrays.asList("No", "Unsure")) );
-    insert ( new NextQuestion("palpitations2.personalHistory", "palpitations2.age", "q") );
-    insert ( new NextQuestion("palpitations2.personalHistory", "palpitations2.gender", "q", Arrays.asList("male", "other")) );
-
-    insert ( new Checkpoint("muted") );
-end
-
 rule "Add age assertion"
 salience 100
-when 
-    $a: Answer( $qid:= questionnaireId == "palpitations2.age", $ref:= questionId == "q", $val:= value)
-    not Assertion( code == codeDirectory.get("tempSCDAge") )
-then
-    String question = $qid + "#" + $ref;
-    Assertion assertion = new Assertion(question, Assertion.Status.AMENDED);
-    assertion.setCode(codeDirectory.get(SnomedConstants.AGE));
-    assertion.setValue($a.getValue().toString());
-    assertion.getRelated().add($a.getQuestionnaireResponse());
-    insert(assertion);
-
-    assertion = new Assertion(question, Assertion.Status.AMENDED);
-    assertion.setCode(codeDirectory.get("tempSCDAge"));
-
-    if (convertAge($val) < 45) {
-        assertion.setValue(true);
-    } else {
-        assertion.setValue(false);
-    } 
-    assertion.getRelated().add($a.getQuestionnaireResponse());
-    insert(assertion);
-
-    assertion = new Assertion(question, Assertion.Status.AMENDED);
-    assertion.setCode(codeDirectory.get("tempPregnancyAge"));
-    if (convertAge($val) < 50 && convertAge($val) > 12) {
-        assertion.setValue(true);
-    } else {
-        assertion.setValue(false);
-    } 
-    assertion.getRelated().add($a.getQuestionnaireResponse());
-    insert(assertion);
-end
-
-rule "Check for pregnancy"
-salience 20
 when
-    Checkpoint( id == "muted" )
-    Answered(questionnaireId == "palpitations2.gender", questionId == "q", value == "Female")
-    (
-        (Answered(questionnaireId == "palpitations2.age", questionId == "q", $age := value)
-        and
-        eval(convertAge($age) < 50 && convertAge($age) > 12))
-    or
-        Assertion(code == codeDirectory.get("tempPregnancyAge"), value == true)
-    )
+    Assertion( code == codeDirectory.get(SnomedConstants.AGE), $value := value )
+    not Assertion( code == codeDirectory.get("under12") )
+    not Assertion( code == codeDirectory.get("between12and45") )
+    not Assertion( code == codeDirectory.get("between45and50") )
+    not Assertion( code == codeDirectory.get("under12") )
 then
-    System.out.println("Will ask for possibility of pregnancy");
-    insert( new HighPriorityNextQuestion("palpitations2.pregnancy", "palpitations2.gender", "q" ));
-end
+   int age = Constraints.convertAge($value);
 
-rule "Check for family history of SCD"
-salience 20
-when
-    Checkpoint( id == "muted" )
-    (
-        Answered(questionnaireId == "palpitations2.age", questionId == "q", $age := value)
-        and
-        eval(convertAge($age) < 45)
-    or
-        Assertion(code == codeDirectory.get("tempSCDAge"), value == true)
-    )
-then
-    System.out.println("Will ask for family history of SCD");
-    insert( new HighPriorityNextQuestion("palpitations2.familyHistory", "palpitations2.gender", "q" ));
+   String assertionId;
+   if (age < 12) {
+       assertionId = "under12";
+   } else if (age < 45) {
+       assertionId = "between12and45";
+   } else if (age < 50) {
+       assertionId = "between45and50";
+   } else {
+       assertionId = "over50";
+   }
+   System.out.println("Generating age assertion: " + assertionId);
+   insert( Assertion.builder()
+        .id(assertionId)
+        .status(Assertion.Status.AMENDED)
+        .code(codeDirectory.get(assertionId))
+        .value(true)
+        .build() );
 end
-

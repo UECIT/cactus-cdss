@@ -1,0 +1,16 @@
+{
+    "id": "vaginalDischarge.lastTemperatureReading",
+    "items": [
+      {
+        "id": "q",
+        "text": "Date and time last temperature reading performed",
+        "type": "CHOICE",
+        "required": true,
+        "options": [
+          {
+            "stringValue": "Yes"
+          }
+        ]
+      }
+    ]
+  }

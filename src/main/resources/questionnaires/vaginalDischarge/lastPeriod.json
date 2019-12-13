@@ -1,15 +1,15 @@
 {
-    "id": "palpitations2.gender",
+    "id": "vaginalDischarge.lastPeriod",
     "items": [
       {
         "id": "q",
-        "text": "What is your gender?",
+        "text": "When was your last period?",
         "type": "CHOICE",
         "required": true,
         "options": [
-          "Male",
-          "Female",
-          "Other"
+          {
+            "stringValue": "Yes"
+          }
         ]
       }
     ]

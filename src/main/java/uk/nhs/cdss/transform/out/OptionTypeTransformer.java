@@ -15,26 +15,21 @@ public class OptionTypeTransformer implements
     Transformer<OptionType, QuestionnaireItemOptionComponent> {
 
   private Type getType(OptionType option) {
-    // TODO: required for compatibility with EMS expectations (for now)
     return new Coding(
         "defaultCoding.com",
         defaultIfNull(option.getCode(), option.getStringValue()),
         option.getStringValue());
-
-//    if (option.hasStringValue()) {
-//      return new StringType(option.getStringValue());
-//    }
-//
-//    return null;
   }
 
   @Override
   public QuestionnaireItemOptionComponent transform(OptionType option) {
 
-    QuestionnaireItemOptionComponent optionComponent = new QuestionnaireItemOptionComponent(getType(option));
+    var optionComponent = new QuestionnaireItemOptionComponent(getType(option));
 
     if (option.isExclusive()) {
-      optionComponent.addExtension("http://hl7.org/fhir/StructureDefinition/questionnaire-optionExclusive", new BooleanType(true));
+      optionComponent.addExtension(
+          "http://hl7.org/fhir/StructureDefinition/questionnaire-optionExclusive",
+          new BooleanType(true));
     }
 
     return optionComponent;

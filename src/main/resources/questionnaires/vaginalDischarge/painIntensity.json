@@ -1,0 +1,37 @@
+{
+    "id": "vaginalDischarge.painIntensity",
+    "items": [
+      {
+        "id": "q",
+        "text": "How would the patient rate their pain on the following scale?",
+        "type": "CHOICE",
+        "required": true,
+        "options": [
+          {
+            "stringValue": "0-1 = No Pain",
+            "code": "noPain"
+          },
+          {
+            "stringValue": "1-3 = Mild Pain",
+            "code": "inPain"
+          },
+          {
+            "stringValue": "3-5 = Moderate Pain",
+            "code": "inPain"
+          },
+          {
+            "stringValue": "5-7 = Severe Pain",
+            "code": "inPain"
+          },
+          {
+            "stringValue": "7-9 = Very Severe Pain",
+            "code": "inPain"
+          },
+          {
+            "stringValue": "9-10 = Worst Pain Possible",
+            "code": "inPain"
+          }
+        ]
+      }
+    ]
+  }

@@ -10,6 +10,9 @@ public class CodeDirectory {
   private Map<String, CodeableConcept> concepts = new HashMap<>();
 
   public CodeableConcept get(String id) {
+    if (!has(id)) {
+      throw new IllegalStateException("Concept " + id + " was not found");
+    }
     return concepts.get(id);
   }
 
@@ -23,6 +26,9 @@ public class CodeDirectory {
           "CodeDirectory already contains an alias " + id + " for " + concepts.get(id));
     }
     concepts.put(id, concept);
+  }
+  public void put(CodeableConcept concept) {
+    put(concept.getText(), concept);
   }
 
   public Coding getCode(String id) {

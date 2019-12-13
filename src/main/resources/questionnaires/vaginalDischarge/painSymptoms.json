@@ -1,0 +1,31 @@
+{
+  "id": "vaginalDischarge.painSymptoms",
+  "items": [
+    {
+      "id": "q",
+      "text": "When experiencing the pain has the patient had any of the following?",
+      "type": "CHOICE",
+      "required": true,
+      "repeats": true,
+      "options": [
+        {
+          "stringValue": "Syncope",
+          "code": "Yes"
+        },
+        {
+          "stringValue": "Light headedness",
+          "code": "Yes"
+        },
+        {
+          "stringValue": "Weakness",
+          "code": "Yes"
+        },
+        {
+          "stringValue": "None of the above",
+          "code": "No",
+          "exclusive": true
+        }
+      ]
+    }
+  ]
+}

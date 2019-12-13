@@ -1,0 +1,22 @@
+{
+    "id": "vaginalDischarge.injuries",
+    "items": [
+      {
+        "id": "q",
+        "text": "Do you have any injuries?",
+        "type": "CHOICE",
+        "required": true,
+        "options": [
+          {
+            "stringValue": "Yes"
+          },
+          {
+            "stringValue": "No"
+          },
+          {
+            "stringValue": "Unsure"
+          }
+        ]
+      }
+    ]
+  }

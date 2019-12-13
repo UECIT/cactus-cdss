@@ -1,0 +1,17 @@
+{
+    "id": "vaginalDischarge.rash",
+    "items": [
+      {
+        "id": "q",
+        "text": "Has the patient got a rash?",
+        "type": "CHOICE",
+        "required": true,
+        "options": [
+          {
+            "stringValue": "Upload image",
+            "code": "Yes"
+          }
+        ]
+      }
+    ]
+  }

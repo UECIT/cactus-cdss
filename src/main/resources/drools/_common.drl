@@ -12,9 +12,8 @@ import uk.nhs.cdss.domain.Questionnaire
 import uk.nhs.cdss.domain.QuestionnaireResponse
 import uk.nhs.cdss.domain.Outcome
 
-declare Checkpoint
-    id: String
-end
+import uk.nhs.cdss.engine.Constraints
+
 
 declare InitialQuestionnaire
     id: String @key
@@ -23,7 +22,7 @@ end
 declare NextQuestion
     next: String @key
     questionnaireId: String @key
-    questionId: String @key
+    questionId: String
     answers: List
 end
 
@@ -31,13 +30,13 @@ declare ConditionalNextQuestion
     id: String @key
     next: String @key
     questionnaireId: String @key
-    questionId: String @key
+    questionId: String
     answers: List
 end
 
 declare NextQuestionCondition
     id: String @key
-    questionnaireId: String @key
+    conditionQuestionnaireId: String @key
     questionId: String @key
     answers: List
 end
@@ -47,17 +46,18 @@ declare AnswersOptional
     questionId: String @key
 end
 
-declare HighPriorityNextQuestion
-    next: String @key
-    questionnaireId: String @key
-    questionId: String @key
-    answers: List
-end
-
 declare Answered
     questionnaireId: String @key
     questionId: String @key
     value: Object
+end
+
+declare NextQuestionConditionsSatisfied
+    id: String @key
+end
+
+declare NextQuestionValid
+    next: String @key
 end
 
 declare OutcomeAnswerCondition
@@ -85,32 +85,35 @@ end
 rule "Answer present"
     salience 20
 when
-    $a: Answer( $id := questionnaireId, $questionId := questionId )
+    Answer( $questionnaireId := questionnaireId, $questionId := questionId, $value := value )
+    NextQuestionValid( $questionnaireId := next )
 then
-    System.out.println("Answered: "+ $id + " " + $questionId);
-    insert( new Answered($id, $questionId, $a.getValue()) );
+    System.out.println("Answered: "+ $questionnaireId + "#" + $questionId + " == " + $value);
+    insert( new Answered($questionnaireId, $questionId, $value) );
 end
 
 rule "Assertion present"
     salience 20
 when
-    $aa: AnswerAssertion( $id := questionnaireId, $questionId := questionId, $value := value)
-    Assertion( code == $aa.code, $value == value)
-    not Answered( $id := questionnaireId, $questionId := questionId )
+    AnswerAssertion( $questionnaireId := questionnaireId, $questionId := questionId, $code := code, $value := value, $answer := answer )
+    NextQuestionValid( $questionnaireId := next )
+    Assertion( $code := code, $value := value )
+    not Answered( $questionnaireId := questionnaireId, $questionId := questionId )
 then
-    System.out.println("Answered question "+ $id + " " + $questionId + " = " + $aa.getAnswer() + " with assertion " + $aa.getCode() + " = " + $aa.getValue());
-    insert( new Answered($id, $questionId, $aa.getAnswer()) );
+    System.out.println("Answered question: " + $questionnaireId + "#" + $questionId + " == " + $answer + " with assertion " + $code + " == " + $value);
+    insert( new Answered($questionnaireId, $questionId, $answer) );
 end
 
 // If no value or answer provided in answer assertion, answer the question with the value of the assertion
 rule "Any assertion present"
     salience 20
 when
-    $aa: AnswerAssertion( $id := questionnaireId, $questionId := questionId, value == null, answer == null)
-    Assertion( code == $aa.code, $value := value)
+    AnswerAssertion( $questionnaireId := questionnaireId, $questionId := questionId, $code := code, value == null, answer == null)
+    NextQuestionValid( $questionnaireId := next )
+    Assertion( $code := code, $value := value)
 then
-    System.out.println("Answered question "+ $id + " " + $questionId + " with assertion " + $aa.getCode() + " = " + $value);
-    insert( new Answered($id, $questionId, $value) );
+    System.out.println("Answered question: " + $questionnaireId + "#" + $questionId + " with assertion " + $code + " == " + $value);
+    insert( new Answered($questionnaireId, $questionId, $value) );
 end
 
 rule "No answer question"
@@ -119,9 +122,22 @@ when
     AnswersOptional($questionnaireId := questionnaireId, $questionId := questionId)
     $qr: QuestionnaireResponse($questionnaireId := questionnaireId, answers.isEmpty())
 then
-    insert( new Answer($questionnaireId, $questionId, Answer.MISSING));
+    System.out.println("No answer for question: " + $questionnaireId + "#" + $questionId);
+    insert( new Answer($questionnaireId, $questionId, Answer.MISSING) );
 end
 
+// Flow conditions
+rule "Answer conditions satisfied"
+when
+    ConditionalNextQuestion( $id := id, $next := next, $questionnaireId := questionnaireId )
+    forall (
+        NextQuestionCondition( $id := id, $cQuestionnaireId := conditionQuestionnaireId, $cQuestionId := questionId, $cAnswers := answers )
+        Answered( $cQuestionnaireId := questionnaireId, $cQuestionId := questionId, Constraints.isMemberOf(value, $cAnswers))
+    )
+then
+    System.out.println("Satisfied all conditions for link " + $id + ": from question " + $questionnaireId + " to " + $next);
+    insert( new NextQuestionConditionsSatisfied($id) );
+end
 
 // Question Flow
 rule "Ask first question"
@@ -129,53 +145,75 @@ rule "Ask first question"
 when
     not Questionnaire()
     not ActiveOutcome( draft == false )
-    $q: InitialQuestionnaire()
+    InitialQuestionnaire( $id := id )
 then
-    System.out.println("No answers: requesting questionnaire " + $q.getId());
-    insert( new Questionnaire($q.getId()) );
+    System.out.println("No answers: requesting questionnaire " + $id);
+    insert( new Questionnaire($id) );
+end
+
+rule "First question is always valid"
+when
+    InitialQuestionnaire($id := id)
+    not NextQuestionValid( $id := next )
+then
+    insert( new NextQuestionValid($id) );
+end
+
+rule "Valid to proceed to next question"
+    salience 15
+when
+    NextQuestion( $next := next, $questionnaireId := questionnaireId, questionId == null, answers == null )
+    $a: Answered( $questionnaireId := questionnaireId)
+    not Answered( $next := questionnaireId )
+then
+    System.out.println("Valid to proceed: from " + $questionnaireId + " to " + $next);
+    insert( new NextQuestionValid($next) );
+end
+
+rule "Valid to proceed to next question with answers"
+    salience 15
+when
+    NextQuestion( $next := next, $questionnaireId := questionnaireId, $questionId := questionId, $answers := answers )
+    Answered( $questionnaireId := questionnaireId, $questionId := questionId, Constraints.isMemberOf(value, $answers) )
+    not Answered( $next := questionnaireId )
+then
+    System.out.println("Valid to proceed: from " + $questionnaireId + " to " + $next);
+    insert( new NextQuestionValid($next) );
+end
+
+rule "Valid to proceed to conditional next question"
+    salience 15
+when
+    ConditionalNextQuestion( $id := id, $next := next, $questionnaireId := questionnaireId, questionId == null, answers == null )
+    NextQuestionConditionsSatisfied( $id := id )
+    Answered( $questionnaireId := questionnaireId)
+    not Answered( $next := questionnaireId )
+then
+    System.out.println("Valid to conditionally proceed: from " + $questionnaireId + " to " + $next);
+    insert( new NextQuestionValid($next) );
+end
+
+rule "Valid to proceed to conditional next question with answers"
+    salience 15
+when
+    ConditionalNextQuestion( $id := id, $next := next, $questionnaireId := questionnaireId, $questionId := questionId, $answers := answers )
+    NextQuestionConditionsSatisfied( $id := id )
+    Answered( $questionnaireId := questionnaireId, $questionId := questionId, Constraints.isMemberOf(value, $answers) )
+    not Answered( $next := questionnaireId )
+then
+    System.out.println("Valid to conditionally proceed: from " + $questionnaireId + " to " + $next);
+    insert( new NextQuestionValid($next) );
 end
 
 rule "Next question from Answer"
     salience 10
 when
-    NextQuestion( $questionnaireId := questionnaireId, $questionId := questionId, $next := next, $answers := answers )
-    $a: Answered( $questionnaireId := questionnaireId, $questionId := questionId, $answers == null || $answers.isEmpty() || value memberOf $answers)
+    NextQuestionValid( $next := next )
     not Answered( $next := questionnaireId )
-    not Questionnaire( )
+    not Questionnaire()
     not ActiveOutcome( draft == false )
 then
-    System.out.println("Have answer for " + $questionnaireId + "#" + $questionId + " == " + $a.getValue() + ": requesting questionnaire " + $next);
-    insert( new Questionnaire($next) );
-end
-
-rule "Conditional next question from Answer"
-    salience 10
-when
-    ConditionalNextQuestion($id := id, $questionnaireId := questionnaireId, $questionId := questionId, $next := next, $answers := answers )
-    $a: Answered( $questionnaireId := questionnaireId, $questionId := questionId, $answers == null || $answers.isEmpty() || value memberOf $answers)
-    not Answered( $next := questionnaireId )
-    not Questionnaire( )
-    not ActiveOutcome()
-    // Make sure all conditions for the next question have been met with the valid answers in the 'Answered' object
-    (forall (
-        $oac : NextQuestionCondition( $id := id, $cquestionnaireId := questionnaireId, $cquestionId := questionId, $canswers := answers )
-        Answered( $cquestionnaireId := questionnaireId, $cquestionId := questionId, $canswers == null || $canswers.isEmpty() || value memberOf $canswers)
-    ))
-then
-    System.out.println("Have answer for " + $questionnaireId + "#" + $questionId + " == " + $a.getValue() + ": requesting questionnaire " + $next);
-    insert( new Questionnaire($next) );
-end
-
-rule "High priority next question from Answer"
-    salience 15
-when
-    HighPriorityNextQuestion( $questionnaireId := questionnaireId, $questionId := questionId, $next := next, $answers := answers )
-    $a: Answered( $questionnaireId := questionnaireId, $questionId := questionId, $answers == null || $answers.isEmpty() || value memberOf $answers)
-    not Answered( $next := questionnaireId )
-    not Questionnaire( )
-    not ActiveOutcome( draft == false )
-then
-    System.out.println("Have answer for " + $questionnaireId + "#" + $questionId + " == " + $a.getValue() + ": requesting questionnaire " + $next);
+    System.out.println("Requesting questionnaire: " + $next);
     insert( new Questionnaire($next) );
 end
 
@@ -186,8 +224,8 @@ when
     $o: Outcome( $id := id )
     // Make sure all conditions for the outcome have been met with the valid answers in the 'Answered' object
     (forall (
-        $oac : OutcomeAnswerCondition( $id := id, $questionnaireId := questionnaireId, $questionId := questionId, $answers := answers )
-        $a: Answered( $questionnaireId := questionnaireId, $questionId := questionId, $answers == null || $answers.isEmpty() || value memberOf $answers)
+        OutcomeAnswerCondition( $id := id, $questionnaireId := questionnaireId, $questionId := questionId, $answers := answers )
+        Answered( $questionnaireId := questionnaireId, $questionId := questionId, Constraints.isMemberOf(value, $answers))
     ))
 then
     System.out.println("All conditions for outcome " + $o);
@@ -203,11 +241,13 @@ when
 then
     String question = $qid + "#" + $ref;
     System.out.println("Assertion: " + question + " == " + $m.getAnswer() + " => " + $m.getCode() + " == " + $m.getValue());
-    Assertion assertion = new Assertion(question, Assertion.Status.AMENDED);
-    assertion.setCode($m.getCode());
-    assertion.setValue($m.getValue());
-    assertion.getRelated().add($a.getQuestionnaireResponse());
-    insert(assertion);
+    insert( Assertion.builder()
+                    .id(question)
+                    .status(Assertion.Status.AMENDED)
+                    .code($m.getCode())
+                    .value($m.getValue())
+                    .oneRelated($a.getQuestionnaireResponse())
+                    .build() );
 end
 
 

@@ -1,0 +1,19 @@
+{
+    "id": "vaginalDischarge.blisters",
+    "items": [
+      {
+        "id": "q",
+        "text": "Has the patient developed any sores or blisters?",
+        "type": "CHOICE",
+        "required": true,
+        "options": [
+          {
+            "stringValue": "Yes"
+          },
+          {
+            "stringValue": "No"
+          }
+        ]
+      }
+    ]
+  }
