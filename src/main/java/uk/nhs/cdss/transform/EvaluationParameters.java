@@ -11,8 +11,6 @@ import static uk.nhs.cdss.constants.SystemConstants.USER_TASK;
 import static uk.nhs.cdss.constants.SystemConstants.USER_TYPE;
 
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Iterables;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -26,14 +24,11 @@ import lombok.Singular;
 import org.hl7.fhir.dstu3.model.CodeableConcept;
 import org.hl7.fhir.dstu3.model.IdType;
 import org.hl7.fhir.dstu3.model.Observation;
-import org.hl7.fhir.dstu3.model.OperationOutcome.IssueType;
 import org.hl7.fhir.dstu3.model.Parameters;
 import org.hl7.fhir.dstu3.model.Parameters.ParametersParameterComponent;
 import org.hl7.fhir.dstu3.model.QuestionnaireResponse;
 import org.hl7.fhir.dstu3.model.Reference;
 import org.hl7.fhir.dstu3.model.Resource;
-import uk.nhs.cdss.OperationOutcomeFactory;
-import uk.nhs.cdss.constants.SystemCode;
 
 @Getter
 @Builder
@@ -129,7 +124,8 @@ public class EvaluationParameters {
       return type.cast(object);
     }
     throw buildOperationOutcomeException(
-        new InvalidRequestException("Invalid parameter type in request body. Should be " + type.toString()),
+        new InvalidRequestException(
+            "Invalid parameter type in request body. Should be " + type.toString()),
         BAD_REQUEST, INVALID);
   }
 

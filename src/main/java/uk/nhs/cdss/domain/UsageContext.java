@@ -1,12 +1,11 @@
 package uk.nhs.cdss.domain;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
-@Getter
-@Setter
+@Data
 public class UsageContext {
+
   private String code;
   private String valueCodeableConcept;
   private IntRange valueRange;

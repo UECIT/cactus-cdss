@@ -4,10 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import uk.nhs.cdss.domain.Assertion;
-import uk.nhs.cdss.domain.CodeableConcept;
 import uk.nhs.cdss.domain.EvaluateContext;
 import uk.nhs.cdss.domain.Patient;
 import uk.nhs.cdss.domain.QuestionnaireResponse;
@@ -15,6 +12,7 @@ import uk.nhs.cdss.domain.QuestionnaireResponse;
 @Getter
 @Builder
 public class CDSInput {
+
   private final String serviceDefinitionId;
   private final String requestId;
   private final String encounterId;

@@ -1,7 +1,5 @@
 package uk.nhs.cdss.resourceProviders;
 
-import static uk.nhs.cdss.resourceProviders.ServiceDefinitionResource.nameFromId;
-
 import ca.uhn.fhir.rest.annotation.IdParam;
 import ca.uhn.fhir.rest.annotation.Operation;
 import ca.uhn.fhir.rest.annotation.OptionalParam;
@@ -62,7 +60,7 @@ public class ServiceDefinitionProvider implements IResourceProvider {
     try {
       return evaluateService.getGuidanceResponse(
           getParameters(resource),
-          nameFromId(serviceDefinitionId));
+          serviceDefinitionId.getIdPart());
     } catch (ServiceDefinitionException e) {
       throw new InternalErrorException(e);
     }
@@ -80,7 +78,7 @@ public class ServiceDefinitionProvider implements IResourceProvider {
   @Read
   public ServiceDefinition getServiceDefinitionById(@IdParam IdType id) {
     return serviceDefinitionRegistry
-        .getById(nameFromId(id))
+        .getById(id.getIdPart())
         .map(serviceDefinitionTransformer::transform)
         .orElseThrow(() -> new ResourceNotFoundException(
             "Unable to load service definition " + id));
@@ -90,7 +88,7 @@ public class ServiceDefinitionProvider implements IResourceProvider {
   public Collection<ServiceDefinition> findServiceDefinitionById(
       @RequiredParam(name = ServiceDefinition.SP_RES_ID) String id) {
     return serviceDefinitionRegistry
-        .getById(nameFromId(id))
+        .getById(id)
         .map(serviceDefinitionTransformer::transform)
         .stream()
         .collect(Collectors.toUnmodifiableList());
@@ -114,14 +112,14 @@ public class ServiceDefinitionProvider implements IResourceProvider {
       @OptionalParam(
           name = SP_CONTEXT_VALUE,
           compositeTypes = {TokenParam.class, TokenParam.class})
-            CompositeAndListParam<TokenParam, TokenParam> useContextConcept,
+          CompositeAndListParam<TokenParam, TokenParam> useContextConcept,
       @OptionalParam(
           name = SP_CONTEXT_QUANTITY,
           compositeTypes = {TokenParam.class, QuantityParam.class})
-            CompositeAndListParam<TokenParam, QuantityParam> useContextQuantity,
+          CompositeAndListParam<TokenParam, QuantityParam> useContextQuantity,
       @OptionalParam(name = SP_CONTEXT_RANGE,
           compositeTypes = {TokenParam.class, QuantityParam.class})
-            CompositeAndListParam<TokenParam, QuantityParam> useContextRange,
+          CompositeAndListParam<TokenParam, QuantityParam> useContextRange,
       @OptionalParam(name = SP_TYPE_CODE, compositeTypes = {TokenParam.class, TokenParam.class})
           CompositeAndListParam<TokenParam, TokenParam> triggerTypeCode) {
 
@@ -148,6 +146,6 @@ public class ServiceDefinitionProvider implements IResourceProvider {
   private int triggerCount(
       uk.nhs.cdss.domain.ServiceDefinition a,
       uk.nhs.cdss.domain.ServiceDefinition b) {
-    return Integer.compare(a.getTriggers().size(), b.getTriggers().size());
+    return Integer.compare(a.getObservationTriggers().size(), b.getObservationTriggers().size());
   }
 }

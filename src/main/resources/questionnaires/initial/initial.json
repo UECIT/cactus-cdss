@@ -16,8 +16,16 @@
           "code": "palpitations"
         },
         {
-          "stringValue": "Female genitoUrinary problems",
+          "stringValue": "Female genito-urinary problems",
           "code": "genitoUrinaryProblems"
+        },
+        {
+          "stringValue": "Constipation",
+          "code": "constipation"
+        },
+        {
+          "stringValue": "Sore Throat",
+          "code": "soreThroat"
         }
       ]
     }

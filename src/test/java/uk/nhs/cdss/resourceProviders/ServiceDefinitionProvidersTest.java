@@ -16,7 +16,9 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import uk.nhs.cdss.config.DroolsConfig;
+import uk.nhs.cdss.config.CodeDirectoryConfig;
+import uk.nhs.cdss.domain.Coding;
+import uk.nhs.cdss.engine.CodeDirectory;
 import uk.nhs.cdss.services.ServiceDefinitionConditionBuilderFactory;
 import uk.nhs.cdss.services.ServiceDefinitionRegistry;
 import uk.nhs.cdss.transform.out.CodeableConceptOutTransformer;
@@ -26,39 +28,43 @@ import uk.nhs.cdss.transform.out.DateRangeTransformer;
 import uk.nhs.cdss.transform.out.IntRangeTransformer;
 import uk.nhs.cdss.transform.out.PublicationStatusTransformer;
 import uk.nhs.cdss.transform.out.ServiceDefinitionTransformer;
+import uk.nhs.cdss.transform.out.TopicTransformer;
+import uk.nhs.cdss.transform.out.TriggerTransformer;
 import uk.nhs.cdss.transform.out.UsageContextTransformer;
 
 @RunWith(JUnitParamsRunner.class)
 public class ServiceDefinitionProvidersTest {
 
   private static ServiceDefinitionProvider provider;
+  private static CodeDirectory codeDirectory = new CodeDirectoryConfig().codeDirectory();
 
   @BeforeClass
   public static void beforeAll() {
-    var codes = new DroolsConfig().codeDirectory();
     var codingTransformer = new CodingOutTransformer();
     var conceptTransformer = new CodeableConceptOutTransformer(codingTransformer);
     var transformer = new ServiceDefinitionTransformer(
-        codes,
-        new DataRequirementTransformer(codes, codingTransformer),
+        codeDirectory,
+        new DataRequirementTransformer(codeDirectory, codingTransformer),
         conceptTransformer,
         new PublicationStatusTransformer(),
         new DateRangeTransformer(),
         new UsageContextTransformer(
-            codes,
+            codeDirectory,
             codingTransformer,
             conceptTransformer,
-            new IntRangeTransformer()));
+            new IntRangeTransformer()),
+        new TopicTransformer(codeDirectory),
+        new TriggerTransformer(codeDirectory, codingTransformer));
     provider = new ServiceDefinitionProvider(
         null,
         transformer,
         new ServiceDefinitionRegistry(new ObjectMapper()),
-        new ServiceDefinitionConditionBuilderFactory());
+        new ServiceDefinitionConditionBuilderFactory(codeDirectory));
   }
 
   @Test
   public void get_byId() {
-    var id = new IdType ("anxiety");
+    var id = new IdType("anxiety");
 
     var result = provider.getServiceDefinitionById(id);
 
@@ -68,7 +74,7 @@ public class ServiceDefinitionProvidersTest {
 
   @Test(expected = ResourceNotFoundException.class)
   public void get_byId_unsuccessful() {
-    var id = new IdType ("anxiety_nonexistent");
+    var id = new IdType("anxiety_nonexistent");
 
     provider.getServiceDefinitionById(id);
   }
@@ -93,9 +99,11 @@ public class ServiceDefinitionProvidersTest {
   private TokenParam token(String code) {
     return new TokenParam(code);
   }
+
   private DateParam date(String date) {
     return new DateParam(date);
   }
+
   private CompositeAndListParam<TokenParam, TokenParam> useContext(String context, String code) {
     var ands = new CompositeAndListParam<>(TokenParam.class, TokenParam.class);
 
@@ -104,13 +112,15 @@ public class ServiceDefinitionProvidersTest {
     ands.addAnd(ors);
     return ands;
   }
+
   private CompositeAndListParam<TokenParam, TokenParam> trigger(String... codes) {
 
     var ands = new CompositeAndListParam<>(TokenParam.class, TokenParam.class);
 
     for (var code : codes) {
+      Coding coding = codeDirectory.getCode(code);
       var ors = new CompositeOrListParam<>(TokenParam.class, TokenParam.class);
-      ors.addOr(new CompositeParam<>(token("CareConnectObservation"), token(code)));
+      ors.addOr(new CompositeParam<>(token("Observation"), token(coding.getCode())));
       ands.addAnd(ors);
     }
 
@@ -146,24 +156,34 @@ public class ServiceDefinitionProvidersTest {
         expectedServiceDefinition,
         result.iterator().next().getName());
   }
+
   public Object parametersForTriage_oneResult() {
-    return new Object[] {
-        new Object[] { null, null, null, null, null, null, null, null, "initial" },
-        new Object[] { token("ACTIVE"), null, null, null, null, null, null, null, "initial" },
-        new Object[] { null, token("false"), null, null, null, null, null, null, "initial" },
-        new Object[] { null, null, date("2020-12-20"), null, null, null, null, null, "initial" },
-        new Object[] { null, null, date("lt3020-12-20"), null, null, null, null, null, "initial" },
-        new Object[] { null, null, date("gt1020-12-20"), null, null, null, null, null, "initial" },
-        new Object[] { null, null, null, token("GB"), null, null, null, null, "initial" },
-        new Object[] { null, null, null, null, useContext("non-existent", "invalid"), null, null, null, "initial" },
-        new Object[] { null, null, null, null, useContext("user", "103TP2700X"), null, null, trigger("anxiety"), "anxiety" },
-        new Object[] { null, null, null, token("GB"), null, null, null, trigger("chestPain"), "chestPains" },
-        new Object[] { null, null, date("2020-12-20"), null, null, null, null, trigger("musculoskeletal"), "musculoskeletal" },
-        new Object[] { token("ACTIVE"), token("false"), null, null, null, null, null, null, "initial" },
-        new Object[] { token("ACTIVE"), token("false"), null, null, null, null, null, trigger("palpitations", "debug"), "palpitations" },
-        new Object[] { token("ACTIVE"), token("false"), date("lt2040-12-20"), null, null, null, null, trigger("palpitations", "debug"), "palpitations" },
-        new Object[] { null, token("false"), date("ge2040-12-20"), null, null, null, null, trigger("palpitations"), "palpitations2" },
-        new Object[] { null, token("false"), null, null, null, null, null, trigger("palpitations"), "palpitations2" }
+    return new Object[]{
+        new Object[]{null, null, null, null, null, null, null, null, "initial"},
+        new Object[]{token("ACTIVE"), null, null, null, null, null, null, null, "initial"},
+        new Object[]{null, token("false"), null, null, null, null, null, null, "initial"},
+        new Object[]{null, null, date("2020-12-20"), null, null, null, null, null, "initial"},
+        new Object[]{null, null, date("lt3020-12-20"), null, null, null, null, null, "initial"},
+        new Object[]{null, null, date("gt1020-12-20"), null, null, null, null, null, "initial"},
+        new Object[]{null, null, null, token("GB"), null, null, null, null, "initial"},
+        new Object[]{null, null, null, null, useContext("non-existent", "invalid"), null, null,
+            null, "initial"},
+        new Object[]{null, null, null, null, useContext("user", "103TP2700X"), null, null,
+            trigger("anxiety"), "anxiety"},
+        new Object[]{null, null, null, token("GB"), null, null, null, trigger("chestPain"),
+            "chestPains"},
+        new Object[]{null, null, date("2020-12-20"), null, null, null, null,
+            trigger("musculoskeletal"), "musculoskeletal"},
+        new Object[]{token("ACTIVE"), token("false"), null, null, null, null, null, null,
+            "initial"},
+        new Object[]{token("ACTIVE"), token("false"), null, null, null, null, null,
+            trigger("palpitations", "debug"), "palpitations"},
+        new Object[]{token("ACTIVE"), token("false"), date("lt2040-12-20"), null, null, null, null,
+            trigger("palpitations", "debug"), "palpitations"},
+        new Object[]{null, token("false"), date("ge2040-12-20"), null, null, null, null,
+            trigger("palpitations"), "palpitations2"},
+        new Object[]{null, token("false"), null, null, null, null, null,
+            trigger("palpitations"), "palpitations2"}
     };
   }
 
@@ -192,15 +212,16 @@ public class ServiceDefinitionProvidersTest {
 
     Assert.assertEquals("Retrieved no definitions", 0, result.size());
   }
+
   public Object parametersForTriage_noResults() {
-    return new Object[] {
-        new Object[] { token("DRAFT"), null, null, null, null, null, null, null },
-        new Object[] { token("RETIRED"), null, null, null, null, null, null, null },
-        new Object[] { null, token("true"), null, null, null, null, null, null },
-        new Object[] { null, null, date("2120-12-20"), null, null, null, null, null },
-        new Object[] { null, null, date("gt2120-12-20"), null, null, null, null, null },
-        new Object[] { null, null, date("lt1920-12-20"), null, null, null, null, null },
-        new Object[] { null, null, null, token("ES"), null, null, null, null },
+    return new Object[]{
+        new Object[]{token("DRAFT"), null, null, null, null, null, null, null},
+        new Object[]{token("RETIRED"), null, null, null, null, null, null, null},
+        new Object[]{null, token("true"), null, null, null, null, null, null},
+        new Object[]{null, null, date("2120-12-20"), null, null, null, null, null},
+        new Object[]{null, null, date("gt2120-12-20"), null, null, null, null, null},
+        new Object[]{null, null, date("lt1920-12-20"), null, null, null, null, null},
+        new Object[]{null, null, null, token("ES"), null, null, null, null},
     };
   }
 }

@@ -9,7 +9,7 @@ import uk.nhs.cdss.transform.Transformer;
 @Component
 @AllArgsConstructor
 public class UsageContextTransformer
-  implements Transformer<UsageContext, org.hl7.fhir.dstu3.model.UsageContext> {
+    implements Transformer<UsageContext, org.hl7.fhir.dstu3.model.UsageContext> {
 
   private final CodeDirectory codeDirectory;
   private final CodingOutTransformer codingTransformer;
@@ -18,11 +18,9 @@ public class UsageContextTransformer
 
   @Override
   public org.hl7.fhir.dstu3.model.UsageContext transform(UsageContext from) {
-    var context = new org.hl7.fhir.dstu3.model.UsageContext();
-
     var code = codeDirectory.getCode(from.getCode());
-
-    context.setCode(codingTransformer.transform(code));
+    var context = new org.hl7.fhir.dstu3.model.UsageContext()
+        .setCode(codingTransformer.transform(code));
 
     if (from.hasCodeableConcept() == from.hasRange()) {
       throw new IllegalArgumentException(

@@ -1,7 +1,5 @@
 package uk.nhs.cdss.domain;
 
-import org.hl7.fhir.dstu3.model.Type;
-
 /**
  * Indicates whether a question can be displayed to the user or not.
  * The hasAnswer and answer properties are mutually exclusive - when

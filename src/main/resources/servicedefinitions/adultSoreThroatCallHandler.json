@@ -1,0 +1,54 @@
+{
+  "title": "adult-1",
+  "description": "Sore Throat - Adult, Call Handler",
+  "purpose": "To triage an adult patient with a sore throat",
+  "usage": "To triage an adult patient with a sore throat",
+  "status": "ACTIVE",
+  "experimental": false,
+  "version": "1.0",
+  "date": "2019-04-01T00:00:00+00:00",
+  "publisher": "NHS Digital",
+  "approvalDate": "2019-04-01",
+  "lastReviewDate": "2019-04-01",
+  "effectivePeriod": {
+    "start": "2019-01-01",
+    "end": "2020-12-31"
+  },
+  "jurisdictions": [
+    "GB"
+  ],
+  "useContext": [
+    {
+      "code": "age",
+      "valueCodeableConcept": "adult"
+    },
+    {
+      "code": "user",
+      "valueCodeableConcept": "provider|urgent"
+    }
+  ],
+  "topics": [
+    {
+      "code": "triage",
+      "userSelected": false
+    }
+  ],
+  "observationTriggers": [
+    {
+      "code": "soreThroat",
+      "value": "present"
+    },
+    {
+      "code": "lifeThreatening",
+      "value": "absent"
+    }
+  ],
+  "patientTriggers": [
+    {
+      "birthDate": {
+        "duration": "P16y",
+        "comparator": ">="
+      }
+    }
+  ]
+}

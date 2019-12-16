@@ -1,7 +1,6 @@
 package uk.nhs.cdss.transform.in;
 
 import lombok.AllArgsConstructor;
-import org.kie.api.definition.rule.All;
 import org.springframework.stereotype.Component;
 import uk.nhs.cdss.engine.CDSInput;
 import uk.nhs.cdss.transform.Transformer;

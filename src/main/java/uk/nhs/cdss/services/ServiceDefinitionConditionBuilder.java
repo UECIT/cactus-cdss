@@ -1,5 +1,7 @@
 package uk.nhs.cdss.services;
 
+import static java.util.Arrays.asList;
+
 import ca.uhn.fhir.model.api.IQueryParameterType;
 import ca.uhn.fhir.rest.param.BaseAndListParam;
 import ca.uhn.fhir.rest.param.CompositeAndListParam;
@@ -17,15 +19,30 @@ import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import lombok.AccessLevel;
 import lombok.Getter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import uk.nhs.cdss.domain.CodeableConcept;
+import uk.nhs.cdss.domain.Coding;
 import uk.nhs.cdss.domain.DateRange;
+import uk.nhs.cdss.domain.ObservationTrigger;
 import uk.nhs.cdss.domain.ServiceDefinition;
 import uk.nhs.cdss.domain.UsageContext;
+import uk.nhs.cdss.engine.CodeDirectory;
 
 @Getter
 public class ServiceDefinitionConditionBuilder {
 
+  @Getter(AccessLevel.NONE)
+  private final Logger log = LoggerFactory.getLogger(getClass());
+
   private Predicate<ServiceDefinition> conditions = sd -> true;
+  private CodeDirectory codeDirectory;
+
+  public ServiceDefinitionConditionBuilder(CodeDirectory codeDirectory) {
+    this.codeDirectory = codeDirectory;
+  }
 
   public void addStatusConditions(TokenParam status) {
     if (status == null || status.isEmpty()) {
@@ -50,7 +67,7 @@ public class ServiceDefinitionConditionBuilder {
     }
 
     addCondition(sd -> sd.getEffectivePeriod() == null ||
-        matchDateRange (effective, sd.getEffectivePeriod()));
+        matchDateRange(effective, sd.getEffectivePeriod()));
   }
 
   public void addJurisdictionConditions(TokenParam jurisdiction) {
@@ -98,22 +115,47 @@ public class ServiceDefinitionConditionBuilder {
 
   public void addTriggerConditions(CompositeAndListParam<TokenParam, TokenParam> triggerTypeCode) {
     if (triggerTypeCode == null) {
-      addCondition(sd -> sd.getTriggers().isEmpty());
+      addCondition(sd -> sd.getObservationTriggers().isEmpty());
       return;
     }
 
-    final var OBSERVATION_TYPE = "CareConnectObservation";
+    final var OBSERVATION_TYPES = asList("observation", "careconnectobservation");
     var codes = triggerTypeCode.getValuesAsQueryTokens()
         .stream()
         .map(CompositeOrListParam::getValuesAsQueryTokens)
         .filter(l -> l.size() == 1)
         .flatMap(Collection::stream)
-        .filter(cp -> OBSERVATION_TYPE.equalsIgnoreCase(cp.getLeftValue().getValue()))
+        .filter(cp -> OBSERVATION_TYPES.contains(cp.getLeftValue().getValue().toLowerCase()))
         .map(CompositeParam::getRightValue)
         .map(TokenParam::getValue)
         .collect(Collectors.toUnmodifiableList());
 
-    addCondition(sd -> codes.containsAll(sd.getTriggers()));
+    addCondition(sd -> matchesTriggers(sd, codes));
+  }
+
+  private boolean matchesTriggers(ServiceDefinition sd, List<String> codes) {
+    for (ObservationTrigger observationTrigger : sd.getObservationTriggers()) {
+      Optional<Coding> code = Optional.ofNullable(observationTrigger.getCode())
+          .map(codeDirectory::get)
+          .map(CodeableConcept::getCoding)
+          .map(list -> list.get(0));
+      Optional<Coding> value = Optional.ofNullable(observationTrigger.getValue())
+          .map(codeDirectory::get)
+          .map(CodeableConcept::getCoding)
+          .map(list -> list.get(0));
+
+      // TODO match system (requires system of each observation code)
+      // TODO match value (requires value of each observation)
+      // TODO match effective (requires date of each observation)
+      if (code.isPresent() && !codes.contains(code.get().getCode())) {
+        log.info("Service Definition {} does not match {} for observation trigger {}",
+            sd.getId(), codes, observationTrigger);
+        return false;
+      }
+    }
+    log.info("Service Definition {} matches all ({}) observation triggers for query {}",
+        sd.getId(), sd.getObservationTriggers().size(), codes);
+    return true;
   }
 
   private void addCondition(Predicate<ServiceDefinition> newCondition) {
@@ -126,6 +168,7 @@ public class ServiceDefinitionConditionBuilder {
         .map(UsageContext::getCode)
         .noneMatch(context::equals);
   }
+
   private <T extends IQueryParameterType>
   Predicate<uk.nhs.cdss.domain.ServiceDefinition> matchesContextRestriction(
       String context,
@@ -145,6 +188,7 @@ public class ServiceDefinitionConditionBuilder {
       List<CompositeParam<TokenParam, T>> params) {
     return ensureSingleContext(params, null);
   }
+
   private <T extends IQueryParameterType> String ensureSingleContext(
       List<CompositeParam<TokenParam, T>> params,
       String expectedContext) {
@@ -192,6 +236,7 @@ public class ServiceDefinitionConditionBuilder {
             "Numeric search params cannot have non-standard prefixes");
     }
   }
+
   private boolean matchDateRange(DateParam dateParam, DateRange range) {
     var date = dateParam.getValueAsInstantDt();
     var prefix = Optional.ofNullable(dateParam.getPrefix()).orElse(ParamPrefixEnum.EQUAL);
@@ -212,6 +257,7 @@ public class ServiceDefinitionConditionBuilder {
             "Date search params cannot have non-standard prefixes");
     }
   }
+
   private boolean matchCode(TokenParam codeParam, UsageContext context) {
     return codeParam.getValue().equals(context.getValueCodeableConcept());
   }

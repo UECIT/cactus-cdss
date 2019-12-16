@@ -9,7 +9,7 @@ import uk.nhs.cdss.domain.Coding;
 import uk.nhs.cdss.engine.CodeDirectory;
 
 @Configuration
-public class DroolsConfig {
+public class CodeDirectoryConfig {
 
   private CodeableConcept snomed(String id, String description) {
     return buildCode(SystemURL.CS_SNOMED, id, description);
@@ -32,13 +32,21 @@ public class DroolsConfig {
   public CodeDirectory codeDirectory() {
     CodeDirectory codeDirectory = new CodeDirectory();
 
+    // Values
+    codeDirectory.put("present", buildCode("value", "present", "Condition is present"));
+    codeDirectory.put("absent", buildCode("value", "absent", "Condition is absent"));
+
+    // Severity qualifiers
+    codeDirectory.put("lifeThreatening", snomed("442452003", "Life threatening severity (qualifier value)"));
+
     common(codeDirectory);
 
     initial(codeDirectory);
     palpitations(codeDirectory);
     chestPains(codeDirectory);
     vaginalDischarge(codeDirectory);
-
+    soreThroat(codeDirectory);
+    constipation(codeDirectory);
 
     jurisdictions(codeDirectory);
     usageContexts(codeDirectory);
@@ -75,10 +83,16 @@ public class DroolsConfig {
     codeDirectory.put("other", gender("other", "Other"));
     codeDirectory.put("unknown", gender("unknown", "Unknown"));
 
+    // age
+    codeDirectory.put("adult", snomed("133936004", "Adult (person)"));
+    codeDirectory.put("child", snomed("67822003", "Child (person)"));
+
     // user type
     codeDirectory.put("103TP0016X", provider("103TP0016X", "Prescribing (Medical)"));
     codeDirectory.put("103TP2700X", provider("103TP2700X", "Psychotherapy"));
     codeDirectory.put("183500000X", provider("183500000X", "Pharmacist"));
+    codeDirectory.put("103GC0700X", provider("103GC0700X", "Clinical"));
+    codeDirectory.put("provider|urgent", provider("261QU0200X", "Urgent"));
 
     /* In EMS */
     codeDirectory.put("CL", provider("CL", "Clinician"));
@@ -90,6 +104,8 @@ public class DroolsConfig {
     codeDirectory.put("phone", provider("phone", "Phone call"));
     codeDirectory.put("online", provider("online", "Online"));
 
+    // Topic
+    codeDirectory.put("triage", buildCode(SystemURL.CS_CDS_STUB, "TRI", "Triage"));
   }
 
   private void jurisdictions(CodeDirectory codeDirectory) {
@@ -170,6 +186,14 @@ public class DroolsConfig {
     codeDirectory.put("emergencyCareReview", snomed("emergencyCareReview", "Emergency Care Physician Review"));
     codeDirectory.put("hcpReview", snomed("hcpReview", "HCP Review"));
     codeDirectory.put("pharmacistReview", snomed("hcpReview", "Review with pharmacist"));
+  }
+
+  private void constipation(CodeDirectory codeDirectory) {
+    codeDirectory.put("constipation", snomed("14760008", "Constipation"));
+  }
+
+  private void soreThroat(CodeDirectory codeDirectory) {
+    codeDirectory.put("soreThroat", snomed("162397003", "Pain in throat"));
   }
 
   private void chestPains(CodeDirectory codeDirectory) {

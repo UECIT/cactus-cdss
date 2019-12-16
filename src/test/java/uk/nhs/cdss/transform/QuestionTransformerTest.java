@@ -17,6 +17,8 @@ import uk.nhs.cdss.domain.OptionType;
 import uk.nhs.cdss.domain.Question;
 import uk.nhs.cdss.domain.QuestionConstraint;
 import uk.nhs.cdss.domain.QuestionType;
+import uk.nhs.cdss.transform.out.CodeableConceptOutTransformer;
+import uk.nhs.cdss.transform.out.CodingOutTransformer;
 import uk.nhs.cdss.transform.out.OptionTypeTransformer;
 import uk.nhs.cdss.transform.out.QuestionConstraintTransformer;
 import uk.nhs.cdss.transform.out.QuestionTransformer;
@@ -35,7 +37,7 @@ public class QuestionTransformerTest {
 
     var options = asList(
         new OptionType("option1", null, true, ""),
-        new OptionType("option2", null,true, ""),
+        new OptionType("option2", null, true, ""),
         new OptionType("option3", null, true, ""));
     question.getOptions().addAll(options);
 
@@ -50,11 +52,13 @@ public class QuestionTransformerTest {
     subQuestionId2.setType(QuestionType.STRING);
     question.getItems().addAll(asList(subQuestionId1, subQuestionId2));
 
+    TypeTransformer typeTransformer = new TypeTransformer(
+        new CodeableConceptOutTransformer(new CodingOutTransformer()));
     var transformer = new QuestionTransformer(
         new QuestionTypeTransformer(),
         new OptionTypeTransformer(),
-        new QuestionConstraintTransformer(new TypeTransformer()),
-        new TypeTransformer());
+        new QuestionConstraintTransformer(typeTransformer),
+        typeTransformer);
 
     var result = transformer.transform(question);
 
@@ -72,8 +76,8 @@ public class QuestionTransformerTest {
         both(isConstraint("constraintQuestion1"))
             .and(hasProperty("hasAnswer", equalTo(true))),
         both(isConstraint("constraintQuestion2"))
-          .and(hasProperty("answer",
-              hasValue("constraintAnswer")))));
+            .and(hasProperty("answer",
+                hasValue("constraintAnswer")))));
 
     assertThat("Sub-questions", result.getItem(), containsInAnyOrder(
         hasProperty("linkId", equalTo("subQuestionId1")),

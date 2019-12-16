@@ -67,6 +67,7 @@ public class ServiceDefinitionRegistry {
 
   @AllArgsConstructor
   private static class CachedServiceDefinition {
+
     private URL resource;
     private ServiceDefinition serviceDefinition;
     private Long modified;
@@ -75,12 +76,12 @@ public class ServiceDefinitionRegistry {
   private class Loader extends CacheLoader<String, CachedServiceDefinition> {
 
     @Override
-    public CachedServiceDefinition load(String key) throws Exception {
-      String path = "/servicedefinitions/" + key + ".json";
+    public CachedServiceDefinition load(String id) throws Exception {
+      String path = "/servicedefinitions/" + id + ".json";
       URL resource = getClass().getResource(path);
 
       if (resource == null) {
-        throw new IOException("Service definition " + key + " is not defined");
+        throw new IOException("Service definition " + id + " is not defined");
       }
 
       Long modified = null;
@@ -88,10 +89,16 @@ public class ServiceDefinitionRegistry {
         modified = new File(resource.getFile()).lastModified();
       }
 
-      ServiceDefinition serviceDefinition = objectMapper
-          .readValue(resource, ServiceDefinition.class);
+      try {
+        ServiceDefinition serviceDefinition = objectMapper
+            .readValue(resource, ServiceDefinition.class);
+        serviceDefinition.setId(id);
 
-      return new CachedServiceDefinition(resource, serviceDefinition, modified);
+        return new CachedServiceDefinition(resource, serviceDefinition, modified);
+      } catch (IOException e) {
+        e.printStackTrace();
+        throw e;
+      }
     }
 
     @Override
