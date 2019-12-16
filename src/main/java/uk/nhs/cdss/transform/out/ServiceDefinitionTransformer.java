@@ -1,11 +1,10 @@
 package uk.nhs.cdss.transform.out;
 
+import static org.apache.commons.lang3.BooleanUtils.toBoolean;
+
 import lombok.AllArgsConstructor;
 import org.hl7.fhir.dstu3.model.ServiceDefinition;
-import org.hl7.fhir.dstu3.model.TriggerDefinition;
 import org.springframework.stereotype.Component;
-import uk.nhs.cdss.domain.DataRequirement;
-import uk.nhs.cdss.domain.DataRequirement.Type;
 import uk.nhs.cdss.engine.CodeDirectory;
 import uk.nhs.cdss.transform.Transformer;
 
@@ -20,56 +19,49 @@ public class ServiceDefinitionTransformer implements
   private final PublicationStatusTransformer statusTransformer;
   private final DateRangeTransformer dateRangeTransformer;
   private final UsageContextTransformer usageContextTransformer;
+  private final TopicTransformer topicTransformer;
+  private final TriggerTransformer triggerTransformer;
 
   @Override
-  public ServiceDefinition transform(uk.nhs.cdss.domain.ServiceDefinition domainServiceDefinition) {
+  public ServiceDefinition transform(uk.nhs.cdss.domain.ServiceDefinition from) {
     var serviceDefinition = new ServiceDefinition();
-    serviceDefinition.setId(domainServiceDefinition.getId());
-    serviceDefinition.setName(domainServiceDefinition.getId());
-    serviceDefinition.setTitle(domainServiceDefinition.getTitle());
-    serviceDefinition.setDescription(domainServiceDefinition.getDescription());
-    serviceDefinition.setUsage(domainServiceDefinition.getUsage());
-    serviceDefinition.setPurpose(domainServiceDefinition.getPurpose());
-    if (domainServiceDefinition.getExperimental() != null) {
-      serviceDefinition.setExperimental(domainServiceDefinition.getExperimental());
-    }
+    serviceDefinition.setId(from.getId());
 
-    serviceDefinition.setStatus(
-        statusTransformer.transform(domainServiceDefinition.getStatus()));
-    serviceDefinition.setEffectivePeriod(
-        dateRangeTransformer.transform(domainServiceDefinition.getEffectivePeriod()));
+    serviceDefinition.setName(from.getId())
+        .setTitle(from.getTitle())
+        .setDescription(from.getDescription())
+        .setPurpose(from.getPurpose())
+        .setUsage(from.getUsage())
+        .setStatus(statusTransformer.transform(from.getStatus()))
+        .setExperimental(toBoolean(from.getExperimental()))
+        .setVersion(from.getVersion())
+        .setDate(from.getDate())
+        .setPublisher(from.getPublisher())
+        .setApprovalDate(from.getApprovalDate())
+        .setLastReviewDate(from.getLastReviewDate())
+        .setEffectivePeriod(dateRangeTransformer.transform(from.getEffectivePeriod()));
 
-    domainServiceDefinition.getJurisdictions()
-        .stream()
+    from.getJurisdictions().stream()
         .map(codeDirectory::get)
         .map(codeableConceptTransformer::transform)
         .forEach(serviceDefinition::addJurisdiction);
 
-    domainServiceDefinition.getUseContext()
-        .stream()
+    from.getUseContext().stream()
         .map(usageContextTransformer::transform)
         .forEach(serviceDefinition::addUseContext);
 
-    domainServiceDefinition.getTriggers()
-        .stream()
-        .map(this::transformTrigger)
+    from.getObservationTriggers().stream()
+        .map(triggerTransformer::transform)
         .forEach(serviceDefinition::addTrigger);
 
-    domainServiceDefinition.getDataRequirements()
-        .stream()
+    from.getDataRequirements().stream()
         .map(requirementTransformer::transform)
         .forEach(serviceDefinition::addDataRequirement);
 
+    from.getTopics().stream()
+        .map(topicTransformer::transform)
+        .forEach(serviceDefinition::addTopic);
+
     return serviceDefinition;
-  }
-
-  private TriggerDefinition transformTrigger(String code) {
-    TriggerDefinition triggerDefinition = new TriggerDefinition();
-
-    var dataReq = new DataRequirement(Type.CareConnectObservation);
-    dataReq.setCode(code);
-    triggerDefinition.setEventData(requirementTransformer.transform(dataReq));
-
-    return triggerDefinition;
   }
 }

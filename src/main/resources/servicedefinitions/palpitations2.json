@@ -1,7 +1,7 @@
 {
   "id": "palpitations2",
-  "title":  "Palpitations Extended",
-  "description": "Palpitations 1st Party",
+  "title": "Palpitations Extended",
+  "description": "Palpitations 1st Party - Extended",
   "usage": "To triage a patient who has palpitations",
   "purpose": "To triage a patient who has palpitations",
   "status": "ACTIVE",
@@ -13,8 +13,11 @@
   "jurisdictions": [
     "GB"
   ],
-  "triggers": [
-    "palpitations"
+  "observationTriggers": [
+    {
+      "code": "palpitations",
+      "value": "present"
+    }
   ],
   "dataRequirements": [
     { "type":  "Patient" },

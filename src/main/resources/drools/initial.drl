@@ -11,6 +11,7 @@ import uk.nhs.cdss.domain.ReferralRequest
 import uk.nhs.cdss.domain.Redirection
 
 import uk.nhs.cdss.engine.CodeDirectory
+import uk.nhs.cdss.domain.CodeableConcept
 
 global CodeDirectory codeDirectory;
 
@@ -26,16 +27,22 @@ when
 then
     insert( new InitialQuestionnaire("initial.initial") );
 
+    CodeableConcept present = codeDirectory.get("present");
     insert( new AnswerAssertion("initial.initial", "q", "chestPain", codeDirectory.get("chestPain"), true));
     insert( new AnswerAssertion("initial.initial", "q", "palpitations", codeDirectory.get("palpitations"), true));
     insert( new AnswerAssertion("initial.initial", "q", "genitoUrinaryProblems", codeDirectory.get("genitoUrinaryProblems"), true));
 
+    insert( new AnswerAssertion("initial.initial", "q", "constipation", codeDirectory.get("constipation"), true)); // Should be 'present'
+    insert( new AnswerAssertion("initial.initial", "q", "soreThroat", codeDirectory.get("soreThroat"), true)); // Should be 'present'
+
+    // These redirections are not dependent on context
     insert( singleCodeRedirection("chestPain", "chestPain"));
     insert( new OutcomeAnswerCondition("chestPain", "initial.initial", "q", Arrays.asList("chestPain") ));
-
     insert( singleCodeRedirection("palpitations", "palpitations"));
     insert( new OutcomeAnswerCondition("palpitations", "initial.initial", "q", Arrays.asList("palpitations") ));
 
+    // This is a complex trigger with additional gender context requirement
+    // FIXME it will fail to match if the gender of the patient is incorrect
     insert( Outcome.of("genitoUrinaryProblems", Redirection.builder()
             .id("genitoUrinaryProblems")
             .code("genitoUrinaryProblems")
@@ -43,4 +50,17 @@ then
             .build()) );
     insert( new OutcomeAnswerCondition("genitoUrinaryProblems", "initial.initial", "q", Arrays.asList("genitoUrinaryProblems") ));
 
+    // These redirections are to service definitions with context-dependent triggers.
+    insert( Outcome.of("constipation", Redirection.builder()
+                        .id("constipation")
+                        .code("constipation")
+                        .code("lifeThreatening")
+                        .build()) );
+    insert( new OutcomeAnswerCondition("constipation", "initial.initial", "q", Arrays.asList("constipation") ));
+    insert( Outcome.of("soreThroat", Redirection.builder()
+                        .id("soreThroat")
+                        .code("soreThroat")
+                        .code("lifeThreatening")
+                        .build()) );
+    insert( new OutcomeAnswerCondition("soreThroat", "initial.initial", "q", Arrays.asList("soreThroat") ));
 end

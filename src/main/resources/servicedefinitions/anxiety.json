@@ -1,6 +1,5 @@
 {
-  "id": "anxiety",
-  "title":  "Anxiety",
+  "title": "Anxiety",
   "description": "Anxiety 1st Party",
   "usage": "To triage a patient suffering from anxiety",
   "purpose": "To triage a patient suffering from anxiety",
@@ -23,12 +22,15 @@
       "valueCodeableConcept": "103TP2700X"
     }
   ],
-  "triggers": [
-    "anxiety"
+  "observationTriggers": [
+    {
+      "code": "anxiety",
+      "value": "present"
+    }
   ],
   "dataRequirements": [
     {
-      "type": "CareConnectObservation",
+      "type": "Observation",
       "code": "anxiety"
     }
   ]

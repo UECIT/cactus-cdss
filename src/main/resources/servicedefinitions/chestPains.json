@@ -1,6 +1,6 @@
 {
   "id": "chestPains",
-  "title":  "Chest Pains",
+  "title": "Chest Pains",
   "description": "Chest pains 1st Party",
   "usage": "To triage a patient who has chest pains",
   "purpose": "To triage a patient who has chest pains",
@@ -13,8 +13,11 @@
   "jurisdictions": [
     "GB"
   ],
-  "triggers": [
-    "chestPain"
+  "observationTriggers": [
+    {
+      "code": "chestPain",
+      "value": "present"
+    }
   ],
   "useContext": [
     {

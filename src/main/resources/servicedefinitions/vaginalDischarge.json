@@ -1,6 +1,6 @@
 {
   "id": "vaginalDischarge",
-  "title":  "Vaginal Discharge",
+  "title": "Vaginal Discharge",
   "description": "Female genitourinary problems",
   "usage": "To triage a female patient with genitourinary problems",
   "purpose": "To triage a female patient with genitourinary problems",
@@ -13,9 +13,14 @@
   "jurisdictions": [
     "GB"
   ],
-  "triggers": [
-    "vaginalDischarge",
-    "isFemale"
+  "observationTriggers": [
+    {
+      "code": "vaginalDischarge",
+      "value": "present"
+    },
+    {
+      "code": "isFemale"
+    }
   ],
   "dataRequirements": [
     { "type":  "Patient" },

@@ -63,5 +63,6 @@ public final class SystemURL {
 	public static final String GR_RES_STATUS = "http://hl7.org/fhir/guidance-response-status";
 	public static final String CS_CONTEXT_TYPE = "http://hl7.org/fhir/usage-context-type";
 	public static final String CS_GENDER = "http://hl7.org/fhir/administrative-gender";
-	public static final String CS_PROVIDER_TAXONOMY = "http://nucc.org/provider-taxonomy";
+	public static final String CS_PROVIDER_TAXONOMY = "http://hl7.org/fhir/valueset-provider-taxonomy.html";
+	public static final String CS_CDS_STUB = "cdss/supplier/stub";
 }

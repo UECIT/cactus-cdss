@@ -1,17 +1,15 @@
 package uk.nhs.cdss.domain;
 
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
+@Data
 @NoArgsConstructor
-@Getter
-@Setter
 public class DataRequirement {
 
   public enum Type {
     Age,
-    CareConnectObservation,
+    Observation,
     Organization,
     Patient,
     QuestionnaireResponse
@@ -21,7 +19,4 @@ public class DataRequirement {
   private String questionnaireId;
   private String code;
 
-  public DataRequirement(Type type) {
-    this.type = type;
-  }
 }

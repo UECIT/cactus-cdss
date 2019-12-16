@@ -28,7 +28,7 @@ public class DataRequirementTransformer
 
     if (from.getType() == Type.QuestionnaireResponse) {
       dataRequirement.addCodeFilter(buildQuestionnaireFilter(from.getQuestionnaireId()));
-    } else if (from.getType() == Type.CareConnectObservation) {
+    } else if (from.getType() == Type.Observation) {
       dataRequirement.addCodeFilter(buildCodeFilter(from.getCode()));
     }
 

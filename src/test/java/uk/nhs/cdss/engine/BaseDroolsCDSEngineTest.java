@@ -1,7 +1,7 @@
 package uk.nhs.cdss.engine;
 
 import org.junit.Before;
-import uk.nhs.cdss.config.DroolsConfig;
+import uk.nhs.cdss.config.CodeDirectoryConfig;
 import uk.nhs.cdss.constants.SnomedConstants;
 import uk.nhs.cdss.constants.SystemURL;
 import uk.nhs.cdss.domain.Answer;
@@ -29,16 +29,17 @@ public abstract class BaseDroolsCDSEngineTest {
 
   @Before
   public void setup() {
-    DroolsConfig droolsConfig = new DroolsConfig();
-    engine = new DroolsCDSEngine(new CDSKnowledgeBaseFactory(false), droolsConfig.codeDirectory());
+    CodeDirectoryConfig codeDirectoryConfig = new CodeDirectoryConfig();
+    engine = new DroolsCDSEngine(new CDSKnowledgeBaseFactory(false),
+        codeDirectoryConfig.codeDirectory());
   }
 
   protected void answerCommonQuestion(String questionnaire, String question, Object answerValue) {
-  String qid = "common." + questionnaire;
-  QuestionnaireResponse response = new QuestionnaireResponse("response", qid);
-  Answer answer = new Answer(qid, question, answerValue);
-  addToInput(response, answer);
-}
+    String qid = "common." + questionnaire;
+    QuestionnaireResponse response = new QuestionnaireResponse("response", qid);
+    Answer answer = new Answer(qid, question, answerValue);
+    addToInput(response, answer);
+  }
 
   protected void answerQuestion(String questionnaire, String question, Object answerValue) {
     String qid = getServiceDefinition() + "." + questionnaire;

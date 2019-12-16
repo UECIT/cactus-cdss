@@ -44,6 +44,7 @@ public class CDSKnowledgeBaseFactory {
       Resource[] resources = resolver.getResources("/drools/*");
 
       Arrays.stream(resources)
+          .parallel()
           .map(Resource::getFilename)
           .filter(Objects::nonNull)
           .filter(file -> !file.startsWith("_"))
