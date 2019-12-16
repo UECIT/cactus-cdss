@@ -19,6 +19,7 @@ import uk.nhs.cdss.domain.CarePlan
 import uk.nhs.cdss.domain.CarePlanActivity
 import uk.nhs.cdss.domain.ReferralRequest
 import uk.nhs.cdss.domain.Redirection
+import uk.nhs.cdss.domain.Coordinates
 
 import uk.nhs.cdss.constants.SnomedConstants
 
@@ -361,20 +362,7 @@ then
     insert( new AnswerAssertion("vaginalDischarge.injuries", "q", "No", codeDirectory.get("injuries"), true) );
     insert( new AnswerAssertion("vaginalDischarge.injuries", "q", "Unsure", codeDirectory.get("injuries"), true) );
     
-    // TODO: image map question
     insert( new NextQuestion("vaginalDischarge.injuriesPlacement", "vaginalDischarge.injuries", "q", Arrays.asList("Yes", "No", "Unsure")) );
-    insert( new AnswerAssertion("vaginalDischarge.injuriesPlacement", "q", "Yes", codeDirectory.get("injuriesPlacement"), true) );
-    insert( Outcome.of("ed-rapeCare", ReferralRequest.builder()
-                .id("ed-rapeCare")
-                .description("ED")
-                .serviceRequested("ed")
-                .occurrence("PT1H")
-                .note("A note")
-                .specialty("pep&counselling&police")
-                .reason("rapeCare")
-                .secondaryReason("abuse&trafficking")
-                .build()) );
-    insert( new OutcomeAnswerCondition("ed-rapeCare", "vaginalDischarge.injuriesPlacement", "q", Arrays.asList("Yes")) );
 
     // TODO: free text question
     insert( new NextQuestion("vaginalDischarge.problemDescription", "vaginalDischarge.assault", "q", Arrays.asList("No")) );
@@ -405,4 +393,33 @@ then
         .code(codeDirectory.get("over50"))
         .value(Constraints.convertAge($value) > 50)
         .build() );
+end
+
+//TODO capture and interpret answers dynamically
+rule "Coordinates answer"
+when
+    $a: Answer(questionnaireId == "vaginalDischarge.injuriesPlacement")
+then
+    System.out.println("vaginalDischarge.injuriesPlacement answered");
+    String location;
+
+    if (((Coordinates)$a.getValue()).getY() < 64) {
+        location = "Head";
+    }
+    else if (((Coordinates)$a.getValue()).getY() < 200) {
+        location = "Torso";
+    }
+    else {
+        location = "Legs";
+    }
+    insert( Outcome.of("ed-rapeCare", ReferralRequest.builder()
+            .id("ed-rapeCare")
+            .description("ED")
+            .serviceRequested("ed")
+            .occurrence("PT1H")
+            .note("Placement - " + location)
+            .specialty("pep&counselling&police")
+            .reason("rapeCare")
+            .secondaryReason("abuse&trafficking")
+            .build()) );
 end

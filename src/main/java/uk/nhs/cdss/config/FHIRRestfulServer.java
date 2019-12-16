@@ -11,6 +11,7 @@ import java.util.Collection;
 import javax.annotation.PostConstruct;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
+import org.hl7.fhir.dstu3.model.CoordinateResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
@@ -36,6 +37,7 @@ public class FHIRRestfulServer extends RestfulServer {
 
     FhirContext ctx = FhirContext.forDstu3();
     ctx.setParserErrorHandler(new StrictErrorHandler());
+    ctx.registerCustomType(CoordinateResource.class);
     setFhirContext(ctx);
     setETagSupport(ETagSupportEnum.ENABLED);
 

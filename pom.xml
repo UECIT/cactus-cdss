@@ -95,6 +95,11 @@
 			<artifactId>EMCI-Fhir-Profiles</artifactId>
 			<version>0.0.1</version>
 		</dependency>
+		<dependency>
+			<groupId>uk.nhs.ctp</groupId>
+			<artifactId>EMS-Fhir-Extensions</artifactId>
+			<version>0.0.1</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
@@ -124,6 +129,12 @@
 			<artifactId>lombok</artifactId>
 			<version>1.18.10</version>
 			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>net.steppschuh.markdowngenerator</groupId>
+			<artifactId>markdowngenerator</artifactId>
+			<version>1.3.1.1</version>
 		</dependency>
 		
 	</dependencies>

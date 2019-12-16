@@ -3,6 +3,7 @@ package uk.nhs.cdss.transform.out;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
 import lombok.AllArgsConstructor;
+import net.steppschuh.markdowngenerator.image.Image;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.dstu3.model.Coding;
 import org.hl7.fhir.dstu3.model.Extension;
@@ -10,6 +11,7 @@ import org.hl7.fhir.dstu3.model.Questionnaire.QuestionnaireItemComponent;
 import org.hl7.fhir.dstu3.model.Questionnaire.QuestionnaireItemType;
 import org.springframework.stereotype.Component;
 import uk.nhs.cdss.domain.Question;
+import uk.nhs.cdss.domain.QuestionType;
 import uk.nhs.cdss.transform.Transformer;
 
 @Component
@@ -26,7 +28,12 @@ public class QuestionTransformer implements
   public QuestionnaireItemComponent transform(Question question) {
     var item = new QuestionnaireItemComponent();
     item.setLinkId(question.getId());
-    item.setText(question.getText());
+
+    String text = question.getType() != QuestionType.IMAGE_MAP
+        ? question.getText()
+        : buildImageMap(item, question.getText(), question.getResource(), question.getId());
+
+    item.setText(text);
     item.setRequired(question.isRequired());
     item.setReadOnly(question.isReadOnly());
     item.setRepeats(question.isRepeats());
@@ -57,6 +64,21 @@ public class QuestionTransformer implements
     buildContextHelp(item, question.getContextHelp(), question.getId());
 
     return item;
+  }
+
+  private String buildImageMap(
+      QuestionnaireItemComponent item, String text,
+      String resource, String id) {
+    Extension contextExtension = new Extension();
+    contextExtension.setUrl("https://hl7.org/fhir/STU3/extension-questionnaire-itemcontrol.html");
+    contextExtension
+        .setValue(new Coding().setSystem("https://hl7.org/fhir/STU3/extension-questionnaire-itemcontrol.html")
+            .setCode("imagemap")
+            .setDisplay(id));
+
+    item.getExtension().add(contextExtension);
+
+    return text + new Image(resource);
   }
 
   private void buildContextHelp(QuestionnaireItemComponent questionnaireItemComponent,

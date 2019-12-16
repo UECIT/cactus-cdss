@@ -4,8 +4,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import com.google.common.collect.Iterables;
 import org.junit.Test;
 import uk.nhs.cdss.domain.Assertion;
+import uk.nhs.cdss.domain.Coordinates;
 
 public class VaginalDischargeTest extends BaseDroolsCDSEngineTest {
 
@@ -108,6 +110,52 @@ public class VaginalDischargeTest extends BaseDroolsCDSEngineTest {
         "gum-stiReocurrence",
         output.getOutcome().getReferralRequest().getId());
     assertEquals(0, output.getQuestionnaireIds().size());
+  }
+
+  @Test
+  public void imageMap_head() throws ServiceDefinitionException {
+    addAgeAssertion("1942-09-07");
+
+    answerQuestion("termsAndConditions", "q", "Yes");
+    answerQuestion("vaginalDischarge", "q", "No");
+    answerQuestion("urine", "q", "No");
+    answerQuestion("assault", "q", "Yes");
+    answerQuestion("injuries", "q", "Yes");
+    answerQuestion("injuriesPlacement", "q",
+        Coordinates.builder()
+            .x(107)
+            .y(34)
+            .build());
+
+    evaluate();
+
+    String note = Iterables
+        .getOnlyElement(output.getOutcome().getReferralRequest().getNote());
+
+    assertEquals("Placement - Head", note);
+  }
+
+  @Test
+  public void imageMap_legs() throws ServiceDefinitionException {
+    addAgeAssertion("1942-09-07");
+
+    answerQuestion("termsAndConditions", "q", "Yes");
+    answerQuestion("vaginalDischarge", "q", "No");
+    answerQuestion("urine", "q", "No");
+    answerQuestion("assault", "q", "Yes");
+    answerQuestion("injuries", "q", "Yes");
+    answerQuestion("injuriesPlacement", "q",
+        Coordinates.builder()
+            .x(107)
+            .y(234)
+            .build());
+
+    evaluate();
+
+    String note = Iterables
+        .getOnlyElement(output.getOutcome().getReferralRequest().getNote());
+
+    assertEquals("Placement - Legs", note);
   }
 
   @Override
