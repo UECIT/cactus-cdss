@@ -11,7 +11,7 @@ public class ImageService {
 
   public Optional<byte[]> getResource(String id) {
 
-    String path ="/images/" + id + ".png";
+    String path ="/images/" + id;
 
     try {
       URL resource = getClass().getResource(path);

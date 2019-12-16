@@ -4,14 +4,9 @@
       {
         "id": "q",
         "text": "Can you tell me where the injuries are?",
-        "type": "CHOICE",
+        "type": "IMAGE_MAP",
         "required": true,
-        "options": [
-          {
-            "stringValue": "Clinician would annotate on chart any injuries",
-            "code": "Yes"
-          }
-        ]
+        "resource": "body.png"
       }
     ]
   }

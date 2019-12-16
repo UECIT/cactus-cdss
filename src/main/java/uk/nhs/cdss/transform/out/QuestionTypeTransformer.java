@@ -39,6 +39,7 @@ public class QuestionTypeTransformer implements Transformer<QuestionType, Questi
       case ATTACHMENT:
         return QuestionnaireItemType.ATTACHMENT;
       case REFERENCE:
+      case IMAGE_MAP:
         return QuestionnaireItemType.REFERENCE;
       case QUANTITY:
         return QuestionnaireItemType.QUANTITY;

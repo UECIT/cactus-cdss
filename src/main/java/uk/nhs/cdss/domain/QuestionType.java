@@ -16,5 +16,7 @@ public enum QuestionType {
   OPEN_CHOICE,
   ATTACHMENT,
   REFERENCE,
-  QUANTITY
+  QUANTITY,
+
+  IMAGE_MAP
 }

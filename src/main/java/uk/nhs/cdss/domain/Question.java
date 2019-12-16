@@ -5,12 +5,14 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class Question {
 
   private String id;
@@ -22,13 +24,11 @@ public class Question {
   private boolean readOnly;
   private Object initial;
   private String contextHelp;
+  private String resource;
 
   private final List<OptionType> options = new ArrayList<>();
   private final List<QuestionConstraint> constraints = new ArrayList<>();
   private final List<Question> items = new ArrayList<>();
-
-  public Question() {
-  }
 
   public Question(String id) {
     this.id = id;
