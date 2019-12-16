@@ -3,18 +3,13 @@ package uk.nhs.cdss.domain;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Singular;
 import lombok.ToString;
+import lombok.Value;
 
-@NoArgsConstructor
-@AllArgsConstructor
-@Getter
+@Value
 @Builder(toBuilder = true)
-@ToString
 public class Assertion {
 
   public enum Status {FINAL, AMENDED}
@@ -28,13 +23,24 @@ public class Assertion {
 
   @Singular("oneRelated")
   @ToString.Exclude
-  private List<QuestionnaireResponse> related = new ArrayList<>();
+  private List<QuestionnaireResponse> related;
+
   @Singular
   @ToString.Exclude
-  private List<Concept> components = new ArrayList<>();
+  private List<Concept> components;
 
-  public Assertion(String id, Status status) {
-    this.id = id;
-    this.status = status;
+  public static Assertion of(String id, Status status) {
+    return builder()
+        .id(id)
+        .status(status)
+        .build();
+  }
+
+  public static Assertion of(Concept code) {
+    return builder()
+        .code(code)
+        .status(Status.AMENDED)
+        .value(true)
+        .build();
   }
 }
