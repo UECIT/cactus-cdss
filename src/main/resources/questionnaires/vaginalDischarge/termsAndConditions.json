@@ -4,16 +4,8 @@
       {
         "id": "q",
         "text": "Do you agree to the terms and conditions?",
-        "type": "CHOICE",
-        "required": true,
-        "options": [
-          {
-            "stringValue": "Yes"
-          },
-          {
-            "stringValue": "No"
-          }
-        ]
+        "type": "BOOLEAN",
+        "required": true
       }
     ]
   }

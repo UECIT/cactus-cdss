@@ -4,13 +4,8 @@
       {
         "id": "q",
         "text": "Date and time last temperature reading performed",
-        "type": "CHOICE",
-        "required": true,
-        "options": [
-          {
-            "stringValue": "Yes"
-          }
-        ]
+        "type": "DATE",
+        "required": true
       }
     ]
   }

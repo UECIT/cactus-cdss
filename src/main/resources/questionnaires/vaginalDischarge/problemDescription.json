@@ -4,14 +4,8 @@
       {
         "id": "q",
         "text": "Can the patient describe the genital problem they are experiencing and for how long?",
-        "type": "CHOICE",
-        "required": true,
-        "options": [
-          {
-            "stringValue": "Free Text Example",
-            "code": "Yes"
-          }
-        ]
+        "type": "TEXT",
+        "required": true
       }
     ]
   }

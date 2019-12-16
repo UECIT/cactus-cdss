@@ -4,13 +4,8 @@
       {
         "id": "q",
         "text": "When was your last period?",
-        "type": "CHOICE",
-        "required": true,
-        "options": [
-          {
-            "stringValue": "Yes"
-          }
-        ]
+        "type": "STRING",
+        "required": true
       }
     ]
   }

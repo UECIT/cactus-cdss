@@ -45,11 +45,10 @@ rule "Init"
 salience 10000
 when // Always
 then
-    // TODO: boolean question
     insert (new InitialQuestionnaire("vaginalDischarge.termsAndConditions") );
-    insert( new AnswerAssertion("vaginalDischarge.termsAndConditions", "q", "Yes", codeDirectory.get("termsAndConditions"), true));
+    insert( new AnswerAssertion("vaginalDischarge.termsAndConditions", "q", "true", codeDirectory.get("termsAndConditions"), true));
 
-    insert( new NextQuestion("vaginalDischarge.vaginalDischarge", "vaginalDischarge.termsAndConditions", "q", Arrays.asList("Yes", "No")) );
+    insert( new NextQuestion("vaginalDischarge.vaginalDischarge", "vaginalDischarge.termsAndConditions", "q", Arrays.asList(true, false)) );
     insert( new AnswerAssertion("vaginalDischarge.vaginalDischarge", "q", "Yes", codeDirectory.get("vaginalDischarge"), true));
 
     insert( new NextQuestion("vaginalDischarge.abdominalPain", "vaginalDischarge.vaginalDischarge", "q", Arrays.asList("Yes")) );
@@ -64,9 +63,6 @@ then
     insert( new NextQuestion("vaginalDischarge.over50", "vaginalDischarge.painIntensity") );
     insert( new AnswerAssertion("vaginalDischarge.over50", "q", "Yes", codeDirectory.get("over50"), true) );
     insert( new AnswerAssertion("vaginalDischarge.over50", "q", "No", codeDirectory.get("over50"), false) );
-
-    // TODO: text question
-    insert( new AnswerAssertion("vaginalDischarge.lastPeriod", "q", "Yes", codeDirectory.get("lastPeriod"), true) );
 
     insert( new ConditionalNextQuestion("over50ToPregnant", "common.pregnant", "vaginalDischarge.over50", "q", Arrays.asList("No")) );
     insert( new NextQuestionCondition("over50ToPregnant", "vaginalDischarge.painIntensity", "q", Arrays.asList("inPain")) );
@@ -127,6 +123,7 @@ then
     insert( new OutcomeAnswerCondition("ed-ectopic-ruptured-1h", "vaginalDischarge.painSymptoms", "q", Arrays.asList("No") ));
 
     insert( new AnswerAssertion("vaginalDischarge.fever", "q", "Yes", codeDirectory.get("fever"), true) );
+    insert( new NextQuestion("vaginalDischarge.lastTemperatureReading", "vaginalDischarge.fever", "q", Arrays.asList("Yes")) );
     insert( Outcome.of("ed-ectopic-pelvic-4h", ReferralRequest.builder()
                 .id("ed-ectopic-pelvic-4h")
                 .description("ED")
@@ -137,12 +134,10 @@ then
                 .reason("ectopic")
                 .secondaryReason("pelvicInflammatory")
                 .build()) );
-    insert( new OutcomeAnswerCondition("ed-ectopic-pelvic-4h", "vaginalDischarge.fever", "q", Arrays.asList("No") ));
+    insert( new OutcomeAnswerCondition("ed-ectopic-pelvic-4h", "vaginalDischarge.lastTemperatureReading", "q"));
+    insert( new OutcomeAnswerCondition("ed-ectopic-pelvic-4h", "vaginalDischarge.fever", "q", Arrays.asList("Yes") ));
     insert( new OutcomeAnswerCondition("ed-ectopic-pelvic-4h", "vaginalDischarge.painIntensity", "q", Arrays.asList("inPain") ));
 
-    // TODO: date question
-    insert( new NextQuestion("vaginalDischarge.lastTemperatureReading", "vaginalDischarge.fever", "q", Arrays.asList("Yes")) );
-    insert( new AnswerAssertion("vaginalDischarge.lastTemperatureReading", "q", "Yes", codeDirectory.get("lastTemperatureReading"), true) );
     insert( Outcome.of("gp-ectopic-pelvic-6h", ReferralRequest.builder()
                 .id("gp-ectopic-pelvic-6h")
                 .description("Contact General Practice Today")
@@ -153,7 +148,7 @@ then
                 .reason("ectopic")
                 .secondaryReason("pelvicInflammatory")
                 .build()) );
-    insert( new OutcomeAnswerCondition("gp-ectopic-pelvic-6h", "vaginalDischarge.lastTemperatureReading", "q", Arrays.asList("Yes") ));
+    insert( new OutcomeAnswerCondition("gp-ectopic-pelvic-6h", "vaginalDischarge.fever", "q", Arrays.asList("No") ));
     insert( new OutcomeAnswerCondition("gp-ectopic-pelvic-6h", "vaginalDischarge.painIntensity", "q", Arrays.asList("inPain") ));
 
     insert( new AnswerAssertion("vaginalDischarge.sti", "q", "Gonorrhoea", codeDirectory.get("gonorrhoea"), true) );
@@ -229,9 +224,7 @@ then
     insert( new AnswerAssertion("vaginalDischarge.foreignBody", "q", "Unsure", codeDirectory.get("foreignBody"), true) );
     insert( new AnswerAssertion("vaginalDischarge.foreignBody", "q", "No", codeDirectory.get("foreignBody"), false) );
 
-    // TODO: image upload
     insert( new NextQuestion("vaginalDischarge.rash", "vaginalDischarge.foreignBody", "q", Arrays.asList("Yes", "Unsure")) );
-    insert( new AnswerAssertion("vaginalDischarge.rash", "q", "Yes", codeDirectory.get("rash"), true) );
     insert( Outcome.of("utc-strepto", ReferralRequest.builder()
                 .id("utc-strepto")
                 .description("UTC")
@@ -242,7 +235,7 @@ then
                 .reason("strepto")
                 .secondaryReason("bacterialInfection")
                 .build()) );
-    insert( new OutcomeAnswerCondition("utc-strepto", "vaginalDischarge.rash", "q", Arrays.asList("Yes")) );
+    insert( new OutcomeAnswerCondition("utc-strepto", "vaginalDischarge.rash", "q") );
 
     insert( new NextQuestion("vaginalDischarge.blisters", "vaginalDischarge.foreignBody", "q", Arrays.asList("No")) );
     insert( new AnswerAssertion("vaginalDischarge.blisters", "q", "Yes", codeDirectory.get("blisters"), true) );
@@ -364,7 +357,6 @@ then
     
     insert( new NextQuestion("vaginalDischarge.injuriesPlacement", "vaginalDischarge.injuries", "q", Arrays.asList("Yes", "No", "Unsure")) );
 
-    // TODO: free text question
     insert( new NextQuestion("vaginalDischarge.problemDescription", "vaginalDischarge.assault", "q", Arrays.asList("No")) );
     insert( new AnswerAssertion("vaginalDischarge.problemDescription", "q", "Yes", codeDirectory.get("problemDescription"), true) );
     insert( Outcome.of("gp-dyspareunia", ReferralRequest.builder()
@@ -377,7 +369,7 @@ then
                 .reason("dyspareunia")
                 .secondaryReason("bacterialOrYeastInfection")
                 .build()) );
-    insert( new OutcomeAnswerCondition("gp-dyspareunia", "vaginalDischarge.problemDescription", "q", Arrays.asList("Yes")) );
+    insert( new OutcomeAnswerCondition("gp-dyspareunia", "vaginalDischarge.problemDescription", "q") );
 end
 
 rule "Add age assertion"
