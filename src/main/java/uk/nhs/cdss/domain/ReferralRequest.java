@@ -87,12 +87,11 @@ public class ReferralRequest {
    */
   private String description;
 
-  private String secondaryReason;
-
   /**
    * This SHOULD be populated by the CDSS. Secondary concerns SHOULD be be carried in this element.
    */
-  private List<Assertion> supportingInfo = new ArrayList<>();
+  @Singular("secondaryReason")
+  private List<Assertion> secondaryReasons = new ArrayList<>();
 
   /**
    * This SHOULD be populated by the CDSS.

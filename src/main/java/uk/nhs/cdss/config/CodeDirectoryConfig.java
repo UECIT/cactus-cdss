@@ -306,6 +306,7 @@ public class CodeDirectoryConfig {
     // Concerns
     codeDirectory.put(snomed("ectopic", "Ectopic pregnancy"));
     codeDirectory.put(snomed("rupturedEctopic", "Ruptured Ectopic pregnancy"));
+    codeDirectory.put(snomed("pelvicInflammatory", "Pelvic Inflammatory Disease"));
     codeDirectory.put(snomed("rupturedEctopicPid", "Ruptured Ectopic pregnancy PID"));
     codeDirectory.put(snomed("candida", "Candida"));
     codeDirectory.put(snomed("bacterialVaginosis", "Bacterial Vaginosis"));
@@ -328,6 +329,7 @@ public class CodeDirectoryConfig {
     codeDirectory.put(snomed("abuse&trafficking", "Sexual Abuse. Victim of people trafficking"));
     codeDirectory.put(snomed("dyspareunia", "Dyspareunia"));
     codeDirectory.put(snomed("bacterialOrYeastInfection", "Bacterial / Yeast infection"));
+    codeDirectory.put(snomed("bacterialInfection", "Bacterial Infection"));
 
     // Activities (Specialties)
     codeDirectory.put(snomed("medicalReview", "Medical review and assessment"));

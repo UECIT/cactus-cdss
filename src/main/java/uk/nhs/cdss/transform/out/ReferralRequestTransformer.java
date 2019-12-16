@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.AllArgsConstructor;
 import org.hl7.fhir.dstu3.model.Annotation;
 import org.hl7.fhir.dstu3.model.Period;
 import org.hl7.fhir.dstu3.model.Reference;
@@ -27,19 +28,14 @@ import uk.nhs.cdss.transform.Transformer;
 import uk.nhs.cdss.transform.bundle.ReferralRequestBundle;
 
 @Component
+@AllArgsConstructor
 public class ReferralRequestTransformer implements
     Transformer<ReferralRequestBundle, ReferralRequest> {
 
   private static final Duration routineAppointmentOccurrence = Duration.parse("P7D");
   private final ConceptTransformer conceptTransformer;
+  private final ObservationTransformer observationTransformer;
   private final CodeDirectory codeDirectory;
-
-  public ReferralRequestTransformer(
-      ConceptTransformer conceptTransformer,
-      CodeDirectory codeDirectory) {
-    this.conceptTransformer = conceptTransformer;
-    this.codeDirectory = codeDirectory;
-  }
 
   @Override
   public ReferralRequest transform(ReferralRequestBundle bundle) {
@@ -64,7 +60,7 @@ public class ReferralRequestTransformer implements
     result.setSpecialty(transformSpecialty(from.getSpecialty()));
     result.setReasonReference(transformReason(from.getReason()));
     result.setDescription(from.getDescription());
-    result.setSupportingInfo(transformSupportingInfo(from.getSupportingInfo()));
+    result.setSupportingInfo(transformSupportingInfo(from.getSecondaryReasons()));
     result.setNote(from.getNote().stream()
         .map(StringType::new)
         .map(Annotation::new)
@@ -87,8 +83,9 @@ public class ReferralRequestTransformer implements
   }
 
   private List<Reference> transformSupportingInfo(List<Assertion> supportingInfo) {
-    // TODO
-    return Collections.emptyList();
+    return supportingInfo.stream()
+        .map(assertion -> new Reference(observationTransformer.transform(assertion)))
+        .collect(Collectors.toList());
   }
 
   private org.hl7.fhir.dstu3.model.CodeableConcept transformSpecialty(String specialty) {

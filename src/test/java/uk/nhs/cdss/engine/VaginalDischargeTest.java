@@ -1,5 +1,7 @@
 package uk.nhs.cdss.engine;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -95,7 +97,7 @@ public class VaginalDischargeTest extends BaseDroolsCDSEngineTest {
   }
 
   @Test
-  public void vaginalDischarge_stiOutcome_over50() throws ServiceDefinitionException {
+  public void vaginalDischarge_stiOutcome_over50_secondary_concern() throws ServiceDefinitionException {
     addAgeAssertion("1942-09-07");
 
     answerQuestion("termsAndConditions", "q", true);
@@ -109,7 +111,8 @@ public class VaginalDischargeTest extends BaseDroolsCDSEngineTest {
         "go to ED",
         "gum-stiReocurrence",
         output.getOutcome().getReferralRequest().getId());
-    assertEquals(0, output.getQuestionnaireIds().size());
+    assertThat(output.getOutcome().getReferralRequest().getSecondaryReasons(), hasSize(1));
+    assertThat(output.getQuestionnaireIds(), empty());
   }
 
   @Test
