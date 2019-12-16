@@ -21,7 +21,7 @@ import uk.nhs.cdss.domain.Coding;
 import uk.nhs.cdss.engine.CodeDirectory;
 import uk.nhs.cdss.services.ServiceDefinitionConditionBuilderFactory;
 import uk.nhs.cdss.services.ServiceDefinitionRegistry;
-import uk.nhs.cdss.transform.out.CodeableConceptOutTransformer;
+import uk.nhs.cdss.transform.out.ConceptTransformer;
 import uk.nhs.cdss.transform.out.CodingOutTransformer;
 import uk.nhs.cdss.transform.out.DataRequirementTransformer;
 import uk.nhs.cdss.transform.out.DateRangeTransformer;
@@ -41,7 +41,7 @@ public class ServiceDefinitionProvidersTest {
   @BeforeClass
   public static void beforeAll() {
     var codingTransformer = new CodingOutTransformer();
-    var conceptTransformer = new CodeableConceptOutTransformer(codingTransformer);
+    var conceptTransformer = new ConceptTransformer(codingTransformer);
     var transformer = new ServiceDefinitionTransformer(
         codeDirectory,
         new DataRequirementTransformer(codeDirectory, codingTransformer),

@@ -13,7 +13,7 @@ import org.junit.Test;
 import uk.nhs.cdss.domain.Assertion.Status;
 import uk.nhs.cdss.transform.in.AssertionTransformer;
 import uk.nhs.cdss.transform.in.AssertionTransformer.StatusTransformer;
-import uk.nhs.cdss.transform.in.CodeableConceptInTransformer;
+import uk.nhs.cdss.transform.in.CodeableConceptTransformer;
 import uk.nhs.cdss.transform.in.CodingInTransformer;
 import uk.nhs.cdss.transform.in.ValueTransformer;
 
@@ -43,10 +43,13 @@ public class AssertionTransformerTest {
     observation.addComponent(new ObservationComponentComponent(buildCode(CODING_2)));
     observation.setValue(new StringType(VALUE));
 
+    CodeableConceptTransformer codeableConceptTransformer =
+        new CodeableConceptTransformer(new CodingInTransformer());
+
     var transformer = new AssertionTransformer(
-        new CodeableConceptInTransformer(new CodingInTransformer()),
+        codeableConceptTransformer,
         new StatusTransformer(),
-        new ValueTransformer());
+        new ValueTransformer(codeableConceptTransformer));
 
     var result = transformer.transform(observation);
 

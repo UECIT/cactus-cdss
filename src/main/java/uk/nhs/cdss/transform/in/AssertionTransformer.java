@@ -5,19 +5,19 @@ import org.hl7.fhir.dstu3.model.Observation;
 import org.hl7.fhir.dstu3.model.Observation.ObservationComponentComponent;
 import org.hl7.fhir.dstu3.model.Observation.ObservationStatus;
 import org.springframework.stereotype.Component;
-import uk.nhs.cdss.transform.Transformer;
 import uk.nhs.cdss.domain.Assertion;
 import uk.nhs.cdss.domain.Assertion.Status;
+import uk.nhs.cdss.transform.Transformer;
 
 @Component
 public final class AssertionTransformer implements Transformer<Observation, Assertion> {
 
-  private final CodeableConceptInTransformer codeTransformer;
+  private final CodeableConceptTransformer codeTransformer;
   private final StatusTransformer statusTransformer;
   private final ValueTransformer valueTransformer;
 
   public AssertionTransformer(
-      CodeableConceptInTransformer codeTransformer,
+      CodeableConceptTransformer codeTransformer,
       StatusTransformer statusTransformer,
       ValueTransformer valueTransformer) {
     this.codeTransformer = codeTransformer;
@@ -63,4 +63,5 @@ public final class AssertionTransformer implements Transformer<Observation, Asse
             .collect(Collectors.toUnmodifiableList()))
         .build();
   }
+
 }

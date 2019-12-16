@@ -4,5 +4,5 @@ public class ActivityDefinition {
   private String id;
   private String name;
   private String title;
-  private CodeableConcept code;
+  private Concept code;
 }

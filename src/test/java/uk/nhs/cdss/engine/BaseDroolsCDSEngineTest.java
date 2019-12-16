@@ -7,7 +7,7 @@ import uk.nhs.cdss.constants.SystemURL;
 import uk.nhs.cdss.domain.Answer;
 import uk.nhs.cdss.domain.Assertion;
 import uk.nhs.cdss.domain.Assertion.Status;
-import uk.nhs.cdss.domain.CodeableConcept;
+import uk.nhs.cdss.domain.Concept;
 import uk.nhs.cdss.domain.Coding;
 import uk.nhs.cdss.domain.QuestionnaireResponse;
 
@@ -63,7 +63,7 @@ public abstract class BaseDroolsCDSEngineTest {
   }
 
   protected void addGenderAssertion(String gender) {
-    var code = new CodeableConcept(
+    var code = new Concept(
         SnomedConstants.GENDER,
         new Coding(SystemURL.CS_SNOMED, SnomedConstants.GENDER));
     var genderAssertion = Assertion.builder()
@@ -75,7 +75,7 @@ public abstract class BaseDroolsCDSEngineTest {
   }
 
   protected void addAgeAssertion(String dateOfBirth) {
-    var code = new CodeableConcept(
+    var code = new Concept(
         SnomedConstants.AGE,
         new Coding(SystemURL.CS_SNOMED, SnomedConstants.AGE));
     var ageAssertion = Assertion.builder()

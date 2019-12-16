@@ -2,25 +2,26 @@ package uk.nhs.cdss.transform.out;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import org.hl7.fhir.dstu3.model.CodeableConcept;
 import org.hl7.fhir.dstu3.model.Coding;
 import org.springframework.stereotype.Component;
-import uk.nhs.cdss.domain.CodeableConcept;
+import uk.nhs.cdss.domain.Concept;
 import uk.nhs.cdss.transform.Transformer;
 
 @Component
-public class CodeableConceptOutTransformer implements
-    Transformer<CodeableConcept, org.hl7.fhir.dstu3.model.CodeableConcept> {
+public class ConceptTransformer implements
+    Transformer<Concept, CodeableConcept> {
 
   private CodingOutTransformer codingTransformer;
 
-  public CodeableConceptOutTransformer(
+  public ConceptTransformer(
       CodingOutTransformer codingTransformer) {
     this.codingTransformer = codingTransformer;
   }
 
   @Override
-  public org.hl7.fhir.dstu3.model.CodeableConcept transform(CodeableConcept from) {
-    var code = new org.hl7.fhir.dstu3.model.CodeableConcept();
+  public CodeableConcept transform(Concept from) {
+    var code = new CodeableConcept();
     code.setText(from.getText());
 
     List<Coding> codings = from.getCoding()

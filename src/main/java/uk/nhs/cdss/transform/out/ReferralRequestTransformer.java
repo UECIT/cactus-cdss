@@ -19,7 +19,7 @@ import org.hl7.fhir.dstu3.model.Type;
 import org.springframework.stereotype.Component;
 import uk.nhs.cdss.domain.ActivityDefinition;
 import uk.nhs.cdss.domain.Assertion;
-import uk.nhs.cdss.domain.CodeableConcept;
+import uk.nhs.cdss.domain.Concept;
 import uk.nhs.cdss.domain.Coding;
 import uk.nhs.cdss.domain.ProcedureRequest;
 import uk.nhs.cdss.engine.CodeDirectory;
@@ -31,13 +31,13 @@ public class ReferralRequestTransformer implements
     Transformer<ReferralRequestBundle, ReferralRequest> {
 
   private static final Duration routineAppointmentOccurrence = Duration.parse("P7D");
-  private final CodeableConceptOutTransformer codeableConceptOutTransformer;
+  private final ConceptTransformer conceptTransformer;
   private final CodeDirectory codeDirectory;
 
   public ReferralRequestTransformer(
-      CodeableConceptOutTransformer codeableConceptOutTransformer,
+      ConceptTransformer conceptTransformer,
       CodeDirectory codeDirectory) {
-    this.codeableConceptOutTransformer = codeableConceptOutTransformer;
+    this.conceptTransformer = conceptTransformer;
     this.codeDirectory = codeDirectory;
   }
 
@@ -77,7 +77,7 @@ public class ReferralRequestTransformer implements
   private List<org.hl7.fhir.dstu3.model.CodeableConcept> transformServiceRequested(
       String serviceRequested) {
     return Collections.singletonList(
-        codeableConceptOutTransformer.transform(codeDirectory.get(serviceRequested))
+        conceptTransformer.transform(codeDirectory.get(serviceRequested))
     );
   }
 
@@ -92,11 +92,11 @@ public class ReferralRequestTransformer implements
   }
 
   private org.hl7.fhir.dstu3.model.CodeableConcept transformSpecialty(String specialty) {
-    CodeableConcept code = codeDirectory.get(specialty);
+    Concept code = codeDirectory.get(specialty);
     if (code == null) {
       return null;
     }
-    return codeableConceptOutTransformer.transform(code);
+    return conceptTransformer.transform(code);
   }
 
   private Type transformOccurrence(String occurrence) {
@@ -115,7 +115,7 @@ public class ReferralRequestTransformer implements
   }
 
   private List<Reference> transformReason(String reason) {
-    CodeableConcept code = codeDirectory.get(reason);
+    Concept code = codeDirectory.get(reason);
     if (code == null) {
       return null;
     }

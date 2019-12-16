@@ -13,7 +13,7 @@ import uk.nhs.cdss.transform.bundle.CDSInputBundle;
 import uk.nhs.cdss.transform.in.AnswerTransformer;
 import uk.nhs.cdss.transform.in.AssertionTransformer;
 import uk.nhs.cdss.transform.in.CDSInputTransformer;
-import uk.nhs.cdss.transform.in.CodeableConceptInTransformer;
+import uk.nhs.cdss.transform.in.CodeableConceptTransformer;
 import uk.nhs.cdss.transform.in.CodingInTransformer;
 import uk.nhs.cdss.transform.in.EvaluateContextTransformer;
 import uk.nhs.cdss.transform.in.QuestionnaireResponseTransformer;
@@ -56,17 +56,18 @@ public class CDSInputTransformerTest {
     var id = Long.toString(SERVICE_DEFINITION_ID);
     var bundle = new CDSInputBundle(id, parameters);
 
+    CodeableConceptTransformer codeableConceptTransformer = new CodeableConceptTransformer(
+        new CodingInTransformer()
+    );
     var transformer = new CDSInputTransformer(
         new QuestionnaireResponseTransformer(
-            new AnswerTransformer(new ValueTransformer()),
+            new AnswerTransformer(new ValueTransformer(codeableConceptTransformer)),
             new QuestionnaireResponseTransformer.StatusTransformer()
         ),
         new AssertionTransformer(
-            new CodeableConceptInTransformer(
-                new CodingInTransformer()
-            ),
+            codeableConceptTransformer,
             new AssertionTransformer.StatusTransformer(),
-            new ValueTransformer()
+            new ValueTransformer(codeableConceptTransformer)
         ),
         new EvaluateContextTransformer());
 

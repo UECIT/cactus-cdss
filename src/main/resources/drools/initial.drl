@@ -11,7 +11,7 @@ import uk.nhs.cdss.domain.ReferralRequest
 import uk.nhs.cdss.domain.Redirection
 
 import uk.nhs.cdss.engine.CodeDirectory
-import uk.nhs.cdss.domain.CodeableConcept
+import uk.nhs.cdss.domain.Concept
 
 global CodeDirectory codeDirectory;
 
@@ -27,13 +27,13 @@ when
 then
     insert( new InitialQuestionnaire("initial.initial") );
 
-    CodeableConcept present = codeDirectory.get("present");
+    Concept present = codeDirectory.get("present");
     insert( new AnswerAssertion("initial.initial", "q", "chestPain", codeDirectory.get("chestPain"), true));
     insert( new AnswerAssertion("initial.initial", "q", "palpitations", codeDirectory.get("palpitations"), true));
     insert( new AnswerAssertion("initial.initial", "q", "genitoUrinaryProblems", codeDirectory.get("genitoUrinaryProblems"), true));
 
-    insert( new AnswerAssertion("initial.initial", "q", "constipation", codeDirectory.get("constipation"), true)); // Should be 'present'
-    insert( new AnswerAssertion("initial.initial", "q", "soreThroat", codeDirectory.get("soreThroat"), true)); // Should be 'present'
+    insert( new AnswerAssertion("initial.initial", "q", "constipation", codeDirectory.get("constipation"), present));
+    insert( new AnswerAssertion("initial.initial", "q", "soreThroat", codeDirectory.get("soreThroat"), present));
 
     // These redirections are not dependent on context
     insert( singleCodeRedirection("chestPain", "chestPain"));

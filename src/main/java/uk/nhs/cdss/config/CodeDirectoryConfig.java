@@ -4,28 +4,28 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import uk.nhs.cdss.constants.SnomedConstants;
 import uk.nhs.cdss.constants.SystemURL;
-import uk.nhs.cdss.domain.CodeableConcept;
+import uk.nhs.cdss.domain.Concept;
 import uk.nhs.cdss.domain.Coding;
 import uk.nhs.cdss.engine.CodeDirectory;
 
 @Configuration
 public class CodeDirectoryConfig {
 
-  private CodeableConcept snomed(String id, String description) {
+  private Concept snomed(String id, String description) {
     return buildCode(SystemURL.CS_SNOMED, id, description);
   }
-  private CodeableConcept contextType(String id, String description) {
+  private Concept contextType(String id, String description) {
     return buildCode(SystemURL.CS_CONTEXT_TYPE, id, description);
   }
-  private CodeableConcept gender(String id, String description) {
+  private Concept gender(String id, String description) {
     return buildCode(SystemURL.CS_GENDER, id, description);
   }
-  private CodeableConcept provider(String id, String description) {
+  private Concept provider(String id, String description) {
     return buildCode(SystemURL.CS_PROVIDER_TAXONOMY, id, description);
   }
-  private CodeableConcept buildCode(String systemURL, String id, String description) {
+  private Concept buildCode(String systemURL, String id, String description) {
     var coding = new Coding(systemURL, id, description);
-    return new CodeableConcept(id, coding);
+    return new Concept(id, coding);
   }
 
   @Bean

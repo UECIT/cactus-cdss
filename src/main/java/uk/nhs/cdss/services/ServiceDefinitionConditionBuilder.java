@@ -23,7 +23,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.nhs.cdss.domain.CodeableConcept;
+import uk.nhs.cdss.domain.Concept;
 import uk.nhs.cdss.domain.Coding;
 import uk.nhs.cdss.domain.DateRange;
 import uk.nhs.cdss.domain.ObservationTrigger;
@@ -137,11 +137,11 @@ public class ServiceDefinitionConditionBuilder {
     for (ObservationTrigger observationTrigger : sd.getObservationTriggers()) {
       Optional<Coding> code = Optional.ofNullable(observationTrigger.getCode())
           .map(codeDirectory::get)
-          .map(CodeableConcept::getCoding)
+          .map(Concept::getCoding)
           .map(list -> list.get(0));
       Optional<Coding> value = Optional.ofNullable(observationTrigger.getValue())
           .map(codeDirectory::get)
-          .map(CodeableConcept::getCoding)
+          .map(Concept::getCoding)
           .map(list -> list.get(0));
 
       // TODO match system (requires system of each observation code)

@@ -21,6 +21,8 @@ import org.hl7.fhir.dstu3.model.StringType;
 import org.junit.Test;
 import uk.nhs.cdss.domain.QuestionnaireResponse.Status;
 import uk.nhs.cdss.transform.in.AnswerTransformer;
+import uk.nhs.cdss.transform.in.CodeableConceptTransformer;
+import uk.nhs.cdss.transform.in.CodingInTransformer;
 import uk.nhs.cdss.transform.in.QuestionnaireResponseTransformer;
 import uk.nhs.cdss.transform.in.QuestionnaireResponseTransformer.StatusTransformer;
 import uk.nhs.cdss.transform.in.ValueTransformer;
@@ -32,6 +34,7 @@ public class QuestionnaireResponseTransformerTest {
       Collection<String> answerValues) {
     return buildItem(questionId, answerValues, null);
   }
+
   private QuestionnaireResponseItemComponent buildItem(
       String questionId,
       Collection<String> answerValues,
@@ -80,10 +83,12 @@ public class QuestionnaireResponseTransformerTest {
         buildItem(Q_2, singletonList("answer2"), asList(
             buildItem(Q_21, singletonList("answer2.1")),
             buildItem(Q_22, asList("answer2.2[0]", "answer2.2[1]")))))
-      .forEach(responseDTO::addItem);
+        .forEach(responseDTO::addItem);
 
+    CodeableConceptTransformer codeableConceptTransformer =
+        new CodeableConceptTransformer(new CodingInTransformer());
     var transformer = new QuestionnaireResponseTransformer(
-        new AnswerTransformer(new ValueTransformer()),
+        new AnswerTransformer(new ValueTransformer(codeableConceptTransformer)),
         new StatusTransformer()
     );
 

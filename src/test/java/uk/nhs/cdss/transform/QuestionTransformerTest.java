@@ -17,7 +17,7 @@ import uk.nhs.cdss.domain.OptionType;
 import uk.nhs.cdss.domain.Question;
 import uk.nhs.cdss.domain.QuestionConstraint;
 import uk.nhs.cdss.domain.QuestionType;
-import uk.nhs.cdss.transform.out.CodeableConceptOutTransformer;
+import uk.nhs.cdss.transform.out.ConceptTransformer;
 import uk.nhs.cdss.transform.out.CodingOutTransformer;
 import uk.nhs.cdss.transform.out.OptionTypeTransformer;
 import uk.nhs.cdss.transform.out.QuestionConstraintTransformer;
@@ -53,7 +53,7 @@ public class QuestionTransformerTest {
     question.getItems().addAll(asList(subQuestionId1, subQuestionId2));
 
     TypeTransformer typeTransformer = new TypeTransformer(
-        new CodeableConceptOutTransformer(new CodingOutTransformer()));
+        new ConceptTransformer(new CodingOutTransformer()));
     var transformer = new QuestionTransformer(
         new QuestionTypeTransformer(),
         new OptionTypeTransformer(),
