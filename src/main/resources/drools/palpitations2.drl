@@ -13,7 +13,7 @@ import uk.nhs.cdss.rules.OutcomeAnswerCondition
 import uk.nhs.cdss.domain.Answer
 import uk.nhs.cdss.domain.Assertion
 import uk.nhs.cdss.domain.Assertion.Status
-import uk.nhs.cdss.domain.CodeableConcept
+import uk.nhs.cdss.domain.Concept
 import uk.nhs.cdss.domain.Patient
 import uk.nhs.cdss.domain.Patient.Sex
 import uk.nhs.cdss.domain.Questionnaire

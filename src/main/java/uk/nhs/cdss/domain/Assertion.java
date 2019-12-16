@@ -22,7 +22,7 @@ public class Assertion {
   @ToString.Exclude
   private String id;
   private Status status;
-  private CodeableConcept code;
+  private Concept code;
   private Object value;
   private Instant issued;
 
@@ -31,7 +31,7 @@ public class Assertion {
   private List<QuestionnaireResponse> related = new ArrayList<>();
   @Singular
   @ToString.Exclude
-  private List<CodeableConcept> components = new ArrayList<>();
+  private List<Concept> components = new ArrayList<>();
 
   public Assertion(String id, Status status) {
     this.id = id;

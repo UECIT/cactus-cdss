@@ -14,12 +14,12 @@ import uk.nhs.cdss.transform.Transformer;
 public class ObservationTransformer implements Transformer<Assertion, Observation> {
 
   private StatusTransformer statusTransformer;
-  private CodeableConceptOutTransformer codeTransformer;
+  private ConceptTransformer codeTransformer;
   private TypeTransformer typeTransformer;
 
   public ObservationTransformer(
       StatusTransformer statusTransformer,
-      CodeableConceptOutTransformer codeTransformer,
+      ConceptTransformer codeTransformer,
       TypeTransformer typeTransformer) {
     this.statusTransformer = statusTransformer;
     this.codeTransformer = codeTransformer;

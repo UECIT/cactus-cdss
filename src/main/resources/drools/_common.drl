@@ -7,7 +7,7 @@ import uk.nhs.cdss.domain.Assertion
 import uk.nhs.cdss.domain.Assertion.Status
 import uk.nhs.cdss.domain.CarePlan
 import uk.nhs.cdss.domain.Redirection
-import uk.nhs.cdss.domain.CodeableConcept
+import uk.nhs.cdss.domain.Concept
 import uk.nhs.cdss.domain.Questionnaire
 import uk.nhs.cdss.domain.QuestionnaireResponse
 import uk.nhs.cdss.domain.Outcome
@@ -77,7 +77,7 @@ declare AnswerAssertion
     questionId: String @key
     answer: String @key
 
-    code: CodeableConcept @key
+    code: Concept @key
     value: Object
 end
 

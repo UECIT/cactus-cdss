@@ -10,7 +10,7 @@ import org.hl7.fhir.dstu3.model.Narrative.NarrativeStatus;
 import org.springframework.stereotype.Component;
 import uk.nhs.cdss.domain.CarePlan.Intent;
 import uk.nhs.cdss.domain.CarePlanActivity;
-import uk.nhs.cdss.domain.CodeableConcept;
+import uk.nhs.cdss.domain.Concept;
 import uk.nhs.cdss.engine.CodeDirectory;
 import uk.nhs.cdss.transform.Transformer;
 import uk.nhs.cdss.transform.bundle.CarePlanBundle;
@@ -19,13 +19,13 @@ import uk.nhs.cdss.transform.bundle.CarePlanBundle;
 public class CarePlanTransformer
     implements Transformer<CarePlanBundle, org.hl7.fhir.dstu3.model.CarePlan> {
 
-  private final CodeableConceptOutTransformer codeableConceptOutTransformer;
+  private final ConceptTransformer conceptTransformer;
   private final CodeDirectory codeDirectory;
 
   public CarePlanTransformer(
-      CodeableConceptOutTransformer codeableConceptOutTransformer,
+      ConceptTransformer conceptTransformer,
       CodeDirectory codeDirectory) {
-    this.codeableConceptOutTransformer = codeableConceptOutTransformer;
+    this.conceptTransformer = conceptTransformer;
     this.codeDirectory = codeDirectory;
   }
 
@@ -49,10 +49,10 @@ public class CarePlanTransformer
 
   private CarePlanActivityComponent transformCarePlanActivity(CarePlanActivity carePlanActivity) {
     CarePlanActivityComponent result = new CarePlanActivityComponent();
-    CodeableConcept code = codeDirectory.get(carePlanActivity.getCode());
+    Concept code = codeDirectory.get(carePlanActivity.getCode());
     result.getDetail()
-        .setCategory(codeableConceptOutTransformer.transform(codeDirectory.get("activity-other")))
-        .setCode(codeableConceptOutTransformer.transform(code))
+        .setCategory(conceptTransformer.transform(codeDirectory.get("activity-other")))
+        .setCode(conceptTransformer.transform(code))
         .setDescription(carePlanActivity.getDescription());
     return result;
   }

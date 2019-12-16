@@ -13,7 +13,7 @@ public class UsageContextTransformer
 
   private final CodeDirectory codeDirectory;
   private final CodingOutTransformer codingTransformer;
-  private final CodeableConceptOutTransformer codeableConceptTransformer;
+  private final ConceptTransformer codeableConceptTransformer;
   private final IntRangeTransformer rangeTransformer;
 
   @Override

@@ -15,7 +15,7 @@ public class ServiceDefinitionTransformer implements
 
   private final CodeDirectory codeDirectory;
   private final DataRequirementTransformer requirementTransformer;
-  private final CodeableConceptOutTransformer codeableConceptTransformer;
+  private final ConceptTransformer codeableConceptTransformer;
   private final PublicationStatusTransformer statusTransformer;
   private final DateRangeTransformer dateRangeTransformer;
   private final UsageContextTransformer usageContextTransformer;

@@ -41,7 +41,7 @@ public class ScenarioTest {
     var hasFlu = Assertion.builder()
         .id("flu")
         .status(Status.AMENDED)
-        .code(new CodeableConcept("flu", coding))
+        .code(new Concept("flu", coding))
         .value(true)
         .oneRelated(response);
 

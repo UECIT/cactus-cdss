@@ -1,16 +1,14 @@
 package uk.nhs.cdss.domain;
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-@NoArgsConstructor
+@Data
 @AllArgsConstructor
-@Getter
-@EqualsAndHashCode
-@ToString
 public class Coding {
 
   private String system;

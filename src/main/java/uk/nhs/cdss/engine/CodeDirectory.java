@@ -2,14 +2,14 @@ package uk.nhs.cdss.engine;
 
 import java.util.HashMap;
 import java.util.Map;
-import uk.nhs.cdss.domain.CodeableConcept;
+import uk.nhs.cdss.domain.Concept;
 import uk.nhs.cdss.domain.Coding;
 
 public class CodeDirectory {
 
-  private Map<String, CodeableConcept> concepts = new HashMap<>();
+  private Map<String, Concept> concepts = new HashMap<>();
 
-  public CodeableConcept get(String id) {
+  public Concept get(String id) {
     if (!has(id)) {
       throw new IllegalStateException("Concept " + id + " was not found");
     }
@@ -20,14 +20,14 @@ public class CodeDirectory {
     return concepts.containsKey(id);
   }
 
-  public void put(String id, CodeableConcept concept) {
+  public void put(String id, Concept concept) {
     if (concepts.containsKey(id)) {
       throw new IllegalStateException(
           "CodeDirectory already contains an alias " + id + " for " + concepts.get(id));
     }
     concepts.put(id, concept);
   }
-  public void put(CodeableConcept concept) {
+  public void put(Concept concept) {
     put(concept.getText(), concept);
   }
 
