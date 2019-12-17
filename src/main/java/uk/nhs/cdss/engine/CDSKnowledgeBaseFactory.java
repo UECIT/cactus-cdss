@@ -44,7 +44,6 @@ public class CDSKnowledgeBaseFactory {
       Resource[] resources = resolver.getResources("/drools/*");
 
       Arrays.stream(resources)
-          .parallel()
           .map(Resource::getFilename)
           .filter(Objects::nonNull)
           .filter(file -> !file.startsWith("_"))
@@ -52,7 +51,7 @@ public class CDSKnowledgeBaseFactory {
             log.info("Loading Drools definitions for " + file);
             try {
               cache.get(file.substring(0, file.indexOf(".")));
-            } catch (ExecutionException e) {
+            } catch (Exception e) {
               log.error("Unable to load Drools definitions for " + file, e);
             }
           });

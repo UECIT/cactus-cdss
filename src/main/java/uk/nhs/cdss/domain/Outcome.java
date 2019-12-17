@@ -33,13 +33,15 @@ public class Outcome {
   }
 
   public static Outcome of(String id, ReferralRequest referralRequest, CarePlan... carePlans) {
-    referralRequest.setIntent("plan");
-    referralRequest.setPriority("routine");
+    ReferralRequest modifiedRequest = referralRequest.toBuilder()
+        .intent("plan")
+        .priority("routine")
+        .build();
     List<CarePlan> carePlanList = Arrays.stream(carePlans)
         .map(Outcome::setDefaultValues)
         .collect(Collectors.toList());
     Outcome outcome = new Outcome(id);
-    outcome.setReferralRequest(referralRequest);
+    outcome.setReferralRequest(modifiedRequest);
     outcome.setCarePlans(carePlanList);
     return outcome;
   }
@@ -59,8 +61,8 @@ public class Outcome {
   private static CarePlan setDefaultValues(CarePlan carePlan) {
     return carePlan.toBuilder()
         .description(carePlan.getActivities().stream()
-          .map(CarePlanActivity::getDescription)
-          .collect(Collectors.joining("\n")))
+            .map(CarePlanActivity::getDescription)
+            .collect(Collectors.joining("\n")))
         .intent(Intent.option)
         .activities(Collections.emptyList())
         .build();

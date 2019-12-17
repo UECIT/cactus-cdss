@@ -1,20 +1,14 @@
 package uk.nhs.cdss.domain;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 import lombok.Singular;
 import lombok.ToString;
+import lombok.Value;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Data
 @Builder(toBuilder = true)
 @ToString(onlyExplicitlyIncluded = true)
 public class ReferralRequest {
@@ -91,17 +85,17 @@ public class ReferralRequest {
    * This SHOULD be populated by the CDSS. Secondary concerns SHOULD be be carried in this element.
    */
   @Singular("secondaryReason")
-  private List<Assertion> secondaryReasons = new ArrayList<>();
+  private List<Assertion> secondaryReasons;
 
   /**
    * This SHOULD be populated by the CDSS.
    */
   @Singular("note")
-  private List<String> note = new ArrayList<>();
+  private List<String> note;
 
   /**
    * This SHOULD be populated by the CDSS.
    */
-  private List<Object> relevantHistory = new ArrayList<>();
+  private List<Object> relevantHistory;
 
 }
