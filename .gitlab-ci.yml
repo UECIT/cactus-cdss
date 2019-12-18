@@ -17,7 +17,7 @@ build-tags:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
     - docker pull $CI_REGISTRY_IMAGE:deps || true
     - docker build --cache-from $CI_REGISTRY_IMAGE:deps -t $CI_REGISTRY_IMAGE:deps --target deps .
-    - docker build --pull -t $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG .
+    - docker build --pull --cache-from $CI_REGISTRY_IMAGE:deps -t $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG .
     - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
   only:
     - tags
@@ -30,7 +30,7 @@ build-develop:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
     - docker pull $CI_REGISTRY_IMAGE:deps || true
     - docker build --cache-from $CI_REGISTRY_IMAGE:deps -t $CI_REGISTRY_IMAGE:deps --target deps .
-    - docker build --pull -t "$CI_REGISTRY_IMAGE:develop-$CI_COMMIT_SHORT_SHA" .
+    - docker build --pull --cache-from $CI_REGISTRY_IMAGE:deps -t "$CI_REGISTRY_IMAGE:develop-$CI_COMMIT_SHORT_SHA" .
     - docker tag "$CI_REGISTRY_IMAGE:develop-$CI_COMMIT_SHORT_SHA" "$CI_REGISTRY_IMAGE:latest"
     - docker push "$CI_REGISTRY_IMAGE:develop-$CI_COMMIT_SHORT_SHA"
     - docker push $CI_REGISTRY_IMAGE:latest
