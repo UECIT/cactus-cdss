@@ -92,7 +92,7 @@ public class CodeDirectoryConfig {
     codeDirectory.put("103TP2700X", provider("103TP2700X", "Psychotherapy"));
     codeDirectory.put("183500000X", provider("183500000X", "Pharmacist"));
     codeDirectory.put("103GC0700X", provider("103GC0700X", "Clinical"));
-    codeDirectory.put("provider|urgent", provider("261QU0200X", "Urgent"));
+    codeDirectory.put("261QU0200X", provider("261QU0200X", "Urgent"));
 
     /* In EMS */
     codeDirectory.put("CL", provider("CL", "Clinician"));
