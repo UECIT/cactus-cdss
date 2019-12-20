@@ -26,7 +26,9 @@ import uk.nhs.cdss.domain.Redirection
 
 import uk.nhs.cdss.engine.CodeDirectory
 import uk.nhs.cdss.engine.Constraints
+import org.slf4j.Logger
 
+global Logger log;
 global CodeDirectory codeDirectory;
 
 /**
@@ -504,7 +506,7 @@ then
    } else {
        assertionId = "over50";
    }
-   System.out.println("Generating age assertion: " + assertionId);
+   log.info("Generating age assertion: " + assertionId);
    insert( Assertion.builder()
         .id(assertionId)
         .status(Assertion.Status.AMENDED)

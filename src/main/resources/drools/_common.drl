@@ -13,7 +13,9 @@ import uk.nhs.cdss.domain.QuestionnaireResponse
 import uk.nhs.cdss.domain.Outcome
 
 import uk.nhs.cdss.engine.Constraints
+import org.slf4j.Logger
 
+global Logger log;
 
 declare InitialQuestionnaire
     id: String @key
@@ -88,7 +90,7 @@ when
     Answer( $questionnaireId := questionnaireId, $questionId := questionId, $value := value )
     NextQuestionValid( $questionnaireId := next )
 then
-    System.out.println("Answered: "+ $questionnaireId + "#" + $questionId + " == " + $value);
+    log.info("Answered: {}#{} == {}", $questionnaireId, $questionId, $value);
     insert( new Answered($questionnaireId, $questionId, $value) );
 end
 
@@ -100,7 +102,8 @@ when
     Assertion( $code := code, $value := value )
     not Answered( $questionnaireId := questionnaireId, $questionId := questionId )
 then
-    System.out.println("Answered question: " + $questionnaireId + "#" + $questionId + " == " + $answer + " with assertion " + $code + " == " + $value);
+    log.info("Answered question: {}#{} == {} with assertion {} == {}",
+      $questionnaireId, $questionId, $answer, $code, $value);
     insert( new Answered($questionnaireId, $questionId, $answer) );
 end
 
@@ -112,7 +115,8 @@ when
     NextQuestionValid( $questionnaireId := next )
     Assertion( $code := code, $value := value)
 then
-    System.out.println("Answered question: " + $questionnaireId + "#" + $questionId + " with assertion " + $code + " == " + $value);
+    log.info("Answered question: {}#{} with assertion {} == {}",
+      $questionnaireId, $questionId, $code, $value);
     insert( new Answered($questionnaireId, $questionId, $value) );
 end
 
@@ -122,7 +126,7 @@ when
     AnswersOptional($questionnaireId := questionnaireId, $questionId := questionId)
     $qr: QuestionnaireResponse($questionnaireId := questionnaireId, answers.isEmpty())
 then
-    System.out.println("No answer for question: " + $questionnaireId + "#" + $questionId);
+    log.info("No answer for question: " + $questionnaireId + "#" + $questionId);
     insert( new Answer($questionnaireId, $questionId, Answer.MISSING) );
 end
 
@@ -135,7 +139,7 @@ when
         Answered( $cQuestionnaireId := questionnaireId, $cQuestionId := questionId, Constraints.isMemberOf(value, $cAnswers))
     )
 then
-    System.out.println("Satisfied all conditions for link " + $id + ": from question " + $questionnaireId + " to " + $next);
+    log.info("Satisfied all conditions for link " + $id + ": from question " + $questionnaireId + " to " + $next);
     insert( new NextQuestionConditionsSatisfied($id) );
 end
 
@@ -147,7 +151,7 @@ when
     not ActiveOutcome( draft == false )
     InitialQuestionnaire( $id := id )
 then
-    System.out.println("No answers: requesting questionnaire " + $id);
+    log.info("No answers: requesting questionnaire " + $id);
     insert( new Questionnaire($id) );
 end
 
@@ -166,7 +170,7 @@ when
     $a: Answered( $questionnaireId := questionnaireId)
     not Answered( $next := questionnaireId )
 then
-    System.out.println("Valid to proceed: from " + $questionnaireId + " to " + $next);
+    log.info("Valid to proceed: from " + $questionnaireId + " to " + $next);
     insert( new NextQuestionValid($next) );
 end
 
@@ -177,7 +181,7 @@ when
     Answered( $questionnaireId := questionnaireId, $questionId := questionId, Constraints.isMemberOf(value, $answers) )
     not Answered( $next := questionnaireId )
 then
-    System.out.println("Valid to proceed: from " + $questionnaireId + " to " + $next);
+    log.info("Valid to proceed: from " + $questionnaireId + " to " + $next);
     insert( new NextQuestionValid($next) );
 end
 
@@ -189,7 +193,7 @@ when
     Answered( $questionnaireId := questionnaireId)
     not Answered( $next := questionnaireId )
 then
-    System.out.println("Valid to conditionally proceed: from " + $questionnaireId + " to " + $next);
+    log.info("Valid to conditionally proceed: from " + $questionnaireId + " to " + $next);
     insert( new NextQuestionValid($next) );
 end
 
@@ -201,7 +205,7 @@ when
     Answered( $questionnaireId := questionnaireId, $questionId := questionId, Constraints.isMemberOf(value, $answers) )
     not Answered( $next := questionnaireId )
 then
-    System.out.println("Valid to conditionally proceed: from " + $questionnaireId + " to " + $next);
+    log.info("Valid to conditionally proceed: from " + $questionnaireId + " to " + $next);
     insert( new NextQuestionValid($next) );
 end
 
@@ -213,7 +217,7 @@ when
     not Questionnaire()
     not ActiveOutcome( draft == false )
 then
-    System.out.println("Requesting questionnaire: " + $next);
+    log.info("Requesting questionnaire: {}", $next);
     insert( new Questionnaire($next) );
 end
 
@@ -228,7 +232,7 @@ when
         Answered( $questionnaireId := questionnaireId, $questionId := questionId, Constraints.isMemberOf(value, $answers))
     ))
 then
-    System.out.println("All conditions for outcome " + $o);
+    log.info("All conditions for outcome " + $o);
     insert( new ActiveOutcome($id, $o.isDraft()) );
 end
 
@@ -240,7 +244,7 @@ when
     $m: AnswerAssertion( $qid := questionnaireId, $ref := questionId, answer == $a.value )
 then
     String question = $qid + "#" + $ref;
-    System.out.println("Assertion: " + question + " == " + $m.getAnswer() + " => " + $m.getCode() + " == " + $m.getValue());
+    log.info("Assertion: " + question + " == " + $m.getAnswer() + " => " + $m.getCode() + " == " + $m.getValue());
     insert( Assertion.builder()
                     .id(question)
                     .status(Assertion.Status.AMENDED)

@@ -15,17 +15,24 @@ import ca.uhn.fhir.rest.server.IResourceProvider;
 import ca.uhn.fhir.rest.server.exceptions.InternalErrorException;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import org.hl7.fhir.dstu3.model.Bundle;
 import org.hl7.fhir.dstu3.model.GuidanceResponse;
 import org.hl7.fhir.dstu3.model.IdType;
 import org.hl7.fhir.dstu3.model.Parameters;
+import org.hl7.fhir.dstu3.model.Parameters.ParametersParameterComponent;
+import org.hl7.fhir.dstu3.model.Reference;
 import org.hl7.fhir.dstu3.model.Resource;
 import org.hl7.fhir.dstu3.model.ResourceType;
 import org.hl7.fhir.dstu3.model.ServiceDefinition;
+import org.hl7.fhir.dstu3.model.Type;
 import org.springframework.web.bind.annotation.RestController;
-import uk.nhs.cdss.engine.ServiceDefinitionException;
+import uk.nhs.cdss.logging.Context;
+import uk.nhs.cdss.logging.Context.ContextBuilder;
 import uk.nhs.cdss.services.EvaluateService;
 import uk.nhs.cdss.services.ServiceDefinitionConditionBuilderFactory;
 import uk.nhs.cdss.services.ServiceDefinitionRegistry;
@@ -57,12 +64,50 @@ public class ServiceDefinitionProvider implements IResourceProvider {
   public GuidanceResponse evaluate(
       @IdParam IdType serviceDefinitionId,
       @ResourceParam Resource resource) {
+
+    Parameters parameters = getParameters(resource);
+    Context context = getEvaluateContext(serviceDefinitionId.toString(), parameters);
+
     try {
-      return evaluateService.getGuidanceResponse(
-          getParameters(resource),
-          serviceDefinitionId.getIdPart());
-    } catch (ServiceDefinitionException e) {
+      return context.wrap(() ->
+          evaluateService.getGuidanceResponse(
+              parameters, serviceDefinitionId.getIdPart()));
+    } catch (Exception e) {
       throw new InternalErrorException(e);
+    }
+  }
+
+  private Context getEvaluateContext(String serviceDefinitionId, Parameters parameters) {
+    Map<String, ParametersParameterComponent> index = new HashMap<>();
+    parameters.getParameter().forEach(p ->
+        index.putIfAbsent(p.getName(), p)
+    );
+
+    ContextBuilder contextBuilder = Context.builder()
+        .task("ServiceDefinition/$evaluate")
+        .serviceDefinition(serviceDefinitionId);
+
+    applyIfPresent(index.get("encounter"), contextBuilder::encounter);
+    applyIfPresent(index.get("requestId"), contextBuilder::request);
+    applyIfPresent(index.get("initiatingPerson"), contextBuilder::supplier);
+
+    return contextBuilder.build();
+  }
+
+  private <T extends ParametersParameterComponent> void applyIfPresent(T o,
+      Consumer<String> consumer) {
+    if (o != null) {
+      Type value = o.getValue();
+      if (value instanceof IdType) {
+        consumer.accept(value.toString());
+      } else if (value instanceof Reference) {
+        consumer.accept(((Reference) value).getReference());
+      } else {
+        Resource resource = o.getResource();
+        if (resource != null) {
+          consumer.accept(resource.fhirType() + "/" + resource.getId());
+        }
+      }
     }
   }
 

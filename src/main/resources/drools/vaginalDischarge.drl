@@ -26,7 +26,9 @@ import uk.nhs.cdss.constants.SnomedConstants
 
 import uk.nhs.cdss.engine.CodeDirectory
 import uk.nhs.cdss.engine.Constraints
+import org.slf4j.Logger
 
+global Logger log;
 global CodeDirectory codeDirectory;
 
 function Outcome rupturedPid(String id, Concept code) {
@@ -379,7 +381,7 @@ when
     Assertion( code == codeDirectory.get(SnomedConstants.AGE), $value := value )
     not Assertion( code == codeDirectory.get("over50") )
 then
-   System.out.println("Generating age assertion: over50");
+   log.info("Generating age assertion: over50");
    insert( Assertion.builder()
         .id("over50")
         .status(Assertion.Status.AMENDED)
@@ -393,7 +395,7 @@ rule "Coordinates answer"
 when
     $a: Answer(questionnaireId == "vaginalDischarge.injuriesPlacement")
 then
-    System.out.println("vaginalDischarge.injuriesPlacement answered");
+    log.info("vaginalDischarge.injuriesPlacement answered");
     String location;
 
     if (((Coordinates)$a.getValue()).getY() < 64) {

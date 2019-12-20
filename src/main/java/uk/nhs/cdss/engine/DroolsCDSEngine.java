@@ -2,6 +2,7 @@ package uk.nhs.cdss.engine;
 
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+import lombok.extern.slf4j.Slf4j;
 import org.drools.core.impl.InternalKnowledgeBase;
 import org.kie.api.runtime.KieSession;
 import org.slf4j.Logger;
@@ -13,13 +14,12 @@ import uk.nhs.cdss.domain.Questionnaire;
 import uk.nhs.cdss.domain.QuestionnaireResponse;
 
 @Component
+@Slf4j
 public class DroolsCDSEngine implements CDSEngine {
 
   private static final DroolsQuery<Assertion> ASSERTIONS = DroolsQuery.forType(Assertion.class);
   private static final DroolsQuery<Questionnaire> QUESTIONNAIRES = DroolsQuery.forType(Questionnaire.class);
   private static final DroolsQuery<Outcome> OUTCOMES = DroolsQuery.forType(Outcome.class);
-
-  private final Logger log = LoggerFactory.getLogger(getClass());
 
   private final CDSKnowledgeBaseFactory knowledgeBaseFactory;
   private final CodeDirectory codeDirectory;
@@ -47,6 +47,7 @@ public class DroolsCDSEngine implements CDSEngine {
 
     try {
       ksession.setGlobal("codeDirectory", codeDirectory);
+      ksession.setGlobal("log", log);
 
       // Add encounter metadata
       if (input.getPatient() != null) {
