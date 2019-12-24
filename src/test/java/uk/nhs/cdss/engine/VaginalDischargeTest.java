@@ -10,6 +10,7 @@ import com.google.common.collect.Iterables;
 import org.junit.Test;
 import uk.nhs.cdss.domain.Assertion;
 import uk.nhs.cdss.domain.Coordinates;
+import uk.nhs.cdss.exception.ServiceDefinitionException;
 
 public class VaginalDischargeTest extends BaseDroolsCDSEngineTest {
 

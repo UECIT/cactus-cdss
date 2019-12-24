@@ -5,13 +5,12 @@ import java.util.stream.StreamSupport;
 import lombok.extern.slf4j.Slf4j;
 import org.drools.core.impl.InternalKnowledgeBase;
 import org.kie.api.runtime.KieSession;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import uk.nhs.cdss.domain.Assertion;
 import uk.nhs.cdss.domain.Outcome;
 import uk.nhs.cdss.domain.Questionnaire;
 import uk.nhs.cdss.domain.QuestionnaireResponse;
+import uk.nhs.cdss.exception.ServiceDefinitionException;
 
 @Component
 @Slf4j

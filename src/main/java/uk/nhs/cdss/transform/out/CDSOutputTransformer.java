@@ -143,6 +143,11 @@ public class CDSOutputTransformer implements Transformer<CDSOutputBundle, Guidan
         .forEach(response::addDataRequirement);
 
     if (outcome != null) {
+
+      if (outcome.getException() != null) {
+        throw outcome.getException();
+      }
+
       if (!dataRequested && outcome.getRedirection() != null) {
         var redirection = outcome.getRedirection();
         redirectTransformer.transform(redirection)

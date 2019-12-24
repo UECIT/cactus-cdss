@@ -5,7 +5,7 @@ import org.hl7.fhir.dstu3.model.GuidanceResponse;
 import org.hl7.fhir.dstu3.model.Parameters;
 import org.springframework.stereotype.Service;
 import uk.nhs.cdss.engine.CDSEngine;
-import uk.nhs.cdss.engine.ServiceDefinitionException;
+import uk.nhs.cdss.exception.ServiceDefinitionException;
 import uk.nhs.cdss.transform.EvaluationParameters;
 import uk.nhs.cdss.transform.bundle.CDSInputBundle;
 import uk.nhs.cdss.transform.bundle.CDSOutputBundle;

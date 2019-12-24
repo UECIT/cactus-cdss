@@ -3,6 +3,7 @@ package uk.nhs.cdss.engine;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
+import uk.nhs.cdss.exception.ServiceDefinitionException;
 
 public class ConditionalNextQuestionTest extends BaseDroolsCDSEngineTest {
 

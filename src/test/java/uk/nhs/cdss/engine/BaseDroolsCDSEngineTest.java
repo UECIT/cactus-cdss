@@ -10,6 +10,7 @@ import uk.nhs.cdss.domain.Assertion.Status;
 import uk.nhs.cdss.domain.Concept;
 import uk.nhs.cdss.domain.Coding;
 import uk.nhs.cdss.domain.QuestionnaireResponse;
+import uk.nhs.cdss.exception.ServiceDefinitionException;
 
 public abstract class BaseDroolsCDSEngineTest {
 

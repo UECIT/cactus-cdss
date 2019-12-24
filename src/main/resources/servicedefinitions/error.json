@@ -1,0 +1,21 @@
+{
+  "title": "Errors",
+  "description": "Error Service Definition",
+  "usage": "To simulate the CDS throwing errors",
+  "purpose": "To simulate the CDS throwing errors",
+  "status": "ACTIVE",
+  "experimental": false,
+  "effectivePeriod": {
+    "start": "2019-01-01",
+    "end": "2119-01-01"
+  },
+  "jurisdictions": [
+    "GB"
+  ],
+  "observationTriggers": [
+    {
+      "code": "error",
+      "value": "present"
+    }
+  ]
+}
