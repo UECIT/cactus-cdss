@@ -1,5 +1,7 @@
 package uk.nhs.cdss.engine;
 
+import uk.nhs.cdss.exception.ServiceDefinitionException;
+
 public interface CDSEngine {
 
   /**

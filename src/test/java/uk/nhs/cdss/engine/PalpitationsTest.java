@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import org.junit.Test;
+import uk.nhs.cdss.exception.ServiceDefinitionException;
 
 public class PalpitationsTest extends BaseDroolsCDSEngineTest {
 

@@ -26,6 +26,10 @@
         {
           "stringValue": "Sore Throat",
           "code": "soreThroat"
+        },
+        {
+          "stringValue": "None of the above",
+          "code": "none"
         }
       ]
     }

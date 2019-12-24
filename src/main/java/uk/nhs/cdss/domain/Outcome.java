@@ -1,5 +1,6 @@
 package uk.nhs.cdss.domain;
 
+import ca.uhn.fhir.rest.server.exceptions.BaseServerResponseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -21,6 +22,8 @@ public class Outcome {
   private List<CarePlan> carePlans = new ArrayList<>();
   private ReferralRequest referralRequest;
   private Redirection redirection;
+
+  private BaseServerResponseException exception;
 
   public Outcome(String id) {
     this.id = id;
@@ -66,5 +69,11 @@ public class Outcome {
         .intent(Intent.option)
         .activities(Collections.emptyList())
         .build();
+  }
+
+  public static Outcome fail(String id, BaseServerResponseException exception) {
+    Outcome outcome = new Outcome(id);
+    outcome.exception = exception;
+    return outcome;
   }
 }

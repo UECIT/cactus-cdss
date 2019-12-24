@@ -1,0 +1,29 @@
+{
+    "id": "errors.errors",
+    "items": [
+      {
+        "id": "q",
+        "text": "Have you had any of the following symptoms in the past 24 hours?",
+        "type": "CHOICE",
+        "required": true,
+        "options": [
+          {
+            "stringValue": "Crushing or intense aching pain in the cest, upper back or upper abdominal area",
+            "code": "chest"
+          },
+          {
+            "stringValue": "Aching pain radiating from chest that goes to arm, neck or jaw",
+            "code": "arm"
+          },
+          {
+            "stringValue": "Significant breathlessness",
+            "code": "breathlessness"
+          },
+          {
+            "stringValue": "None of the above",
+            "code": "none"
+          }
+        ]
+      }
+    ]
+  }

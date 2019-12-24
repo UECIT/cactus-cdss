@@ -47,6 +47,7 @@ public class CodeDirectoryConfig {
     vaginalDischarge(codeDirectory);
     soreThroat(codeDirectory);
     constipation(codeDirectory);
+    errors(codeDirectory);
 
     jurisdictions(codeDirectory);
     usageContexts(codeDirectory);
@@ -194,6 +195,10 @@ public class CodeDirectoryConfig {
 
   private void soreThroat(CodeDirectory codeDirectory) {
     codeDirectory.put("soreThroat", snomed("162397003", "Pain in throat"));
+  }
+
+  private void errors(CodeDirectory codeDirectory) {
+    codeDirectory.put("error", snomed("error", "Error"));
   }
 
   private void chestPains(CodeDirectory codeDirectory) {

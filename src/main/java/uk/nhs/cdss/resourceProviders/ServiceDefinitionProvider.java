@@ -13,6 +13,7 @@ import ca.uhn.fhir.rest.param.ConstructedParam;
 import ca.uhn.fhir.rest.param.DateParam;
 import ca.uhn.fhir.rest.param.TokenParam;
 import ca.uhn.fhir.rest.server.IResourceProvider;
+import ca.uhn.fhir.rest.server.exceptions.BaseServerResponseException;
 import ca.uhn.fhir.rest.server.exceptions.InternalErrorException;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import java.util.Collection;
@@ -81,6 +82,9 @@ public class ServiceDefinitionProvider implements IResourceProvider {
           evaluateService.getGuidanceResponse(
               parameters, serviceDefinitionId.getIdPart()));
     } catch (Exception e) {
+      if (e instanceof BaseServerResponseException) {
+        throw (BaseServerResponseException)e;
+      }
       throw new InternalErrorException(e);
     }
   }

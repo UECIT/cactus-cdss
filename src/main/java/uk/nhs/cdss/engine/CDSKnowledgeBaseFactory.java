@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Service;
+import uk.nhs.cdss.exception.ServiceDefinitionException;
 
 /**
  * Creates and caches Drools KnowledgeBase instances for each ServiceDefinition

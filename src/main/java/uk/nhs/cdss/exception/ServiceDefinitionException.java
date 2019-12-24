@@ -1,4 +1,4 @@
-package uk.nhs.cdss.engine;
+package uk.nhs.cdss.exception;
 
 public class ServiceDefinitionException extends Exception {
 

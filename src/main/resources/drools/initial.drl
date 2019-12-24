@@ -33,6 +33,7 @@ then
     insert( new AnswerAssertion("initial.initial", "q", "genitoUrinaryProblems", codeDirectory.get("genitoUrinaryProblems"), present));
     insert( new AnswerAssertion("initial.initial", "q", "constipation", codeDirectory.get("constipation"), present));
     insert( new AnswerAssertion("initial.initial", "q", "soreThroat", codeDirectory.get("soreThroat"), present));
+    insert( new AnswerAssertion("initial.initial", "q", "none", codeDirectory.get("error"), present));
 end
 
 //Rule for adding outcomes - currently we've hard coded a requirements for the patient age as a trigger in DataRequirements.
@@ -83,5 +84,12 @@ then
                     .patientTrigger($a.getValue())
                     .build() ));
     insert( new OutcomeAnswerCondition("palpitations", "initial.initial", "q", Arrays.asList("palpitations") ));
+
+    insert( Outcome.of("error", Redirection.builder()
+                    .id("error")
+                    .observationTrigger("error", "present")
+                    .patientTrigger($a.getValue())
+                    .build() ));
+    insert( new OutcomeAnswerCondition("error", "initial.initial", "q", Arrays.asList("none") ));
 
 end
