@@ -18,7 +18,6 @@ import uk.nhs.cdss.domain.QuestionnaireResponse
 import uk.nhs.cdss.domain.CarePlan
 import uk.nhs.cdss.domain.CarePlanActivity
 import uk.nhs.cdss.domain.ReferralRequest
-import uk.nhs.cdss.domain.Redirection
 import uk.nhs.cdss.domain.Coordinates
 import uk.nhs.cdss.domain.Concept
 

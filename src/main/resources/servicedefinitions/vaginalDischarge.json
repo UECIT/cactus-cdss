@@ -19,12 +19,19 @@
       "value": "present"
     },
     {
-      "code": "isFemale"
+      "code": "gender",
+      "value": "female"
     }
   ],
   "dataRequirements": [
     { "type":  "Patient" },
     { "type":  "Organization" },
     { "type":  "Age" }
+  ],
+  "useContext": [
+    {
+      "code": "gender",
+      "valueCodeableConcept": "female"
+    }
   ]
 }

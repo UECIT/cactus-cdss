@@ -13,6 +13,7 @@ public class RedirectionTest extends BaseDroolsCDSEngineTest {
 
   @Test
   public void redirectOutcome() throws ServiceDefinitionException {
+    addAgeAssertion("1900-12-25");
     answerQuestion("hasPalpitations", "q", "No");
     answerQuestion("lastExperienced", "q3", "Yes");
     answerQuestion("syncope", "q", "No");
@@ -26,7 +27,8 @@ public class RedirectionTest extends BaseDroolsCDSEngineTest {
 
     assertNull("has no referral", output.getOutcome().getReferralRequest());
     assertThat("has no care plan", output.getOutcome().getCarePlans(), empty());
-    assertEquals("redirect outcome", ANXIETY, output.getOutcome().getRedirection().getId());
+    assertEquals("redirect outcome", ANXIETY,
+        output.getOutcome().getRedirection().getObservationTriggers().get(0).getCode());
   }
 
   @Override

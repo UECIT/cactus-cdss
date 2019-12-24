@@ -5,62 +5,83 @@ import java.util.Arrays
 import uk.nhs.cdss.rules.InitialQuestionnaire
 import uk.nhs.cdss.rules.AnswerAssertion
 import uk.nhs.cdss.rules.OutcomeAnswerCondition
+import uk.nhs.cdss.rules.NextQuestion
 
 import uk.nhs.cdss.domain.Outcome
 import uk.nhs.cdss.domain.ReferralRequest
 import uk.nhs.cdss.domain.Redirection
+import uk.nhs.cdss.domain.Assertion
+
+import uk.nhs.cdss.constants.SnomedConstants
 
 import uk.nhs.cdss.engine.CodeDirectory
 import uk.nhs.cdss.domain.Concept
 
 global CodeDirectory codeDirectory;
 
-function Outcome singleCodeRedirection(String id, String code) {
-    return Outcome.of(id, Redirection.builder()
-            .id(code)
-            .code(code)
-            .build());
-}
-
 rule "Init"
 when
 then
-    insert( new InitialQuestionnaire("initial.initial") );
+    insert( new InitialQuestionnaire("common.birthDate"));
+    insert( new AnswerAssertion("common.birthDate", "q", null, codeDirectory.get(SnomedConstants.AGE)));
+
+    insert( new NextQuestion("initial.initial", "common.birthDate") );
 
     Concept present = codeDirectory.get("present");
-    insert( new AnswerAssertion("initial.initial", "q", "chestPain", codeDirectory.get("chestPain"), true));
-    insert( new AnswerAssertion("initial.initial", "q", "palpitations", codeDirectory.get("palpitations"), true));
-    insert( new AnswerAssertion("initial.initial", "q", "genitoUrinaryProblems", codeDirectory.get("genitoUrinaryProblems"), true));
-
+    insert( new AnswerAssertion("initial.initial", "q", "chestPain", codeDirectory.get("chestPain"), present));
+    insert( new AnswerAssertion("initial.initial", "q", "palpitations", codeDirectory.get("palpitations"), present));
+    insert( new AnswerAssertion("initial.initial", "q", "genitoUrinaryProblems", codeDirectory.get("genitoUrinaryProblems"), present));
     insert( new AnswerAssertion("initial.initial", "q", "constipation", codeDirectory.get("constipation"), present));
     insert( new AnswerAssertion("initial.initial", "q", "soreThroat", codeDirectory.get("soreThroat"), present));
+end
 
-    // These redirections are not dependent on context
-    insert( singleCodeRedirection("chestPain", "chestPain"));
-    insert( new OutcomeAnswerCondition("chestPain", "initial.initial", "q", Arrays.asList("chestPain") ));
-    insert( singleCodeRedirection("palpitations", "palpitations"));
-    insert( new OutcomeAnswerCondition("palpitations", "initial.initial", "q", Arrays.asList("palpitations") ));
+//Rule for adding outcomes - currently we've hard coded a requirements for the patient age as a trigger in DataRequirements.
+//If the EMS is going to look for age observations then this custom rule could be removed and we only need to use a single code filter.
+//Spec currently unclear.
+rule "Redirect Outcomes"
+when
+    $a: Assertion(code == codeDirectory.get(SnomedConstants.AGE))
+then
+    // These redirections are to service definitions with context-dependent triggers.
+    insert( Outcome.of("constipation", Redirection.builder()
+                        .id("constipation")
+                        .observationTrigger("constipation", "present")
+                        .observationTrigger("lifeThreatening", "absent")
+                        .patientTrigger($a.getValue())
+                        .build()) );
+    insert( new OutcomeAnswerCondition("constipation", "initial.initial", "q", Arrays.asList("constipation") ));
+
+    insert( Outcome.of("soreThroat", Redirection.builder()
+                    .id("soreThroat")
+                    .observationTrigger("soreThroat", "present")
+                    .observationTrigger("lifeThreatening", "absent")
+                    .patientTrigger($a.getValue())
+                    .build()) );
+    insert( new OutcomeAnswerCondition("soreThroat", "initial.initial", "q", Arrays.asList("soreThroat") ));
 
     // This is a complex trigger with additional gender context requirement
     // FIXME it will fail to match if the gender of the patient is incorrect
     insert( Outcome.of("genitoUrinaryProblems", Redirection.builder()
-            .id("genitoUrinaryProblems")
-            .code("genitoUrinaryProblems")
-            .code("isFemale")
-            .build()) );
+                    .id("genitoUrinaryProblems")
+                    .observationTrigger("genitoUrinaryProblems", "present")
+                    .observationTrigger("gender", "female")
+                    .patientTrigger($a.getValue())
+                    .build()) );
     insert( new OutcomeAnswerCondition("genitoUrinaryProblems", "initial.initial", "q", Arrays.asList("genitoUrinaryProblems") ));
 
-    // These redirections are to service definitions with context-dependent triggers.
-    insert( Outcome.of("constipation", Redirection.builder()
-                        .id("constipation")
-                        .code("constipation")
-                        .code("lifeThreatening")
-                        .build()) );
-    insert( new OutcomeAnswerCondition("constipation", "initial.initial", "q", Arrays.asList("constipation") ));
-    insert( Outcome.of("soreThroat", Redirection.builder()
-                        .id("soreThroat")
-                        .code("soreThroat")
-                        .code("lifeThreatening")
-                        .build()) );
-    insert( new OutcomeAnswerCondition("soreThroat", "initial.initial", "q", Arrays.asList("soreThroat") ));
+    // These redirections are not dependent on context
+    insert( Outcome.of("chestPain", Redirection.builder()
+                    .id("chestPain")
+                    .observationTrigger("chestPain", "present")
+                    .patientTrigger($a.getValue())
+                    .build() ));
+    insert( new OutcomeAnswerCondition("chestPain", "initial.initial", "q", Arrays.asList("chestPain") ));
+
+    insert( Outcome.of("palpitations", Redirection.builder()
+                    .id("palpitations")
+                    .observationTrigger("palpitations", "present")
+                    .patientTrigger($a.getValue())
+                    .build() ));
+    insert( new OutcomeAnswerCondition("palpitations", "initial.initial", "q", Arrays.asList("palpitations") ));
+
 end

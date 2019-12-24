@@ -21,6 +21,7 @@ public class Palpitations2Test extends BaseDroolsCDSEngineTest {
 
   @Test
   public void palpitations2_complex_syncope_outcome() throws ServiceDefinitionException {
+    addAgeAssertion("1900-12-25");
     answerQuestion("hasPalpitations", "q", "No");
     answerQuestion("lastExperienced", "q1", "Yes");
     answerQuestion("syncope", "q", "Yes");
@@ -32,6 +33,7 @@ public class Palpitations2Test extends BaseDroolsCDSEngineTest {
 
   @Test
   public void palpitations2_complex_syncope_outcome2() throws ServiceDefinitionException {
+    addAgeAssertion("1900-12-25");
     answerQuestion("hasPalpitations", "q", "No");
     answerQuestion("lastExperienced", "q3", "Yes");
     answerQuestion("syncope", "q", "Yes");
@@ -61,6 +63,7 @@ public class Palpitations2Test extends BaseDroolsCDSEngineTest {
 
   @Test
   public void shouldAskMuteLogicUnderConditions() throws ServiceDefinitionException {
+    addAgeAssertion("1900-12-25");
     answerQuestion("hasPalpitations", "q", "Yes");
     answerQuestion("hasICD", "q", "No");
     answerQuestion("symptoms", "q", "none");
@@ -71,7 +74,7 @@ public class Palpitations2Test extends BaseDroolsCDSEngineTest {
 
     evaluate();
 
-    assertEquals(5, output.getAssertions().size());
+    assertEquals(7, output.getAssertions().size());
     assertEquals("ed-cardio-mi-8m", output.getOutcome().getReferralRequest().getId());
   }
 
@@ -106,6 +109,7 @@ public class Palpitations2Test extends BaseDroolsCDSEngineTest {
 
   @Test
   public void redirectOutcomeForTransfer() throws ServiceDefinitionException {
+    addAgeAssertion("1900-12-25");
     answerQuestion("hasPalpitations", "q", "No");
     answerQuestion("lastExperienced", "q3", "Yes");
     answerQuestion("syncope", "q", "No");
@@ -117,12 +121,14 @@ public class Palpitations2Test extends BaseDroolsCDSEngineTest {
 
     evaluate();
 
-    assertEquals(3, output.getAssertions().size());
-    assertEquals("anxiety", output.getOutcome().getRedirection().getId());
+    assertEquals(5, output.getAssertions().size());
+    assertEquals("anxiety",
+        output.getOutcome().getRedirection().getObservationTriggers().get(0).getCode());
   }
 
   @Test
   public void carePlanOutcomeForSelfCare() throws ServiceDefinitionException {
+    addAgeAssertion("1900-12-25");
     answerQuestion("hasPalpitations", "q", "No");
     answerQuestion("lastExperienced", "q3", "Yes");
     answerQuestion("syncope", "q", "No");
@@ -134,7 +140,7 @@ public class Palpitations2Test extends BaseDroolsCDSEngineTest {
 
     evaluate();
 
-    assertEquals(3, output.getAssertions().size());
+    assertEquals(5, output.getAssertions().size());
     assertEquals(1, output.getOutcome().getCarePlans().size());
     assertEquals("carePlan", output.getOutcome().getCarePlans().get(0).getId());
   }

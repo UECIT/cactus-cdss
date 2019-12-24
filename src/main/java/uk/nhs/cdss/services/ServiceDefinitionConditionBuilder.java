@@ -1,35 +1,44 @@
 package uk.nhs.cdss.services;
 
-import static java.util.Arrays.asList;
-
 import ca.uhn.fhir.model.api.IQueryParameterType;
-import ca.uhn.fhir.rest.param.BaseAndListParam;
 import ca.uhn.fhir.rest.param.CompositeAndListParam;
 import ca.uhn.fhir.rest.param.CompositeOrListParam;
 import ca.uhn.fhir.rest.param.CompositeParam;
+import ca.uhn.fhir.rest.param.ConstructedAndListParam;
+import ca.uhn.fhir.rest.param.ConstructedOrListParam;
+import ca.uhn.fhir.rest.param.ConstructedParam;
 import ca.uhn.fhir.rest.param.DateParam;
 import ca.uhn.fhir.rest.param.ParamPrefixEnum;
-import ca.uhn.fhir.rest.param.QuantityParam;
 import ca.uhn.fhir.rest.param.TokenParam;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.Period;
+import java.time.ZoneId;
+import java.time.format.DateTimeParseException;
+import java.time.temporal.TemporalAmount;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import lombok.AccessLevel;
 import lombok.Getter;
+import org.hl7.fhir.dstu3.model.codesystems.QuantityComparator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.nhs.cdss.domain.Concept;
 import uk.nhs.cdss.domain.Coding;
+import uk.nhs.cdss.domain.Concept;
+import uk.nhs.cdss.domain.DateFilter;
 import uk.nhs.cdss.domain.DateRange;
 import uk.nhs.cdss.domain.ObservationTrigger;
+import uk.nhs.cdss.domain.PatientTrigger;
 import uk.nhs.cdss.domain.ServiceDefinition;
 import uk.nhs.cdss.domain.UsageContext;
 import uk.nhs.cdss.engine.CodeDirectory;
+import uk.nhs.cdss.resourceProviders.ObservationTriggerParameter;
+import uk.nhs.cdss.resourceProviders.PatientTriggerParameter;
 
 @Getter
 public class ServiceDefinitionConditionBuilder {
@@ -61,13 +70,14 @@ public class ServiceDefinitionConditionBuilder {
         String.valueOf(sd.getExperimental()).equalsIgnoreCase(experimental.getValue()));
   }
 
-  public void addEffectivePeriodConditions(DateParam effective) {
-    if (effective == null || effective.isEmpty()) {
+  public void addEffectivePeriodConditions(DateParam effectiveFrom, DateParam effectiveEnd) {
+    if ((effectiveFrom == null || effectiveFrom.isEmpty()) &&
+        (effectiveEnd == null || effectiveEnd.isEmpty())) {
       return;
     }
 
     addCondition(sd -> sd.getEffectivePeriod() == null ||
-        matchDateRange(effective, sd.getEffectivePeriod()));
+        matchDateRange(effectiveFrom, effectiveEnd, sd.getEffectivePeriod()));
   }
 
   public void addJurisdictionConditions(TokenParam jurisdiction) {
@@ -94,46 +104,41 @@ public class ServiceDefinitionConditionBuilder {
     }
   }
 
-  public void addAgeConditions(
-      CompositeAndListParam<TokenParam, QuantityParam> useContextQuantity,
-      CompositeAndListParam<TokenParam, QuantityParam> useContextRange) {
-
-    var ageQueries = Stream.of(useContextQuantity, useContextRange)
-        .filter(Objects::nonNull)
-        .map(BaseAndListParam::getValuesAsQueryTokens)
-        .flatMap(Collection::stream)
-        .collect(Collectors.toUnmodifiableList());
-
-    final var AGE = "age";
-    for (var orAges : ageQueries) {
-      ensureSingleContext(orAges.getValuesAsQueryTokens(), AGE);
-      addCondition(
-          isNotRestrictedToContext(AGE).or(
-              matchesContextRestriction(AGE, orAges, this::matchAgeRange)));
-    }
-  }
-
-  public void addTriggerConditions(CompositeAndListParam<TokenParam, TokenParam> triggerTypeCode) {
-    if (triggerTypeCode == null) {
+  public void addObservationTriggerConditions(
+      ConstructedAndListParam<ObservationTriggerParameter> observationParams) {
+    if (observationParams == null) {
       addCondition(sd -> sd.getObservationTriggers().isEmpty());
       return;
     }
 
-    final var OBSERVATION_TYPES = asList("observation", "careconnectobservation");
-    var codes = triggerTypeCode.getValuesAsQueryTokens()
-        .stream()
-        .map(CompositeOrListParam::getValuesAsQueryTokens)
-        .filter(l -> l.size() == 1)
-        .flatMap(Collection::stream)
-        .filter(cp -> OBSERVATION_TYPES.contains(cp.getLeftValue().getValue().toLowerCase()))
-        .map(CompositeParam::getRightValue)
-        .map(TokenParam::getValue)
-        .collect(Collectors.toUnmodifiableList());
+    List<ObservationTriggerParameter> triggerParameters = extractParameters(observationParams);
 
-    addCondition(sd -> matchesTriggers(sd, codes));
+    addCondition(sd -> matchesObservationTriggers(sd, triggerParameters));
   }
 
-  private boolean matchesTriggers(ServiceDefinition sd, List<String> codes) {
+  public void addPatientTriggerConditions(
+      ConstructedParam<PatientTriggerParameter> patientParams) {
+    if (patientParams == null) {
+      addCondition(sd -> sd.getPatientTriggers().isEmpty());
+      return;
+    }
+
+    addCondition(sd -> matchesPatientTriggers(sd, patientParams.getValue()));
+  }
+
+  private <T> List<T> extractParameters(
+      ConstructedAndListParam<T> patientParams) {
+    return patientParams.getValuesAsQueryTokens()
+        .stream()
+        .map(ConstructedOrListParam::getValuesAsQueryTokens)
+        .filter(l -> l.size() == 1)
+        .flatMap(Collection::stream)
+        .map(ConstructedParam::getValue)
+        .collect(Collectors.toList());
+  }
+
+  private boolean matchesObservationTriggers(ServiceDefinition sd, List<ObservationTriggerParameter> triggerParameters) {
+
     for (ObservationTrigger observationTrigger : sd.getObservationTriggers()) {
       Optional<Coding> code = Optional.ofNullable(observationTrigger.getCode())
           .map(codeDirectory::get)
@@ -144,17 +149,32 @@ public class ServiceDefinitionConditionBuilder {
           .map(Concept::getCoding)
           .map(list -> list.get(0));
 
-      // TODO match system (requires system of each observation code)
-      // TODO match value (requires value of each observation)
-      // TODO match effective (requires date of each observation)
-      if (code.isPresent() && !codes.contains(code.get().getCode())) {
-        log.info("Service Definition {} does not match {} for observation trigger {}",
-            sd.getId(), codes, observationTrigger);
+      var triggerMatch = triggerParameters.stream()
+          .anyMatch(param -> matchCode(param.getCode(), code)
+              && matchCode(param.getValue(), value)
+              && matchDate(param.getEffective(), observationTrigger.getEffective()));
+
+      if (!triggerMatch) {
+        log.debug("Service Definition {} does not match {} for observation trigger {}",
+            sd.getId(), triggerParameters, observationTrigger);
         return false;
       }
     }
-    log.info("Service Definition {} matches all ({}) observation triggers for query {}",
-        sd.getId(), sd.getObservationTriggers().size(), codes);
+
+    return true;
+  }
+
+  private boolean matchesPatientTriggers(ServiceDefinition sd, PatientTriggerParameter triggerParameter) {
+
+    for (PatientTrigger patientTrigger : sd.getPatientTriggers()) {
+      DateFilter birthDate = patientTrigger.getBirthDate();
+
+      if (!matchDate(triggerParameter.getBirthDate(), birthDate)) {
+        log.debug("Service Definition {} does not match {} for patient trigger {}",
+            sd.getId(), triggerParameter, patientTrigger);
+        return false;
+      }
+    }
     return true;
   }
 
@@ -212,46 +232,28 @@ public class ServiceDefinitionConditionBuilder {
         .orElseThrow(() -> wrongCodesException);
   }
 
-  private boolean matchAgeRange(QuantityParam ageParam, UsageContext context) {
-    var range = context.getValueRange();
-    var age = ageParam.getValue().intValueExact();
+  private boolean matchDateRange(DateParam startDateParam, DateParam endDateParam, DateRange range) {
+    var startDate = startDateParam.getValue();
+    var endDate = endDateParam.getValue();
+    var startPrefix = Optional.ofNullable(startDateParam.getPrefix()).orElse(ParamPrefixEnum.EQUAL);
+    var endPrefix = Optional.ofNullable(endDateParam.getPrefix()).orElse(ParamPrefixEnum.EQUAL);
 
-    var prefix = Optional.ofNullable(ageParam.getPrefix()).orElse(ParamPrefixEnum.EQUAL);
-
-    switch (prefix) {
-      case EQUAL:
-        return range.getLow() <= age && age <= range.getHigh();
-      case NOT_EQUAL:
-        return age < range.getLow() || range.getHigh() < age;
-      case GREATERTHAN:
-        return age < range.getHigh();
-      case GREATERTHAN_OR_EQUALS:
-        return age <= range.getHigh();
-      case LESSTHAN:
-        return range.getLow() < age;
-      case LESSTHAN_OR_EQUALS:
-        return range.getLow() <= age;
-      default:
-        throw new IllegalArgumentException(
-            "Numeric search params cannot have non-standard prefixes");
-    }
+    return matchDate(startDate, startPrefix, range.getStart())
+        && matchDate(endDate, endPrefix, range.getEnd());
   }
 
-  private boolean matchDateRange(DateParam dateParam, DateRange range) {
-    var date = dateParam.getValueAsInstantDt();
-    var prefix = Optional.ofNullable(dateParam.getPrefix()).orElse(ParamPrefixEnum.EQUAL);
-
+  private boolean matchDate(Date paramDate, ParamPrefixEnum prefix, Date sdDate) {
     switch (prefix) {
       case EQUAL:
-        return date.after(range.getStart()) && date.before(range.getEnd());
+        return sdDate.equals(paramDate);
       case NOT_EQUAL:
-        return date.before(range.getStart()) || date.after(range.getEnd());
+        return !sdDate.equals(paramDate);
       case GREATERTHAN:
       case GREATERTHAN_OR_EQUALS:
-        return date.before(range.getEnd());
+        return sdDate.after(paramDate);
       case LESSTHAN:
       case LESSTHAN_OR_EQUALS:
-        return date.after(range.getStart());
+        return sdDate.before(paramDate);
       default:
         throw new IllegalArgumentException(
             "Date search params cannot have non-standard prefixes");
@@ -259,6 +261,44 @@ public class ServiceDefinitionConditionBuilder {
   }
 
   private boolean matchCode(TokenParam codeParam, UsageContext context) {
-    return codeParam.getValue().equals(context.getValueCodeableConcept());
+    return codeParam.getValue().equals(codeDirectory.getCode(context.getValueCodeableConcept()).getCode());
+  }
+
+  private boolean matchCode(TokenParam codeParam, Optional<Coding> coding) {
+    return coding.map(value -> codeParam.getValue().equals(value.getCode())
+        && codeParam.getSystem().equals(value.getSystem()))
+        .orElse(true); //If the trigger is not on the service definition consider matched
+  }
+
+  private boolean matchDate(DateParam effectiveParam, DateFilter effectiveFilter) {
+    if (effectiveFilter == null) {
+      return true;
+    }
+
+    var effective = effectiveParam.getValue()
+        .toInstant()
+        .atZone(ZoneId.systemDefault())
+        .toLocalDateTime();
+    var now = LocalDateTime.now();
+    QuantityComparator comparator = QuantityComparator.fromCode(effectiveFilter.getComparator());
+    TemporalAmount serviceDefinitionDuration;
+    try {
+      serviceDefinitionDuration = Duration.parse(effectiveFilter.getDuration());
+    } catch (DateTimeParseException e) {
+      serviceDefinitionDuration = Period.parse(effectiveFilter.getDuration());
+    }
+    LocalDateTime expired = now.minus(serviceDefinitionDuration);
+    switch (comparator) {
+      case LESS_THAN:
+        return effective.isAfter(expired);
+      case LESS_OR_EQUAL:
+        return effective.isAfter(expired) || effective.equals(expired);
+      case GREATER_OR_EQUAL:
+        return effective.isBefore(expired) || effective.equals(expired);
+      case GREATER_THAN:
+        return effective.isBefore(expired);
+      default:
+        throw new IllegalStateException("Service definition did not specify valid comparator");
+    }
   }
 }

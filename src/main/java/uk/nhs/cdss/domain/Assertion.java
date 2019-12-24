@@ -1,7 +1,6 @@
 package uk.nhs.cdss.domain;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import lombok.Builder;
 import lombok.Singular;
@@ -20,6 +19,7 @@ public class Assertion {
   private Concept code;
   private Object value;
   private Instant issued;
+  private Instant effective;
 
   @Singular("oneRelated")
   @ToString.Exclude

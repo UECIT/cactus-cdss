@@ -1,0 +1,11 @@
+{
+    "id": "common.birthDate",
+    "items": [
+      {
+        "id": "q",
+        "text": "Enter patients birth date",
+        "type": "DATE",
+        "required": true
+      }
+    ]
+  }

@@ -154,19 +154,15 @@ function CarePlan aspirin() {
             .build();    
 }
 
-function Outcome singleCodeRedirection(String id, String code) {
-    return Outcome.of(id, Redirection.builder()
-            .id(code)
-            .code(code)
-            .build());
-}
-
 rule "Init"
 salience 10000
 when // Always
 then
     // Are you experiencing palpitations now?
-    insert( new InitialQuestionnaire("palpitations2.hasPalpitations") );
+    insert( new InitialQuestionnaire("common.birthDate"));
+    insert( new AnswerAssertion("common.birthDate", "q", null, codeDirectory.get(SnomedConstants.AGE)));
+
+    insert( new NextQuestion("palpitations2.hasPalpitations", "common.birthDate") );    
     insert( new AnswerAssertion("palpitations2.hasPalpitations", "q", "Yes", codeDirectory.get("palpitations"), true));
 
     // Have you got an ICD (implanted cardiovascular defibrillator)?
@@ -422,12 +418,6 @@ then
     // Is your mental health a concern to you
     insert( new NextQuestion("palpitations2.mentalHealthConcern", "palpitations2.careHCP", "q", Arrays.asList("No")) );
     insert( new AnswerAssertion("palpitations2.mentalHealthConcern", "q", "Yes", codeDirectory.get("mentalHealthConcern"), true));
-    insert( singleCodeRedirection("mentalHealthConcern", "anxiety"));
-    insert( new OutcomeAnswerCondition("mentalHealthConcern", "palpitations2.mentalHealthConcern", "q", Arrays.asList("Yes") ));
-
-    //  Anxiety cause
-    insert( singleCodeRedirection("anxiety", "anxiety"));
-    insert( new OutcomeAnswerCondition("anxiety", "palpitations2.mentalHealthConcern", "q", Arrays.asList("Yes") ));
 
     // Do any of these apply to you?
     insert( new NextQuestion("palpitations2.causes", "palpitations2.mentalHealthConcern", "q", Arrays.asList("No")) );
@@ -513,4 +503,16 @@ then
         .code(codeDirectory.get(assertionId))
         .value(true)
         .build() );
+end
+
+rule "Redirect Outcomes"
+when
+    $a: Assertion(code == codeDirectory.get(SnomedConstants.AGE))
+then
+    insert(Outcome.of("mentalHealthConcern", Redirection.builder()
+            .id("mentalHealthConcern")
+            .observationTrigger("anxiety", "present")
+            .patientTrigger($a.getValue())
+            .build()));
+    insert( new OutcomeAnswerCondition("mentalHealthConcern", "palpitations2.mentalHealthConcern", "q", Arrays.asList("Yes") ));
 end
