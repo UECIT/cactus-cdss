@@ -3,10 +3,10 @@ package uk.nhs.cdss.transform;
 import static org.junit.Assert.assertEquals;
 
 import org.hl7.fhir.dstu3.model.CodeableConcept;
+import org.hl7.fhir.dstu3.model.Encounter;
 import org.hl7.fhir.dstu3.model.IdType;
 import org.hl7.fhir.dstu3.model.Parameters;
 import org.hl7.fhir.dstu3.model.Parameters.ParametersParameterComponent;
-import org.hl7.fhir.dstu3.model.Reference;
 import org.hl7.fhir.dstu3.model.StringType;
 import org.junit.Test;
 import uk.nhs.cdss.transform.bundle.CDSInputBundle;
@@ -31,7 +31,7 @@ public class CDSInputTransformerTest {
 
     var encounterComponent = new ParametersParameterComponent(
         new StringType("encounter"));
-    encounterComponent.setValue(new Reference());
+    encounterComponent.setResource(new Encounter());
     parameters.addParameter(encounterComponent);
 
     var typeComponent = new ParametersParameterComponent(
