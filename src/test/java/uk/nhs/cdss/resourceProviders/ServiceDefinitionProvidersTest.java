@@ -1,13 +1,26 @@
 package uk.nhs.cdss.resourceProviders;
 
+import static com.google.common.collect.Streams.zip;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+
 import ca.uhn.fhir.rest.param.CompositeAndListParam;
 import ca.uhn.fhir.rest.param.CompositeOrListParam;
 import ca.uhn.fhir.rest.param.CompositeParam;
+import ca.uhn.fhir.rest.param.ConstructedAndListParam;
+import ca.uhn.fhir.rest.param.ConstructedOrListParam;
+import ca.uhn.fhir.rest.param.ConstructedParam;
 import ca.uhn.fhir.rest.param.DateParam;
-import ca.uhn.fhir.rest.param.QuantityParam;
+import ca.uhn.fhir.rest.param.ParamPrefixEnum;
+import ca.uhn.fhir.rest.param.StringParam;
 import ca.uhn.fhir.rest.param.TokenParam;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
+import java.util.stream.Stream;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.naming.TestCaseName;
@@ -17,12 +30,11 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import uk.nhs.cdss.config.CodeDirectoryConfig;
-import uk.nhs.cdss.domain.Coding;
 import uk.nhs.cdss.engine.CodeDirectory;
 import uk.nhs.cdss.services.ServiceDefinitionConditionBuilderFactory;
 import uk.nhs.cdss.services.ServiceDefinitionRegistry;
-import uk.nhs.cdss.transform.out.ConceptTransformer;
 import uk.nhs.cdss.transform.out.CodingOutTransformer;
+import uk.nhs.cdss.transform.out.ConceptTransformer;
 import uk.nhs.cdss.transform.out.DataRequirementTransformer;
 import uk.nhs.cdss.transform.out.DateRangeTransformer;
 import uk.nhs.cdss.transform.out.IntRangeTransformer;
@@ -100,31 +112,60 @@ public class ServiceDefinitionProvidersTest {
     return new TokenParam(code);
   }
 
+  private TokenParam token(String code, String system) {
+    return new TokenParam(system, code);
+  }
+
   private DateParam date(String date) {
     return new DateParam(date);
   }
 
-  private CompositeAndListParam<TokenParam, TokenParam> useContext(String context, String code) {
+  private CompositeAndListParam<TokenParam, TokenParam> useContext(Stream<String> contexts, Stream<String> codes) {
     var ands = new CompositeAndListParam<>(TokenParam.class, TokenParam.class);
 
-    var ors = new CompositeOrListParam<>(TokenParam.class, TokenParam.class);
-    ors.addOr(new CompositeParam<>(token(context), token(code)));
-    ands.addAnd(ors);
+    zip(contexts, codes, (context, code) ->
+        new CompositeOrListParam<>(TokenParam.class, TokenParam.class)
+            .addOr(new CompositeParam<>(token(context), token(code))))
+        .forEach(ands::addAnd);
+
     return ands;
   }
 
-  private CompositeAndListParam<TokenParam, TokenParam> trigger(String... codes) {
+  private ConstructedAndListParam<ObservationTriggerParameter> observationTrigger(Stream<String> codes, Stream<String> values) {
 
-    var ands = new CompositeAndListParam<>(TokenParam.class, TokenParam.class);
+    var ands = new ConstructedAndListParam<>(ObservationTriggerParameter.class);
 
-    for (var code : codes) {
-      Coding coding = codeDirectory.getCode(code);
-      var ors = new CompositeOrListParam<>(TokenParam.class, TokenParam.class);
-      ors.addOr(new CompositeParam<>(token("Observation"), token(coding.getCode())));
-      ands.addAnd(ors);
-    }
+    zip(codes, values, (code, value) -> {
+      var ors = new ConstructedOrListParam<>(ObservationTriggerParameter.class);
+      var codeCode = codeDirectory.getCode(code);
+      var valueCode = codeDirectory.getCode(value);
+      var observationTriggerParameter = new ObservationTriggerParameter(
+          new StringParam("CareConnectObservation"),
+          new StringParam("code"),
+          token(codeCode.getCode(), codeCode.getSystem()),
+          new StringParam("value"),
+          token(valueCode.getCode(), valueCode.getSystem()),
+          new StringParam("effective"),
+          new DateParam(ParamPrefixEnum.EQUAL, new Date())
+      );
+      var constructed = new ConstructedParam<>(observationTriggerParameter);
+      ors.add(constructed);
+      return ors;
+    }).forEach(ands::addAnd);
 
     return ands;
+  }
+
+  private ConstructedParam<PatientTriggerParameter> patientParam(String date) {
+
+    PatientTriggerParameter patientTriggerParameter = new PatientTriggerParameter(
+        new StringParam("CareConnectPatient"),
+        new StringParam("birthDate"),
+        date(date)
+    );
+
+    return new ConstructedParam<>(patientTriggerParameter);
+
   }
 
   @Test
@@ -133,22 +174,22 @@ public class ServiceDefinitionProvidersTest {
   public void triage_oneResult(
       TokenParam status,
       TokenParam experimental,
-      DateParam effective,
+      DateParam effectiveStart,
+      DateParam effectiveEnd,
       TokenParam jurisdiction,
       CompositeAndListParam<TokenParam, TokenParam> useContextConcept,
-      CompositeAndListParam<TokenParam, QuantityParam> useContextQuantity,
-      CompositeAndListParam<TokenParam, QuantityParam> useContextRange,
-      CompositeAndListParam<TokenParam, TokenParam> triggerTypeCode,
+      ConstructedAndListParam<ObservationTriggerParameter> observationParams,
+      ConstructedParam<PatientTriggerParameter> patientParam,
       String expectedServiceDefinition) {
     var result = provider.findTriageServiceDefinitions(
         status,
         experimental,
-        effective,
+        effectiveStart,
+        effectiveEnd,
         jurisdiction,
         useContextConcept,
-        useContextQuantity,
-        useContextRange,
-        triggerTypeCode
+        observationParams,
+        patientParam
     );
 
     Assert.assertEquals("Retrieved one definition", 1, result.size());
@@ -160,30 +201,19 @@ public class ServiceDefinitionProvidersTest {
   public Object parametersForTriage_oneResult() {
     return new Object[]{
         new Object[]{null, null, null, null, null, null, null, null, "initial"},
-        new Object[]{token("ACTIVE"), null, null, null, null, null, null, null, "initial"},
+        new Object[]{token("ACTIVE"), null, null, null, null, null, null, null,"initial"},
         new Object[]{null, token("false"), null, null, null, null, null, null, "initial"},
-        new Object[]{null, null, date("2020-12-20"), null, null, null, null, null, "initial"},
-        new Object[]{null, null, date("lt3020-12-20"), null, null, null, null, null, "initial"},
-        new Object[]{null, null, date("gt1020-12-20"), null, null, null, null, null, "initial"},
-        new Object[]{null, null, null, token("GB"), null, null, null, null, "initial"},
-        new Object[]{null, null, null, null, useContext("non-existent", "invalid"), null, null,
-            null, "initial"},
-        new Object[]{null, null, null, null, useContext("user", "103TP2700X"), null, null,
-            trigger("anxiety"), "anxiety"},
-        new Object[]{null, null, null, token("GB"), null, null, null, trigger("chestPain"),
-            "chestPains"},
-        new Object[]{null, null, date("2020-12-20"), null, null, null, null,
-            trigger("musculoskeletal"), "musculoskeletal"},
-        new Object[]{token("ACTIVE"), token("false"), null, null, null, null, null, null,
-            "initial"},
-        new Object[]{token("ACTIVE"), token("false"), null, null, null, null, null,
-            trigger("palpitations", "debug"), "palpitations"},
-        new Object[]{token("ACTIVE"), token("false"), date("lt2040-12-20"), null, null, null, null,
-            trigger("palpitations", "debug"), "palpitations"},
-        new Object[]{null, token("false"), date("ge2040-12-20"), null, null, null, null,
-            trigger("palpitations"), "palpitations2"},
-        new Object[]{null, token("false"), null, null, null, null, null,
-            trigger("palpitations"), "palpitations2"}
+        new Object[]{null, null, date("le2020-12-20"), date("ge2020-12-20"), null, null, null, null, "initial"},
+        new Object[]{null, null, null, null, token("GB"), null, null, null, "initial"},
+        new Object[]{null, null, null, null, null, useContext(Stream.of("non-existent"), Stream.of("invalid")), null, null, "initial"},
+        new Object[]{null, null, null, null, null, useContext(Stream.of("user"), Stream.of("103TP2700X")), observationTrigger(Stream.of("anxiety"), Stream.of("present")), null, "anxiety"},
+        new Object[]{null, null, null, null, token("GB"), null, observationTrigger(Stream.of("chestPain"), Stream.of("present")), null, "chestPains"},
+        new Object[]{null, null, date("le2020-12-20"), date("ge2020-12-20"), null, null, observationTrigger(Stream.of("musculoskeletal"), Stream.of("present")), null, "musculoskeletal"},
+        new Object[]{token("ACTIVE"), token("false"), null, null, null, null, null, null, "initial"},
+        new Object[]{token("ACTIVE"), token("false"), null, null, null, null, observationTrigger(Stream.of("palpitations", "debug"), Stream.of("present", "present")), null, "palpitations"},
+        new Object[]{token("ACTIVE"), token("false"), date("le2020-12-20"), date("ge2020-12-20"), null, null, observationTrigger(Stream.of("palpitations", "debug"), Stream.of("present", "present")), null, "palpitations"},
+        new Object[]{null, token("false"), date("le2020-12-20"), date("ge2020-12-20"), null, null, observationTrigger(Stream.of("palpitations"), Stream.of("present")), null, "palpitations2"},
+        new Object[]{null, token("false"), null, null, null, null, observationTrigger(Stream.of("palpitations"), Stream.of("present")), null, "palpitations2"}
     };
   }
 
@@ -196,18 +226,17 @@ public class ServiceDefinitionProvidersTest {
       DateParam effective,
       TokenParam jurisdiction,
       CompositeAndListParam<TokenParam, TokenParam> useContextConcept,
-      CompositeAndListParam<TokenParam, QuantityParam> useContextQuantity,
-      CompositeAndListParam<TokenParam, QuantityParam> useContextRange,
-      CompositeAndListParam<TokenParam, TokenParam> triggerTypeCode) {
+      ConstructedAndListParam<ObservationTriggerParameter> observationParams,
+      ConstructedParam<PatientTriggerParameter> patientParam) {
     var result = provider.findTriageServiceDefinitions(
         status,
         experimental,
         effective,
+        effective,
         jurisdiction,
         useContextConcept,
-        useContextQuantity,
-        useContextRange,
-        triggerTypeCode
+        observationParams,
+        patientParam
     );
 
     Assert.assertEquals("Retrieved no definitions", 0, result.size());
@@ -215,13 +244,94 @@ public class ServiceDefinitionProvidersTest {
 
   public Object parametersForTriage_noResults() {
     return new Object[]{
-        new Object[]{token("DRAFT"), null, null, null, null, null, null, null},
-        new Object[]{token("RETIRED"), null, null, null, null, null, null, null},
-        new Object[]{null, token("true"), null, null, null, null, null, null},
-        new Object[]{null, null, date("2120-12-20"), null, null, null, null, null},
-        new Object[]{null, null, date("gt2120-12-20"), null, null, null, null, null},
-        new Object[]{null, null, date("lt1920-12-20"), null, null, null, null, null},
-        new Object[]{null, null, null, token("ES"), null, null, null, null},
+        new Object[]{token("DRAFT"), null, null, null, null, null, null},
+        new Object[]{token("RETIRED"), null, null, null, null, null, null},
+        new Object[]{null, token("true"), null, null, null, null, null},
+        new Object[]{null, null, date("2120-12-20"), null, null, null, null},
+        new Object[]{null, null, date("gt2120-12-20"), null, null, null, null},
+        new Object[]{null, null, date("lt1920-12-20"), null, null, null, null},
+        new Object[]{null, null, null, token("ES"), null, null, null},
+    };
+  }
+
+  @Test
+  @Parameters
+  @TestCaseName
+  public void triage_searchContextsTriggers(
+      CompositeAndListParam<TokenParam, TokenParam> useContextConcept,
+      ConstructedAndListParam<ObservationTriggerParameter> observationParams,
+      String birthDate,
+      String expectedServiceDef
+  ) {
+    var result = provider.findTriageServiceDefinitions(
+        token("active"),
+        token("false"),
+        date("le2019-12-20"),
+        date("ge2019-12-20"),
+        token("GB"),
+        useContextConcept,
+        observationParams,
+        patientParam(birthDate)
+    );
+
+    assertThat(result, hasSize(1));
+    assertThat(result.iterator().next().getDescription(), is(expectedServiceDef));
+  }
+
+  public Object parametersForTriage_searchContextsTriggers() {
+    String childBirthDate = LocalDate.now().minusYears(3).format(DateTimeFormatter.ISO_LOCAL_DATE);
+    String adultBirthDate = LocalDate.now().minusYears(23).format(DateTimeFormatter.ISO_LOCAL_DATE);
+
+
+    return new Object[]{
+        new Object[]{
+            useContext(Stream.of("age", "user"), Stream.of("133936004", "261QU0200X")),
+            observationTrigger(Stream.of("soreThroat", "lifeThreatening"), Stream.of("present", "absent")),
+            adultBirthDate,
+            "Sore Throat - Adult, Call Handler"
+        },
+        new Object[]{
+            useContext(Stream.of("age", "user"), Stream.of("133936004", "103GC0700X")),
+            observationTrigger(Stream.of("soreThroat", "lifeThreatening"), Stream.of("present", "absent")),
+            adultBirthDate,
+            "Sore Throat - Adult, Clinical"
+        },
+        new Object[]{
+            useContext(Stream.of("age", "user"), Stream.of("67822003", "261QU0200X")),
+            observationTrigger(Stream.of("soreThroat", "lifeThreatening"), Stream.of("present", "absent")),
+            childBirthDate,
+            "Sore Throat - Child, Call Handler"
+        },
+        new Object[]{
+            useContext(Stream.of("age", "user"), Stream.of("67822003", "103GC0700X")),
+            observationTrigger(Stream.of("soreThroat", "lifeThreatening"), Stream.of("present", "absent")),
+            childBirthDate,
+            "Sore Throat - Child, Clinical"
+        },
+        new Object[]{
+            useContext(Stream.of("age", "user"), Stream.of("133936004", "261QU0200X")),
+            observationTrigger(Stream.of("constipation", "lifeThreatening"),
+                Stream.of("present", "absent")),
+            adultBirthDate,
+            "Constipation - Adult, Call Handler"
+        },
+        new Object[]{
+            useContext(Stream.of("age", "user"), Stream.of("133936004", "103GC0700X")),
+            observationTrigger(Stream.of("constipation", "lifeThreatening"), Stream.of("present", "absent")),
+            adultBirthDate,
+            "Constipation - Adult, Clinical"},
+        new Object[]{
+            useContext(Stream.of("age", "user"), Stream.of("67822003", "261QU0200X")),
+            observationTrigger(Stream.of("constipation", "lifeThreatening"), Stream.of("present", "absent")),
+            childBirthDate,
+            "Constipation - Child, Call Handler"
+        },
+        new Object[]{
+            useContext(Stream.of("age", "user"), Stream.of("67822003", "103GC0700X")),
+            observationTrigger(Stream.of("constipation", "lifeThreatening"), Stream.of("present", "absent")),
+            childBirthDate,
+            "Constipation - Child, Clinical"
+        },
     };
   }
 }

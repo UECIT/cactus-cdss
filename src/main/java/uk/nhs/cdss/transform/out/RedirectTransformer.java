@@ -1,56 +1,42 @@
 package uk.nhs.cdss.transform.out;
 
+import static org.apache.commons.collections4.ListUtils.union;
+
+import java.sql.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+import lombok.AllArgsConstructor;
 import org.hl7.fhir.dstu3.model.DataRequirement;
-import org.hl7.fhir.dstu3.model.DataRequirement.DataRequirementCodeFilterComponent;
+import org.hl7.fhir.dstu3.model.DateTimeType;
 import org.springframework.stereotype.Component;
-import uk.nhs.cdss.domain.Concept;
+import uk.nhs.cdss.domain.PatientTrigger;
 import uk.nhs.cdss.domain.Redirection;
-import uk.nhs.cdss.engine.CodeDirectory;
 import uk.nhs.cdss.transform.Transformer;
 
 @Component
-public class RedirectTransformer implements Transformer<Redirection, DataRequirement> {
+@AllArgsConstructor
+public class RedirectTransformer implements Transformer<Redirection, List<DataRequirement>> {
 
-  private CodeDirectory codeDirectory;
-  private CodingOutTransformer codingTransformer;
-
-  public RedirectTransformer(
-      CodeDirectory codeDirectory,
-      CodingOutTransformer codingTransformer) {
-    this.codeDirectory = codeDirectory;
-    this.codingTransformer = codingTransformer;
-  }
-
-  private DataRequirementCodeFilterComponent buildFilter(Concept code) {
-    var filter = new DataRequirementCodeFilterComponent();
-    filter.setPath("code");
-    code.getCoding()
-        .stream()
-        .map(codingTransformer::transform)
-        .forEach(filter::addValueCoding);
-    return filter;
-  }
+  private TriggerTransformer triggerTransformer;
 
   @Override
-  public DataRequirement transform(Redirection from) {
-    final var TRIGGER_PROFILE =
-        "https://fhir.hl7.org.uk/STU3/StructureDefinition/CareConnect-CareConnectObservation-1";
+  public List<DataRequirement> transform(Redirection from) {
+    List<DataRequirement> observationDataRequirements = from.getObservationTriggers().stream()
+        .map(trigger -> triggerTransformer.buildDataRequirementFromObservation(trigger))
+        .collect(Collectors.toList());
+    List<DataRequirement> patientDataRequirements = from.getPatientTriggers().stream()
+        .map(this::createPatientDataRequirement)
+        .collect(Collectors.toList());
+    return union(observationDataRequirements, patientDataRequirements);
+  }
 
-    var requirement = new DataRequirement();
-    requirement.setId(from.getId());
-    // TODO: this type must be documented as a difference between 1.0 and 1.POC of the spec
-    // the guide still specifies this must be set to "TriggerDefinition"
-    requirement.setType("CareConnectObservation");
+  private DataRequirement createPatientDataRequirement(PatientTrigger trigger) {
 
-    from.getCodingIds().stream()
-        .filter(codeDirectory::has)
-        .map(codeDirectory::get)
-        .map(this::buildFilter)
-        .forEach(code -> {
-          requirement.addProfile(TRIGGER_PROFILE);
-          requirement.addCodeFilter(code);
-        });
-
-    return requirement;
+    DataRequirement dataRequirement = new DataRequirement();
+    dataRequirement.setType("CareConnectPatient")
+        .addDateFilter()
+          .setPath("birthDate")
+          .setValue(new DateTimeType(Date.from(trigger.getBirthDate().getInstant())));
+    return dataRequirement;
   }
 }

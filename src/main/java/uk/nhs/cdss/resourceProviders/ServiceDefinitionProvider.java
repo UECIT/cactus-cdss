@@ -8,8 +8,9 @@ import ca.uhn.fhir.rest.annotation.RequiredParam;
 import ca.uhn.fhir.rest.annotation.ResourceParam;
 import ca.uhn.fhir.rest.annotation.Search;
 import ca.uhn.fhir.rest.param.CompositeAndListParam;
+import ca.uhn.fhir.rest.param.ConstructedAndListParam;
+import ca.uhn.fhir.rest.param.ConstructedParam;
 import ca.uhn.fhir.rest.param.DateParam;
-import ca.uhn.fhir.rest.param.QuantityParam;
 import ca.uhn.fhir.rest.param.TokenParam;
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import ca.uhn.fhir.rest.server.exceptions.InternalErrorException;
@@ -19,7 +20,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.hl7.fhir.dstu3.model.Bundle;
 import org.hl7.fhir.dstu3.model.GuidanceResponse;
 import org.hl7.fhir.dstu3.model.IdType;
@@ -30,6 +33,8 @@ import org.hl7.fhir.dstu3.model.Resource;
 import org.hl7.fhir.dstu3.model.ResourceType;
 import org.hl7.fhir.dstu3.model.ServiceDefinition;
 import org.hl7.fhir.dstu3.model.Type;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RestController;
 import uk.nhs.cdss.logging.Context;
 import uk.nhs.cdss.logging.Context.ContextBuilder;
@@ -45,15 +50,18 @@ public class ServiceDefinitionProvider implements IResourceProvider {
   private static final String EVALUATE = "$evaluate";
 
   private static final String SP_EXPERIMENTAL = "experimental";
-  private static final String SP_TYPE_CODE = "type-code";
-  private static final String SP_CONTEXT_VALUE = "context-value";
-  private static final String SP_CONTEXT_QUANTITY = "context-quantity";
-  private static final String SP_CONTEXT_RANGE = "context-range";
+  private static final String SP_OBSERVATION_TYPE_CODE = "trigger-type-code-value-effective";
+  private static final String SP_PATIENT_TYPE_CODE = "trigger-type-date";
+  private static final String SP_CONTEXT_VALUE = "useContext-code-value";
+  private static final String SP_EFFECTIVE_PERIOD = "effectivePeriod";
 
   private final EvaluateService evaluateService;
   private final ServiceDefinitionTransformer serviceDefinitionTransformer;
   private final ServiceDefinitionRegistry serviceDefinitionRegistry;
   private final ServiceDefinitionConditionBuilderFactory conditionBuilderFactory;
+
+  @Getter(AccessLevel.NONE)
+  private final Logger log = LoggerFactory.getLogger(getClass());
 
   @Override
   public Class<ServiceDefinition> getResourceType() {
@@ -152,36 +160,33 @@ public class ServiceDefinitionProvider implements IResourceProvider {
   public Collection<ServiceDefinition> findTriageServiceDefinitions(
       @OptionalParam(name = ServiceDefinition.SP_STATUS) TokenParam status,
       @OptionalParam(name = SP_EXPERIMENTAL) TokenParam experimental,
-      @OptionalParam(name = ServiceDefinition.SP_EFFECTIVE) DateParam effective,
+      @OptionalParam(name = SP_EFFECTIVE_PERIOD + ".start") DateParam effectiveStart, //Not FHIR compliant - can only have chained params on resource (Period is not)
+      @OptionalParam(name = SP_EFFECTIVE_PERIOD + ".end") DateParam effectiveEnd,
       @OptionalParam(name = ServiceDefinition.SP_JURISDICTION) TokenParam jurisdiction,
       @OptionalParam(
           name = SP_CONTEXT_VALUE,
           compositeTypes = {TokenParam.class, TokenParam.class})
           CompositeAndListParam<TokenParam, TokenParam> useContextConcept,
-      @OptionalParam(
-          name = SP_CONTEXT_QUANTITY,
-          compositeTypes = {TokenParam.class, QuantityParam.class})
-          CompositeAndListParam<TokenParam, QuantityParam> useContextQuantity,
-      @OptionalParam(name = SP_CONTEXT_RANGE,
-          compositeTypes = {TokenParam.class, QuantityParam.class})
-          CompositeAndListParam<TokenParam, QuantityParam> useContextRange,
-      @OptionalParam(name = SP_TYPE_CODE, compositeTypes = {TokenParam.class, TokenParam.class})
-          CompositeAndListParam<TokenParam, TokenParam> triggerTypeCode) {
+      @OptionalParam(name = SP_OBSERVATION_TYPE_CODE, constructedType = ObservationTriggerParameter.class)
+          ConstructedAndListParam<ObservationTriggerParameter> observationParams,
+      @OptionalParam(name = SP_PATIENT_TYPE_CODE, constructedType = PatientTriggerParameter.class)
+          ConstructedParam<PatientTriggerParameter> patientParams) {
 
     var builder = conditionBuilderFactory.load();
 
     builder.addStatusConditions(status);
     builder.addExperimentalConditions(experimental);
-    builder.addEffectivePeriodConditions(effective);
+    builder.addEffectivePeriodConditions(effectiveStart, effectiveEnd);
     builder.addJurisdictionConditions(jurisdiction);
     builder.addUseContextCodeConditions(useContextConcept);
-    builder.addAgeConditions(useContextQuantity, useContextRange);
-    builder.addTriggerConditions(triggerTypeCode);
+    builder.addObservationTriggerConditions(observationParams);
+    builder.addPatientTriggerConditions(patientParams);
 
     return serviceDefinitionRegistry
         .getAll()
         .stream()
         .filter(builder.getConditions())
+        .peek(sd -> log.info("Service definition {} matched", sd.getDescription()))
         .max(this::triggerCount)
         .map(serviceDefinitionTransformer::transform)
         .stream()
