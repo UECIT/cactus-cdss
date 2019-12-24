@@ -54,7 +54,7 @@ public class ReferralRequestTransformer implements
     result.setPriority(transformPriority(from.getPriority()));
     result.setServiceRequested(transformServiceRequested(from.getServiceRequested()));
     result.setSubject(bundle.getSubject());
-    result.setContext(bundle.getContext());
+    result.setContext(new Reference(bundle.getContext()));
     result.setOccurrence(transformOccurrence(from.getOccurrence()));
     result.setAuthoredOn(from.getAuthoredOn());
     result.setSpecialty(transformSpecialty(from.getSpecialty()));

@@ -28,6 +28,7 @@ import org.hl7.fhir.dstu3.model.StringType;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.springframework.stereotype.Component;
 import uk.nhs.cdss.domain.Outcome;
+import uk.nhs.cdss.services.ReferenceStorageService;
 import uk.nhs.cdss.transform.Transformer;
 import uk.nhs.cdss.transform.bundle.CDSOutputBundle;
 import uk.nhs.cdss.transform.bundle.CarePlanBundle;
@@ -42,6 +43,7 @@ public class CDSOutputTransformer implements Transformer<CDSOutputBundle, Guidan
   private final RedirectTransformer redirectTransformer;
   private final ObservationTransformer observationTransformer;
   private final IGenericClient fhirClient;
+  private final ReferenceStorageService storageService;
 
   private DataRequirement buildDataRequirement(String questionnaireId) {
     var dataRequirement = new DataRequirement();
@@ -100,7 +102,7 @@ public class CDSOutputTransformer implements Transformer<CDSOutputBundle, Guidan
         .setOccurrenceDateTime(new Date())
         .setRequestId(bundle.getParameters().getRequestId())
         .setModule(serviceDefinition)
-        .setContext(bundle.getParameters().getEncounter());
+        .setContext(storageService.store(bundle.getParameters().getEncounter()));
 
     boolean dataRequested = !output.getQuestionnaireIds().isEmpty();
 

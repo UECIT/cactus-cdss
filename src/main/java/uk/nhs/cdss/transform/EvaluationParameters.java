@@ -3,6 +3,7 @@ package uk.nhs.cdss.transform;
 import static org.hl7.fhir.dstu3.model.OperationOutcome.IssueType.INVALID;
 import static uk.nhs.cdss.OperationOutcomeFactory.buildOperationOutcomeException;
 import static uk.nhs.cdss.constants.SystemCode.BAD_REQUEST;
+import static uk.nhs.cdss.constants.SystemConstants.ENCOUNTER;
 import static uk.nhs.cdss.constants.SystemConstants.INPUT_DATA;
 import static uk.nhs.cdss.constants.SystemConstants.REQUEST_ID;
 import static uk.nhs.cdss.constants.SystemConstants.SETTING;
@@ -22,12 +23,12 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Singular;
 import org.hl7.fhir.dstu3.model.CodeableConcept;
+import org.hl7.fhir.dstu3.model.Encounter;
 import org.hl7.fhir.dstu3.model.IdType;
 import org.hl7.fhir.dstu3.model.Observation;
 import org.hl7.fhir.dstu3.model.Parameters;
 import org.hl7.fhir.dstu3.model.Parameters.ParametersParameterComponent;
 import org.hl7.fhir.dstu3.model.QuestionnaireResponse;
-import org.hl7.fhir.dstu3.model.Reference;
 import org.hl7.fhir.dstu3.model.Resource;
 
 @Getter
@@ -37,7 +38,7 @@ public class EvaluationParameters {
 
 
   private String requestId;
-  private Reference encounter;
+  private Encounter encounter;
   @Singular("input")
   private List<Resource> inputData;
   @Singular
@@ -54,9 +55,8 @@ public class EvaluationParameters {
     requestId = castToType(requestIdParameter.getValue(), IdType.class)
         .asStringValue();
 
-    // TODO: depends on the EMS providing an encounter
-//    var encounterParameter = getParameterByName(parameters, ENCOUNTER);
-//    encounter = castToType(encounterParameter.getValue(), Reference.class);
+    var encounterParameter = getParameterByName(parameters, ENCOUNTER);
+    encounter = castToType(encounterParameter.getResource(), Encounter.class);
 
     inputData = getParametersByName(parameters, INPUT_DATA)
         .stream()
