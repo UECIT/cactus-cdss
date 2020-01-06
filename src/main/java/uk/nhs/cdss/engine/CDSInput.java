@@ -10,7 +10,7 @@ import uk.nhs.cdss.domain.Patient;
 import uk.nhs.cdss.domain.QuestionnaireResponse;
 
 @Getter
-@Builder
+@Builder(toBuilder = true)
 public class CDSInput {
 
   private final String serviceDefinitionId;

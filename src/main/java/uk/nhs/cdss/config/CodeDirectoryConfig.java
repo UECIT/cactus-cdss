@@ -96,9 +96,6 @@ public class CodeDirectoryConfig {
     codeDirectory.put("261QU0200X", provider("261QU0200X", "Urgent"));
 
     /* In EMS */
-    codeDirectory.put("CL", provider("CL", "Clinician"));
-    codeDirectory.put("CH", provider("CH", "Call Handler"));
-    codeDirectory.put("MH", provider("MH", "Mental Health Specialist"));
     codeDirectory.put("PA", provider("PA", "Patient"));
 
     // setting

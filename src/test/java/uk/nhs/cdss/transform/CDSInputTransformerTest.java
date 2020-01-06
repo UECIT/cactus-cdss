@@ -3,6 +3,7 @@ package uk.nhs.cdss.transform;
 import static org.junit.Assert.assertEquals;
 
 import org.hl7.fhir.dstu3.model.CodeableConcept;
+import org.hl7.fhir.dstu3.model.Coding;
 import org.hl7.fhir.dstu3.model.Encounter;
 import org.hl7.fhir.dstu3.model.IdType;
 import org.hl7.fhir.dstu3.model.Parameters;
@@ -36,7 +37,7 @@ public class CDSInputTransformerTest {
 
     var typeComponent = new ParametersParameterComponent(
         new StringType("userType"));
-    typeComponent.setValue(new CodeableConcept());
+    typeComponent.setValue(new CodeableConcept(new Coding("roles", "PA", "Patient")));
     parameters.addParameter(typeComponent);
 
     var settingComponent = new ParametersParameterComponent(

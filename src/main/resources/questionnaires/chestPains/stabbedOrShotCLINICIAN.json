@@ -1,0 +1,19 @@
+{
+    "id": "chestPains.stabbedOrShot",
+    "items": [
+      {
+        "id": "q",
+        "text": "Was the injury caused by any of the following? Stabbing or other mechanism causing the puncture wound. Gunshot",
+        "type": "CHOICE",
+        "required": true,
+        "options": [
+          {
+            "stringValue": "Yes"
+          },
+          {
+            "stringValue": "No"
+          }
+        ]
+      }
+    ]
+  }

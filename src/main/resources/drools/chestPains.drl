@@ -19,6 +19,7 @@ import uk.nhs.cdss.domain.CarePlanActivity
 import uk.nhs.cdss.domain.ReferralRequest
 import uk.nhs.cdss.domain.Redirection
 import uk.nhs.cdss.domain.Assertion
+import uk.nhs.cdss.domain.EvaluateContext
 
 import uk.nhs.cdss.constants.SnomedConstants
 
@@ -166,17 +167,18 @@ function CarePlan recordTemperature() {
 
 rule "Init"
 salience 10000
-when // Always
+when
+    EvaluateContext($role := role.name())
 then
-    // Patient Question (TODO: ROLES)
     // Pain caused by injury?
-    insert( new InitialQuestionnaire("chestPains.causedByInjury") );
-    insert( new AnswerAssertion("chestPains.causedByInjury", "q", "Yes", codeDirectory.get("causedByInjury"), true));
+    String causedByInjury = "chestPains.causedByInjury" + $role;
+    insert( new InitialQuestionnaire(causedByInjury) );
+    insert( new AnswerAssertion(causedByInjury, "q", "Yes", codeDirectory.get("causedByInjury"), true));
 
-    // Patient Question (TODO: ROLES)
     // Have you been stabbed/shot e.g. arrow or nail gun
-    insert( new NextQuestion("chestPains.stabbedOrShot", "chestPains.causedByInjury", "q", Arrays.asList("Yes")) );
-    insert( new AnswerAssertion("chestPains.stabbedOrShot", "q", "Yes", codeDirectory.get("stabbedOrShot"), true));
+    String stabbedOrShot = "chestPains.stabbedOrShot" + $role;
+    insert( new NextQuestion(stabbedOrShot, causedByInjury, "q", Arrays.asList("Yes")) );
+    insert( new AnswerAssertion(stabbedOrShot, "q", "Yes", codeDirectory.get("stabbedOrShot"), true));
     insert( Outcome.of("stabbedOrShot", CarePlan.builder()
                 .id("stabbedOrShot")
                 .title("Stabbed or shot")
@@ -185,10 +187,10 @@ then
                 .activity(new CarePlanActivity("selfCare", "Put yourself in a place of safety"))
                 .build())
             .interim());
-    insert( new OutcomeAnswerCondition("stabbedOrShot", "chestPains.stabbedOrShot", "q", Arrays.asList("Yes") ));
+    insert( new OutcomeAnswerCondition("stabbedOrShot", stabbedOrShot, "q", Arrays.asList("Yes") ));
 
     // Bleeding from the injury
-    insert( new NextQuestion("chestPains.bleeding", "chestPains.stabbedOrShot", "q", Arrays.asList("Yes")));
+    insert( new NextQuestion("chestPains.bleeding", stabbedOrShot, "q", Arrays.asList("Yes")));
     insert( new AnswerAssertion("chestPains.bleeding", "q", "Yes", codeDirectory.get("bleeding"), true));
     insert( Outcome.of("bleedingIR", ReferralRequest.builder()
                 .id("utc-ami-12h")
@@ -202,9 +204,9 @@ then
             .interim());    
     insert( new OutcomeAnswerCondition("bleedingIR", "chestPains.bleeding", "q", Arrays.asList("Yes") ));
 
-    // Amount of Blood loss (TODO: ROLES)
-    insert( new NextQuestion("chestPains.bloodLoss", "chestPains.bleeding", "q", Arrays.asList("Yes")));
-    insert( new AnswerAssertion("chestPains.bloodLoss", "q", "Yes", codeDirectory.get("bloodLoss"), true));
+    String bloodLoss = "chestPains.bloodLoss" + $role;
+    insert( new NextQuestion(bloodLoss, "chestPains.bleeding", "q", Arrays.asList("Yes")));
+    insert( new AnswerAssertion(bloodLoss, "q", "Yes", codeDirectory.get("bloodLoss"), true));
     insert( Outcome.of("bloodLoss", ReferralRequest.builder()
                 .id("call999-transfusion&intervention-8m")
                 .description("Call 999")
@@ -214,10 +216,10 @@ then
                 .specialty("transfusion&intervention")
                 .reason("haemorrhageTrauma")
                 .build()));
-    insert( new OutcomeAnswerCondition("bloodLoss", "chestPains.bloodLoss", "q", Arrays.asList("Yes") ));
+    insert( new OutcomeAnswerCondition("bloodLoss", bloodLoss, "q", Arrays.asList("Yes") ));
 
     // Bleeding controlled by application of direct pressure
-    insert( new NextQuestion("chestPains.controlledByPressure", "chestPains.bloodLoss", "q", Arrays.asList("No")));
+    insert( new NextQuestion("chestPains.controlledByPressure", bloodLoss, "q", Arrays.asList("No")));
     insert( new AnswerAssertion("chestPains.controlledByPressure", "q", "Yes", codeDirectory.get("controlledByPressure"), true));
     insert( edSurgicalIntervention("controlledByPressure", "organTrauma", "PT1h"));
     insert( new OutcomeAnswerCondition("controlledByPressure", "chestPains.controlledByPressure", "q", Arrays.asList("Yes") ));
@@ -229,18 +231,19 @@ then
     insert( new OutcomeAnswerCondition("bleedingStopped", "chestPains.bleedingStopped", "q", Arrays.asList("Yes", "No", "Unsure") ));
 
     
-    // Entry Point/Open Wound (TODO: ROLES)
-    insert( new NextQuestion("chestPains.openWound", "chestPains.bleeding", "q", Arrays.asList("No")));
-    insert( new AnswerAssertion("chestPains.openWound", "q", "Yes", codeDirectory.get("openWound"), true));
+    // Entry Point/Open Wound
+    String openWound = "chestPains.openWound" + $role;
+    insert( new NextQuestion(openWound, "chestPains.bleeding", "q", Arrays.asList("No")));
+    insert( new AnswerAssertion(openWound, "q", "Yes", codeDirectory.get("openWound"), true));
 
     // Bruising, Swelling or Haematoma
-    insert( new NextQuestion("chestPains.bruisingOrSwelling", "chestPains.openWound", "q", Arrays.asList("Yes")));
+    insert( new NextQuestion("chestPains.bruisingOrSwelling", openWound, "q", Arrays.asList("Yes")));
     insert( new AnswerAssertion("chestPains.bruisingOrSwelling", "q", "Yes", codeDirectory.get("bruisingOrSwelling"), true));
     insert( edSurgicalIntervention("bruisingOrSwelling", "bleedingTrauma", "PT1h"));
     insert( new OutcomeAnswerCondition("bruisingOrSwelling", "chestPains.bruisingOrSwelling", "q", Arrays.asList("Yes", "No", "Unsure") ));
 
     // Still has pain from injury
-    insert( new NextQuestion("chestPains.stillPain", "chestPains.openWound", "q", Arrays.asList("No", "Unsure")));
+    insert( new NextQuestion("chestPains.stillPain", openWound, "q", Arrays.asList("No", "Unsure")));
     insert( new AnswerAssertion("chestPains.stillPain", "q", "Yes", codeDirectory.get("stillPain"), true));
     insert( Outcome.of("stillPain", ReferralRequest.builder()
                 .id("ed-bleedingWound-1h")
@@ -276,16 +279,18 @@ then
     insert( new NextQuestion("chestPains.heavyLifting", "chestPains.crushInjury", "q4", Arrays.asList("No")));
     insert( new AnswerAssertion("chestPains.heavyLifting", "q", "Yes", codeDirectory.get("heavyLifting"), true));
     
-    // Chest pains now (TODO: ROLES)
-    insert( new NextQuestion("chestPains.painsNow", "chestPains.causedByInjury", "q", Arrays.asList("No")));
-    insert( new AnswerAssertion("chestPains.painsNow", "q", "Yes", codeDirectory.get("painsNow"), true));
+    // Chest pains now
+    String painsNow = "chestPains.painsNow" + $role;
+    insert( new NextQuestion(painsNow, causedByInjury, "q", Arrays.asList("No")));
+    insert( new AnswerAssertion(painsNow, "q", "Yes", codeDirectory.get("painsNow"), true));
 
-    // Heart attack in the past (TODO: ROLES)
-    insert( new NextQuestion("chestPains.heartAttackInPast", "chestPains.painsNow", "q", Arrays.asList("Yes")));
-    insert( new AnswerAssertion("chestPains.heartAttackInPast", "q", "Yes", codeDirectory.get("heartAttackInPast"), true));
+    // Heart attack in the past
+    String heartAttackInPast = "chestPains.heartAttackInPast" + $role;
+    insert( new NextQuestion(heartAttackInPast, painsNow, "q", Arrays.asList("Yes")));
+    insert( new AnswerAssertion(heartAttackInPast, "q", "Yes", codeDirectory.get("heartAttackInPast"), true));
 
     // Same symptoms as previous MI
-    insert( new NextQuestion("chestPains.sameSymptoms", "chestPains.heartAttackInPast", "q", Arrays.asList("Yes")));
+    insert( new NextQuestion("chestPains.sameSymptoms", heartAttackInPast, "q", Arrays.asList("Yes")));
     insert( new AnswerAssertion("chestPains.sameSymptoms", "q", "Yes", codeDirectory.get("sameSymptoms"), true));
     insert( call999MiCardiology("sameSymptoms"));
     insert( new OutcomeAnswerCondition("sameSymptoms", "chestPains.sameSymptoms", "q", Arrays.asList("Yes") ));
@@ -305,7 +310,7 @@ then
                 .reason("aneurysm")
                 .build()));
     insert( new OutcomeAnswerCondition("hasConditionsPainsNow", "chestPains.conditions", "q", Arrays.asList("Yes") ));
-    insert( new OutcomeAnswerCondition("hasConditionsPainsNow", "chestPains.painsNow", "q", Arrays.asList("Yes") ));
+    insert( new OutcomeAnswerCondition("hasConditionsPainsNow", painsNow, "q", Arrays.asList("Yes") ));
     insert( Outcome.of("hasConditionsNotPainsNow", ReferralRequest.builder()
                 .id("ed-aneurysm-risk-4h")
                 .description("ED")
@@ -316,7 +321,7 @@ then
                 .reason("aneurysmRisk")
                 .build()));
     insert( new OutcomeAnswerCondition("hasConditionsNotPainsNow", "chestPains.conditions", "q", Arrays.asList("aneurysm", "mafan") ));
-    insert( new OutcomeAnswerCondition("hasConditionsNotPainsNow", "chestPains.painsNow", "q", Arrays.asList("Yes") ));
+    insert( new OutcomeAnswerCondition("hasConditionsNotPainsNow", painsNow, "q", Arrays.asList("Yes") ));
     insert( Outcome.of("noConditions", ReferralRequest.builder()
                 .id("ed-possibleMI-1h")
                 .description("ED")
@@ -330,14 +335,14 @@ then
     insert( new OutcomeAnswerCondition("noConditions", "chestPains.sameSymptoms", "q", Arrays.asList("No", "Unsure")));
 
     // Symptoms
-    insert( new NextQuestion("chestPains.symptoms", "chestPains.heartAttackInPast", "q", Arrays.asList("No")));
-    insert( new NextQuestion("chestPains.symptoms", "chestPains.painsNow", "q", Arrays.asList("No")));
+    insert( new NextQuestion("chestPains.symptoms", heartAttackInPast, "q", Arrays.asList("No")));
+    insert( new NextQuestion("chestPains.symptoms", painsNow, "q", Arrays.asList("No")));
     insert( new AnswerAssertion("chestPains.symptoms", "q", "chest", codeDirectory.get("symptoms"), true));
     insert( new AnswerAssertion("chestPains.symptoms", "q", "arm", codeDirectory.get("symptoms"), true));
     insert( new AnswerAssertion("chestPains.symptoms", "q", "sick", codeDirectory.get("symptoms"), true));
     insert( call999MiCardiology("sameSymptoms"));
     insert( new OutcomeAnswerCondition("symptomsHAInPast", "chestPains.symptoms", "q", Arrays.asList("chest", "arm", "sick") ));
-    insert( new OutcomeAnswerCondition("symptomsHAInPast", "chestPains.heartAttackInPast", "q", Arrays.asList("No") ));
+    insert( new OutcomeAnswerCondition("symptomsHAInPast", heartAttackInPast, "q", Arrays.asList("No") ));
 
     // Previous heart problems (Display)
     insert( new NextQuestion("chestPains.previousProblems", "chestPains.symptoms", "q", Arrays.asList("chest", "arm", "sick")));
@@ -355,17 +360,19 @@ then
 
     // Patient experiencing breathlessness
     insert( new ConditionalNextQuestion("breathlessnessIfPainsNow", "chestPains.breathlessness", "chestPains.conditions", "q", Arrays.asList("none")));
-    insert( new NextQuestionCondition("breathlessnessIfPainsNow", "chestPains.painsNow", "q", Arrays.asList("Yes")));
+    insert( new NextQuestionCondition("breathlessnessIfPainsNow", painsNow, "q", Arrays.asList("Yes")));
 
     insert( new AnswerAssertion("chestPains.breathlessness", "q", "Yes", codeDirectory.get("breathlessness"), true));
 
     // Underlying condition that affects breathing
-    insert( new NextQuestion("chestPains.breathingCondition", "chestPains.breathlessness", "q", Arrays.asList("Yes")));
-    insert( new AnswersOptional("chestPains.breathingCondition", "q"));
-    insert( new AnswerAssertion("chestPains.breathingCondition", "q", "hasBreathingCondition", codeDirectory.get("breathingCondition"), true));
+    String breathingCondition = "chestPains.breathingCondition" + $role;
+    insert( new NextQuestion(breathingCondition, "chestPains.breathlessness", "q", Arrays.asList("Yes")));
+    insert( new AnswersOptional("chestPains.breathingConditionCLINICIAN", "q"));
+    insert( new AnswersOptional("chestPains.breathingConditionPATIENT", "q"));
+    insert( new AnswerAssertion(breathingCondition, "q", "hasBreathingCondition", codeDirectory.get("breathingCondition"), true));
 
     // Does the patients breathing feel worse than normal?
-    insert( new NextQuestion("chestPains.breathingWorse", "chestPains.breathingCondition", "q", Arrays.asList("hasBreathingCondition")));
+    insert( new NextQuestion("chestPains.breathingWorse", breathingCondition, "q", Arrays.asList("hasBreathingCondition")));
     insert( new AnswerAssertion("chestPains.breathingWorse", "q", "Yes", codeDirectory.get("breathingWorse"), true));
     insert( comorbids("breathingWorse", "PT1h"));
     insert( new OutcomeAnswerCondition("breathingWorse", "chestPains.breathingWorse", "q", Arrays.asList("Yes") ));
@@ -400,48 +407,49 @@ then
     insert( comorbidsFull("coughingUpAnyNone"));
     insert( new OutcomeAnswerCondition("coughingUpAnyNone", "chestPains.coughingUpAny", "q", Arrays.asList("none") ));
 
-    //Patient coughing blood.  (TODO: Roles)
-    // Blood
-    insert( new NextQuestion("chestPains.coughingBlood", "chestPains.immuneCompromised", "q", Arrays.asList("No")));
-    insert( new NextQuestion("chestPains.coughingBlood", "chestPains.painComesAndGoes", "q", Arrays.asList("Unsure", "Yes")));
-    insert( new ConditionalNextQuestion("coughingBloodPainDoesNotComeAndGoMustBeBreathless", "chestPains.coughingBlood", "chestPains.painComesAndGoes", "q", Arrays.asList("No")));
+    //Patient coughing blood.
+    String immuneCompromised = "chestPains.immuneCompromised" + $role;
+    String coughingBlood = "chestPains.coughingBlood" + $role;
+    insert( new NextQuestion(coughingBlood, immuneCompromised, "q", Arrays.asList("No")));
+    insert( new NextQuestion(coughingBlood, "chestPains.painComesAndGoes", "q", Arrays.asList("Unsure", "Yes")));
+    insert( new ConditionalNextQuestion("coughingBloodPainDoesNotComeAndGoMustBeBreathless", coughingBlood, "chestPains.painComesAndGoes", "q", Arrays.asList("No")));
     insert( new NextQuestionCondition("coughingBloodPainDoesNotComeAndGoMustBeBreathless", "chestPains.breathlessness", "q", Arrays.asList("Yes")));
-    insert( new NextQuestion("chestPains.coughingBlood", "chestPains.highTempUnwell", "q", Arrays.asList("none")));
-    insert( new AnswerAssertion("chestPains.coughingBlood", "q", "Yes", codeDirectory.get("coughingBlood"), true));
+    insert( new NextQuestion(coughingBlood, "chestPains.highTempUnwell", "q", Arrays.asList("none")));
+    insert( new AnswerAssertion(coughingBlood, "q", "Yes", codeDirectory.get("coughingBlood"), true));
     insert( edResusIntervention("coughingBloodBreathlessConditions", "PT1h"));
     insert( new OutcomeAnswerCondition("coughingBloodBreathlessConditions", "chestPains.breathlessness", "q", Arrays.asList("Yes") ));
-    insert( new OutcomeAnswerCondition("coughingBloodBreathlessConditions", "chestPains.coughingBlood", "q", Arrays.asList("Yes") ));
-    insert( new OutcomeAnswerCondition("coughingBloodBreathlessConditions", "chestPains.breathingCondition", "q", Arrays.asList("hasBreathingCondition") ));
+    insert( new OutcomeAnswerCondition("coughingBloodBreathlessConditions", coughingBlood, "q", Arrays.asList("Yes") ));
+    insert( new OutcomeAnswerCondition("coughingBloodBreathlessConditions", breathingCondition, "q", Arrays.asList("hasBreathingCondition") ));
     insert( edResusIntervention("coughingBloodBreathlessNoConditions", "PT4h"));
     insert( new OutcomeAnswerCondition("coughingBloodBreathlessNoConditions", "chestPains.breathlessness", "q", Arrays.asList("Yes") ));
-    insert( new OutcomeAnswerCondition("coughingBloodBreathlessNoConditions", "chestPains.coughingBlood", "q", Arrays.asList("Yes") ));
-    insert( new OutcomeAnswerCondition("coughingBloodBreathlessNoConditions", "chestPains.breathingCondition", "q", Arrays.asList(Answer.MISSING) ));
+    insert( new OutcomeAnswerCondition("coughingBloodBreathlessNoConditions", coughingBlood, "q", Arrays.asList("Yes") ));
+    insert( new OutcomeAnswerCondition("coughingBloodBreathlessNoConditions", breathingCondition, "q", Arrays.asList(Answer.MISSING, "No") ));
     insert( comorbidsFull("notCoughingBloodBreathlessNewCough"));
     insert( new OutcomeAnswerCondition("notCoughingBloodBreathlessNewCough", "chestPains.breathlessness", "q", Arrays.asList("Yes") ));
     insert( new OutcomeAnswerCondition("notCoughingBloodBreathlessNewCough", "chestPains.newCough", "q", Arrays.asList("No") ));
-    insert( new OutcomeAnswerCondition("notCoughingBloodBreathlessNewCough", "chestPains.coughingBlood", "q", Arrays.asList("No", "Unsure") ));
+    insert( new OutcomeAnswerCondition("notCoughingBloodBreathlessNewCough", coughingBlood, "q", Arrays.asList("No", "Unsure") ));
     insert( utcIntervention("coughingBloodNotBreathlessComeAndGo"));
     insert( new OutcomeAnswerCondition("coughingBloodNotBreathlessComeAndGo", "chestPains.breathlessness", "q", Arrays.asList("No") ));
     insert( new OutcomeAnswerCondition("coughingBloodNotBreathlessComeAndGo", "chestPains.painComesAndGoes", "q", Arrays.asList("Yes") ));
-    insert( new OutcomeAnswerCondition("coughingBloodNotBreathlessComeAndGo", "chestPains.coughingBlood", "q", Arrays.asList("Yes") ));
+    insert( new OutcomeAnswerCondition("coughingBloodNotBreathlessComeAndGo", coughingBlood, "q", Arrays.asList("Yes") ));
     insert( utcIntervention("coughingBloodNotBreathlessNotComeAndGo"));
     insert( new OutcomeAnswerCondition("coughingBloodNotBreathlessNotComeAndGo", "chestPains.breathlessness", "q", Arrays.asList("No") ));
     insert( new OutcomeAnswerCondition("coughingBloodNotBreathlessNotComeAndGo", "chestPains.painComesAndGoes", "q", Arrays.asList("No") ));
-    insert( new OutcomeAnswerCondition("coughingBloodNotBreathlessNotComeAndGo", "chestPains.coughingBlood", "q", Arrays.asList("Yes") ));
+    insert( new OutcomeAnswerCondition("coughingBloodNotBreathlessNotComeAndGo", coughingBlood, "q", Arrays.asList("Yes") ));
     insert( hcp("notCoughingBloodNotBreathlessNotComeAndGo", "PT4h", "Contact GP Practice today"));
     insert( new OutcomeAnswerCondition("notCoughingBloodNotBreathlessNotComeAndGo", "chestPains.breathlessness", "q", Arrays.asList("No") ));
     insert( new OutcomeAnswerCondition("notCoughingBloodNotBreathlessNotComeAndGo", "chestPains.painComesAndGoes", "q", Arrays.asList("No") ));
-    insert( new OutcomeAnswerCondition("notCoughingBloodNotBreathlessNotComeAndGo", "chestPains.coughingBlood", "q", Arrays.asList("No") ));
+    insert( new OutcomeAnswerCondition("notCoughingBloodNotBreathlessNotComeAndGo", coughingBlood, "q", Arrays.asList("No") ));
 
-    // Difficulty fighting infections/immune compromised (TODO: ROLES)
-    insert( new NextQuestion("chestPains.immuneCompromised", "chestPains.newCough", "q", Arrays.asList("No")));
-    insert( new AnswerAssertion("chestPains.immuneCompromised", "q", "Yes", codeDirectory.get("immuneCompromised"), true));
+    // Difficulty fighting infections/immune compromised
+    insert( new NextQuestion(immuneCompromised, "chestPains.newCough", "q", Arrays.asList("No")));
+    insert( new AnswerAssertion(immuneCompromised, "q", "Yes", codeDirectory.get("immuneCompromised"), true));
     insert( immunity("immuneCompromised", "PT6h"));
-    insert( new OutcomeAnswerCondition("immuneCompromised", "chestPains.immuneCompromised", "q", Arrays.asList("Yes") ));
+    insert( new OutcomeAnswerCondition("immuneCompromised", immuneCompromised, "q", Arrays.asList("Yes") ));
 
 
     // Does the chest pain come and go?
-    insert( new NextQuestion("chestPains.painComesAndGoes", "chestPains.breathingCondition", "q", Arrays.asList(Answer.MISSING)));
+    insert( new NextQuestion("chestPains.painComesAndGoes", breathingCondition, "q", Arrays.asList(Answer.MISSING, "No")));
     insert( new NextQuestion("chestPains.painComesAndGoes", "chestPains.breathlessness", "q", Arrays.asList("No")));
     insert( new AnswerAssertion("chestPains.painComesAndGoes", "q", "Yes", codeDirectory.get("painComesAndGoes"), true));
     insert( Outcome.of("painComesAndGoes", ReferralRequest.builder()
@@ -459,7 +467,7 @@ then
 
     // Any of the following symptoms...
     // Feel breathless even when resting.
-    insert( new ConditionalNextQuestion("breathlessWhenPainComesAndGoes", "chestPains.breathlessSymptom", "chestPains.coughingBlood", "q", Arrays.asList("No")));
+    insert( new ConditionalNextQuestion("breathlessWhenPainComesAndGoes", "chestPains.breathlessSymptom", coughingBlood, "q", Arrays.asList("No")));
     insert( new NextQuestionCondition("breathlessWhenPainComesAndGoes", "chestPains.painComesAndGoes", "q", Arrays.asList("No", "Unsure")));
     insert( new AnswerAssertion("chestPains.breathlessSymptom", "q", "Yes", codeDirectory.get("breathlessSymptom"), true));
     
@@ -515,7 +523,7 @@ then
     insert( new OutcomeAnswerCondition("notGenerallyUnwell", "chestPains.generallyUnwell", "q", Arrays.asList("No") ));
 
     // High temperature or feeling unwell?
-    insert( new ConditionalNextQuestion("highTempUnwellNotBreathlessFromCoughingBlood", "chestPains.highTempUnwell", "chestPains.coughingBlood", "q", Arrays.asList("No")));
+    insert( new ConditionalNextQuestion("highTempUnwellNotBreathlessFromCoughingBlood", "chestPains.highTempUnwell", coughingBlood, "q", Arrays.asList("No")));
     insert( new NextQuestionCondition("highTempUnwellNotBreathlessFromCoughingBlood", "chestPains.breathlessness", "q", Arrays.asList("No")));
     insert( new ConditionalNextQuestion("highTempUnwellNotBreathlessFromPainComesAndGoes", "chestPains.highTempUnwell", "chestPains.painComesAndGoes", "q", Arrays.asList("No")));
     insert( new NextQuestionCondition("highTempUnwellNotBreathlessFromPainComesAndGoes", "chestPains.breathlessness", "q", Arrays.asList("No")));
@@ -535,7 +543,7 @@ then
 
     // Did the patient have shortness of breath at the time of the pain?
     insert( new ConditionalNextQuestion("breathAtTimeFromNoPainsNow", "chestPains.breathAtTime", "chestPains.conditions", "q", Arrays.asList("none")));
-    insert( new NextQuestionCondition("breathAtTimeFromNoPainsNow", "chestPains.painsNow", "q", Arrays.asList("No")));
+    insert( new NextQuestionCondition("breathAtTimeFromNoPainsNow", painsNow, "q", Arrays.asList("No")));
     insert( new AnswerAssertion("chestPains.breathAtTime", "q", "Yes", codeDirectory.get("breathAtTime"), true));
     insert( Outcome.of("breathAtTime", ReferralRequest.builder()
                 .id("gp-pericarditis")

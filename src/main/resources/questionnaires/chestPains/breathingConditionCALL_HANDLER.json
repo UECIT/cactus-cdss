@@ -1,0 +1,20 @@
+{
+    "id": "chestPains.bleeding",
+    "items": [
+      {
+        "id": "q",
+        "text": "Does patient have an underlying condition that affects their breathing?",
+        "type": "CHOICE",
+        "required": true,
+        "options": [
+          {
+            "stringValue": "Yes",
+            "code": "hasBreathingCondition"
+          },
+          {
+            "stringValue": "No"
+          }
+        ]
+      }
+    ]
+  }
