@@ -1,0 +1,19 @@
+{
+    "id": "chestPains.causedByInjury",
+    "items": [
+      {
+        "id": "q",
+        "text": "Has the patient sustained any trauma to the chest causing the pain?",
+        "type": "CHOICE",
+        "required": true,
+        "options": [
+          {
+            "stringValue": "Yes"
+          },
+          {
+            "stringValue": "No"
+          }
+        ]
+      }
+    ]
+  }

@@ -89,10 +89,10 @@ public class ReferralRequestTransformer implements
   }
 
   private org.hl7.fhir.dstu3.model.CodeableConcept transformSpecialty(String specialty) {
-    Concept code = codeDirectory.get(specialty);
-    if (code == null) {
+    if (specialty == null) {
       return null;
     }
+    Concept code = codeDirectory.get(specialty);
     return conceptTransformer.transform(code);
   }
 
@@ -112,10 +112,10 @@ public class ReferralRequestTransformer implements
   }
 
   private List<Reference> transformReason(String reason) {
-    Concept code = codeDirectory.get(reason);
-    if (code == null) {
-      return null;
+    if (reason == null) {
+      return Collections.emptyList();
     }
+    Concept code = codeDirectory.get(reason);
 
     // TODO Should be a reference to an Observation
     Reference reference = new Reference();

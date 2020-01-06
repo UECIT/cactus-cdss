@@ -4,21 +4,24 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 import org.junit.Test;
+import uk.nhs.cdss.domain.EvaluateContext.Role;
 import uk.nhs.cdss.exception.ServiceDefinitionException;
 
 public class NoAnswersTest extends BaseDroolsCDSEngineTest {
 
   @Test
   public void shouldContinueWithNoAnswers() throws ServiceDefinitionException {
-    answerQuestion("causedByInjury", "q", "No");
-    answerQuestion("painsNow", "q", "Yes");
-    answerQuestion("heartAttackInPast", "q", "No");
+    withRole(Role.CLINICIAN);
+
+    answerQuestion("causedByInjuryCLINICIAN", "q", "No");
+    answerQuestion("painsNowCLINICIAN", "q", "Yes");
+    answerQuestion("heartAttackInPastCLINICIAN", "q", "No");
     answerQuestion("symptoms", "q", "none");
     answerQuestion("conditions", "q", "none");
     answerQuestion("breathlessness", "q", "Yes");
-    dontAnswerQuestion("breathingCondition");
+    dontAnswerQuestion("breathingConditionCLINICIAN");
     answerQuestion("painComesAndGoes", "q", "No");
-    answerQuestion("coughingBlood", "q", "No");
+    answerQuestion("coughingBloodCLINICIAN", "q", "No");
     answerQuestion("breathlessSymptom", "q", "Yes");
     dontAnswerQuestion("feelingUnwell");
 

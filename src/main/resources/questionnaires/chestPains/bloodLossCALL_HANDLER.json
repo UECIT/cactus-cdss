@@ -1,0 +1,19 @@
+{
+    "id": "chestPains.bloodLoss",
+    "items": [
+      {
+        "id": "q",
+        "text": "Large amounts of bleeding. Blood spurts with each beat of the heart, and is bright red.",
+        "type": "CHOICE",
+        "required": true,
+        "options": [
+          {
+            "stringValue": "Yes"
+          },
+          {
+            "stringValue": "No"
+          }
+        ]
+      }
+    ]
+  }

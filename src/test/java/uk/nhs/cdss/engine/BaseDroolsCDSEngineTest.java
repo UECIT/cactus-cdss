@@ -7,8 +7,10 @@ import uk.nhs.cdss.constants.SystemURL;
 import uk.nhs.cdss.domain.Answer;
 import uk.nhs.cdss.domain.Assertion;
 import uk.nhs.cdss.domain.Assertion.Status;
-import uk.nhs.cdss.domain.Concept;
 import uk.nhs.cdss.domain.Coding;
+import uk.nhs.cdss.domain.Concept;
+import uk.nhs.cdss.domain.EvaluateContext;
+import uk.nhs.cdss.domain.EvaluateContext.Role;
 import uk.nhs.cdss.domain.QuestionnaireResponse;
 import uk.nhs.cdss.exception.ServiceDefinitionException;
 
@@ -26,6 +28,7 @@ public abstract class BaseDroolsCDSEngineTest {
       .requestId(REQUEST_1)
       .encounterId(ENCOUNTER_1)
       .supplierId(SUPPLIER_1)
+      .context(EvaluateContext.builder().build())
       .build();
 
   @Before
@@ -33,6 +36,15 @@ public abstract class BaseDroolsCDSEngineTest {
     CodeDirectoryConfig codeDirectoryConfig = new CodeDirectoryConfig();
     engine = new DroolsCDSEngine(new CDSKnowledgeBaseFactory(false),
         codeDirectoryConfig.codeDirectory());
+  }
+
+  protected void withRole(Role role) {
+    var existingContext = input.getContext();
+    input = input.toBuilder()
+        .context(existingContext.toBuilder()
+            .role(role)
+            .build())
+        .build();
   }
 
   protected void answerCommonQuestion(String questionnaire, String question, Object answerValue) {

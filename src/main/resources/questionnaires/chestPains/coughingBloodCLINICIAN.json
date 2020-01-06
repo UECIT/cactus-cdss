@@ -1,0 +1,23 @@
+{
+    "id": "chestPains.coughingBlood",
+    "items": [
+      {
+        "id": "q",
+        "text": "Has the patient had haemoptysis?",
+        "type": "CHOICE",
+        "required": true,
+        "options": [
+          {
+            "stringValue": "Yes"
+          },
+          {
+            "stringValue": "No"
+          },
+          {
+            "stringValue": "Unsure"
+          }
+        ],
+        "contextHelp": "You are not looking for the symptom of cough, just haemoptysis"
+      }
+    ]
+  }

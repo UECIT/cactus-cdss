@@ -1,0 +1,19 @@
+{
+    "id": "chestPains.heartAttackInPast",
+    "items": [
+      {
+        "id": "q",
+        "text": "Has the patient had a previous diagnosis of MI?",
+        "type": "CHOICE",
+        "required": true,
+        "options": [
+          {
+            "stringValue": "Yes"
+          },
+          {
+            "stringValue": "No"
+          }
+        ]
+      }
+    ]
+  }
