@@ -62,6 +62,16 @@ function Outcome hypertension(String id, String description, String serviceReque
             .specialty("primaryCareReview")
             .reason("hypertension")
             .note("A note")
+            .build(),
+        CarePlan.builder()
+            .id("pregnancy")
+            .title("Pregnancy")
+            .text("Care Advice")
+            .activity(new CarePlanActivity("selfCare", "Pregnancy brings lots of changes. Besides the obvious ones like a growing belly, there " +
+                "are some that aren't as noticeable. One example is an increased amount of blood in the body." + 
+                " This extra blood results in a heart rate that's about 25 percent faster than usual. A faster rate can result in occasional heart palpitations." + 
+                " These feel like your heart is fluttering or beating extremely fast. Heart palpitations can be normal and nonharmful during pregnancy." + 
+                " But there's always a chance they could mean you have a more serious underlying health condition."))
             .build()
     );
 }
@@ -76,6 +86,16 @@ function Outcome edHeartAttack(String id) {
             .specialty("cardio")
             .reason("mi")
             .note("A note")
+            .build(),
+        CarePlan.builder()
+            .id("edHeartAttack")
+            .title("Heart Attack")
+            .text("Care Advice")
+            .activity(new CarePlanActivity("selfCare", "Get someone to drive you to ED"))
+            .activity(new CarePlanActivity("selfCare", "Take all medications"))
+            .activity(new CarePlanActivity("selfCare", "Take a mobile phone"))
+            .activity(new CarePlanActivity("selfCare", "If you develop any worsening or new symptoms call us back."))
+            .activity(new CarePlanActivity("selfCare", "If you develop chest pain that radiates to your arm or jaw or you become breathless, dial 999"))
             .build()
     );
 }
@@ -91,7 +111,17 @@ function Outcome utcStroke(String id) {
             .reason("stroke")
             .note("A note")
             .build(),
-        defaultCarePlan()
+        CarePlan.builder()
+            .id("stroke")
+            .title("Stroke Symptoms")
+            .text("Care Advice")
+            .activity(new CarePlanActivity("selfCare", "The main symptoms of a stroke can be remembered with the word FAST:" + 
+                " Face - the face may have dropped on 1 side, the person may not be able to smile or their mouth or eye may have dropped." + 
+                " Arms - the person with suspected stroke may not be able to lift both arms and keep them there because of weakness of numbers in 1 arm." + 
+                " Speech - their speech may be slurred or garbled, or the person may not be able to talk at all despite appearing to be awake; " + 
+                    "they may also have problems understanding what you're saying to them." + 
+                " Time - It's time to dial 999 immediately if you see any of these signs or symptoms."))
+            .build()
     );
 }
 
@@ -132,6 +162,20 @@ function CarePlan defaultCarePlan() {
         .build();
 }
 
+function CarePlan foodAndDrink() {
+    return CarePlan.builder()
+        .id("carePlan")
+        .title("Heart Palpitations")
+        .text("After Care Instructions")
+        .activity(new CarePlanActivity("selfCare", "Heart palpitations are heartbeats that suddenly become more noticeable"))
+        .activity(new CarePlanActivity("selfCare", "Your heart may feel like it's pounding, fluttering or beating irregularly, often for just a few seconds or minutes." + 
+            " You may also feel these sensations in your throat or neck. Palpitations may seem alarming, but in most cases they're harmless and not a sign of a serious problem." +
+            " Sometimes you may feel an extra or missed beat. These are known as ectopic beats and are also usually nothing to worry about."))
+        .activity(new CarePlanActivity("selfCare", "Try to keep a diary of food or drink you have consumed."))
+        .activity(new CarePlanActivity("selfCare", "If your condition worsens or if you develop new or worsening symptoms call 111 back for further assessment"))
+        .build();
+}
+
 function CarePlan waitForAmbulance() {
     return CarePlan.builder()
             .id("waitForAmbulance")
@@ -168,7 +212,7 @@ then
     // Have you got an ICD (implanted cardiovascular defibrillator)?
     insert( new NextQuestion("palpitations2.hasICD", "palpitations2.hasPalpitations", "q", Arrays.asList("Yes")) );
     insert( new AnswerAssertion("palpitations2.hasICD", "q", "Yes", codeDirectory.get("hasICD"), true));
-    insert( heartAttack("hasICD", new CarePlan[]{waitForAmbulance(), aspirin()}) );
+    insert( heartAttack("hasICD", new CarePlan[]{waitForAmbulance()}) );
     insert( new OutcomeAnswerCondition("hasICD", "palpitations2.hasICD", "q", Arrays.asList("Yes") ));
 
     // Have you had any of the following symptoms in the last 24 hours?
@@ -178,7 +222,7 @@ then
     insert( new AnswerAssertion("palpitations2.symptoms", "q", "breathingProblems", codeDirectory.get("breathingProblems"), true));
     insert( new AnswerAssertion("palpitations2.symptoms", "q", "syncope", codeDirectory.get("syncope"), true));
     insert( new AnswerAssertion("palpitations2.symptoms", "q", "none", codeDirectory.get("noSymptoms"), true));
-    insert( heartAttack("symptoms", new CarePlan[]{waitForAmbulance()}) );
+    insert( heartAttack("symptoms", new CarePlan[]{waitForAmbulance(), aspirin()}) );
     insert( new OutcomeAnswerCondition("symptoms", "palpitations2.symptoms", "q", Arrays.asList("chestPains", "neckPain", "breathingProblems", "syncope") ));
 
     insert( new NextQuestion("palpitations2.ageRange", "palpitations2.symptoms", "q", Arrays.asList("none")));
@@ -296,7 +340,7 @@ then
                 .note("A note")
                 .reason("stroke")
                 .build(),
-            defaultCarePlan()));
+            waitForAmbulance()));
     insert( new OutcomeAnswerCondition("strokeSymptomsRightNow", "palpitations2.strokeSymptoms", "q4", Arrays.asList("Yes") ));
 
     // Onset of palpitations precipitated by exercise
@@ -412,6 +456,18 @@ then
                 .specialty("gp")
                 .reason("anxiety")
                 .note("A note")
+                .build(),
+            CarePlan.builder()
+                .id("anxiety")
+                .title("Anxiety")
+                .text("Care Advice")
+                .activity(new CarePlanActivity("selfCare", "Try talking about your feelings to a friend, family member, health professional or counsellor." +
+                    " You could also contact Samaritans, call 116 123 or email jo@samaritans.org if you need someone to talk to."))
+                .activity(new CarePlanActivity("selfCare", "Exercise - Activities such as running, walking, swimming and yoga can help you relax"))
+                .activity(new CarePlanActivity("selfCare", "Sleep: First of all, keep regular sleeping hours. This prgrammes the brain and internal body clock to get used to a set routine." +
+                    " Most adults need between 6 and 9 hours of sleep every night. By working out what time you need to wake up, you can set a regular bedtime schedule." + 
+                    " It is also important to try and wake up at the same time every day. While it may seem like a good idea to try to catch up on sleep after a bad night, " +
+                        "doing so on a regular basis can also disrupt your sleep routine."))
                 .build()));
     insert( new OutcomeAnswerCondition("noCarePlan", "palpitations2.hasCarePlan", "q", Arrays.asList("No") ));
 
@@ -440,11 +496,11 @@ then
     insert( new NextQuestionCondition("familyHistoryToCauses", "palpitations2.hasPalpitations", "q", Arrays.asList("No", "Unsure")) );
 
     //  Some foods cause
-    insert( Outcome.of("someFoods", defaultCarePlan()));
+    insert( Outcome.of("someFoods", foodAndDrink()));
     insert( new OutcomeAnswerCondition("someFoods", "palpitations2.causes", "q1", Arrays.asList("Yes") ));
 
     //  Some drinks cause
-    insert( Outcome.of("someDrinks", defaultCarePlan()));
+    insert( Outcome.of("someDrinks", foodAndDrink()));
     insert( new OutcomeAnswerCondition("someDrinks", "palpitations2.causes", "q2", Arrays.asList("Yes") ));
 
     //  Smoker
@@ -456,7 +512,16 @@ then
                 .specialty("pharmacistReview")
                 .reason("nicotine")
                 .note("A note")
-                .build()));
+                .build(),
+            CarePlan.builder()
+                .id("nicotine")
+                .title("Nicotine")
+                .text("Care Advice")
+                .activity(new CarePlanActivity("selfCare", "Speak to your pharmacist about available options for nicotine replacement"))
+                .activity(new CarePlanActivity("selfCare", "Try to relax and take your mind off smoking"))
+                .activity(new CarePlanActivity("selfCare", "Try to exercise"))
+                .build()
+            ));
     insert( new OutcomeAnswerCondition("smoker", "palpitations2.causes", "q3", Arrays.asList("Yes") ));
 
     //  No causes
@@ -470,7 +535,16 @@ then
     insert( new OutcomeAnswerCondition("noCausesMentalHealthRoute", "palpitations2.causes", "q4", Arrays.asList("Yes") ));
     insert( new OutcomeAnswerCondition("noCausesMentalHealthRoute", "palpitations2.anxiety", "q", Arrays.asList("Yes") ));
 
-    insert( Outcome.of("noCausesNotMentalHealthRoute", defaultCarePlan()));
+    insert( Outcome.of("noCausesNotMentalHealthRoute", 
+        CarePlan.builder()
+            .id("noCauses")
+            .title("No Causes")
+            .text("Care Advice")
+            .activity(new CarePlanActivity("selfCare", "Try to relax"))
+            .activity(new CarePlanActivity("selfCare", "Make sure you are having enough sleep"))
+            .activity(new CarePlanActivity("selfCare", "If symptoms worsen call us back"))
+            .build()
+        ));
     insert( new OutcomeAnswerCondition("noCausesNotMentalHealthRoute", "palpitations2.causes", "q4", Arrays.asList("Yes") ));
     insert( new OutcomeAnswerCondition("noCausesNotMentalHealthRoute", "palpitations2.anxiety", "q", Arrays.asList("No") ));
 end
