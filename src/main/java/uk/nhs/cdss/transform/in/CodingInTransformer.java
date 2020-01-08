@@ -11,7 +11,8 @@ public class CodingInTransformer implements Transformer<org.hl7.fhir.dstu3.model
   public Coding transform(org.hl7.fhir.dstu3.model.Coding from) {
     var code = from.getCode();
     var system = from.getSystem();
+    var description = from.getDisplay();
 
-    return new Coding(system, code);
+    return new Coding(system, code, description);
   }
 }
