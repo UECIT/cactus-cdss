@@ -1,6 +1,6 @@
 package uk.nhs.cdss.transform.out;
 
-import ca.uhn.fhir.rest.client.api.IGenericClient;
+import com.google.common.base.Preconditions;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -27,7 +27,6 @@ import org.hl7.fhir.dstu3.model.RequestGroup.RequestStatus;
 import org.hl7.fhir.dstu3.model.Resource;
 import org.hl7.fhir.dstu3.model.ResourceType;
 import org.hl7.fhir.dstu3.model.StringType;
-import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.springframework.stereotype.Component;
 import uk.nhs.cdss.domain.Outcome;
 import uk.nhs.cdss.services.ReferenceStorageService;
@@ -44,7 +43,6 @@ public class CDSOutputTransformer implements Transformer<CDSOutputBundle, Guidan
   private final ReferralRequestTransformer referralRequestTransformer;
   private final RedirectTransformer redirectTransformer;
   private final ObservationTransformer observationTransformer;
-  private final IGenericClient fhirClient;
   private final ReferenceStorageService storageService;
 
   private DataRequirement buildDataRequirement(String questionnaireId) {
@@ -90,8 +88,8 @@ public class CDSOutputTransformer implements Transformer<CDSOutputBundle, Guidan
   }
 
   private String createResource(Resource resource) {
-    storageService.store(resource);
-    return resource.getId();
+    Preconditions.checkArgument(!resource.hasId(), "ID should not be set when creating a resource");
+    return storageService.store(resource).getReference();
   }
 
   @Override

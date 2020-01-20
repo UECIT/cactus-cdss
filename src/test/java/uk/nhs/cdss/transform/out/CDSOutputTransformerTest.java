@@ -11,8 +11,11 @@ import org.hl7.fhir.dstu3.model.Encounter;
 import org.hl7.fhir.dstu3.model.GuidanceResponse;
 import org.hl7.fhir.dstu3.model.Reference;
 import org.hl7.fhir.dstu3.model.ReferralRequest;
+import org.hl7.fhir.dstu3.model.Resource;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import uk.nhs.cdss.config.CodeDirectoryConfig;
 import uk.nhs.cdss.domain.Outcome;
 import uk.nhs.cdss.engine.CDSOutput;
@@ -39,9 +42,14 @@ public class CDSOutputTransformerTest {
         new StatusTransformer(), conceptTransformer,
         new TypeTransformer(conceptTransformer));
 
-    mockClient = mock(IGenericClient.class);
     mockStorageService = mock(ReferenceStorageService.class);
-    when(mockStorageService.store(any())).thenReturn(new Reference());
+    when(mockStorageService.store(any())).thenAnswer(new Answer<Reference>() {
+      @Override
+      public Reference answer(InvocationOnMock invocationOnMock) throws Throwable {
+        Resource resource = invocationOnMock.getArgument(0);
+        return new Reference(resource.getId());
+      }
+    });
 
     outputTransformer = new CDSOutputTransformer(new CarePlanTransformer(conceptTransformer,
         codeDirectory),
@@ -50,7 +58,7 @@ public class CDSOutputTransformerTest {
             observationTransformer, codeDirectory),
         new RedirectTransformer(
             new TriggerTransformer(codeDirectory, codingTransformer)), observationTransformer,
-        mockClient, mockStorageService);
+        mockStorageService);
   }
 
   @Test(expected = IllegalStateException.class)
