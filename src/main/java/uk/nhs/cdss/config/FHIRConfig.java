@@ -49,6 +49,7 @@ public class FHIRConfig {
   @Bean
   public IParser fhirParser() {
     IParser fhirParser = fhirContext().newJsonParser();
+    fhirParser.setServerBaseUrl(fhirServer);
     fhirParser.setPreferTypes(Arrays.asList(
         CareConnectCarePlan.class,
         CareConnectCareTeam.class,

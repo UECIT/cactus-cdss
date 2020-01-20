@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import org.hl7.fhir.dstu3.model.CarePlan;
 import org.hl7.fhir.dstu3.model.DataRequirement;
 import org.hl7.fhir.dstu3.model.DataRequirement.DataRequirementCodeFilterComponent;
+import org.hl7.fhir.dstu3.model.Encounter;
 import org.hl7.fhir.dstu3.model.GuidanceResponse;
 import org.hl7.fhir.dstu3.model.GuidanceResponse.GuidanceResponseStatus;
 import org.hl7.fhir.dstu3.model.Identifier;
@@ -23,6 +24,7 @@ import org.hl7.fhir.dstu3.model.RequestGroup;
 import org.hl7.fhir.dstu3.model.RequestGroup.RequestGroupActionComponent;
 import org.hl7.fhir.dstu3.model.RequestGroup.RequestIntent;
 import org.hl7.fhir.dstu3.model.RequestGroup.RequestStatus;
+import org.hl7.fhir.dstu3.model.Resource;
 import org.hl7.fhir.dstu3.model.ResourceType;
 import org.hl7.fhir.dstu3.model.StringType;
 import org.hl7.fhir.instance.model.api.IBaseResource;
@@ -87,8 +89,9 @@ public class CDSOutputTransformer implements Transformer<CDSOutputBundle, Guidan
     group.setId(createResource(group));
   }
 
-  private String createResource(IBaseResource resource) {
-    return fhirClient.create().resource(resource).execute().getId().getValue();
+  private String createResource(Resource resource) {
+    storageService.store(resource);
+    return resource.getId();
   }
 
   @Override
@@ -98,11 +101,19 @@ public class CDSOutputTransformer implements Transformer<CDSOutputBundle, Guidan
 
     var serviceDefinition = new Reference(
         "ServiceDefinition/" + bundle.getServiceDefinitionId());
+
+    Encounter encounter = bundle.getParameters().getEncounter();
+    if (!encounter.hasId()) {
+      throw new IllegalStateException(
+          "Encounter has no ID and cannot be referenced in GuidanceResponse");
+    }
+    Reference encounterRef = new Reference(encounter.getId());
+
     var response = new GuidanceResponse()
         .setOccurrenceDateTime(new Date())
         .setRequestId(bundle.getParameters().getRequestId())
         .setModule(serviceDefinition)
-        .setContext(storageService.store(bundle.getParameters().getEncounter()));
+        .setContext(encounterRef);
 
     boolean dataRequested = !output.getQuestionnaireIds().isEmpty();
 
