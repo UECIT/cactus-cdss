@@ -1,12 +1,12 @@
 package uk.nhs.cdss.transform.out;
 
-import com.google.common.base.Preconditions;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.hl7.fhir.dstu3.model.CarePlan;
 import org.hl7.fhir.dstu3.model.DataRequirement;
 import org.hl7.fhir.dstu3.model.DataRequirement.DataRequirementCodeFilterComponent;
@@ -37,6 +37,7 @@ import uk.nhs.cdss.transform.bundle.ReferralRequestBundle;
 
 @Component
 @AllArgsConstructor
+@Slf4j
 public class CDSOutputTransformer implements Transformer<CDSOutputBundle, GuidanceResponse> {
 
   private final CarePlanTransformer carePlanTransformer;
@@ -88,8 +89,10 @@ public class CDSOutputTransformer implements Transformer<CDSOutputBundle, Guidan
   }
 
   private String createResource(Resource resource) {
-    Preconditions.checkArgument(!resource.hasId(), "ID should not be set when creating a resource");
-    return storageService.store(resource).getReference();
+    if (resource.hasId()) {
+      log.warn("ID should not be set when creating a resource: {}", resource.getId());
+    }
+    return storageService.create(resource).getReference();
   }
 
   @Override
