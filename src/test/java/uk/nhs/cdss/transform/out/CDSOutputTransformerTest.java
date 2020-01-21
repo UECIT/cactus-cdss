@@ -41,7 +41,7 @@ public class CDSOutputTransformerTest {
         new TypeTransformer(conceptTransformer));
 
     mockStorageService = mock(ReferenceStorageService.class);
-    when(mockStorageService.store(any())).thenAnswer(new Answer<Reference>() {
+    when(mockStorageService.create(any())).thenAnswer(new Answer<Reference>() {
       private long nextResourceId = 1;
 
       @Override

@@ -34,7 +34,6 @@ public class CarePlanTransformer
     CareConnectCarePlan result = new CareConnectCarePlan();
     var from = bundle.getCarePlan();
 
-    result.setId(from.getId());
     result.setTitle(from.getTitle());
     result.setStatus(bundle.isDraft() ? CarePlanStatus.DRAFT : CarePlanStatus.ACTIVE);
     result.setIntent(transformIntent(from.getIntent()));
