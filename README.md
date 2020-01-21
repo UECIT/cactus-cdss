@@ -9,6 +9,11 @@ To run this locally just run:
 mvn spring-boot:run
 ```
 
+To enable more readable logging for local testing:
+```bash
+mvn spring-boot:run -Dspring.profiles.active=prettylogs
+```
+
 ## Licence
 
 Unless stated otherwise, the codebase is released under [the MIT License][mit].
