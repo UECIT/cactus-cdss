@@ -37,6 +37,9 @@ public class Context {
     log.info("START: [{}]", task);
     try {
       return callable.call();
+    } catch (Exception e) {
+      log.error("Uncaught exception in [{}]", task, e);
+      throw e;
     } finally {
       log.info("FINISH: [{}] took {} ms", task,
           Duration.between(start, Instant.now()).toMillis());

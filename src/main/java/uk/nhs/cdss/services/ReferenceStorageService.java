@@ -20,6 +20,6 @@ public class ReferenceStorageService {
       resource.setId(id);
     }
 
-    return new Reference(resource);
+    return new Reference(resource.getId());
   }
 }

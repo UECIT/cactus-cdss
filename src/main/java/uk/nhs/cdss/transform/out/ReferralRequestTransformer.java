@@ -43,7 +43,6 @@ public class ReferralRequestTransformer implements
     ReferralRequest result = new ReferralRequest();
     var from = bundle.getReferralRequest();
 
-    result.setId(from.getId());
     result.setDefinition(transformDefinition(from.getDefinition()));
     result.setBasedOn(transformProcedureRequest(from.getBasedOn()));
     // replaces?
