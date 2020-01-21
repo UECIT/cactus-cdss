@@ -1,6 +1,6 @@
 package uk.nhs.cdss.transform.out;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -10,7 +10,6 @@ import java.util.Collections;
 import org.hl7.fhir.dstu3.model.Encounter;
 import org.hl7.fhir.dstu3.model.GuidanceResponse;
 import org.hl7.fhir.dstu3.model.Reference;
-import org.hl7.fhir.dstu3.model.ReferralRequest;
 import org.hl7.fhir.dstu3.model.Resource;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,7 +31,6 @@ public class CDSOutputTransformerTest {
   private IGenericClient mockClient;
   private ReferenceStorageService mockStorageService;
 
-
   @Before
   public void setup() {
     CodingOutTransformer codingTransformer = new CodingOutTransformer();
@@ -44,10 +42,14 @@ public class CDSOutputTransformerTest {
 
     mockStorageService = mock(ReferenceStorageService.class);
     when(mockStorageService.store(any())).thenAnswer(new Answer<Reference>() {
+      private long nextResourceId = 1;
+
       @Override
       public Reference answer(InvocationOnMock invocationOnMock) throws Throwable {
         Resource resource = invocationOnMock.getArgument(0);
-        return new Reference(resource.getId());
+        String id = resource.getResourceType().name() + "/" + nextResourceId++;
+        resource.setId(id);
+        return new Reference(id);
       }
     });
 
