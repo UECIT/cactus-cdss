@@ -35,7 +35,7 @@ public class PalpitationsTest extends BaseDroolsCDSEngineTest {
 
     evaluate();
     assertNotNull(output.getOutcome().getReferralRequest());
-    assertEquals("call999" , output.getOutcome().getReferralRequest().getServiceRequested());
+    assertEquals("call999-cardio-ami-8m" , output.getOutcome().getReferralRequest().getId());
   }
 
   @Test

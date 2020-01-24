@@ -22,7 +22,6 @@ then
         ReferralRequest.builder()
             .id("gp-anxiety-72h")
             .description("Consult GP")
-            .serviceRequested("gp")
             .occurrence("PT72h")
             .specialty("gp")
             .reason("anxiety")

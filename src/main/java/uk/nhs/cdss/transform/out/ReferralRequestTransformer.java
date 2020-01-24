@@ -51,7 +51,6 @@ public class ReferralRequestTransformer implements
     result.setIntent(transformIntent(from.getIntent()));
     // type?
     result.setPriority(transformPriority(from.getPriority()));
-    result.setServiceRequested(transformServiceRequested(from.getServiceRequested()));
     result.setSubject(bundle.getSubject());
     result.setContext(new Reference(bundle.getContext()));
     result.setOccurrence(transformOccurrence(from.getOccurrence()));
@@ -67,13 +66,6 @@ public class ReferralRequestTransformer implements
     result.setRelevantHistory(transformRelevantHistory(from.getRelevantHistory()));
 
     return result;
-  }
-
-  private List<org.hl7.fhir.dstu3.model.CodeableConcept> transformServiceRequested(
-      String serviceRequested) {
-    return Collections.singletonList(
-        conceptTransformer.transform(codeDirectory.get(serviceRequested))
-    );
   }
 
   private List<Reference> transformRelevantHistory(List<Object> relevantHistory) {

@@ -22,7 +22,6 @@ then
         ReferralRequest.builder()
             .id("musculoskeletal")
             .description("PLACEHOLDER REFERRAL")
-            .serviceRequested("call999")
             .occurrence("PT8m")
             .specialty("cardio")
             .reason("ami")
