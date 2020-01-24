@@ -41,7 +41,6 @@ function Outcome heartAttack(String id, CarePlan[] carePlans) {
     return Outcome.of(id, 
         ReferralRequest.builder()
             .id("call999-cardio-ami-8m")
-            .serviceRequested("call999")
             .description("Call 999")
             .occurrence("PT8m")
             .specialty("cardio")
@@ -52,12 +51,11 @@ function Outcome heartAttack(String id, CarePlan[] carePlans) {
     );
 }
 
-function Outcome hypertension(String id, String description, String serviceRequested) {
+function Outcome hypertension(String id, String description) {
     return Outcome.of(id,
         ReferralRequest.builder()
             .id("hypertension-12h")
             .description(description)
-            .serviceRequested(serviceRequested)
             .occurrence("PT12h")
             .specialty("primaryCareReview")
             .reason("hypertension")
@@ -81,7 +79,6 @@ function Outcome edHeartAttack(String id) {
         ReferralRequest.builder()
             .id("ed-cardio-mi-8m")
             .description("ED")
-            .serviceRequested("ed")
             .occurrence("PT8m")
             .specialty("cardio")
             .reason("mi")
@@ -105,7 +102,6 @@ function Outcome utcStroke(String id) {
         ReferralRequest.builder()
             .id("utc-primary-care-stroke")
             .description("UTC")
-            .serviceRequested("utc")
             .occurrence("PT4h")
             .specialty("primaryCareReview")
             .reason("stroke")
@@ -130,7 +126,6 @@ function Outcome utcArrhythmia(String id, String occurrence, String specialty) {
         ReferralRequest.builder()
             .id("utc-arrhythmia")
             .description("UTC")
-            .serviceRequested("utc")
             .occurrence(occurrence)
             .specialty(specialty)
             .reason("arrhythmia")
@@ -144,7 +139,6 @@ function Outcome gpArrhythmia(String id, String occurrence) {
         ReferralRequest.builder()
             .id("gp-arrhythmia")
             .description("Consult GP")
-            .serviceRequested("gp")
             .occurrence(occurrence)
             .specialty("gp")
             .reason("arrhythmia")
@@ -250,10 +244,10 @@ then
     insert( new NextQuestionCondition("genderToPersonalHistoryOver12", "common.gender", "q", Arrays.asList("Male")) );
     insert( new NextQuestionCondition("genderToPersonalHistoryOver12", "palpitations2.hasPalpitations", "q", Arrays.asList("Yes") ));
 
-    insert( hypertension("pregnancy-hasPalpitations", "Speak to Primary Care professional", "primaryCare"));
+    insert( hypertension("pregnancy-hasPalpitations", "Speak to Primary Care professional"));
     insert( new OutcomeAnswerCondition("pregnancy-hasPalpitations", "common.pregnant", "q", Arrays.asList("Yes") ));
     insert( new OutcomeAnswerCondition("pregnancy-hasPalpitations", "palpitations2.hasPalpitations", "q", Arrays.asList("Yes") ));
-    insert( hypertension("pregnancy-noPalpitations", "Consult GP", "gp"));
+    insert( hypertension("pregnancy-noPalpitations", "Consult GP"));
     insert( new OutcomeAnswerCondition("pregnancy-noPalpitations", "common.pregnant", "q", Arrays.asList("Yes") ));
     insert( new OutcomeAnswerCondition("pregnancy-noPalpitations", "palpitations2.hasPalpitations", "q", Arrays.asList("No") ));
 
@@ -271,7 +265,6 @@ then
     insert( Outcome.of("noPalpitationsFamilyHistory", ReferralRequest.builder()
                 .id("utc-ami-12h")
                 .description("UTC")
-                .serviceRequested("utc")
                 .occurrence("PT12h")
                 .specialty("primaryCareReview")
                 .reason("ami")
@@ -301,7 +294,6 @@ then
     insert( Outcome.of("hadECG", ReferralRequest.builder()
                 .id("primaryCareReview")
                 .description("Speak to Primary Care professional")
-                .serviceRequested("primaryCare")
                 .occurrence("PT12h")
                 .specialty("primaryCareReview")
                 .note("A note")
@@ -334,7 +326,6 @@ then
     insert( Outcome.of("strokeSymptomsRightNow", ReferralRequest.builder()
                 .id("call999-stroke")
                 .description("Call 999")
-                .serviceRequested("call999")
                 .occurrence("PT18m")
                 .specialty("primaryCareReview")
                 .note("A note")
@@ -350,7 +341,6 @@ then
     insert( Outcome.of("exerciseTriggered", ReferralRequest.builder()
                 .id("ed-cardio-arrhythmia-4h")
                 .description("ED")
-                .serviceRequested("ed")
                 .occurrence("PT4h")
                 .specialty("cardio")
                 .reason("arrhythmia")
@@ -372,7 +362,6 @@ then
     insert( Outcome.of("syncope12hrs", ReferralRequest.builder()
                 .id("ed-arrhythmia-emergency")
                 .description("ED")
-                .serviceRequested("ed")
                 .occurrence("PT4h")
                 .specialty("emergencyCareReview")
                 .reason("arrhythmia")
@@ -415,7 +404,6 @@ then
     insert( Outcome.of("drugUse", ReferralRequest.builder()
                 .id("utc-hcpReview-4h")
                 .description("UTC")
-                .serviceRequested("utc")
                 .occurrence("PT4h")
                 .specialty("hcpReview")
                 .reason("adverseReaction")
@@ -428,7 +416,6 @@ then
     insert( Outcome.of("prescriptionUse", ReferralRequest.builder()
                 .id("gp-hcpReview-4h")
                 .description("Consult GP")
-                .serviceRequested("gp")
                 .occurrence("PT12h")
                 .specialty("gp")
                 .reason("adverseReaction")
@@ -451,7 +438,6 @@ then
     insert( Outcome.of("noCarePlan",  ReferralRequest.builder()
                 .id("gp-anxiety-72h")
                 .description("Consult GP")
-                .serviceRequested("gp")
                 .occurrence("PT72h")
                 .specialty("gp")
                 .reason("anxiety")
@@ -507,7 +493,6 @@ then
     insert( Outcome.of("smoker", ReferralRequest.builder()
                 .id("pharmacy-nicotine-168h")
                 .description("Consult Pharmacy")
-                .serviceRequested("pharmacy")
                 .occurrence("PT168H")
                 .specialty("pharmacistReview")
                 .reason("nicotine")
@@ -528,7 +513,6 @@ then
     insert( Outcome.of("noCausesMentalHealthRoute", ReferralRequest.builder()
                 .id("pharmacy-nicotine-168h")
                 .description("Consult GP")
-                .serviceRequested("gp")
                 .specialty("gp")
                 .note("A note")
                 .build()));

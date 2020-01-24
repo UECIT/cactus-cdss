@@ -74,7 +74,6 @@ function Outcome call999(String id) {
     return Outcome.of(id, 
         ReferralRequest.builder()
             .id("call999-cardio-ami-8m")
-            .serviceRequested("call999")
             .description("Call 999")
             .occurrence("PT8m")
             .specialty("cardio")

@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
 import lombok.ToString;
-import lombok.Value;
 
 @Data
 @Builder(toBuilder = true)
@@ -45,8 +44,11 @@ public class ReferralRequest {
   /**
    * This SHOULD be populated with the recommended generic service type (e.g. GP or Emergency
    * Department)
+   *
+   * @deprecated CDS API Spec change from 1.0 -> 1.1, this field will not be transformed
    */
   @ToString.Include
+  @Deprecated
   private String serviceRequested;
 
   /**
