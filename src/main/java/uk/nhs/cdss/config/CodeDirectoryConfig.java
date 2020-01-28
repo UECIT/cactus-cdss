@@ -1,11 +1,14 @@
 package uk.nhs.cdss.config;
 
+import static uk.nhs.cdss.constants.SystemCode.INVALID_RESOURCE;
+import static uk.nhs.cdss.constants.SystemCode.NO_RECORD_FOUND;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import uk.nhs.cdss.constants.SnomedConstants;
 import uk.nhs.cdss.constants.SystemURL;
-import uk.nhs.cdss.domain.Concept;
 import uk.nhs.cdss.domain.Coding;
+import uk.nhs.cdss.domain.Concept;
 import uk.nhs.cdss.engine.CodeDirectory;
 
 @Configuration
@@ -26,6 +29,10 @@ public class CodeDirectoryConfig {
   private Concept buildCode(String systemURL, String id, String description) {
     var coding = new Coding(systemURL, id, description);
     return new Concept(id, coding);
+  }
+
+  private Concept error(String id, String description) {
+    return buildCode(SystemURL.VS_GPC_ERROR_WARNING_CODE, id, description);
   }
 
   @Bean
@@ -196,6 +203,8 @@ public class CodeDirectoryConfig {
 
   private void errors(CodeDirectory codeDirectory) {
     codeDirectory.put("error", snomed("error", "Error"));
+    codeDirectory.put("noRecordFound", error(NO_RECORD_FOUND, "No record found"));
+    codeDirectory.put("invalidResource", error(INVALID_RESOURCE, "Invalid Request Message"));
   }
 
   private void chestPains(CodeDirectory codeDirectory) {

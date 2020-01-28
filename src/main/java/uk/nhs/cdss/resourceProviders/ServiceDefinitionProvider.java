@@ -1,11 +1,13 @@
 package uk.nhs.cdss.resourceProviders;
 
+import static ca.uhn.fhir.rest.annotation.OperationParam.MAX_UNLIMITED;
+
 import ca.uhn.fhir.rest.annotation.IdParam;
 import ca.uhn.fhir.rest.annotation.Operation;
+import ca.uhn.fhir.rest.annotation.OperationParam;
 import ca.uhn.fhir.rest.annotation.OptionalParam;
 import ca.uhn.fhir.rest.annotation.Read;
 import ca.uhn.fhir.rest.annotation.RequiredParam;
-import ca.uhn.fhir.rest.annotation.ResourceParam;
 import ca.uhn.fhir.rest.annotation.Search;
 import ca.uhn.fhir.rest.param.CompositeAndListParam;
 import ca.uhn.fhir.rest.param.ConstructedAndListParam;
@@ -17,38 +19,47 @@ import ca.uhn.fhir.rest.server.exceptions.BaseServerResponseException;
 import ca.uhn.fhir.rest.server.exceptions.InternalErrorException;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Consumer;
+import java.util.List;
 import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.hl7.fhir.dstu3.model.Bundle;
+import org.hl7.fhir.dstu3.model.CodeableConcept;
+import org.hl7.fhir.dstu3.model.Encounter;
 import org.hl7.fhir.dstu3.model.GuidanceResponse;
 import org.hl7.fhir.dstu3.model.IdType;
-import org.hl7.fhir.dstu3.model.Parameters;
-import org.hl7.fhir.dstu3.model.Parameters.ParametersParameterComponent;
-import org.hl7.fhir.dstu3.model.Reference;
-import org.hl7.fhir.dstu3.model.Resource;
-import org.hl7.fhir.dstu3.model.ResourceType;
+import org.hl7.fhir.dstu3.model.Observation;
+import org.hl7.fhir.dstu3.model.Patient;
+import org.hl7.fhir.dstu3.model.Person;
+import org.hl7.fhir.dstu3.model.QuestionnaireResponse;
 import org.hl7.fhir.dstu3.model.ServiceDefinition;
-import org.hl7.fhir.dstu3.model.Type;
+import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RestController;
 import uk.nhs.cdss.logging.Context;
-import uk.nhs.cdss.logging.Context.ContextBuilder;
 import uk.nhs.cdss.services.EvaluateService;
 import uk.nhs.cdss.services.ServiceDefinitionConditionBuilderFactory;
 import uk.nhs.cdss.services.ServiceDefinitionRegistry;
+import uk.nhs.cdss.transform.EvaluationParameters;
 import uk.nhs.cdss.transform.out.ServiceDefinitionTransformer;
+import uk.nhs.cdss.util.CollectionUtil;
 
 @RestController
 @AllArgsConstructor
 public class ServiceDefinitionProvider implements IResourceProvider {
 
   private static final String EVALUATE = "$evaluate";
+
+  private static final String INPUT_DATA = "inputData";
+  private static final String REQUEST_ID = "requestId";
+  private static final String ENCOUNTER = "encounter";
+  private static final String PATIENT = "patient";
+  private static final String INITIATING_PERSON = "initiatingPerson";
+  private static final String USER_TYPE = "userType";
+  private static final String SETTING = "setting";
+  private static final String USER_LANGUAGE = "userLanguage";
+  private static final String USER_TASK = "userTaskContext";
 
   private static final String SP_EXPERIMENTAL = "experimental";
   private static final String SP_OBSERVATION_TYPE_CODE = "trigger-type-code-value-effective";
@@ -69,67 +80,55 @@ public class ServiceDefinitionProvider implements IResourceProvider {
     return ServiceDefinition.class;
   }
 
-  @Operation(name = EVALUATE, idempotent = true, type = Parameters.class)
+  @Operation(name = EVALUATE)
   public GuidanceResponse evaluate(
       @IdParam IdType serviceDefinitionId,
-      @ResourceParam Resource resource) {
+      @OperationParam(name = REQUEST_ID, min = 1) IdType requestId,
+      @OperationParam(name = INPUT_DATA, max = MAX_UNLIMITED) List<IBaseResource> inputData,
+      @OperationParam(name = PATIENT, min = 1) Patient patient,
+      @OperationParam(name = ENCOUNTER, min = 1) Encounter encounter,
+      @OperationParam(name = INITIATING_PERSON, min = 1) Person initiatingPerson, // Spec says this should be a reference to patient/practitioner/related person (NCTH-431)
+      @OperationParam(name = USER_TYPE, min = 1) CodeableConcept userType,
+      @OperationParam(name = USER_LANGUAGE) CodeableConcept userLanguage,
+      @OperationParam(name = USER_TASK) CodeableConcept userTaskContext,
+      @OperationParam(name = SETTING, min = 1) CodeableConcept setting) {
 
-    Parameters parameters = getParameters(resource);
-    Context context = getEvaluateContext(serviceDefinitionId.toString(), parameters);
+    Context context = Context.builder()
+        .task("ServiceDefinition/$evaluate")
+        .serviceDefinition(serviceDefinitionId.toString())
+        .encounter(encounter.getId())
+        .request(requestId.toString())
+        .supplier(initiatingPerson.getId())
+        .build();
 
+    EvaluationParameters evaluationParameters = EvaluationParameters.builder()
+        .requestId(requestId.getId())
+        .encounter(encounter)
+        .patient(patient)
+        .inputData(inputData)
+        .responses(CollectionUtil.filterAndCast(inputData, QuestionnaireResponse.class))
+        .observations(CollectionUtil.filterAndCast(inputData, Observation.class))
+        .userType(userType)
+        .setting(setting)
+        .userLanguage(userLanguage)
+        .userTaskContext(userTaskContext)
+        .build();
+
+    return evaluate(serviceDefinitionId, context, evaluationParameters);
+  }
+
+  private GuidanceResponse evaluate(IdType serviceDefinitionId,
+      Context context, EvaluationParameters evaluationParameters) {
     try {
       return context.wrap(() ->
           evaluateService.getGuidanceResponse(
-              parameters, serviceDefinitionId.getIdPart()));
+              evaluationParameters, serviceDefinitionId.getIdPart()));
     } catch (Exception e) {
       if (e instanceof BaseServerResponseException) {
         throw (BaseServerResponseException)e;
       }
       throw new InternalErrorException(e);
     }
-  }
-
-  private Context getEvaluateContext(String serviceDefinitionId, Parameters parameters) {
-    Map<String, ParametersParameterComponent> index = new HashMap<>();
-    parameters.getParameter().forEach(p ->
-        index.putIfAbsent(p.getName(), p)
-    );
-
-    ContextBuilder contextBuilder = Context.builder()
-        .task("ServiceDefinition/$evaluate")
-        .serviceDefinition(serviceDefinitionId);
-
-    applyIfPresent(index.get("encounter"), contextBuilder::encounter);
-    applyIfPresent(index.get("requestId"), contextBuilder::request);
-    applyIfPresent(index.get("initiatingPerson"), contextBuilder::supplier);
-
-    return contextBuilder.build();
-  }
-
-  private <T extends ParametersParameterComponent> void applyIfPresent(T o,
-      Consumer<String> consumer) {
-    if (o != null) {
-      Type value = o.getValue();
-      if (value instanceof IdType) {
-        consumer.accept(value.toString());
-      } else if (value instanceof Reference) {
-        consumer.accept(((Reference) value).getReference());
-      } else {
-        Resource resource = o.getResource();
-        if (resource != null) {
-          consumer.accept(resource.fhirType() + "/" + resource.getId());
-        }
-      }
-    }
-  }
-
-  private Parameters getParameters(Resource resource) {
-    if (ResourceType.Parameters.equals(resource.getResourceType())) {
-      return (Parameters) resource;
-    }
-
-    var bundle = (Bundle) resource;
-    return (Parameters) bundle.getEntry().get(0).getResource();
   }
 
   @Read

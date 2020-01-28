@@ -8,7 +8,7 @@
         "required": true,
         "options": [
           {
-            "stringValue": "Crushing or intense aching pain in the cest, upper back or upper abdominal area",
+            "stringValue": "Crushing or intense aching pain in the chest, upper back or upper abdominal area",
             "code": "chest"
           },
           {

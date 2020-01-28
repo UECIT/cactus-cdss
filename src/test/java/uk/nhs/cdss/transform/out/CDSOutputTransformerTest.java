@@ -5,8 +5,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import ca.uhn.fhir.rest.client.api.IGenericClient;
-import java.util.Collections;
 import org.hl7.fhir.dstu3.model.Encounter;
 import org.hl7.fhir.dstu3.model.GuidanceResponse;
 import org.hl7.fhir.dstu3.model.Reference;
@@ -28,9 +26,6 @@ public class CDSOutputTransformerTest {
 
   private CDSOutputTransformer outputTransformer;
 
-  private IGenericClient mockClient;
-  private ReferenceStorageService mockStorageService;
-
   @Before
   public void setup() {
     CodingOutTransformer codingTransformer = new CodingOutTransformer();
@@ -40,12 +35,12 @@ public class CDSOutputTransformerTest {
         new StatusTransformer(), conceptTransformer,
         new TypeTransformer(conceptTransformer));
 
-    mockStorageService = mock(ReferenceStorageService.class);
+    ReferenceStorageService mockStorageService = mock(ReferenceStorageService.class);
     when(mockStorageService.create(any())).thenAnswer(new Answer<Reference>() {
       private long nextResourceId = 1;
 
       @Override
-      public Reference answer(InvocationOnMock invocationOnMock) throws Throwable {
+      public Reference answer(InvocationOnMock invocationOnMock) {
         Resource resource = invocationOnMock.getArgument(0);
         String id = resource.getResourceType().name() + "/" + nextResourceId++;
         resource.setId(id);
@@ -60,6 +55,7 @@ public class CDSOutputTransformerTest {
             observationTransformer, codeDirectory),
         new RedirectTransformer(
             new TriggerTransformer(codeDirectory, codingTransformer)), observationTransformer,
+        new OperationOutcomeTransformer(conceptTransformer, codeDirectory),
         mockStorageService);
   }
 
@@ -68,9 +64,9 @@ public class CDSOutputTransformerTest {
     CDSOutput output = new CDSOutput();
     output.setOutcome(new Outcome("outcome"));
 
-    Encounter encounter = new Encounter();
-    EvaluationParameters params = new EvaluationParameters("1", encounter, Collections.emptyList(),
-        Collections.emptyList(), Collections.emptyList(), Collections.emptyMap());
+    EvaluationParameters params = EvaluationParameters.builder()
+        .encounter(new Encounter())
+        .build();
 
     CDSOutputBundle bundle = new CDSOutputBundle(output, "1", params);
     outputTransformer.transform(bundle);
@@ -82,8 +78,9 @@ public class CDSOutputTransformerTest {
 
     Encounter encounter = new Encounter();
     encounter.setId("Encounter/5");
-    EvaluationParameters params = new EvaluationParameters("1", encounter, Collections.emptyList(),
-        Collections.emptyList(), Collections.emptyList(), Collections.emptyMap());
+    EvaluationParameters params = EvaluationParameters.builder()
+        .encounter(encounter)
+        .build();
 
     CDSOutputBundle bundle = new CDSOutputBundle(output, "1", params);
     outputTransformer.transform(bundle);
@@ -96,8 +93,9 @@ public class CDSOutputTransformerTest {
 
     Encounter encounter = new Encounter();
     encounter.setId("Encounter/5");
-    EvaluationParameters params = new EvaluationParameters("1", encounter, Collections.emptyList(),
-        Collections.emptyList(), Collections.emptyList(), Collections.emptyMap());
+    EvaluationParameters params = EvaluationParameters.builder()
+        .encounter(encounter)
+        .build();
 
     CDSOutputBundle bundle = new CDSOutputBundle(output, "1", params);
     GuidanceResponse guidanceResponse = outputTransformer.transform(bundle);

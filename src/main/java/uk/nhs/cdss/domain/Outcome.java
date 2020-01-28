@@ -24,6 +24,7 @@ public class Outcome {
   private Redirection redirection;
 
   private BaseServerResponseException exception;
+  private Error error;
 
   public Outcome(String id) {
     this.id = id;
@@ -74,6 +75,12 @@ public class Outcome {
   public static Outcome fail(String id, BaseServerResponseException exception) {
     Outcome outcome = new Outcome(id);
     outcome.exception = exception;
+    return outcome;
+  }
+
+  public static Outcome fail(String id, Error error) {
+    Outcome outcome = new Outcome(id);
+    outcome.error = error;
     return outcome;
   }
 }

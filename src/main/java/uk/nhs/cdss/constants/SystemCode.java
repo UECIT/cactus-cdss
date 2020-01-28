@@ -14,4 +14,5 @@ public final class SystemCode {
 	public static final String PATIENT_NOT_FOUND = "PATIENT_NOT_FOUND";
 	public static final String REFERENCE_NOT_FOUND = "REFERENCE_NOT_FOUND";
 	public static final String FHIR_CONSTRAINT_VIOLATION = "FHIR_CONSTRAINT_VIOLATION";
+	public static final String NO_RECORD_FOUND = "NO_RECORD_FOUND";
 }
