@@ -25,7 +25,6 @@ import org.hl7.fhir.dstu3.model.RequestGroup.RequestGroupActionComponent;
 import org.hl7.fhir.dstu3.model.RequestGroup.RequestIntent;
 import org.hl7.fhir.dstu3.model.RequestGroup.RequestStatus;
 import org.hl7.fhir.dstu3.model.Resource;
-import org.hl7.fhir.dstu3.model.ResourceType;
 import org.hl7.fhir.dstu3.model.StringType;
 import org.springframework.stereotype.Component;
 import uk.nhs.cdss.domain.Outcome;
@@ -44,6 +43,7 @@ public class CDSOutputTransformer implements Transformer<CDSOutputBundle, Guidan
   private final ReferralRequestTransformer referralRequestTransformer;
   private final RedirectTransformer redirectTransformer;
   private final ObservationTransformer observationTransformer;
+  private final OperationOutcomeTransformer operationOutcomeTransformer;
   private final ReferenceStorageService storageService;
 
   private DataRequirement buildDataRequirement(String questionnaireId) {
@@ -108,13 +108,15 @@ public class CDSOutputTransformer implements Transformer<CDSOutputBundle, Guidan
       throw new IllegalStateException(
           "Encounter has no ID and cannot be referenced in GuidanceResponse");
     }
-    Reference encounterRef = new Reference(encounter.getId());
+    var encounterRef = new Reference(encounter.getId());
+    var subjectRef = new Reference(bundle.getParameters().getPatient());
 
     var response = new GuidanceResponse()
         .setOccurrenceDateTime(new Date())
         .setRequestId(bundle.getParameters().getRequestId())
         .setModule(serviceDefinition)
-        .setContext(encounterRef);
+        .setContext(encounterRef)
+        .setSubject(subjectRef);
 
     boolean dataRequested = !output.getQuestionnaireIds().isEmpty();
 
@@ -160,6 +162,12 @@ public class CDSOutputTransformer implements Transformer<CDSOutputBundle, Guidan
         throw outcome.getException();
       }
 
+      if (outcome.getError() != null) {
+        String outcomeRef = createResource(operationOutcomeTransformer.transform(outcome.getError()));
+        response.addEvaluationMessage(new Reference(outcomeRef));
+        response.setStatus(GuidanceResponseStatus.FAILURE);
+      }
+
       if (!dataRequested && outcome.getRedirection() != null) {
         var redirection = outcome.getRedirection();
         redirectTransformer.transform(redirection)
@@ -167,14 +175,14 @@ public class CDSOutputTransformer implements Transformer<CDSOutputBundle, Guidan
       }
 
       if (outcome.getRedirection() == null) {
-        response.setResult(new Reference(buildRequestGroup(bundle)));
+        response.setResult(new Reference(buildRequestGroup(bundle, subjectRef)));
       }
     }
 
     return response;
   }
 
-  private RequestGroup buildRequestGroup(CDSOutputBundle bundle) {
+  private RequestGroup buildRequestGroup(CDSOutputBundle bundle, Reference subject) {
 
     // FIXME - not known until after request group has been stored
     Identifier requestGroupIdentifier = null;
@@ -192,12 +200,6 @@ public class CDSOutputTransformer implements Transformer<CDSOutputBundle, Guidan
 
     org.hl7.fhir.dstu3.model.ReferralRequest referralRequest = null;
     if (outcome.getReferralRequest() != null) {
-
-      var subject = bundle.getParameters().getInputData().stream()
-          .filter(resource -> resource.getResourceType() == ResourceType.Patient)
-          .findAny()
-          .map(Reference::new)
-          .orElse(null);
 
       var context = bundle.getParameters().getEncounter();
 

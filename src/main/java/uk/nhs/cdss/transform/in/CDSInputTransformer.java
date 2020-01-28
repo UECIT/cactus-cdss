@@ -20,7 +20,7 @@ public final class CDSInputTransformer implements Transformer<CDSInputBundle, CD
     var cdsInput = CDSInput.builder()
         .serviceDefinitionId(bundle.getServiceDefinitionId())
         .requestId(parameters.getRequestId())
-        .context(contextTransformer.transform(parameters.getContexts()))
+        .context(contextTransformer.transform(parameters))
         .build();
 
     parameters.getResponses()
