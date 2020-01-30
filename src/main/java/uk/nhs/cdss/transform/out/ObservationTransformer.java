@@ -47,9 +47,7 @@ public class ObservationTransformer implements Transformer<Assertion, Observatio
   @Override
   public CareConnectObservation transform(Assertion from) {
     var observation = new CareConnectObservation();
-
-    observation.setId(from.getId());
-
+    
     var isRecentlyCreated = from.getIssued() == null;
     if (isRecentlyCreated) {
       observation.setIssued(new Date());

@@ -7,6 +7,9 @@ import uk.nhs.cdss.rules.AnswerAssertion
 import uk.nhs.cdss.rules.OutcomeAnswerCondition
 
 import uk.nhs.cdss.domain.Outcome
+import uk.nhs.cdss.domain.Concern
+import uk.nhs.cdss.domain.Concern.ClinicalStatus
+import uk.nhs.cdss.domain.Concern.VerificationStatus
 import uk.nhs.cdss.domain.ReferralRequest
 
 import uk.nhs.cdss.engine.CodeDirectory
@@ -23,9 +26,10 @@ then
             .id("gp-anxiety-72h")
             .description("Consult GP")
             .occurrence("PT72h")
-            .specialty("gp")
-            .reason("anxiety")
-            .note("A note")
+            .reasonCode("gp")
+            .reason(Concern.builder()
+                .condition("anxiety")
+                .build())
             .build()));
     insert( new OutcomeAnswerCondition("anxiety", "anxiety.anxiety", "q", Arrays.asList("Yes", "No") ));
 end

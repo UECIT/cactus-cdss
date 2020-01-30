@@ -47,6 +47,7 @@ public class CodeDirectoryConfig {
     codeDirectory.put("lifeThreatening", snomed("442452003", "Life threatening severity (qualifier value)"));
 
     common(codeDirectory);
+    bodyLocations(codeDirectory);
 
     initial(codeDirectory);
     palpitations(codeDirectory);
@@ -61,6 +62,15 @@ public class CodeDirectoryConfig {
     outcomes(codeDirectory);
 
     return codeDirectory;
+  }
+
+  private void bodyLocations(CodeDirectory codeDirectory) {
+    codeDirectory.put("head", snomed("774007", "Head and neck"));
+    codeDirectory.put(snomed("chest", "Chest"));
+    codeDirectory.put(snomed("heart", "Heart"));
+    codeDirectory.put(snomed("arms", "Arms"));
+    codeDirectory.put(snomed("torso", "Torso"));
+    codeDirectory.put(snomed("legs", "Legs"));
   }
 
   private void outcomes(CodeDirectory codeDirectory) {
@@ -131,6 +141,8 @@ public class CodeDirectoryConfig {
     codeDirectory.put(snomed("pregnant", "Is pregnant"));
     codeDirectory.put(snomed("over50", "Over 50 years of age"));
     codeDirectory.put(snomed("chestPain", "Feeling pain in chest"));
+
+    codeDirectory.put("defaultStage", snomed("786005", "Clinical stage I B"));
   }
 
   private void initial(CodeDirectory codeDirectory) {

@@ -37,15 +37,11 @@ public class Outcome {
   }
 
   public static Outcome of(String id, ReferralRequest referralRequest, CarePlan... carePlans) {
-    ReferralRequest modifiedRequest = referralRequest.toBuilder()
-        .intent("plan")
-        .priority("routine")
-        .build();
     List<CarePlan> carePlanList = Arrays.stream(carePlans)
         .map(Outcome::setDefaultValues)
         .collect(Collectors.toList());
     Outcome outcome = new Outcome(id);
-    outcome.setReferralRequest(modifiedRequest);
+    outcome.setReferralRequest(referralRequest);
     outcome.setCarePlans(carePlanList);
     return outcome;
   }

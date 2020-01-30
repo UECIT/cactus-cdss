@@ -23,6 +23,9 @@ import uk.nhs.cdss.domain.CarePlan
 import uk.nhs.cdss.domain.CarePlanActivity
 import uk.nhs.cdss.domain.ReferralRequest
 import uk.nhs.cdss.domain.Redirection
+import uk.nhs.cdss.domain.Concern
+import uk.nhs.cdss.domain.Concern.ClinicalStatus
+import uk.nhs.cdss.domain.Concern.VerificationStatus
 
 import uk.nhs.cdss.engine.CodeDirectory
 import uk.nhs.cdss.engine.Constraints
@@ -43,9 +46,11 @@ function Outcome heartAttack(String id, CarePlan[] carePlans) {
             .id("call999-cardio-ami-8m")
             .description("Call 999")
             .occurrence("PT8m")
-            .specialty("cardio")
-            .reason("ami")
-            .note("A note")
+            .reasonCode("cardio")
+            .reason(Concern.builder()
+                .condition("ami")
+                .verificationStatus(VerificationStatus.CONFIRMED)
+                .build())
             .build(),
             carePlans
     );
@@ -57,9 +62,11 @@ function Outcome hypertension(String id, String description) {
             .id("hypertension-12h")
             .description(description)
             .occurrence("PT12h")
-            .specialty("primaryCareReview")
-            .reason("hypertension")
-            .note("A note")
+            .reasonCode("primaryCareReview")
+            .reason(Concern.builder()
+                .condition("hypertension")
+                .verificationStatus(VerificationStatus.CONFIRMED)
+                .build())
             .build(),
         CarePlan.builder()
             .id("pregnancy")
@@ -80,9 +87,13 @@ function Outcome edHeartAttack(String id) {
             .id("ed-cardio-mi-8m")
             .description("ED")
             .occurrence("PT8m")
-            .specialty("cardio")
-            .reason("mi")
-            .note("A note")
+            .reasonCode("cardio")
+            .reason(Concern.builder()
+                .condition("mi")
+                .verificationStatus(VerificationStatus.CONFIRMED)
+                .bodySite("heart")
+                .bodySite("chest")
+                .build())
             .build(),
         CarePlan.builder()
             .id("edHeartAttack")
@@ -97,15 +108,18 @@ function Outcome edHeartAttack(String id) {
     );
 }
 
-function Outcome utcStroke(String id) {
+function Outcome utcStroke(String id, String bodySite) {
     return Outcome.of(id,
         ReferralRequest.builder()
             .id("utc-primary-care-stroke")
             .description("UTC")
             .occurrence("PT4h")
-            .specialty("primaryCareReview")
-            .reason("stroke")
-            .note("A note")
+            .reasonCode("primaryCareReview")
+            .reason(Concern.builder()
+                .condition("stroke")
+                .bodySite(bodySite)
+                .verificationStatus(VerificationStatus.CONFIRMED)
+                .build())
             .build(),
         CarePlan.builder()
             .id("stroke")
@@ -127,9 +141,11 @@ function Outcome utcArrhythmia(String id, String occurrence, String specialty) {
             .id("utc-arrhythmia")
             .description("UTC")
             .occurrence(occurrence)
-            .specialty(specialty)
-            .reason("arrhythmia")
-            .note("A note")
+            .reasonCode(specialty)
+            .reason(Concern.builder()
+                .condition("arrhythmia")
+                .verificationStatus(VerificationStatus.CONFIRMED)
+                .build())
             .build()
     );
 }
@@ -140,9 +156,10 @@ function Outcome gpArrhythmia(String id, String occurrence) {
             .id("gp-arrhythmia")
             .description("Consult GP")
             .occurrence(occurrence)
-            .specialty("gp")
-            .reason("arrhythmia")
-            .note("A note")
+            .reasonCode("gp")
+            .reason(Concern.builder()
+                .condition("arrhythmia")
+                .build())
             .build()
     );
 }
@@ -266,9 +283,11 @@ then
                 .id("utc-ami-12h")
                 .description("UTC")
                 .occurrence("PT12h")
-                .specialty("primaryCareReview")
-                .reason("ami")
-                .note("A note")
+                .reasonCode("primaryCareReview")
+                .reason(Concern.builder()
+                    .condition("ami")
+                    .verificationStatus(VerificationStatus.CONFIRMED)
+                    .build())                
                 .build()));
     insert( new OutcomeAnswerCondition("noPalpitationsFamilyHistory", "palpitations2.familyHistory", "q", Arrays.asList("Yes") ));
     insert( new OutcomeAnswerCondition("noPalpitationsFamilyHistory", "palpitations2.hasPalpitations", "q", Arrays.asList("No") ));
@@ -295,8 +314,11 @@ then
                 .id("primaryCareReview")
                 .description("Speak to Primary Care professional")
                 .occurrence("PT12h")
-                .specialty("primaryCareReview")
-                .note("A note")
+                .reasonCode("primaryCareReview")
+                .reason(Concern.builder() //TODO: No primary concern given on scenario
+                    .condition("aprimaryCareReviewmi")
+                    .verificationStatus(VerificationStatus.CONFIRMED)
+                    .build()) 
                 .build()));
     insert( new OutcomeAnswerCondition("hadECG", "palpitations2.hadECG", "q", Arrays.asList("Yes") ));
 
@@ -306,19 +328,19 @@ then
 
     //  Face dropped
     insert( new AnswerAssertion("palpitations2.strokeSymptoms", "q1", "Yes", codeDirectory.get("faceDropped"), true));
-    insert( utcStroke("faceDropped"));
+    insert( utcStroke("faceDropped", "head"));
     insert( new OutcomeAnswerCondition("faceDropped", "palpitations2.strokeSymptoms", "q1", Arrays.asList("Yes") ));
     insert( new OutcomeAnswerCondition("faceDropped", "palpitations2.strokeSymptoms", "q4", Arrays.asList("No") ));
 
     //  Arm lift problems
     insert( new AnswerAssertion("palpitations2.strokeSymptoms", "q2", "Yes", codeDirectory.get("armLiftProblems"), true));
-    insert( utcStroke("armListProblems"));
+    insert( utcStroke("armListProblems", "arm"));
     insert( new OutcomeAnswerCondition("armListProblems", "palpitations2.strokeSymptoms", "q2", Arrays.asList("Yes") ));
     insert( new OutcomeAnswerCondition("armListProblems", "palpitations2.strokeSymptoms", "q4", Arrays.asList("No") ));
 
     //  Speaking problems
     insert( new AnswerAssertion("palpitations2.strokeSymptoms", "q3", "Yes", codeDirectory.get("speakingProblems"), true));
-    insert( utcStroke("speakingProblems"));
+    insert( utcStroke("speakingProblems", "head"));
     insert( new OutcomeAnswerCondition("speakingProblems", "palpitations2.strokeSymptoms", "q3", Arrays.asList("Yes") ));
     insert( new OutcomeAnswerCondition("speakingProblems", "palpitations2.strokeSymptoms", "q4", Arrays.asList("No") ));
     //  Symptoms right now
@@ -327,9 +349,11 @@ then
                 .id("call999-stroke")
                 .description("Call 999")
                 .occurrence("PT18m")
-                .specialty("primaryCareReview")
-                .note("A note")
-                .reason("stroke")
+                .reasonCode("primaryCareReview")
+                .reason(Concern.builder()
+                    .condition("stroke")
+                    .verificationStatus(VerificationStatus.CONFIRMED)
+                    .build()) 
                 .build(),
             waitForAmbulance()));
     insert( new OutcomeAnswerCondition("strokeSymptomsRightNow", "palpitations2.strokeSymptoms", "q4", Arrays.asList("Yes") ));
@@ -342,9 +366,11 @@ then
                 .id("ed-cardio-arrhythmia-4h")
                 .description("ED")
                 .occurrence("PT4h")
-                .specialty("cardio")
-                .reason("arrhythmia")
-                .note("A note")
+                .reasonCode("cardio")
+                .reason(Concern.builder()
+                    .condition("arrhythmia")
+                    .verificationStatus(VerificationStatus.CONFIRMED)
+                    .build()) 
                 .build(),
             defaultCarePlan()));
     insert( new OutcomeAnswerCondition("exerciseTriggered", "palpitations2.exercise", "q", Arrays.asList("Yes") ));
@@ -363,9 +389,11 @@ then
                 .id("ed-arrhythmia-emergency")
                 .description("ED")
                 .occurrence("PT4h")
-                .specialty("emergencyCareReview")
-                .reason("arrhythmia")
-                .note("A note")
+                .reasonCode("emergencyCareReview")
+                .reason(Concern.builder()
+                    .condition("arrhythmia")
+                    .verificationStatus(VerificationStatus.CONFIRMED)
+                    .build()) 
                 .build(),
             waitForAmbulance()));
     insert( new OutcomeAnswerCondition("syncope12hrs", "palpitations2.syncope", "q", Arrays.asList("Yes", "Unsure") ));
@@ -405,9 +433,11 @@ then
                 .id("utc-hcpReview-4h")
                 .description("UTC")
                 .occurrence("PT4h")
-                .specialty("hcpReview")
-                .reason("adverseReaction")
-                .note("A note")
+                .reasonCode("hcpReview")
+                .reason(Concern.builder()
+                    .condition("adverseReaction")
+                    .verificationStatus(VerificationStatus.CONFIRMED)
+                    .build()) 
                 .build()));
     insert( new OutcomeAnswerCondition("drugUse", "palpitations2.drugUse", "q", Arrays.asList("Yes") ));
 
@@ -417,9 +447,11 @@ then
                 .id("gp-hcpReview-4h")
                 .description("Consult GP")
                 .occurrence("PT12h")
-                .specialty("gp")
-                .reason("adverseReaction")
-                .note("A note")
+                .reasonCode("gp")
+                .reason(Concern.builder()
+                    .condition("adverseReaction")
+                    .verificationStatus(VerificationStatus.CONFIRMED)
+                    .build()) 
                 .build()));
     insert( new OutcomeAnswerCondition("prescriptionUse", "palpitations2.prescriptionUse", "q", Arrays.asList("Yes", "Unsure") ));
 
@@ -439,9 +471,10 @@ then
                 .id("gp-anxiety-72h")
                 .description("Consult GP")
                 .occurrence("PT72h")
-                .specialty("gp")
-                .reason("anxiety")
-                .note("A note")
+                .reasonCode("gp")
+                .reason(Concern.builder()
+                    .condition("anxiety")
+                    .build()) 
                 .build(),
             CarePlan.builder()
                 .id("anxiety")
@@ -494,9 +527,10 @@ then
                 .id("pharmacy-nicotine-168h")
                 .description("Consult Pharmacy")
                 .occurrence("PT168H")
-                .specialty("pharmacistReview")
-                .reason("nicotine")
-                .note("A note")
+                .reasonCode("pharmacistReview")
+                .reason(Concern.builder()
+                    .condition("nicotine")
+                    .build()) 
                 .build(),
             CarePlan.builder()
                 .id("nicotine")
@@ -513,8 +547,10 @@ then
     insert( Outcome.of("noCausesMentalHealthRoute", ReferralRequest.builder()
                 .id("pharmacy-nicotine-168h")
                 .description("Consult GP")
-                .specialty("gp")
-                .note("A note")
+                .reasonCode("gp")
+                .reason(Concern.builder()
+                    .condition("nicotine")
+                    .build()) 
                 .build()));
     insert( new OutcomeAnswerCondition("noCausesMentalHealthRoute", "palpitations2.causes", "q4", Arrays.asList("Yes") ));
     insert( new OutcomeAnswerCondition("noCausesMentalHealthRoute", "palpitations2.anxiety", "q", Arrays.asList("Yes") ));

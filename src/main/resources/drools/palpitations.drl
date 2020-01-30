@@ -16,6 +16,9 @@ import uk.nhs.cdss.domain.Outcome
 import uk.nhs.cdss.domain.CarePlan
 import uk.nhs.cdss.domain.CarePlanActivity
 import uk.nhs.cdss.domain.ReferralRequest
+import uk.nhs.cdss.domain.Concern
+import uk.nhs.cdss.domain.Concern.ClinicalStatus
+import uk.nhs.cdss.domain.Concern.VerificationStatus
 
 import uk.nhs.cdss.engine.CodeDirectory
 
@@ -30,7 +33,7 @@ then
     insert( new InitialQuestionnaire("palpitations.chestPain") );
     insert( new AnswerAssertion("palpitations.chestPain", "q1", "Yes", codeDirectory.get("chestPain"), true));
 
-    insert( call999("chestPains").interim() );
+    insert( call999("chestPains", "chest").interim() );
     insert( new OutcomeAnswerCondition("chestPains", "palpitations.chestPain", "q1", Arrays.asList("Yes") ));
 
     insert( new NextQuestion("palpitations.neckPain", "palpitations.chestPain") );
@@ -38,7 +41,7 @@ then
     // Neck pains
     insert( new AnswerAssertion("palpitations.neckPain", "q2", "Yes", codeDirectory.get("neckPain"), true));
 
-    insert( call999("neckPains"));
+    insert( call999("neckPains", "head"));
     insert( new OutcomeAnswerCondition("neckPains", "palpitations.neckPain", "q2", Arrays.asList("Yes") ));
 
     insert( new NextQuestion("palpitations.breathing", "palpitations.neckPain") );
@@ -46,7 +49,7 @@ then
     // Breathing
     insert( new AnswerAssertion("palpitations.breathing", "q3", "Yes", codeDirectory.get("breathingProblems"), true));
 
-    insert( call999("breathing"));
+    insert( call999("breathing", "head"));
     insert( new OutcomeAnswerCondition("breathing", "palpitations.breathing", "q3", Arrays.asList("Yes") ));
 
     insert( new NextQuestion("palpitations.heartProblems", "palpitations.breathing") );
@@ -54,7 +57,7 @@ then
     // Heart problems
     insert( new AnswerAssertion("palpitations.heartProblems", "q4", "Yes", codeDirectory.get("heartProblems"), true));
 
-    insert( call999("heartProblems"));
+    insert( call999("heartProblems", "heart"));
     insert( new OutcomeAnswerCondition("heartProblems", "palpitations.heartProblems", "q4", Arrays.asList("Yes") ));
 
     // Answered no to all questions
@@ -70,15 +73,18 @@ then
     insert( new OutcomeAnswerCondition("noSymptoms", "palpitations.chestPain", "q1", Arrays.asList("No", "Unsure") ));
 end
 
-function Outcome call999(String id) {
+function Outcome call999(String id, String bodySite) {
     return Outcome.of(id, 
         ReferralRequest.builder()
             .id("call999-cardio-ami-8m")
             .description("Call 999")
             .occurrence("PT8m")
-            .specialty("cardio")
-            .reason("ami")
-            .note("A note")
+            .reasonCode("cardio")
+            .reason(Concern.builder()
+                .condition("ami")
+                .bodySite(bodySite)
+                .verificationStatus(VerificationStatus.CONFIRMED)
+                .build())
             .build(),
         CarePlan.builder()
             .id("aspirin")

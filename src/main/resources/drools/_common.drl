@@ -246,7 +246,6 @@ then
     String question = $qid + "#" + $ref;
     log.info("Assertion: " + question + " == " + $m.getAnswer() + " => " + $m.getCode() + " == " + $m.getValue());
     insert( Assertion.builder()
-                    .id(question)
                     .status(Assertion.Status.AMENDED)
                     .code($m.getCode())
                     .value($m.getValue())

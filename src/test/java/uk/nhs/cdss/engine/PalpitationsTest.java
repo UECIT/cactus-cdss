@@ -25,7 +25,6 @@ public class PalpitationsTest extends BaseDroolsCDSEngineTest {
     evaluate();
 
     assertEquals(1, output.getAssertions().size());
-    assertEquals("palpitations.chestPain#q1", output.getAssertions().get(0).getId());
     assertEquals(true, output.getAssertions().get(0).getValue());
   }
 

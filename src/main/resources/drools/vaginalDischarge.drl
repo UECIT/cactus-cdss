@@ -20,6 +20,9 @@ import uk.nhs.cdss.domain.CarePlanActivity
 import uk.nhs.cdss.domain.ReferralRequest
 import uk.nhs.cdss.domain.Coordinates
 import uk.nhs.cdss.domain.Concept
+import uk.nhs.cdss.domain.Concern
+import uk.nhs.cdss.domain.Concern.ClinicalStatus
+import uk.nhs.cdss.domain.Concern.VerificationStatus
 
 import uk.nhs.cdss.constants.SnomedConstants
 
@@ -30,15 +33,19 @@ import org.slf4j.Logger
 global Logger log;
 global CodeDirectory codeDirectory;
 
-function Outcome rupturedPid(String id, Concept code) {
+function Outcome rupturedPid(String id, String secondaryReason) {
     return Outcome.of(id, ReferralRequest.builder()
                 .id("ed-ectopic-ruptured-4h")
                 .description("ED")
                 .occurrence("PT4H")
-                .note("A note")
-                .specialty("medicalReview&surgicalReview")
-                .reason("ectopic")
-                .secondaryReason(Assertion.of(code))
+                .reasonCode("medicalReview&surgicalReview")
+                .reason(Concern.builder()
+                    .condition("ectopic")
+                    .verificationStatus(VerificationStatus.CONFIRMED)
+                    .build())
+                .secondaryReason(Concern.builder()
+                    .condition(secondaryReason)
+                    .build())
                 .build());
 }
 
@@ -86,10 +93,10 @@ then
     insert( new NextQuestionCondition("pregnantToStiNoPain", "vaginalDischarge.abdominalPain", "q", Arrays.asList("No")) );
     insert( new ConditionalNextQuestion("pregnantToStiMildPain", "vaginalDischarge.sti", "common.pregnant", "q", Arrays.asList("No")) );
     insert( new NextQuestionCondition("pregnantToStiMildPain", "vaginalDischarge.painIntensity", "q", Arrays.asList("noPain")) );
-    insert( rupturedPid("ed-ectopic-ruptured-4h-noPain", codeDirectory.get("rupturedEctopicPid")) );
+    insert( rupturedPid("ed-ectopic-ruptured-4h-noPain", "rupturedEctopicPid") );
     insert( new OutcomeAnswerCondition("ed-ectopic-ruptured-4h-noPain", "common.pregnant", "q", Arrays.asList("Yes") ));
     insert( new OutcomeAnswerCondition("ed-ectopic-ruptured-4h-noPain", "vaginalDischarge.abdominalPain", "q", Arrays.asList("No")) );
-    insert( rupturedPid("ed-ectopic-ruptured-4h-mildPain", codeDirectory.get("rupturedEctopicPid")) );
+    insert( rupturedPid("ed-ectopic-ruptured-4h-mildPain", "rupturedEctopicPid") );
     insert( new OutcomeAnswerCondition("ed-ectopic-ruptured-4h-mildPain", "common.pregnant", "q", Arrays.asList("Yes") ));
     insert( new OutcomeAnswerCondition("ed-ectopic-ruptured-4h-mildPain", "vaginalDischarge.painIntensity", "q", Arrays.asList("noPain")) );
 
@@ -104,20 +111,28 @@ then
                 .id("call999-ectopic-ruptured-asap")
                 .description("Call 999")
                 .occurrence("PT0S")
-                .note("A note")
-                .specialty("medicalReview&surgicalReview")
-                .reason("ectopic")
-                .secondaryReason(Assertion.of(codeDirectory.get("rupturedEctopic")))
+                .reasonCode("medicalReview&surgicalReview")
+                .reason(Concern.builder()
+                    .condition("ectopic")
+                    .verificationStatus(VerificationStatus.CONFIRMED)
+                    .build())
+                .secondaryReason(Concern.builder()
+                    .condition("rupturedEctopic")
+                    .build())
                 .build()) );
     insert( new OutcomeAnswerCondition("call999-ectopic-ruptured-asap", "vaginalDischarge.painSymptoms", "q", Arrays.asList("Yes") ));
     insert( Outcome.of("ed-ectopic-ruptured-1h", ReferralRequest.builder()
                 .id("ed-ectopic-ruptured-1h")
                 .description("ED")
                 .occurrence("PT1H")
-                .note("A note")
-                .specialty("medicalReview&surgicalReview")
-                .reason("ectopic")
-                .secondaryReason(Assertion.of(codeDirectory.get("rupturedEctopic")))
+                .reasonCode("medicalReview&surgicalReview")
+                .reason(Concern.builder()
+                    .condition("ectopic")
+                    .verificationStatus(VerificationStatus.CONFIRMED)
+                    .build())
+                .secondaryReason(Concern.builder()
+                    .condition("rupturedEctopic")
+                    .build())
                 .build()) );
     insert( new OutcomeAnswerCondition("ed-ectopic-ruptured-1h", "vaginalDischarge.painSymptoms", "q", Arrays.asList("No") ));
 
@@ -127,10 +142,14 @@ then
                 .id("ed-ectopic-pelvic-4h")
                 .description("ED")
                 .occurrence("PT4H")
-                .note("A note")
-                .specialty("medicalReview")
-                .reason("ectopic")
-                .secondaryReason(Assertion.of(codeDirectory.get("pelvicInflammatory")))
+                .reasonCode("medicalReview")
+                .reason(Concern.builder()
+                    .condition("ectopic")
+                    .verificationStatus(VerificationStatus.CONFIRMED)
+                    .build())
+                .secondaryReason(Concern.builder()
+                    .condition("pelvicInflammatory")
+                    .build())
                 .build()) );
     insert( new OutcomeAnswerCondition("ed-ectopic-pelvic-4h", "vaginalDischarge.lastTemperatureReading", "q"));
     insert( new OutcomeAnswerCondition("ed-ectopic-pelvic-4h", "vaginalDischarge.fever", "q", Arrays.asList("Yes") ));
@@ -140,10 +159,14 @@ then
                 .id("gp-ectopic-pelvic-6h")
                 .description("Contact General Practice Today")
                 .occurrence("PT6H")
-                .note("A note")
-                .specialty("hcpReview&pregnancyTest")
-                .reason("ectopic")
-                .secondaryReason(Assertion.of(codeDirectory.get("pelvicInflammatory")))
+                .reasonCode("hcpReview&pregnancyTest")
+                .reason(Concern.builder()
+                    .condition("ectopic")
+                    .verificationStatus(VerificationStatus.CONFIRMED)
+                    .build())
+                .secondaryReason(Concern.builder()
+                    .condition("pelvicInflammatory")
+                    .build())
                 .build()) );
     insert( new OutcomeAnswerCondition("gp-ectopic-pelvic-6h", "vaginalDischarge.fever", "q", Arrays.asList("No") ));
     insert( new OutcomeAnswerCondition("gp-ectopic-pelvic-6h", "vaginalDischarge.painIntensity", "q", Arrays.asList("inPain") ));
@@ -157,10 +180,15 @@ then
                 .id("gum-stiReocurrence")
                 .description("GUM")
                 .occurrence("P1D")
-                .note("A note")
-                .specialty("screening&contactTracing")
-                .reason("stiReoccurrence")
-                .secondaryReason(Assertion.of(codeDirectory.get("newStiInfection")))
+                .reasonCode("screening&contactTracing")
+                .reason(Concern.builder()
+                    .condition("stiReoccurrence")
+                    .verificationStatus(VerificationStatus.CONFIRMED)
+                    .clinicalStatus(ClinicalStatus.RECURRENCE)
+                    .build())
+                .secondaryReason(Concern.builder()
+                    .condition("newStiInfection")
+                    .build())
                 .build()) );
     insert( new OutcomeAnswerCondition("gum-stiReocurrence", "vaginalDischarge.sti", "q", Arrays.asList("Gonorrhoea", "Chlamydia", "Mycoplasma", "Genitalium")) );
 
@@ -174,30 +202,42 @@ then
                 .id("gp-candida-48h")
                 .description("General Practice")
                 .occurrence("P2D")
-                .note("A note")
-                .specialty("primaryHcpReview")
-                .reason("candida")
-                .secondaryReason(Assertion.of(codeDirectory.get("bacterialVaginosis")))
+                .reasonCode("primaryHcpReview")
+                .reason(Concern.builder()
+                    .condition("candida")
+                    .verificationStatus(VerificationStatus.CONFIRMED)
+                    .build())
+                .secondaryReason(Concern.builder()
+                    .condition("bacterialVaginosis")
+                    .build())
                 .build()) );
     insert( new OutcomeAnswerCondition("gp-candida-48h", "vaginalDischarge.dischargeDescription", "q", Arrays.asList("whiteOrFishyDischarge")) );
     insert( Outcome.of("gp-ectopic-cervical", ReferralRequest.builder()
                 .id("gp-ectopic-cervical")
                 .description("General Practice")
                 .occurrence("P1D")
-                .note("A note")
-                .specialty("primaryHcpReview")
-                .reason("ectopic")
-                .secondaryReason(Assertion.of(codeDirectory.get("cervical&uterine")))
+                .reasonCode("primaryHcpReview")
+                .reason(Concern.builder()
+                    .condition("ectopic")
+                    .verificationStatus(VerificationStatus.CONFIRMED)
+                    .build())
+                .secondaryReason(Concern.builder()
+                    .condition("cervical&uterine")
+                    .build())
                 .build()) );
     insert( new OutcomeAnswerCondition("gp-ectopic-cervical", "vaginalDischarge.dischargeDescription", "q", Arrays.asList("bloodStainedDischarge")) );
     insert( Outcome.of("gum-sti-foreignCervical", ReferralRequest.builder()
                 .id("gum-sti-foreignCervical")
                 .description("GUM")
                 .occurrence("P1D")
-                .note("A note")
-                .specialty("screening&vaginalExam&contactTracing")
-                .reason("sti")
-                .secondaryReason(Assertion.of(codeDirectory.get("foreign&cervical")))
+                .reasonCode("screening&vaginalExam&contactTracing")
+                .reason(Concern.builder()
+                    .condition("sti")
+                    .verificationStatus(VerificationStatus.CONFIRMED)
+                    .build())
+                .secondaryReason(Concern.builder()
+                    .condition("foreign&cervical")
+                    .build())
                 .build()) );
     insert( new OutcomeAnswerCondition("gum-sti-foreignCervical", "vaginalDischarge.dischargeDescription", "q", Arrays.asList("colouredDischarge")) );
 
@@ -222,10 +262,14 @@ then
                 .id("utc-strepto")
                 .description("UTC")
                 .occurrence("PT1H")
-                .note("A note")
-                .specialty("assessment&removal")
-                .reason("strepto")
-                .secondaryReason(Assertion.of(codeDirectory.get("bacterialInfection")))
+                .reasonCode("assessment&removal")
+                .reason(Concern.builder()
+                    .condition("strepto")
+                    .verificationStatus(VerificationStatus.CONFIRMED)
+                    .build())
+                .secondaryReason(Concern.builder()
+                    .condition("bacterialInfection")
+                    .build())
                 .build()) );
     insert( new OutcomeAnswerCondition("utc-strepto", "vaginalDischarge.rash", "q") );
 
@@ -240,20 +284,28 @@ then
                 .id("gp-herpes")
                 .description("General practice")
                 .occurrence("PT24H")
-                .note("A note")
-                .specialty("primaryHcpReview")
-                .reason("herpes")
-                .secondaryReason(Assertion.of(codeDirectory.get("shingles")))
+                .reasonCode("primaryHcpReview")
+                .reason(Concern.builder()
+                    .condition("herpes")
+                    .verificationStatus(VerificationStatus.CONFIRMED)
+                    .build())
+                .secondaryReason(Concern.builder()
+                    .condition("shingles")
+                    .build())
                 .build()) );
     insert( new OutcomeAnswerCondition("gp-herpes", "vaginalDischarge.herpes", "q", Arrays.asList("Yes")) );
     insert( Outcome.of("gum-herpes", ReferralRequest.builder()
                 .id("gum-herpes")
                 .description("GUM")
                 .occurrence("PT24H")
-                .note("A note")
-                .specialty("screening&vaginalExam")
-                .reason("primaryHerpes")
-                .secondaryReason(Assertion.of(codeDirectory.get("shingles")))
+                .reasonCode("screening&vaginalExam")
+                .reason(Concern.builder()
+                    .condition("primaryHerpes")
+                    .verificationStatus(VerificationStatus.CONFIRMED)
+                    .build())
+                .secondaryReason(Concern.builder()
+                    .condition("shingles")
+                    .build())
                 .build()) );
     insert( new OutcomeAnswerCondition("gum-herpes", "vaginalDischarge.herpes", "q", Arrays.asList("No")) );
 
@@ -270,20 +322,28 @@ then
                 .id("gp-uti")
                 .description("General practice")
                 .occurrence("PT48H")
-                .note("A note")
-                .specialty("urineTesting&hcpAssessment&diagnosis")
-                .reason("uti")
-                .secondaryReason(Assertion.of(codeDirectory.get("cystitis&incontinence")))
+                .reasonCode("urineTesting&hcpAssessment&diagnosis")
+                .reason(Concern.builder()
+                    .condition("uti")
+                    .verificationStatus(VerificationStatus.CONFIRMED)
+                    .build())
+                .secondaryReason(Concern.builder()
+                    .condition("cystitis&incontinence")
+                    .build())
                 .build()) );
     insert( new OutcomeAnswerCondition("gp-uti", "vaginalDischarge.symptoms", "q", Arrays.asList("burningOrStinging")) );
     insert( Outcome.of("utc-urineRetention", ReferralRequest.builder()
                 .id("utc-urineRetention")
                 .description("UTC")
                 .occurrence("PT4H")
-                .note("A note")
-                .specialty("catheterisation&hcpAssessment&diagnosis")
-                .reason("acuteUrineRetention")
-                .secondaryReason(Assertion.of(codeDirectory.get("uti&sti&neurogenic")))
+                .reasonCode("catheterisation&hcpAssessment&diagnosis")
+                .reason(Concern.builder()
+                    .condition("acuteUrineRetention")
+                    .verificationStatus(VerificationStatus.CONFIRMED)
+                    .build())
+                .secondaryReason(Concern.builder()
+                    .condition("uti&sti&neurogenic")
+                    .build())
                 .build()) );
     insert( new OutcomeAnswerCondition("utc-urineRetention", "vaginalDischarge.symptoms", "q", Arrays.asList("urineUnable")) );
 
@@ -297,30 +357,40 @@ then
                 .id("gp-candida-routine")
                 .description("General Practice")
                 .occurrence("routine")
-                .note("A note")
-                .specialty("urineTesting&hcpAssessment&diagnosis")
-                .reason("candida")
-                .secondaryReason(Assertion.of(codeDirectory.get("bacterialVaginosis")))
+                .reasonCode("urineTesting&hcpAssessment&diagnosis")
+                .reason(Concern.builder()
+                    .condition("candida")
+                    .verificationStatus(VerificationStatus.CONFIRMED)
+                    .build())
+                .secondaryReason(Concern.builder()
+                    .condition("bacterialVaginosis")
+                    .build())
                 .build()) );
     insert( new OutcomeAnswerCondition("gp-candida-routine", "vaginalDischarge.potentialDischargeDescription", "q", Arrays.asList("whiteOrFishyDischarge")) );
     insert( Outcome.of("gp-cervical", ReferralRequest.builder()
                 .id("gp-cervical")
                 .description("General Practice")
                 .occurrence("P2D")
-                .note("A note")
-                .specialty("screening&vaginalExam")
-                .reason("cervical")
-                .secondaryReason(Assertion.of(codeDirectory.get("detrusor&bladder")))
+                .reasonCode("screening&vaginalExam")
+                .reason(Concern.builder()
+                    .condition("cervical")
+                    .build())
+                .secondaryReason(Concern.builder()
+                    .condition("detrusor&bladder")
+                    .build())
                 .build()) );
     insert( new OutcomeAnswerCondition("gp-cervical", "vaginalDischarge.potentialDischargeDescription", "q", Arrays.asList("bloodStainedDischarge")) );
     insert( Outcome.of("gum-sti-additionalTesting", ReferralRequest.builder()
                 .id("gum-sti-additionalTesting")
                 .description("GUM")
                 .occurrence("P1D")
-                .note("A note")
-                .specialty("screening&vaginalExam")
-                .reason("sti")
-                .secondaryReason(Assertion.of(codeDirectory.get("stiTesting")))
+                .reasonCode("screening&vaginalExam")
+                .reason(Concern.builder()
+                    .condition("sti")
+                    .build())
+                .secondaryReason(Concern.builder()
+                    .condition("stiTesting")
+                    .build())
                 .build()) );
     insert( new OutcomeAnswerCondition("gum-sti-additionalTesting", "vaginalDischarge.potentialDischargeDescription", "q", Arrays.asList("colouredDischarge")) );
 
@@ -348,10 +418,13 @@ then
                 .id("gp-dyspareunia")
                 .description("Contact General Practice")
                 .occurrence("routine")
-                .note("A note")
-                .specialty("examination&diagnosis")
-                .reason("dyspareunia")
-                .secondaryReason(Assertion.of(codeDirectory.get("bacterialOrYeastInfection")))
+                .reasonCode("examination&diagnosis")
+                .reason(Concern.builder()
+                    .condition("dyspareunia")
+                    .build())
+                .secondaryReason(Concern.builder()
+                    .condition("bacterialOrYeastInfection")
+                    .build())
                 .build()) );
     insert( new OutcomeAnswerCondition("gp-dyspareunia", "vaginalDischarge.problemDescription", "q") );
 end
@@ -380,21 +453,26 @@ then
     String location;
 
     if (((Coordinates)$a.getValue()).getY() < 64) {
-        location = "Head";
+        location = "head";
     }
     else if (((Coordinates)$a.getValue()).getY() < 200) {
-        location = "Torso";
+        location = "torso";
     }
     else {
-        location = "Legs";
+        location = "legs";
     }
     insert( Outcome.of("ed-rapeCare", ReferralRequest.builder()
             .id("ed-rapeCare")
             .description("ED")
             .occurrence("PT1H")
-            .note("Placement - " + location)
-            .specialty("pep&counselling&police")
-            .reason("rapeCare")
-            .secondaryReason(Assertion.of(codeDirectory.get("abuse&trafficking")))
+            .reasonCode("pep&counselling&police")
+            .reason(Concern.builder()
+                .condition("rapeCare")
+                .bodySite(location)
+                .verificationStatus(VerificationStatus.CONFIRMED)
+                .build())
+            .secondaryReason(Concern.builder()
+                .condition("abuse&trafficking")
+                .build())
             .build()) );
 end

@@ -20,6 +20,9 @@ import uk.nhs.cdss.domain.ReferralRequest
 import uk.nhs.cdss.domain.Redirection
 import uk.nhs.cdss.domain.Assertion
 import uk.nhs.cdss.domain.EvaluateContext
+import uk.nhs.cdss.domain.Concern
+import uk.nhs.cdss.domain.Concern.ClinicalStatus
+import uk.nhs.cdss.domain.Concern.VerificationStatus
 
 import uk.nhs.cdss.constants.SnomedConstants
 
@@ -32,9 +35,11 @@ function Outcome edSurgicalIntervention(String id, String reason, String occurre
                 .id("ed-surgical-intervention")
                 .description("ED")
                 .occurrence(occurrence)
-                .note("A note")
-                .specialty("surgicalIntervention")
-                .reason(reason)
+                .reasonCode("surgicalIntervention")
+                .reason(Concern.builder()
+                    .condition(reason)
+                    .verificationStatus(VerificationStatus.CONFIRMED)
+                    .build())
                 .build());
 }
 
@@ -43,9 +48,12 @@ function Outcome edResusIntervention(String id, String occurrence) {
                 .id("ed-resus-intervention")
                 .description("ED")
                 .occurrence(occurrence)
-                .note("A note")
-                .specialty("resusIntervention")
-                .reason("pe")
+                .reasonCode("resusIntervention")
+                .reason(Concern.builder()
+                    .condition("pe")
+                    .bodySite("head")
+                    .verificationStatus(VerificationStatus.CONFIRMED)
+                    .build())
                 .build());    
 }
 
@@ -54,9 +62,11 @@ function Outcome call999MiCardiology(String id) {
             .id("ed-surgical-intervention")
             .description("Call 999")
             .occurrence("PT8m")
-            .note("A note")
-            .specialty("resusCardiologyReview")
-            .reason("possibleMI")
+            .reasonCode("resusCardiologyReview")
+            .reason(Concern.builder()
+                .condition("possibleMI")
+                .verificationStatus(VerificationStatus.CONFIRMED)
+                .build())
             .build(),
             aspirin());
 }
@@ -66,9 +76,10 @@ function Outcome comorbids(String id, String occurrence) {
             .id("gp-comorbids")
             .description("Contact GP Practice Today")
             .occurrence(occurrence)
-            .note("A note")
-            .specialty("gpreview")
-            .reason("comorbids")
+            .reasonCode("gpreview")
+            .reason(Concern.builder()
+                .condition("comorbids")
+                .build())
             .build());
 }
 
@@ -77,9 +88,11 @@ function Outcome comorbidsFull(String id) {
                 .id("gp-comorbidsfull-24h")
                 .description("Next day appointment at GP Practice")
                 .occurrence("PT24h")
-                .note("A note")
-                .specialty("gpreview")
-                .reason("comorbidsFull")
+                .reasonCode("gpreview")
+                .reason(Concern.builder()
+                    .condition("comorbidsFull")
+                    .verificationStatus(VerificationStatus.CONFIRMED)
+                    .build())
                 .build());
 }
 
@@ -88,9 +101,11 @@ function Outcome utcIntervention(String id) {
                 .id("utc-pe-intervention-4h")
                 .description("UTC")
                 .occurrence("PT4h")
-                .note("A note")
-                .specialty("intervention")
-                .reason("pe")
+                .reasonCode("intervention")
+                .reason(Concern.builder()
+                    .condition("pe")
+                    .verificationStatus(VerificationStatus.CONFIRMED)
+                    .build())
                 .build());
 }
 
@@ -99,9 +114,11 @@ function Outcome hcp(String id, String occurrence, String description) {
                 .id("gpreview-hcp")
                 .description(description)
                 .occurrence(occurrence)
-                .note("A note")
-                .specialty("gpreview")
-                .reason("careHCPReview")
+                .reasonCode("gpreview")
+                .reason(Concern.builder()
+                    .condition("careHCPReview")
+                    .verificationStatus(VerificationStatus.UNKNOWN)
+                    .build())
                 .build());    
 }
 
@@ -110,9 +127,10 @@ function Outcome immunity(String id, String occurrence) {
                 .id("gp-immunity")
                 .description("Contact GP Practice Today")
                 .occurrence(occurrence)
-                .note("A note")
-                .specialty("gpreview")
-                .reason("immuneFull")
+                .reasonCode("gpreview")
+                .reason(Concern.builder()
+                    .condition("immuneFull")
+                    .build())
                 .build());     
 }
 
@@ -187,8 +205,12 @@ then
     insert( Outcome.of("bleedingIR", ReferralRequest.builder()
                 .id("utc-ami-12h")
                 .description("Call 999")
+                .reason(Concern.builder()
+                    .condition("bleeding")
+                    .bodySite("chest")
+                    .verificationStatus(VerificationStatus.CONFIRMED)
+                    .build())
                 .occurrence("PT8m")
-                .note("A note")
                 .build(),
             applyPressureSitUpright(),
             waitForAmbulance())
@@ -202,9 +224,11 @@ then
                 .id("call999-transfusion&intervention-8m")
                 .description("Call 999")
                 .occurrence("PT8m")
-                .note("A note")
-                .specialty("transfusion&intervention")
-                .reason("haemorrhageTrauma")
+                .reasonCode("transfusion&intervention")
+                .reason(Concern.builder()
+                    .condition("haemorrhageTrauma")
+                    .verificationStatus(VerificationStatus.CONFIRMED)
+                    .build())
                 .build()));
     insert( new OutcomeAnswerCondition("bloodLoss", bloodLoss, "q", Arrays.asList("Yes") ));
 
@@ -239,9 +263,12 @@ then
                 .id("ed-bleedingWound-1h")
                 .description("ED")
                 .occurrence("PT1h")
-                .note("A note")
-                .specialty("surgicalIntervention")
-                .reason("bleedingWound")
+                .reasonCode("surgicalIntervention")
+                .reason(Concern.builder()
+                    .condition("bleedingWound")
+                    .bodySite("chest")                    
+                    .verificationStatus(VerificationStatus.CONFIRMED)
+                    .build())
                 .build()));
     insert( new OutcomeAnswerCondition("stillPain", "chestPains.stillPain", "q", Arrays.asList("Yes", "No", "Unsure") ));
 
@@ -293,9 +320,12 @@ then
                 .id("call999-resus-aneurysm-8m")
                 .description("Call 999")
                 .occurrence("PT8m")
-                .note("A note")
-                .specialty("resusIntervention")
-                .reason("aneurysm")
+                .reasonCode("resusIntervention")
+                .reason(Concern.builder()
+                    .condition("aneurysm")
+                    .bodySite("chest")
+                    .verificationStatus(VerificationStatus.CONFIRMED)
+                    .build())
                 .build()));
     insert( new OutcomeAnswerCondition("hasConditionsPainsNow", "chestPains.conditions", "q", Arrays.asList("Yes") ));
     insert( new OutcomeAnswerCondition("hasConditionsPainsNow", painsNow, "q", Arrays.asList("Yes") ));
@@ -303,9 +333,11 @@ then
                 .id("ed-aneurysm-risk-4h")
                 .description("ED")
                 .occurrence("PT4h")
-                .note("A note")
-                .specialty("assessReview")
-                .reason("aneurysmRisk")
+                .reasonCode("assessReview")
+                .reason(Concern.builder()
+                    .condition("aneurysmRisk")
+                    .verificationStatus(VerificationStatus.CONFIRMED)
+                    .build())
                 .build()));
     insert( new OutcomeAnswerCondition("hasConditionsNotPainsNow", "chestPains.conditions", "q", Arrays.asList("aneurysm", "mafan") ));
     insert( new OutcomeAnswerCondition("hasConditionsNotPainsNow", painsNow, "q", Arrays.asList("Yes") ));
@@ -313,9 +345,11 @@ then
                 .id("ed-possibleMI-1h")
                 .description("ED")
                 .occurrence("PT1h")
-                .note("A note")
-                .specialty("resusCardiologyReview")
-                .reason("possibleMI")
+                .reasonCode("resusCardiologyReview")
+                .reason(Concern.builder()
+                    .condition("possibleMI")
+                    .verificationStatus(VerificationStatus.CONFIRMED)
+                    .build())
                 .build()));
     insert( new OutcomeAnswerCondition("noConditions", "chestPains.conditions", "q", Arrays.asList("none") ));
     insert( new OutcomeAnswerCondition("noConditions", "chestPains.sameSymptoms", "q", Arrays.asList("No", "Unsure")));
@@ -337,9 +371,12 @@ then
                 .id("ed-coronary-4h")
                 .description("ED")
                 .occurrence("PT4h")
-                .note("A note")
-                .specialty("interventionCardiology")
-                .reason("coronarySyndrome")
+                .reasonCode("interventionCardiology")
+                .reason(Concern.builder()
+                    .condition("coronarySyndrome")
+                    .clinicalStatus(ClinicalStatus.RECURRENCE)
+                    .verificationStatus(VerificationStatus.CONFIRMED)
+                    .build())
                 .build()));
     insert( new OutcomeAnswerCondition("previousProblems", "chestPains.previousProblems", "q", Arrays.asList(Answer.MISSING) ));
 
@@ -373,9 +410,11 @@ then
                 .id("gp-malignancy")
                 .description("Contact GP Practice Today")
                 .occurrence("PT12h")
-                .note("A note")
-                .specialty("gpreview")
-                .reason("malignancy")
+                .reasonCode("gpreview")
+                .reason(Concern.builder()
+                    .condition("malignancy")
+                    .verificationStatus(VerificationStatus.CONFIRMED)
+                    .build())
                 .build()));
     insert( new OutcomeAnswerCondition("threeWeeksCough", "chestPains.threeWeeksCough", "q", Arrays.asList("Yes") ));
     
@@ -440,9 +479,12 @@ then
                 .id("gp-angina")
                 .description("Next day appointment at GP Practice")
                 .occurrence("PT24h")
-                .note("A note")
-                .specialty("gpreviewCardiology")
-                .reason("angina")
+                .reasonCode("gpreviewCardiology")
+                .reason(Concern.builder()
+                    .condition("angina")
+                    .bodySite("chest")
+                    .verificationStatus(VerificationStatus.CONFIRMED)
+                    .build())
                 .build()));
     insert( new OutcomeAnswerCondition("painComesAndGoes", "chestPains.painComesAndGoes", "q", Arrays.asList("Yes") ));
     insert( new OutcomeAnswerCondition("painComesAndGoes", "chestPains.breathlessness", "q", Arrays.asList("Yes") ));
@@ -461,9 +503,11 @@ then
                 .id("gp-progressive_respiratory_infection")
                 .description("Contact GP Practice Today")
                 .occurrence("PT12h")
-                .note("A note")
-                .specialty("gpreview")
-                .reason("progressiveRespiratoryInfection")
+                .reasonCode("gpreview")
+                .reason(Concern.builder()
+                    .condition("progressiveRespiratoryInfection")
+                    .verificationStatus(VerificationStatus.CONFIRMED)
+                    .build())
                 .build()));
     insert( new OutcomeAnswerCondition("feelingUnwell", "chestPains.feelingUnwell", "q", Arrays.asList(Answer.MISSING) ));
 
@@ -479,9 +523,12 @@ then
                 .id("utc-respiratory_infection")
                 .description("UTC")
                 .occurrence("PT12h")
-                .note("A note")
-                .specialty("earlyIntervention")
-                .reason("respiratoryInfection")
+                .reasonCode("earlyIntervention")
+                .reason(Concern.builder()
+                    .condition("respiratoryInfection")
+                    .bodySite("head")
+                    .verificationStatus(VerificationStatus.CONFIRMED)
+                    .build())
                 .build(),
                 recordTemperature()));
     insert( new OutcomeAnswerCondition("highTemp", "chestPains.highTemp", "q", Arrays.asList("Yes", "Unsure") ));
@@ -494,9 +541,11 @@ then
                 .id("gp-infection")
                 .description("Next day appointment at GP practice")
                 .occurrence("PT24h")
-                .note("A note")
-                .specialty("gpreview")
-                .reason("infection")
+                .reasonCode("gpreview")
+                .reason(Concern.builder()
+                    .condition("infection")
+                    .verificationStatus(VerificationStatus.CONFIRMED)
+                    .build())
                 .build()));
     insert( new OutcomeAnswerCondition("generallyUnwell", "chestPains.generallyUnwell", "q", Arrays.asList("Yes", "Unsure") ));
     insert( hcp("notGenerallyUnwell", "PT48h", "Appointment at GP practice within next 3 working days"));
@@ -529,9 +578,10 @@ then
                 .id("gp-pericarditis")
                 .description("Contact GP practice today")
                 .occurrence("PT6h")
-                .note("A note")
-                .specialty("gpreview")
-                .reason("pericarditis")
+                .reasonCode("gpreview")
+                .reason(Concern.builder()
+                    .condition("pericarditis")
+                    .build())
                 .build()));
     insert( new OutcomeAnswerCondition("breathAtTime", "chestPains.breathAtTime", "q", Arrays.asList("Yes") ));
 
@@ -542,18 +592,20 @@ then
                 .id("ed-assess-coronary-4h")
                 .description("ED")
                 .occurrence("PT4h")
-                .note("A note")
-                .specialty("intervention")
-                .reason("assessCoronarySyndrome")
+                .reasonCode("intervention")
+                .reason(Concern.builder()
+                    .condition("assessCoronarySyndrome")
+                    .build())
                 .build()));
     insert( new OutcomeAnswerCondition("generallyUnwellSince", "chestPains.generallyUnwellSince", "q", Arrays.asList("Yes") ));
     insert( Outcome.of("notGenerallyUnwellSince", ReferralRequest.builder()
                 .id("utc-assess-coronary-6h")
                 .description("UTC")
                 .occurrence("PT6h")
-                .note("A note")
-                .specialty("clinicalIntervention")
-                .reason("assessCoronarySyndrome")
+                .reasonCode("clinicalIntervention")
+                .reason(Concern.builder()
+                    .condition("assessCoronarySyndrome")
+                    .build())
                 .build()));
     insert( new OutcomeAnswerCondition("notGenerallyUnwellSince", "chestPains.generallyUnwellSince", "q", Arrays.asList("No", "Unsure") ));
 end
