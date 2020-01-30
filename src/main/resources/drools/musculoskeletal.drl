@@ -7,6 +7,9 @@ import uk.nhs.cdss.rules.AnswerAssertion
 import uk.nhs.cdss.rules.OutcomeAnswerCondition
 
 import uk.nhs.cdss.domain.Outcome
+import uk.nhs.cdss.domain.Concern
+import uk.nhs.cdss.domain.Concern.ClinicalStatus
+import uk.nhs.cdss.domain.Concern.VerificationStatus
 import uk.nhs.cdss.domain.ReferralRequest
 
 import uk.nhs.cdss.engine.CodeDirectory
@@ -23,9 +26,11 @@ then
             .id("musculoskeletal")
             .description("PLACEHOLDER REFERRAL")
             .occurrence("PT8m")
-            .specialty("cardio")
-            .reason("ami")
-            .note("A note")
+            .reasonCode("cardio")
+            .reason(Concern.builder()
+                .condition("ami")
+                .verificationStatus(VerificationStatus.CONFIRMED)
+                .build())
             .build())); //Temporary - this is not the right outcome
     insert( new OutcomeAnswerCondition("musculoskeletal", "musculoskeletal.musculoskeletal", "q", Arrays.asList("Yes", "No") ));
 end

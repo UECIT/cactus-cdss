@@ -34,6 +34,7 @@ public class CDSOutputTransformerTest {
     ObservationTransformer observationTransformer = new ObservationTransformer(
         new StatusTransformer(), conceptTransformer,
         new TypeTransformer(conceptTransformer));
+    ConditionTransformer conditionTransformer = new ConditionTransformer(conceptTransformer, codeDirectory);
 
     ReferenceStorageService mockStorageService = mock(ReferenceStorageService.class);
     when(mockStorageService.create(any())).thenAnswer(new Answer<Reference>() {
@@ -52,7 +53,7 @@ public class CDSOutputTransformerTest {
         codeDirectory),
         new ReferralRequestTransformer(
             conceptTransformer,
-            observationTransformer, codeDirectory),
+            conditionTransformer, codeDirectory, mockStorageService),
         new RedirectTransformer(
             new TriggerTransformer(codeDirectory, codingTransformer)), observationTransformer,
         new OperationOutcomeTransformer(conceptTransformer, codeDirectory),

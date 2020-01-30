@@ -22,14 +22,6 @@ public class ReferralRequest {
   private ActivityDefinition definition;
 
   /**
-   * This SHOULD be populated with a ProcedureRequest, where the ProcedureRequest contains the
-   * information on the next activity to be performed in order to identify the patient's health
-   * need. This ProcedureRequest will be a procedure that the current service is unable to perform,
-   * but that the recipient MUST be able to be perform.
-   */
-  private ProcedureRequest basedOn;
-
-  /**
    * In most cases, this will be populated with the code 'plan', as the patient will need to take
    * the next step.
    */
@@ -40,16 +32,6 @@ public class ReferralRequest {
    * 'routine', indicating that the request is of normal priority.
    */
   private String priority;
-
-  /**
-   * This SHOULD be populated with the recommended generic service type (e.g. GP or Emergency
-   * Department)
-   *
-   * @deprecated CDS API Spec change from 1.0 -> 1.1, this field will not be transformed
-   */
-  @ToString.Include
-  @Deprecated
-  private String serviceRequested;
 
   /**
    * This MUST be populated by the CDSS with a timeframe in which the attendance at the next service
@@ -65,18 +47,16 @@ public class ReferralRequest {
   private Date authoredOn;
 
   /**
-   * This SHOULD be populated by the CDSS with the clinical specialty related to the patient's
-   * identified health need.
+   * This MUST be populated.
    */
   @ToString.Include
-  private String specialty;
+  private String reasonCode;
 
   /**
    * This SHOULD be populated by the CDSS. The chief concern SHOULD be carried in this element.
    */
-  // TODO should be a reference to an Observation?
   @ToString.Include
-  private String reason;
+  private Concern reason;
 
   /**
    * This SHOULD be populated by the CDSS.
@@ -87,13 +67,7 @@ public class ReferralRequest {
    * This SHOULD be populated by the CDSS. Secondary concerns SHOULD be be carried in this element.
    */
   @Singular("secondaryReason")
-  private List<Assertion> secondaryReasons;
-
-  /**
-   * This SHOULD be populated by the CDSS.
-   */
-  @Singular("note")
-  private List<String> note;
+  private List<Concern> secondaryReasons;
 
   /**
    * This SHOULD be populated by the CDSS.

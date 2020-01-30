@@ -21,7 +21,6 @@ public class VaginalDischargeTest extends BaseDroolsCDSEngineTest {
     evaluate();
 
     assertEquals(1, output.getAssertions().size());
-    assertEquals("vaginalDischarge.termsAndConditions#q", output.getAssertions().get(0).getId());
     assertEquals("termsAndConditions", output.getAssertions().get(0).getCode().getText());
     assertEquals(true, output.getAssertions().get(0).getValue());
   }
@@ -133,10 +132,10 @@ public class VaginalDischargeTest extends BaseDroolsCDSEngineTest {
 
     evaluate();
 
-    String note = Iterables
-        .getOnlyElement(output.getOutcome().getReferralRequest().getNote());
+    String location = Iterables
+        .getOnlyElement(output.getOutcome().getReferralRequest().getReason().getBodySites());
 
-    assertEquals("Placement - Head", note);
+    assertEquals("head", location);
   }
 
   @Test
@@ -156,10 +155,10 @@ public class VaginalDischargeTest extends BaseDroolsCDSEngineTest {
 
     evaluate();
 
-    String note = Iterables
-        .getOnlyElement(output.getOutcome().getReferralRequest().getNote());
+    String location = Iterables
+        .getOnlyElement(output.getOutcome().getReferralRequest().getReason().getBodySites());
 
-    assertEquals("Placement - Legs", note);
+    assertEquals("legs", location);
   }
 
   @Override

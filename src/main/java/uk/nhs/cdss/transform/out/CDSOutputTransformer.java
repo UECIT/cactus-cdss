@@ -132,14 +132,16 @@ public class CDSOutputTransformer implements Transformer<CDSOutputBundle, Guidan
       throw new IllegalStateException("Rules did not create an outcome or request data");
     }
 
-    var oldAssertions = bundle.getParameters().getObservations().stream();
+    var oldAssertions = bundle.getParameters().getObservations();
     var newAssertions = output.getAssertions()
         .stream()
-        .map(observationTransformer::transform);
+        .map(observationTransformer::transform)
+        .collect(Collectors.toList());
 
     var outputParameters = new Parameters();
     // New assertions overwrite old assertions
-    Stream.concat(newAssertions, oldAssertions)
+
+    Stream.concat(newAssertions.stream(), oldAssertions.stream())
         .distinct()
         .map(this::buildParameter)
         .forEach(outputParameters::addParameter);
@@ -175,14 +177,22 @@ public class CDSOutputTransformer implements Transformer<CDSOutputBundle, Guidan
       }
 
       if (outcome.getRedirection() == null) {
-        response.setResult(new Reference(buildRequestGroup(bundle, subjectRef)));
+        var qrs = bundle.getParameters().getResponses().stream()
+            .map(Reference::new)
+            .collect(Collectors.toList());
+        var obReferences = Stream.concat(newAssertions.stream(), oldAssertions.stream())
+            .distinct()
+            .map(Reference::new)
+            .collect(Collectors.toList());
+
+        response.setResult(new Reference(buildRequestGroup(bundle, subjectRef, qrs, obReferences)));
       }
     }
 
     return response;
   }
 
-  private RequestGroup buildRequestGroup(CDSOutputBundle bundle, Reference subject) {
+  private RequestGroup buildRequestGroup(CDSOutputBundle bundle, Reference subject, List<Reference> questionaireResponse, List<Reference> observations) {
 
     // FIXME - not known until after request group has been stored
     Identifier requestGroupIdentifier = null;
@@ -201,15 +211,20 @@ public class CDSOutputTransformer implements Transformer<CDSOutputBundle, Guidan
     org.hl7.fhir.dstu3.model.ReferralRequest referralRequest = null;
     if (outcome.getReferralRequest() != null) {
 
-      var context = bundle.getParameters().getEncounter();
+      //TODO: NCTH-431 - currently the actual resource but will be changed to be a full reference on $evaluate params
+      var context = new Reference(bundle.getParameters().getEncounter());
 
-      referralRequest = referralRequestTransformer.transform(new ReferralRequestBundle(
-          requestGroupIdentifier,
-          outcome.getReferralRequest(),
-          subject,
-          context,
-          outcome.isDraft()
-      ));
+      var refReqBundle = ReferralRequestBundle.builder()
+          .requestGroupIdentifier(requestGroupIdentifier)
+          .subject(subject)
+          .context(context)
+          .referralRequest(outcome.getReferralRequest())
+          .draft(outcome.isDraft())
+          .conditionEvidenceResponseDetail(questionaireResponse)
+          .conditionEvidenceObservationDetail(observations)
+          .build();
+
+      referralRequest = referralRequestTransformer.transform(refReqBundle);
     }
 
     saveRequestGroup(requestGroup, referralRequest, carePlans);
