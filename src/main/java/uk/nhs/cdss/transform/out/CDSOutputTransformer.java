@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.hl7.fhir.dstu3.model.CarePlan;
 import org.hl7.fhir.dstu3.model.DataRequirement;
 import org.hl7.fhir.dstu3.model.DataRequirement.DataRequirementCodeFilterComponent;
-import org.hl7.fhir.dstu3.model.Encounter;
 import org.hl7.fhir.dstu3.model.GuidanceResponse;
 import org.hl7.fhir.dstu3.model.GuidanceResponse.GuidanceResponseStatus;
 import org.hl7.fhir.dstu3.model.Identifier;
@@ -103,13 +102,8 @@ public class CDSOutputTransformer implements Transformer<CDSOutputBundle, Guidan
     var serviceDefinition = new Reference(
         "ServiceDefinition/" + bundle.getServiceDefinitionId());
 
-    Encounter encounter = bundle.getParameters().getEncounter();
-    if (!encounter.hasId()) {
-      throw new IllegalStateException(
-          "Encounter has no ID and cannot be referenced in GuidanceResponse");
-    }
-    var encounterRef = new Reference(encounter.getId());
-    var subjectRef = new Reference(bundle.getParameters().getPatient());
+    var encounterRef = bundle.getParameters().getEncounter();
+    var subjectRef = bundle.getParameters().getPatient();
 
     var response = new GuidanceResponse()
         .setOccurrenceDateTime(new Date())
@@ -185,14 +179,25 @@ public class CDSOutputTransformer implements Transformer<CDSOutputBundle, Guidan
             .map(Reference::new)
             .collect(Collectors.toList());
 
-        response.setResult(new Reference(buildRequestGroup(bundle, subjectRef, qrs, obReferences)));
+        var requestGroup = buildRequestGroup(
+            bundle,
+            subjectRef,
+            encounterRef,
+            qrs,
+            obReferences);
+        response.setResult(new Reference(requestGroup));
       }
     }
 
     return response;
   }
 
-  private RequestGroup buildRequestGroup(CDSOutputBundle bundle, Reference subject, List<Reference> questionaireResponse, List<Reference> observations) {
+  private RequestGroup buildRequestGroup(
+      CDSOutputBundle bundle,
+      Reference subject,
+      Reference context,
+      List<Reference> questionaireResponse,
+      List<Reference> observations) {
 
     // FIXME - not known until after request group has been stored
     Identifier requestGroupIdentifier = null;
@@ -210,9 +215,6 @@ public class CDSOutputTransformer implements Transformer<CDSOutputBundle, Guidan
 
     org.hl7.fhir.dstu3.model.ReferralRequest referralRequest = null;
     if (outcome.getReferralRequest() != null) {
-
-      //TODO: NCTH-431 - currently the actual resource but will be changed to be a full reference on $evaluate params
-      var context = new Reference(bundle.getParameters().getEncounter());
 
       var refReqBundle = ReferralRequestBundle.builder()
           .requestGroupIdentifier(requestGroupIdentifier)

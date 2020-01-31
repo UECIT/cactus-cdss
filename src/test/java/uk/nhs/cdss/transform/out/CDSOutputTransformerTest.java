@@ -5,7 +5,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.hl7.fhir.dstu3.model.Encounter;
 import org.hl7.fhir.dstu3.model.GuidanceResponse;
 import org.hl7.fhir.dstu3.model.Reference;
 import org.hl7.fhir.dstu3.model.Resource;
@@ -61,26 +60,11 @@ public class CDSOutputTransformerTest {
   }
 
   @Test(expected = IllegalStateException.class)
-  public void encounterWithNoIdNotAccepted() {
-    CDSOutput output = new CDSOutput();
-    output.setOutcome(new Outcome("outcome"));
-
-    EvaluationParameters params = EvaluationParameters.builder()
-        .encounter(new Encounter())
-        .build();
-
-    CDSOutputBundle bundle = new CDSOutputBundle(output, "1", params);
-    outputTransformer.transform(bundle);
-  }
-
-  @Test(expected = IllegalStateException.class)
   public void missingResultNotAccepted() {
     CDSOutput output = new CDSOutput();
 
-    Encounter encounter = new Encounter();
-    encounter.setId("Encounter/5");
     EvaluationParameters params = EvaluationParameters.builder()
-        .encounter(encounter)
+        .encounter(new Reference("Encounter/5"))
         .build();
 
     CDSOutputBundle bundle = new CDSOutputBundle(output, "1", params);
@@ -92,10 +76,8 @@ public class CDSOutputTransformerTest {
     CDSOutput output = new CDSOutput();
     output.setOutcome(new Outcome("outcome"));
 
-    Encounter encounter = new Encounter();
-    encounter.setId("Encounter/5");
     EvaluationParameters params = EvaluationParameters.builder()
-        .encounter(encounter)
+        .encounter(new Reference("Encounter/5"))
         .build();
 
     CDSOutputBundle bundle = new CDSOutputBundle(output, "1", params);
