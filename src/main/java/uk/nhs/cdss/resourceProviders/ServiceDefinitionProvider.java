@@ -25,13 +25,12 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.hl7.fhir.dstu3.model.CodeableConcept;
-import org.hl7.fhir.dstu3.model.Encounter;
 import org.hl7.fhir.dstu3.model.GuidanceResponse;
 import org.hl7.fhir.dstu3.model.IdType;
 import org.hl7.fhir.dstu3.model.Observation;
-import org.hl7.fhir.dstu3.model.Patient;
 import org.hl7.fhir.dstu3.model.Person;
 import org.hl7.fhir.dstu3.model.QuestionnaireResponse;
+import org.hl7.fhir.dstu3.model.Reference;
 import org.hl7.fhir.dstu3.model.ServiceDefinition;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.slf4j.Logger;
@@ -85,8 +84,8 @@ public class ServiceDefinitionProvider implements IResourceProvider {
       @IdParam IdType serviceDefinitionId,
       @OperationParam(name = REQUEST_ID, min = 1) IdType requestId,
       @OperationParam(name = INPUT_DATA, max = MAX_UNLIMITED) List<IBaseResource> inputData,
-      @OperationParam(name = PATIENT, min = 1) Patient patient,
-      @OperationParam(name = ENCOUNTER, min = 1) Encounter encounter,
+      @OperationParam(name = PATIENT, min = 1) Reference patient,
+      @OperationParam(name = ENCOUNTER, min = 1) Reference encounter,
       @OperationParam(name = INITIATING_PERSON, min = 1) Person initiatingPerson, // Spec says this should be a reference to patient/practitioner/related person (NCTH-431)
       @OperationParam(name = USER_TYPE, min = 1) CodeableConcept userType,
       @OperationParam(name = USER_LANGUAGE) CodeableConcept userLanguage,
@@ -96,10 +95,11 @@ public class ServiceDefinitionProvider implements IResourceProvider {
     Context context = Context.builder()
         .task("ServiceDefinition/$evaluate")
         .serviceDefinition(serviceDefinitionId.toString())
-        .encounter(encounter.getId())
+        .encounter(encounter.getReference())
         .request(requestId.toString())
         .supplier(initiatingPerson.getId())
         .build();
+
 
     EvaluationParameters evaluationParameters = EvaluationParameters.builder()
         .requestId(requestId.getId())
