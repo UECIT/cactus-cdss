@@ -126,7 +126,6 @@ public class CDSOutputTransformer implements Transformer<CDSOutputBundle, Guidan
       throw new IllegalStateException("Rules did not create an outcome or request data");
     }
 
-    var oldAssertions = bundle.getParameters().getObservations();
     var newAssertions = output.getAssertions()
         .stream()
         .map(observationTransformer::transform)
@@ -135,8 +134,7 @@ public class CDSOutputTransformer implements Transformer<CDSOutputBundle, Guidan
     var outputParameters = new Parameters();
     // New assertions overwrite old assertions
 
-    Stream.concat(newAssertions.stream(), oldAssertions.stream())
-        .distinct()
+    newAssertions.stream()
         .map(this::buildParameter)
         .forEach(outputParameters::addParameter);
 
@@ -174,8 +172,7 @@ public class CDSOutputTransformer implements Transformer<CDSOutputBundle, Guidan
         var qrs = bundle.getParameters().getResponses().stream()
             .map(Reference::new)
             .collect(Collectors.toList());
-        var obReferences = Stream.concat(newAssertions.stream(), oldAssertions.stream())
-            .distinct()
+        var obReferences = newAssertions.stream()
             .map(Reference::new)
             .collect(Collectors.toList());
 
