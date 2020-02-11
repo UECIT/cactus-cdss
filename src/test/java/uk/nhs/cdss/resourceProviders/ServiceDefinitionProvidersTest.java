@@ -55,9 +55,7 @@ public class ServiceDefinitionProvidersTest {
     var codingTransformer = new CodingOutTransformer();
     var conceptTransformer = new ConceptTransformer(codingTransformer);
     var transformer = new ServiceDefinitionTransformer(
-        codeDirectory,
         new DataRequirementTransformer(codeDirectory, codingTransformer),
-        conceptTransformer,
         new PublicationStatusTransformer(),
         new DateRangeTransformer(),
         new UsageContextTransformer(
@@ -210,8 +208,8 @@ public class ServiceDefinitionProvidersTest {
         new Object[]{null, null, null, null, token("GB"), null, observationTrigger(Stream.of("chestPain"), Stream.of("present")), null, "chestPains"},
         new Object[]{null, null, date("le2020-12-20"), date("ge2020-12-20"), null, null, observationTrigger(Stream.of("musculoskeletal"), Stream.of("present")), null, "musculoskeletal"},
         new Object[]{token("ACTIVE"), token("false"), null, null, null, null, null, null, "initial"},
-        new Object[]{token("ACTIVE"), token("false"), null, null, null, null, observationTrigger(Stream.of("palpitations", "debug"), Stream.of("present", "present")), null, "palpitations"},
-        new Object[]{token("ACTIVE"), token("false"), date("le2020-12-20"), date("ge2020-12-20"), null, null, observationTrigger(Stream.of("palpitations", "debug"), Stream.of("present", "present")), null, "palpitations"},
+        new Object[]{token("ACTIVE"), token("false"), null, null, null, null, observationTrigger(Stream.of("palpitations", "debug"), Stream.of("present", "present")), null, "palpitations2"},
+        new Object[]{token("ACTIVE"), token("true"), date("le2020-12-20"), date("ge2020-12-20"), null, null, observationTrigger(Stream.of("palpitations", "debug"), Stream.of("present", "present")), null, "palpitations"},
         new Object[]{null, token("false"), date("le2020-12-20"), date("ge2020-12-20"), null, null, observationTrigger(Stream.of("palpitations"), Stream.of("present")), null, "palpitations2"},
         new Object[]{null, token("false"), null, null, null, null, observationTrigger(Stream.of("palpitations"), Stream.of("present")), null, "palpitations2"}
     };
