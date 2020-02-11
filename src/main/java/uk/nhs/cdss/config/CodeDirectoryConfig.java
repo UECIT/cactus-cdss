@@ -57,7 +57,6 @@ public class CodeDirectoryConfig {
     constipation(codeDirectory);
     errors(codeDirectory);
 
-    jurisdictions(codeDirectory);
     usageContexts(codeDirectory);
     outcomes(codeDirectory);
 
@@ -121,18 +120,6 @@ public class CodeDirectoryConfig {
 
     // Topic
     codeDirectory.put("triage", buildCode(SystemURL.CS_CDS_STUB, "TRI", "Triage"));
-  }
-
-  private void jurisdictions(CodeDirectory codeDirectory) {
-    codeDirectory.put("GB", buildCode(
-        "urn:iso:std:iso:3166",
-        "GB",
-        "United Kingdom of Great Britain and Northern Ireland (the)"));
-    codeDirectory.put("TK", buildCode(
-        "urn:iso:std:iso:3166",
-        "TK",
-        "Tokelau"
-    ));
   }
 
   private void common(CodeDirectory codeDirectory) {

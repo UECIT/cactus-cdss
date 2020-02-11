@@ -2,25 +2,29 @@ package uk.nhs.cdss.transform.out;
 
 import static org.apache.commons.lang3.BooleanUtils.toBoolean;
 
-import lombok.AllArgsConstructor;
+import java.util.StringJoiner;
+import lombok.RequiredArgsConstructor;
 import org.hl7.fhir.dstu3.model.ServiceDefinition;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import uk.nhs.cdss.engine.CodeDirectory;
+import uk.nhs.cdss.domain.enums.Concept;
+import uk.nhs.cdss.domain.enums.Jurisdiction;
 import uk.nhs.cdss.transform.Transformer;
 
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ServiceDefinitionTransformer implements
     Transformer<uk.nhs.cdss.domain.ServiceDefinition, ServiceDefinition> {
 
-  private final CodeDirectory codeDirectory;
   private final DataRequirementTransformer requirementTransformer;
-  private final ConceptTransformer codeableConceptTransformer;
   private final PublicationStatusTransformer statusTransformer;
   private final DateRangeTransformer dateRangeTransformer;
   private final UsageContextTransformer usageContextTransformer;
   private final TopicTransformer topicTransformer;
   private final TriggerTransformer triggerTransformer;
+
+  @Value("${cds.fhir.server}")
+  private String cdsServer;
 
   @Override
   public ServiceDefinition transform(uk.nhs.cdss.domain.ServiceDefinition from) {
@@ -28,6 +32,7 @@ public class ServiceDefinitionTransformer implements
     serviceDefinition.setId(from.getId());
 
     serviceDefinition.setName(from.getId())
+        .setUrl(fullUrl(from.getId()))
         .setTitle(from.getTitle())
         .setDescription(from.getDescription())
         .setPurpose(from.getPurpose())
@@ -42,8 +47,7 @@ public class ServiceDefinitionTransformer implements
         .setEffectivePeriod(dateRangeTransformer.transform(from.getEffectivePeriod()));
 
     from.getJurisdictions().stream()
-        .map(codeDirectory::get)
-        .map(codeableConceptTransformer::transform)
+        .map(code -> Concept.fromCode(code, Jurisdiction.class).toCodeableConcept())
         .forEach(serviceDefinition::addJurisdiction);
 
     from.getUseContext().stream()
@@ -63,5 +67,13 @@ public class ServiceDefinitionTransformer implements
         .forEach(serviceDefinition::addTopic);
 
     return serviceDefinition;
+  }
+
+  public String fullUrl(String id) {
+    return new StringJoiner("/")
+        .add(cdsServer)
+        .add("ServiceDefinition")
+        .add(id)
+        .toString();
   }
 }
