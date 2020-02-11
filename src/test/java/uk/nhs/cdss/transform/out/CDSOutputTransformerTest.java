@@ -16,6 +16,7 @@ import uk.nhs.cdss.config.CodeDirectoryConfig;
 import uk.nhs.cdss.domain.Outcome;
 import uk.nhs.cdss.engine.CDSOutput;
 import uk.nhs.cdss.engine.CodeDirectory;
+import uk.nhs.cdss.services.CDSDeviceService;
 import uk.nhs.cdss.services.ReferenceStorageService;
 import uk.nhs.cdss.transform.EvaluationParameters;
 import uk.nhs.cdss.transform.bundle.CDSOutputBundle;
@@ -27,14 +28,6 @@ public class CDSOutputTransformerTest {
 
   @Before
   public void setup() {
-    CodingOutTransformer codingTransformer = new CodingOutTransformer();
-    ConceptTransformer conceptTransformer = new ConceptTransformer(codingTransformer);
-    CodeDirectory codeDirectory = new CodeDirectoryConfig().codeDirectory();
-    ObservationTransformer observationTransformer = new ObservationTransformer(
-        new StatusTransformer(), conceptTransformer,
-        new TypeTransformer(conceptTransformer));
-    ConditionTransformer conditionTransformer = new ConditionTransformer(conceptTransformer, codeDirectory);
-
     ReferenceStorageService mockStorageService = mock(ReferenceStorageService.class);
     when(mockStorageService.create(any())).thenAnswer(new Answer<Reference>() {
       private long nextResourceId = 1;
@@ -48,14 +41,25 @@ public class CDSOutputTransformerTest {
       }
     });
 
-    outputTransformer = new CDSOutputTransformer(new CarePlanTransformer(conceptTransformer,
-        codeDirectory),
-        new ReferralRequestTransformer(
-            conceptTransformer,
-            conditionTransformer, codeDirectory, mockStorageService),
+
+    CodingOutTransformer codingTransformer = new CodingOutTransformer();
+    ConceptTransformer conceptTransformer = new ConceptTransformer(codingTransformer);
+    CodeDirectory codeDirectory = new CodeDirectoryConfig().codeDirectory();
+    ObservationTransformer observationTransformer = new ObservationTransformer(
+        new StatusTransformer(), conceptTransformer,
+        new TypeTransformer(conceptTransformer));
+    ConditionTransformer conditionTransformer = new ConditionTransformer(conceptTransformer, codeDirectory);
+    CarePlanTransformer carePlanTransformer = new CarePlanTransformer(conceptTransformer,
+        codeDirectory);
+    ReferralRequestTransformer referralRequestTransformer = new ReferralRequestTransformer(
+        conceptTransformer,
+        conditionTransformer, codeDirectory, mockStorageService);
+
+    outputTransformer = new CDSOutputTransformer(carePlanTransformer,referralRequestTransformer,
         new RedirectTransformer(
             new TriggerTransformer(codeDirectory, codingTransformer)), observationTransformer,
         new OperationOutcomeTransformer(conceptTransformer, codeDirectory),
+        new RequestGroupTransformer(mockStorageService, new CDSDeviceService()),
         mockStorageService);
   }
 

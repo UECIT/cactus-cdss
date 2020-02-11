@@ -12,7 +12,6 @@ import org.hl7.fhir.dstu3.model.DataRequirement;
 import org.hl7.fhir.dstu3.model.DataRequirement.DataRequirementCodeFilterComponent;
 import org.hl7.fhir.dstu3.model.GuidanceResponse;
 import org.hl7.fhir.dstu3.model.GuidanceResponse.GuidanceResponseStatus;
-import org.hl7.fhir.dstu3.model.Identifier;
 import org.hl7.fhir.dstu3.model.Observation;
 import org.hl7.fhir.dstu3.model.Parameters;
 import org.hl7.fhir.dstu3.model.Parameters.ParametersParameterComponent;
@@ -21,8 +20,6 @@ import org.hl7.fhir.dstu3.model.QuestionnaireResponse.QuestionnaireResponseStatu
 import org.hl7.fhir.dstu3.model.Reference;
 import org.hl7.fhir.dstu3.model.RequestGroup;
 import org.hl7.fhir.dstu3.model.RequestGroup.RequestGroupActionComponent;
-import org.hl7.fhir.dstu3.model.RequestGroup.RequestIntent;
-import org.hl7.fhir.dstu3.model.RequestGroup.RequestStatus;
 import org.hl7.fhir.dstu3.model.Resource;
 import org.hl7.fhir.dstu3.model.StringType;
 import org.springframework.stereotype.Component;
@@ -43,6 +40,7 @@ public class CDSOutputTransformer implements Transformer<CDSOutputBundle, Guidan
   private final RedirectTransformer redirectTransformer;
   private final ObservationTransformer observationTransformer;
   private final OperationOutcomeTransformer operationOutcomeTransformer;
+  private final RequestGroupTransformer requestGroupTransformer;
   private final ReferenceStorageService storageService;
 
   private DataRequirement buildDataRequirement(String questionnaireId) {
@@ -76,7 +74,7 @@ public class CDSOutputTransformer implements Transformer<CDSOutputBundle, Guidan
     return parameter;
   }
 
-  private void saveRequestGroup(RequestGroup group,
+  private void updateRequestGroup(RequestGroup group,
       org.hl7.fhir.dstu3.model.ReferralRequest referralRequest, List<CarePlan> carePlans) {
     Stream.concat(Stream.of(referralRequest), carePlans.stream())
         .filter(Objects::nonNull)
@@ -84,7 +82,7 @@ public class CDSOutputTransformer implements Transformer<CDSOutputBundle, Guidan
         .map(id -> new RequestGroupActionComponent().setResource(new Reference(id)))
         .forEach(group.getAction()::add);
 
-    group.setId(createResource(group));
+    storageService.upsert(group);
   }
 
   private String createResource(Resource resource) {
@@ -196,12 +194,7 @@ public class CDSOutputTransformer implements Transformer<CDSOutputBundle, Guidan
       List<Reference> questionaireResponse,
       List<Reference> observations) {
 
-    // FIXME - not known until after request group has been stored
-    Identifier requestGroupIdentifier = null;
-
-    var requestGroup = new RequestGroup();
-    requestGroup.setStatus(RequestStatus.ACTIVE);
-    requestGroup.setIntent(RequestIntent.ORDER);
+    var requestGroup = requestGroupTransformer.transform(bundle);
 
     Outcome outcome = bundle.getOutput().getOutcome();
     final List<CarePlan> carePlans = outcome.getCarePlans()
@@ -214,7 +207,7 @@ public class CDSOutputTransformer implements Transformer<CDSOutputBundle, Guidan
     if (outcome.getReferralRequest() != null) {
 
       var refReqBundle = ReferralRequestBundle.builder()
-          .requestGroupIdentifier(requestGroupIdentifier)
+          .requestGroupId(requestGroup.getId())
           .subject(subject)
           .context(context)
           .referralRequest(outcome.getReferralRequest())
@@ -226,7 +219,7 @@ public class CDSOutputTransformer implements Transformer<CDSOutputBundle, Guidan
       referralRequest = referralRequestTransformer.transform(refReqBundle);
     }
 
-    saveRequestGroup(requestGroup, referralRequest, carePlans);
+    updateRequestGroup(requestGroup, referralRequest, carePlans);
     return requestGroup;
   }
 }
