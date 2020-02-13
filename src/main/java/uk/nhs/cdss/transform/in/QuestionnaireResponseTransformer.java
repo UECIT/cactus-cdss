@@ -3,6 +3,7 @@ package uk.nhs.cdss.transform.in;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.collections4.CollectionUtils;
+import org.hl7.fhir.dstu3.model.IdType;
 import org.hl7.fhir.dstu3.model.QuestionnaireResponse.QuestionnaireResponseItemComponent;
 import org.hl7.fhir.dstu3.model.QuestionnaireResponse.QuestionnaireResponseStatus;
 import org.springframework.stereotype.Component;
@@ -68,9 +69,7 @@ public final class QuestionnaireResponseTransformer implements Transformer<
   @Override
   public QuestionnaireResponse transform(
       org.hl7.fhir.dstu3.model.QuestionnaireResponse from) {
-    var questionnaireId = from.getQuestionnaire()
-        .getReference()
-        .split("/")[1];
+    var questionnaireId = new IdType(from.getQuestionnaire().getReference()).getIdPart();
 
     var response = new QuestionnaireResponse(from.getId(), questionnaireId);
 
