@@ -18,6 +18,7 @@ import org.hl7.fhir.dstu3.model.Parameters.ParametersParameterComponent;
 import org.hl7.fhir.dstu3.model.QuestionnaireResponse;
 import org.hl7.fhir.dstu3.model.QuestionnaireResponse.QuestionnaireResponseStatus;
 import org.hl7.fhir.dstu3.model.Reference;
+import org.hl7.fhir.dstu3.model.ReferralRequest;
 import org.hl7.fhir.dstu3.model.RequestGroup;
 import org.hl7.fhir.dstu3.model.RequestGroup.RequestGroupActionComponent;
 import org.hl7.fhir.dstu3.model.Resource;
@@ -75,7 +76,7 @@ public class CDSOutputTransformer implements Transformer<CDSOutputBundle, Guidan
   }
 
   private void updateRequestGroup(RequestGroup group,
-      org.hl7.fhir.dstu3.model.ReferralRequest referralRequest, List<CarePlan> carePlans) {
+      ReferralRequest referralRequest, List<CarePlan> carePlans) {
     Stream.concat(Stream.of(referralRequest), carePlans.stream())
         .filter(Objects::nonNull)
         .map(this::createResource)
@@ -199,11 +200,18 @@ public class CDSOutputTransformer implements Transformer<CDSOutputBundle, Guidan
     Outcome outcome = bundle.getOutput().getOutcome();
     final List<CarePlan> carePlans = outcome.getCarePlans()
         .stream()
-        .map(cp -> new CarePlanBundle(cp, outcome.isDraft()))
+        .map(cp -> CarePlanBundle.builder()
+              .carePlan(cp)
+              .subject(subject)
+              .context(context)
+              .draft(outcome.isDraft())
+              .conditionEvidenceResponseDetail(questionaireResponse)
+              .conditionEvidenceObservationDetail(observations)
+              .build())
         .map(carePlanTransformer::transform)
         .collect(Collectors.toUnmodifiableList());
 
-    org.hl7.fhir.dstu3.model.ReferralRequest referralRequest = null;
+    ReferralRequest referralRequest = null;
     if (outcome.getReferralRequest() != null) {
 
       var refReqBundle = ReferralRequestBundle.builder()

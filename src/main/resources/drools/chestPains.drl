@@ -15,7 +15,6 @@ import uk.nhs.cdss.domain.Outcome
 import uk.nhs.cdss.domain.Answer
 import uk.nhs.cdss.domain.QuestionnaireResponse
 import uk.nhs.cdss.domain.CarePlan
-import uk.nhs.cdss.domain.CarePlanActivity
 import uk.nhs.cdss.domain.ReferralRequest
 import uk.nhs.cdss.domain.Redirection
 import uk.nhs.cdss.domain.Assertion
@@ -138,12 +137,16 @@ function CarePlan waitForAmbulance() {
     return CarePlan.builder()
             .id("waitForAmbulance")
             .title("Wait for an ambulance")
-            .text("Care advice")
-            .activity(new CarePlanActivity("selfCare", "Try to get someone to sit with you until the ambulance arrives"))
-            .activity(new CarePlanActivity("selfCare", "Unlock doors"))
-            .activity(new CarePlanActivity("selfCare", "If you have a dog put them in another room"))
-            .activity(new CarePlanActivity("selfCare", "Collect any medications to take to the hospital"))
-            .activity(new CarePlanActivity("selfCare", "Take a mobile phone if you have one"))
+            .textLine("Try to get someone to sit with you until the ambulance arrives")
+            .textLine("Unlock doors")
+            .textLine("If you have a dog put them in another room")
+            .textLine("Collect any medications to take to the hospital")
+            .textLine("Take a mobile phone if you have one")
+            .reason(Concern.builder()
+                .condition("bleeding")
+                .bodySite("chest")
+                .verificationStatus(VerificationStatus.CONFIRMED)
+                .build())
             .build();
 }
 
@@ -151,9 +154,14 @@ function CarePlan applyPressureSitUpright() {
     return CarePlan.builder()
         .id("applyPressureSitUpright")
         .title("Bleeding from the injury")
-        .text("Interim Care Advice")
-        .activity(new CarePlanActivity("selfCare", "Apply pressure to the area using a clean and dry absorbent material. If shot there may be a exit point apply pressure to both sites if possible"))
-        .activity(new CarePlanActivity("selfCare", "Sit upright do not lay down"))
+        .textLine("Apply pressure to the area using a clean and dry absorbent material.")
+        .textLine("If shot there may be a exit point apply pressure to both sites if possible")
+        .textLine("Sit upright do not lay down")
+        .reason(Concern.builder()
+            .condition("bleeding")
+            .bodySite("chest")
+            .verificationStatus(VerificationStatus.CONFIRMED)
+            .build())
         .build();
 }
 
@@ -161,17 +169,24 @@ function CarePlan aspirin() {
     return CarePlan.builder()
             .id("aspirin")
             .title("Aspirin")
-            .text("Interim Care Advice")
-            .activity(new CarePlanActivity("selfCare", "If not allergic to Aspirin take 300mg now."))
-            .build();    
+            .textLine("If not allergic to Aspirin take 300mg now.")
+            .reason(Concern.builder()
+                .condition("possibleMI")
+                .verificationStatus(VerificationStatus.CONFIRMED)
+                .build())
+            .build();
 }
 
 function CarePlan recordTemperature() {
     return CarePlan.builder()
         .id("recordTemperature")
         .title("Record Temperature")
-        .text("Interim Care Advice")
-        .activity(new CarePlanActivity("selfCare", "Please record temperature"))
+        .textLine("Please record temperature")
+        .reason(Concern.builder()
+            .condition("respiratoryInfection")
+            .bodySite("head")
+            .verificationStatus(VerificationStatus.CONFIRMED)
+            .build())
         .build();
 }
 
@@ -192,9 +207,11 @@ then
     insert( Outcome.of("stabbedOrShot", CarePlan.builder()
                 .id("stabbedOrShot")
                 .title("Stabbed or shot")
-                .text("Interim Care Advice")
-                .activity(new CarePlanActivity("selfCare", "Do not remove the knife or other material causing the puncture wound"))
-                .activity(new CarePlanActivity("selfCare", "Put yourself in a place of safety"))
+                .textLine("Do not remove the knife or other material causing the puncture wound")
+                .textLine("Put yourself in a place of safety")
+                .reason(Concern.builder()
+                    .condition("bleedingWound")
+                    .build())
                 .build())
             .interim());
     insert( new OutcomeAnswerCondition("stabbedOrShot", stabbedOrShot, "q", Arrays.asList("Yes") ));

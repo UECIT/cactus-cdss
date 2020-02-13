@@ -1,6 +1,7 @@
 package uk.nhs.cdss.transform.out;
 
 import java.util.Date;
+import lombok.RequiredArgsConstructor;
 import org.hl7.fhir.dstu3.model.CareConnectObservation;
 import org.hl7.fhir.dstu3.model.Observation;
 import org.hl7.fhir.dstu3.model.Observation.ObservationComponentComponent;
@@ -11,20 +12,12 @@ import uk.nhs.cdss.domain.Assertion.Status;
 import uk.nhs.cdss.transform.Transformer;
 
 @Component
+@RequiredArgsConstructor
 public class ObservationTransformer implements Transformer<Assertion, Observation> {
 
-  private StatusTransformer statusTransformer;
-  private ConceptTransformer codeTransformer;
-  private TypeTransformer typeTransformer;
-
-  public ObservationTransformer(
-      StatusTransformer statusTransformer,
-      ConceptTransformer codeTransformer,
-      TypeTransformer typeTransformer) {
-    this.statusTransformer = statusTransformer;
-    this.codeTransformer = codeTransformer;
-    this.typeTransformer = typeTransformer;
-  }
+  private final StatusTransformer statusTransformer;
+  private final ConceptTransformer codeTransformer;
+  private final TypeTransformer typeTransformer;
 
   @Component
   public static final class StatusTransformer
@@ -48,8 +41,7 @@ public class ObservationTransformer implements Transformer<Assertion, Observatio
   public CareConnectObservation transform(Assertion from) {
     var observation = new CareConnectObservation();
     
-    var isRecentlyCreated = from.getIssued() == null;
-    if (isRecentlyCreated) {
+    if (from.getIssued() == null) {
       observation.setIssued(new Date());
     } else {
       observation.setIssued(Date.from(from.getIssued()));

@@ -16,7 +16,6 @@ import uk.nhs.cdss.domain.Answer
 import uk.nhs.cdss.domain.Assertion
 import uk.nhs.cdss.domain.QuestionnaireResponse
 import uk.nhs.cdss.domain.CarePlan
-import uk.nhs.cdss.domain.CarePlanActivity
 import uk.nhs.cdss.domain.ReferralRequest
 import uk.nhs.cdss.domain.Coordinates
 import uk.nhs.cdss.domain.Concept
@@ -397,7 +396,10 @@ then
     insert( Outcome.of("selfCare", CarePlan.builder()
                 .id("selfCare")
                 .title("Self care")
-                .text("Self care")
+                .textLine("Take care of yourself")
+                .reason(Concern.builder()
+                    .condition("sti")
+                    .build())
                 .build()) );
     insert( new OutcomeAnswerCondition("selfCare", "vaginalDischarge.potentialDischargeDescription", "q", Arrays.asList("none")) );
     

@@ -1,15 +1,20 @@
 package uk.nhs.cdss.transform.bundle;
 
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import java.util.List;
+import lombok.Builder;
+import lombok.Value;
+import org.hl7.fhir.dstu3.model.Reference;
 import uk.nhs.cdss.domain.CarePlan;
 
-@AllArgsConstructor
-@Getter
+@Value
+@Builder
 public class CarePlanBundle {
 
-  private final CarePlan carePlan;
-  private final boolean draft;
-
+  CarePlan carePlan;
+  Reference subject;
+  Reference context;
+  boolean draft;
+  List<Reference> conditionEvidenceResponseDetail;
+  List<Reference> conditionEvidenceObservationDetail;
 }

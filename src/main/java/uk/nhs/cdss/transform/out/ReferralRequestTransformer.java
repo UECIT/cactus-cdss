@@ -43,22 +43,8 @@ public class ReferralRequestTransformer implements
 
     ReferralRequest result = new ReferralRequest();
     var from = bundle.getReferralRequest();
-
-    Reference context = bundle.getContext();
-    Reference subject = bundle.getSubject();
-    List<Reference> conditionEvidenceResponseDetail = bundle.getConditionEvidenceResponseDetail();
-    List<Reference> conditionEvidenceObservationDetail = bundle.getConditionEvidenceObservationDetail();
-
-    ConcernBundle primaryConcern = ConcernBundle.builder()
-        .concern(from.getReason())
-        .context(context)
-        .subject(subject)
-        .questionnaireEvidenceDetail(conditionEvidenceResponseDetail)
-        .observationEvidenceDetail(conditionEvidenceObservationDetail)
-        .build();
-
-    Reference reasonRef = referenceStorageService
-        .create(conditionTransformer.transform(primaryConcern));
+    Reference reasonRef = referenceStorageService.create(
+        conditionTransformer.transform(createConcernBundle(bundle, from.getReason())));
 
     result.setDefinition(transformDefinition(from.getDefinition()));
     result.setGroupIdentifier(new Identifier()
@@ -66,36 +52,32 @@ public class ReferralRequestTransformer implements
     result.setStatus(bundle.isDraft() ? ReferralRequestStatus.DRAFT :ReferralRequestStatus.ACTIVE);
     result.setIntent(ReferralCategory.PLAN);
     result.setPriority(ReferralPriority.ROUTINE);
-    result.setSubject(subject);
-    result.setContext(context);
+    result.setSubject(bundle.getSubject());
+    result.setContext(bundle.getContext());
     result.setOccurrence(transformOccurrence(from.getOccurrence()));
     result.setAuthoredOn(from.getAuthoredOn());
     result.setReasonCode(transformNextActivity(from.getReasonCode()));
     result.setReasonReference(Collections.singletonList(reasonRef));
     result.setDescription(from.getDescription());
-    result.setSupportingInfo(transformSupportingInfo(from.getSecondaryReasons(), subject, context,
-        conditionEvidenceResponseDetail, conditionEvidenceObservationDetail));
+    result.setSupportingInfo(from.getSecondaryReasons()
+        .stream()
+        .map(concern -> createConcernBundle(bundle, concern))
+        .map(conditionTransformer::transform)
+        .map(referenceStorageService::create)
+        .collect(Collectors.toList()));
     result.setRelevantHistory(transformRelevantHistory(from.getRelevantHistory()));
 
     return result;
   }
 
-  private List<Reference> transformSupportingInfo(List<Concern> supportingInfo,
-      Reference subject,
-      Reference context,
-      List<Reference> qr,
-      List<Reference> observations) {
-    return supportingInfo.stream()
-        .map(concern -> ConcernBundle.builder()
-            .subject(subject)
-            .context(context)
-            .concern(concern)
-            .questionnaireEvidenceDetail(qr)
-            .observationEvidenceDetail(observations)
-            .build())
-        .map(conditionTransformer::transform)
-        .map(referenceStorageService::create)
-        .collect(Collectors.toList());
+  private ConcernBundle createConcernBundle(ReferralRequestBundle bundle, Concern concern) {
+    return ConcernBundle.builder()
+        .subject(bundle.getSubject())
+        .context(bundle.getContext())
+        .questionnaireEvidenceDetail(bundle.getConditionEvidenceResponseDetail())
+        .observationEvidenceDetail(bundle.getConditionEvidenceObservationDetail())
+        .concern(concern)
+        .build();
   }
 
   private Type transformOccurrence(String occurrence) {

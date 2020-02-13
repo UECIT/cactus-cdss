@@ -14,7 +14,6 @@ import uk.nhs.cdss.domain.Concept
 import uk.nhs.cdss.domain.Questionnaire
 import uk.nhs.cdss.domain.Outcome
 import uk.nhs.cdss.domain.CarePlan
-import uk.nhs.cdss.domain.CarePlanActivity
 import uk.nhs.cdss.domain.ReferralRequest
 import uk.nhs.cdss.domain.Concern
 import uk.nhs.cdss.domain.Concern.ClinicalStatus
@@ -64,8 +63,11 @@ then
     insert( Outcome.of("noSymptoms", CarePlan.builder()
         .id("selfCare")
         .title("Self Care")
-        .text("After Care Instructions")
-        .activity(new CarePlanActivity("selfCare", "Try sitting cross-legged and taking a slow breath in through your nostrils and then out through your mouth. Repeat until you feel calm."))
+        .textLine("Try sitting cross-legged and taking a slow breath in through your nostrils and then out through your mouth.")
+        .textLine("Repeat until you feel calm.")
+        .reason(Concern.builder()
+            .condition("anxiety")
+            .build())
         .build()));
     insert( new OutcomeAnswerCondition("noSymptoms", "palpitations.heartProblems", "q4", Arrays.asList("No", "Unsure") ));
     insert( new OutcomeAnswerCondition("noSymptoms", "palpitations.breathing", "q3", Arrays.asList("No", "Unsure") ));
@@ -89,18 +91,28 @@ function Outcome call999(String id, String bodySite) {
         CarePlan.builder()
             .id("aspirin")
             .title("Take Aspirin")
-            .text("Take 300mg Aspirin")
-            .activity(new CarePlanActivity("selfCare", "While waiting for an ambulance, it may help to chew and then swallow a tablet of aspirin (ideally 300mg), as long as the person having a heart attack is not allergic to aspirin."))
+            .textLine("While waiting for an ambulance, it may help to chew and then swallow"
+                + " a tablet of aspirin (ideally 300mg), as long as"
+                + " the person having a heart attack is not allergic to aspirin.")
+            .reason(Concern.builder()
+                .condition("ami")
+                .bodySite(bodySite)
+                .verificationStatus(VerificationStatus.CONFIRMED)
+                .build())
             .build(),
         CarePlan.builder()
             .id("waitForAmbulance")
             .title("Wait for an ambulance")
-            .text("Care advice")
-            .activity(new CarePlanActivity("selfCare", "Try to get someone to sit with you until the ambulance arrives"))
-            .activity(new CarePlanActivity("selfCare", "Unlock doors"))
-            .activity(new CarePlanActivity("selfCare", "If you have a dog put them in another room"))
-            .activity(new CarePlanActivity("selfCare", "Collect any medications to take to the hospital"))
-            .activity(new CarePlanActivity("selfCare", "Take a mobile phone if you have one"))
+            .textLine("Try to get someone to sit with you until the ambulance arrives")
+            .textLine("Unlock doors")
+            .textLine("If you have a dog put them in another room")
+            .textLine("Collect any medications to take to the hospital")
+            .textLine("Take a mobile phone if you have one")
+            .reason(Concern.builder()
+                .condition("ami")
+                .bodySite(bodySite)
+                .verificationStatus(VerificationStatus.CONFIRMED)
+                .build())
             .build()
     );
 }

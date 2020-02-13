@@ -3,13 +3,10 @@ package uk.nhs.cdss.domain;
 import ca.uhn.fhir.rest.server.exceptions.BaseServerResponseException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import uk.nhs.cdss.domain.CarePlan.Intent;
 
 @Getter
 @Setter
@@ -37,9 +34,7 @@ public class Outcome {
   }
 
   public static Outcome of(String id, ReferralRequest referralRequest, CarePlan... carePlans) {
-    List<CarePlan> carePlanList = Arrays.stream(carePlans)
-        .map(Outcome::setDefaultValues)
-        .collect(Collectors.toList());
+    var carePlanList = Arrays.asList(carePlans);
     Outcome outcome = new Outcome(id);
     outcome.setReferralRequest(referralRequest);
     outcome.setCarePlans(carePlanList);
@@ -47,7 +42,6 @@ public class Outcome {
   }
 
   public static Outcome of(String id, CarePlan carePlan) {
-    carePlan = setDefaultValues(carePlan);
     Outcome outcome = new Outcome(id);
     outcome.getCarePlans().add(carePlan);
     return outcome;
@@ -56,16 +50,6 @@ public class Outcome {
   public Outcome interim() {
     setDraft(true);
     return this;
-  }
-
-  private static CarePlan setDefaultValues(CarePlan carePlan) {
-    return carePlan.toBuilder()
-        .description(carePlan.getActivities().stream()
-            .map(CarePlanActivity::getDescription)
-            .collect(Collectors.joining("\n")))
-        .intent(Intent.option)
-        .activities(Collections.emptyList())
-        .build();
   }
 
   public static Outcome fail(String id, BaseServerResponseException exception) {
