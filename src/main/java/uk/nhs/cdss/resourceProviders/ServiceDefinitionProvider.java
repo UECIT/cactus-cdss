@@ -86,7 +86,7 @@ public class ServiceDefinitionProvider implements IResourceProvider {
       @OperationParam(name = INPUT_DATA, max = MAX_UNLIMITED) List<IBaseResource> inputData,
       @OperationParam(name = PATIENT, min = 1) Reference patient,
       @OperationParam(name = ENCOUNTER, min = 1) Reference encounter,
-      @OperationParam(name = INITIATING_PERSON, min = 1) Person initiatingPerson, // Spec says this should be a reference to patient/practitioner/related person (NCTH-431)
+      @OperationParam(name = INITIATING_PERSON, min = 1) Reference initiatingPerson,
       @OperationParam(name = USER_TYPE, min = 1) CodeableConcept userType,
       @OperationParam(name = USER_LANGUAGE) CodeableConcept userLanguage,
       @OperationParam(name = USER_TASK) CodeableConcept userTaskContext,

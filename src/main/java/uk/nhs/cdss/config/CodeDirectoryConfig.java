@@ -105,18 +105,14 @@ public class CodeDirectoryConfig {
     codeDirectory.put("child", snomed("67822003", "Child (person)"));
 
     // user type
-    codeDirectory.put("103TP0016X", provider("103TP0016X", "Prescribing (Medical)"));
-    codeDirectory.put("103TP2700X", provider("103TP2700X", "Psychotherapy"));
-    codeDirectory.put("183500000X", provider("183500000X", "Pharmacist"));
-    codeDirectory.put("103GC0700X", provider("103GC0700X", "Clinical"));
-    codeDirectory.put("261QU0200X", provider("261QU0200X", "Urgent"));
-
-    /* In EMS */
-    codeDirectory.put("PA", provider("PA", "Patient"));
+    codeDirectory.put("Practitioner", provider("Practitioner", "Practitioner"));
+    codeDirectory.put("Patient", provider("Patient", "Patient"));
+    codeDirectory.put("RelatedPerson", provider("RelatedPerson", "Related Person"));
 
     // setting
     codeDirectory.put("phone", provider("phone", "Phone call"));
     codeDirectory.put("online", provider("online", "Online"));
+    codeDirectory.put("clinical", provider("clinical", "Clinical"));
 
     // Topic
     codeDirectory.put("triage", buildCode(SystemURL.CS_CDS_STUB, "TRI", "Triage"));

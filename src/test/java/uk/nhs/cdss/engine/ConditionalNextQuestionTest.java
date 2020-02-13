@@ -10,17 +10,18 @@ public class ConditionalNextQuestionTest extends BaseDroolsCDSEngineTest {
 
   @Test
   public void coughingBloodNoViaPainComesAndGoesNoShouldGoToBreathlessSymptom() throws ServiceDefinitionException {
-    withRole(Role.CALL_HANDLER);
+    withRole(Role.PRACTITIONER);
+    withSetting("phone");
 
-    answerQuestion("causedByInjuryCALL_HANDLER", "q", "No");
-    answerQuestion("painsNowCALL_HANDLER", "q", "Yes");
-    answerQuestion("heartAttackInPastCALL_HANDLER", "q", "No");
+    answerQuestion("causedByInjury.phone", "q", "No");
+    answerQuestion("painsNow.phone", "q", "Yes");
+    answerQuestion("heartAttackInPast.phone", "q", "No");
     answerQuestion("symptoms", "q", "none");
     answerQuestion("conditions", "q", "none");
     answerQuestion("breathlessness", "q", "Yes");
-    answerQuestion("breathingConditionCALL_HANDLER", "q", "No");
+    answerQuestion("breathingCondition.phone", "q", "No");
     answerQuestion("painComesAndGoes", "q", "No");
-    answerQuestion("coughingBloodCALL_HANDLER", "q", "No");
+    answerQuestion("coughingBlood.phone", "q", "No");
 
     evaluate();
 
@@ -31,15 +32,16 @@ public class ConditionalNextQuestionTest extends BaseDroolsCDSEngineTest {
   @Test
   public void coughingBloodNoViaBreathlessNoShouldGoToHighTemperatureOrUnwell() throws ServiceDefinitionException {
     withRole(Role.PATIENT);
+    withSetting("online");
 
-    answerQuestion("causedByInjuryPATIENT", "q", "No");
-    answerQuestion("painsNowPATIENT", "q", "Yes");
-    answerQuestion("heartAttackInPastPATIENT", "q", "No");
+    answerQuestion("causedByInjury.online", "q", "No");
+    answerQuestion("painsNow.online", "q", "Yes");
+    answerQuestion("heartAttackInPast.online", "q", "No");
     answerQuestion("symptoms", "q", "none");
     answerQuestion("conditions", "q", "none");
     answerQuestion("breathlessness", "q", "No");
     answerQuestion("painComesAndGoes", "q", "Yes");
-    answerQuestion("coughingBloodPATIENT", "q", "No");
+    answerQuestion("coughingBlood.online", "q", "No");
 
     evaluate();
 

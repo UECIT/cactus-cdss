@@ -11,17 +11,18 @@ public class NoAnswersTest extends BaseDroolsCDSEngineTest {
 
   @Test
   public void shouldContinueWithNoAnswers() throws ServiceDefinitionException {
-    withRole(Role.CLINICIAN);
+    withRole(Role.PRACTITIONER);
+    withSetting("clinical");
 
-    answerQuestion("causedByInjuryCLINICIAN", "q", "No");
-    answerQuestion("painsNowCLINICIAN", "q", "Yes");
-    answerQuestion("heartAttackInPastCLINICIAN", "q", "No");
+    answerQuestion("causedByInjury.clinical", "q", "No");
+    answerQuestion("painsNow.clinical", "q", "Yes");
+    answerQuestion("heartAttackInPast.clinical", "q", "No");
     answerQuestion("symptoms", "q", "none");
     answerQuestion("conditions", "q", "none");
     answerQuestion("breathlessness", "q", "Yes");
-    dontAnswerQuestion("breathingConditionCLINICIAN");
+    dontAnswerQuestion("breathingCondition.clinical");
     answerQuestion("painComesAndGoes", "q", "No");
-    answerQuestion("coughingBloodCLINICIAN", "q", "No");
+    answerQuestion("coughingBlood.clinical", "q", "No");
     answerQuestion("breathlessSymptom", "q", "Yes");
     dontAnswerQuestion("feelingUnwell");
 

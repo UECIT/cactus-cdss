@@ -18,9 +18,9 @@ public class EvaluateContext {
   private String task;
 
   public enum Role {
-    PATIENT("PA"),
-    CLINICIAN("103GC0700X"),
-    CALL_HANDLER("261QU0200X");
+    PATIENT("Patient"),
+    PRACTITIONER("Practitioner"),
+    RELATED_PERSON("RelatedPerson");
 
     private String code;
 
@@ -32,7 +32,7 @@ public class EvaluateContext {
       return Arrays.stream(Role.values())
           .filter(role -> code.equals(role.code))
           .findFirst()
-          .orElseThrow(IllegalArgumentException::new);
+          .orElseThrow(() -> new IllegalArgumentException("Invalid role code: " + code));
     }
 
   }
