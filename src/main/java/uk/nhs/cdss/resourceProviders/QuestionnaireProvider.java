@@ -34,7 +34,7 @@ public class QuestionnaireProvider implements IResourceProvider {
   @Read
   public Questionnaire getQuestionnaireById(@IdParam IdType id) {
     String idPart = id.getIdPart();
-    String[] idSegments = idPart.split("\\.");
+    String[] idSegments = idPart.split("\\.", 2);
     if (idSegments.length != 2) {
       throw new InvalidRequestException("Invalid questionnaire ID");
     }

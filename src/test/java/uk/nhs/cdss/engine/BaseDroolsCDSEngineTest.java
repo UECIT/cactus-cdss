@@ -47,6 +47,15 @@ public abstract class BaseDroolsCDSEngineTest {
         .build();
   }
 
+  protected void withSetting(String setting) {
+    var existingContext = input.getContext();
+    input = input.toBuilder()
+        .context(existingContext.toBuilder()
+            .setting(setting)
+            .build())
+        .build();
+  }
+
   protected void answerCommonQuestion(String questionnaire, String question, Object answerValue) {
     String qid = "common." + questionnaire;
     QuestionnaireResponse response = new QuestionnaireResponse("response", qid);

@@ -24,7 +24,11 @@
     },
     {
       "code": "user",
-      "valueCodeableConcept": "261QU0200X"
+      "valueCodeableConcept": "Practitioner"
+    },
+    {
+      "code": "setting",
+      "valueCodeableConcept": "phone"
     }
   ],
   "topics": [

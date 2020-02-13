@@ -12,16 +12,6 @@
   "jurisdictions": [
     "GB"
   ],
-  "useContext": [
-    {
-      "code": "gender",
-      "valueCodeableConcept": "female"
-    },
-    {
-      "code": "user",
-      "valueCodeableConcept": "103TP2700X"
-    }
-  ],
   "observationTriggers": [
     {
       "code": "anxiety",

@@ -1,8 +1,8 @@
 {
   "title": "adult-1",
-  "description": "Sore Throat - Adult, Clinical",
-  "purpose": "To triage an adult patient with a sore throat",
-  "usage": "To triage an adult patient with a sore throat",
+  "description": "Constipation - No match",
+  "purpose": "No match for use context",
+  "usage": "No match for use context",
   "status": "ACTIVE",
   "experimental": false,
   "version": "1.0",
@@ -17,20 +17,6 @@
   "jurisdictions": [
     "GB"
   ],
-  "useContext": [
-    {
-      "code": "age",
-      "valueCodeableConcept": "adult"
-    },
-    {
-      "code": "user",
-      "valueCodeableConcept": "Practitioner"
-    },
-    {
-      "code": "setting",
-      "valueCodeableConcept": "clinical"
-    }
-  ],
   "topics": [
     {
       "code": "triage",
@@ -39,7 +25,7 @@
   ],
   "observationTriggers": [
     {
-      "code": "soreThroat",
+      "code": "constipation",
       "value": "present",
       "effective": {
         "duration": "PT20m",
@@ -49,14 +35,6 @@
     {
       "code": "lifeThreatening",
       "value": "absent"
-    }
-  ],
-  "patientTriggers": [
-    {
-      "birthDate": {
-        "duration": "P16y",
-        "comparator": ">="
-      }
     }
   ]
 }

@@ -24,7 +24,11 @@
     },
     {
       "code": "user",
-      "valueCodeableConcept": "103GC0700X"
+      "valueCodeableConcept": "Practitioner"
+    },
+    {
+      "code": "setting",
+      "valueCodeableConcept": "clinical"
     }
   ],
   "topics": [

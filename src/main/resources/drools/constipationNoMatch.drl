@@ -1,0 +1,15 @@
+package uk.nhs.cdss.rules.anxiety
+
+import java.util.Arrays
+
+import uk.nhs.cdss.rules.InitialQuestionnaire
+
+import uk.nhs.cdss.engine.CodeDirectory
+
+global CodeDirectory codeDirectory;
+
+rule "Init"
+when
+then
+    insert( new InitialQuestionnaire("noMatch.noMatch") );
+end

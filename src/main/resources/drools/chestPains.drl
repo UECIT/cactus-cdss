@@ -193,15 +193,15 @@ function CarePlan recordTemperature() {
 rule "Init"
 salience 10000
 when
-    EvaluateContext($role := role.name())
+    EvaluateContext($setting := setting)
 then
     // Pain caused by injury?
-    String causedByInjury = "chestPains.causedByInjury" + $role;
+    String causedByInjury = "chestPains.causedByInjury." + $setting;
     insert( new InitialQuestionnaire(causedByInjury) );
     insert( new AnswerAssertion(causedByInjury, "q", "Yes", codeDirectory.get("causedByInjury"), true));
 
     // Have you been stabbed/shot e.g. arrow or nail gun
-    String stabbedOrShot = "chestPains.stabbedOrShot" + $role;
+    String stabbedOrShot = "chestPains.stabbedOrShot." + $setting;
     insert( new NextQuestion(stabbedOrShot, causedByInjury, "q", Arrays.asList("Yes")) );
     insert( new AnswerAssertion(stabbedOrShot, "q", "Yes", codeDirectory.get("stabbedOrShot"), true));
     insert( Outcome.of("stabbedOrShot", CarePlan.builder()
@@ -234,7 +234,7 @@ then
             .interim());    
     insert( new OutcomeAnswerCondition("bleedingIR", "chestPains.bleeding", "q", Arrays.asList("Yes") ));
 
-    String bloodLoss = "chestPains.bloodLoss" + $role;
+    String bloodLoss = "chestPains.bloodLoss." + $setting;
     insert( new NextQuestion(bloodLoss, "chestPains.bleeding", "q", Arrays.asList("Yes")));
     insert( new AnswerAssertion(bloodLoss, "q", "Yes", codeDirectory.get("bloodLoss"), true));
     insert( Outcome.of("bloodLoss", ReferralRequest.builder()
@@ -263,7 +263,7 @@ then
 
     
     // Entry Point/Open Wound
-    String openWound = "chestPains.openWound" + $role;
+    String openWound = "chestPains.openWound." + $setting;
     insert( new NextQuestion(openWound, "chestPains.bleeding", "q", Arrays.asList("No")));
     insert( new AnswerAssertion(openWound, "q", "Yes", codeDirectory.get("openWound"), true));
 
@@ -313,12 +313,12 @@ then
     insert( new AnswerAssertion("chestPains.heavyLifting", "q", "Yes", codeDirectory.get("heavyLifting"), true));
     
     // Chest pains now
-    String painsNow = "chestPains.painsNow" + $role;
+    String painsNow = "chestPains.painsNow." + $setting;
     insert( new NextQuestion(painsNow, causedByInjury, "q", Arrays.asList("No")));
     insert( new AnswerAssertion(painsNow, "q", "Yes", codeDirectory.get("painsNow"), true));
 
     // Heart attack in the past
-    String heartAttackInPast = "chestPains.heartAttackInPast" + $role;
+    String heartAttackInPast = "chestPains.heartAttackInPast." + $setting;
     insert( new NextQuestion(heartAttackInPast, painsNow, "q", Arrays.asList("Yes")));
     insert( new AnswerAssertion(heartAttackInPast, "q", "Yes", codeDirectory.get("heartAttackInPast"), true));
 
@@ -404,10 +404,10 @@ then
     insert( new AnswerAssertion("chestPains.breathlessness", "q", "Yes", codeDirectory.get("breathlessness"), true));
 
     // Underlying condition that affects breathing
-    String breathingCondition = "chestPains.breathingCondition" + $role;
+    String breathingCondition = "chestPains.breathingCondition." + $setting;
     insert( new NextQuestion(breathingCondition, "chestPains.breathlessness", "q", Arrays.asList("Yes")));
-    insert( new AnswersOptional("chestPains.breathingConditionCLINICIAN", "q"));
-    insert( new AnswersOptional("chestPains.breathingConditionPATIENT", "q"));
+    insert( new AnswersOptional("chestPains.breathingCondition.clinical", "q"));
+    insert( new AnswersOptional("chestPains.breathingCondition.online", "q"));
     insert( new AnswerAssertion(breathingCondition, "q", "hasBreathingCondition", codeDirectory.get("breathingCondition"), true));
 
     // Does the patients breathing feel worse than normal?
@@ -448,8 +448,8 @@ then
     insert( new OutcomeAnswerCondition("coughingUpAnyNone", "chestPains.coughingUpAny", "q", Arrays.asList("none") ));
 
     //Patient coughing blood.
-    String immuneCompromised = "chestPains.immuneCompromised" + $role;
-    String coughingBlood = "chestPains.coughingBlood" + $role;
+    String immuneCompromised = "chestPains.immuneCompromised." + $setting;
+    String coughingBlood = "chestPains.coughingBlood." + $setting;
     insert( new NextQuestion(coughingBlood, immuneCompromised, "q", Arrays.asList("No")));
     insert( new NextQuestion(coughingBlood, "chestPains.painComesAndGoes", "q", Arrays.asList("Unsure", "Yes")));
     insert( new ConditionalNextQuestion("coughingBloodPainDoesNotComeAndGoMustBeBreathless", coughingBlood, "chestPains.painComesAndGoes", "q", Arrays.asList("No")));
