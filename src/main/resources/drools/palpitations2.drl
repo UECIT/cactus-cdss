@@ -20,7 +20,6 @@ import uk.nhs.cdss.domain.Questionnaire
 import uk.nhs.cdss.constants.SnomedConstants
 import uk.nhs.cdss.domain.Outcome
 import uk.nhs.cdss.domain.CarePlan
-import uk.nhs.cdss.domain.CarePlanActivity
 import uk.nhs.cdss.domain.ReferralRequest
 import uk.nhs.cdss.domain.Redirection
 import uk.nhs.cdss.domain.Concern
@@ -71,12 +70,18 @@ function Outcome hypertension(String id, String description) {
         CarePlan.builder()
             .id("pregnancy")
             .title("Pregnancy")
-            .text("Care Advice")
-            .activity(new CarePlanActivity("selfCare", "Pregnancy brings lots of changes. Besides the obvious ones like a growing belly, there " +
-                "are some that aren't as noticeable. One example is an increased amount of blood in the body." + 
-                " This extra blood results in a heart rate that's about 25 percent faster than usual. A faster rate can result in occasional heart palpitations." + 
-                " These feel like your heart is fluttering or beating extremely fast. Heart palpitations can be normal and nonharmful during pregnancy." + 
-                " But there's always a chance they could mean you have a more serious underlying health condition."))
+            .textLine("Pregnancy brings lots of changes.")
+            .textLine("Besides the obvious ones like a growing belly, there are some that aren't as noticeable.")
+            .textLine("One example is an increased amount of blood in the body.")
+            .textLine("This extra blood results in a heart rate that's about 25 percent faster than usual.")
+            .textLine("A faster rate can result in occasional heart palpitations.")
+            .textLine("These feel like your heart is fluttering or beating extremely fast.")
+            .textLine("Heart palpitations can be normal and non-harmful during pregnancy.")
+            .textLine("But there's always a chance they could mean you have a more serious underlying health condition.")
+            .reason(Concern.builder()
+                .condition("hypertension")
+                .verificationStatus(VerificationStatus.CONFIRMED)
+                .build())
             .build()
     );
 }
@@ -98,12 +103,17 @@ function Outcome edHeartAttack(String id) {
         CarePlan.builder()
             .id("edHeartAttack")
             .title("Heart Attack")
-            .text("Care Advice")
-            .activity(new CarePlanActivity("selfCare", "Get someone to drive you to ED"))
-            .activity(new CarePlanActivity("selfCare", "Take all medications"))
-            .activity(new CarePlanActivity("selfCare", "Take a mobile phone"))
-            .activity(new CarePlanActivity("selfCare", "If you develop any worsening or new symptoms call us back."))
-            .activity(new CarePlanActivity("selfCare", "If you develop chest pain that radiates to your arm or jaw or you become breathless, dial 999"))
+            .textLine("Get someone to drive you to ED")
+            .textLine("Take all medications")
+            .textLine("Take a mobile phone")
+            .textLine("If you develop any worsening or new symptoms call us back.")
+            .textLine("If you develop chest pain that radiates to your arm or jaw or you become breathless, dial 999")
+            .reason(Concern.builder()
+                .condition("mi")
+                .verificationStatus(VerificationStatus.CONFIRMED)
+                .bodySite("heart")
+                .bodySite("chest")
+                .build())
             .build()
     );
 }
@@ -124,13 +134,17 @@ function Outcome utcStroke(String id, String bodySite) {
         CarePlan.builder()
             .id("stroke")
             .title("Stroke Symptoms")
-            .text("Care Advice")
-            .activity(new CarePlanActivity("selfCare", "The main symptoms of a stroke can be remembered with the word FAST:" + 
-                " Face - the face may have dropped on 1 side, the person may not be able to smile or their mouth or eye may have dropped." + 
-                " Arms - the person with suspected stroke may not be able to lift both arms and keep them there because of weakness of numbers in 1 arm." + 
-                " Speech - their speech may be slurred or garbled, or the person may not be able to talk at all despite appearing to be awake; " + 
-                    "they may also have problems understanding what you're saying to them." + 
-                " Time - It's time to dial 999 immediately if you see any of these signs or symptoms."))
+            .textLine("The main symptoms of a stroke can be remembered with the word FAST:")
+            .textLine("Face - the face may have dropped on 1 side, the person may not be able to smile or their mouth or eye may have dropped.")
+            .textLine("Arms - the person with suspected stroke may not be able to lift both arms and keep them there because of weakness of numbers in 1 arm.")
+            .textLine("Speech - their speech may be slurred or garbled, or the person may not be able to talk at all despite appearing to be awake; "
+                + "they may also have problems understanding what you're saying to them.")
+            .textLine("Time - It's time to dial 999 immediately if you see any of these signs or symptoms.")
+            .reason(Concern.builder()
+                .condition("stroke")
+                .bodySite(bodySite)
+                .verificationStatus(VerificationStatus.CONFIRMED)
+                .build())
             .build()
     );
 }
@@ -168,8 +182,12 @@ function CarePlan defaultCarePlan() {
     return CarePlan.builder()
         .id("carePlan")
         .title("Self care")
-        .text("After Care Instructions")
-        .activity(new CarePlanActivity("selfCare", "Try sitting cross-legged and taking a slow breath in through your nostrils and then out through your mouth. Repeat until you feel calm."))
+        .textLine("Try sitting cross-legged and taking a slow breath in through your nostrils and then out through your mouth.")
+        .textLine("Repeat until you feel calm.")
+        .reason(Concern.builder()
+            .condition("arrhythmia")
+            .verificationStatus(VerificationStatus.CONFIRMED)
+            .build())
         .build();
 }
 
@@ -177,13 +195,15 @@ function CarePlan foodAndDrink() {
     return CarePlan.builder()
         .id("carePlan")
         .title("Heart Palpitations")
-        .text("After Care Instructions")
-        .activity(new CarePlanActivity("selfCare", "Heart palpitations are heartbeats that suddenly become more noticeable"))
-        .activity(new CarePlanActivity("selfCare", "Your heart may feel like it's pounding, fluttering or beating irregularly, often for just a few seconds or minutes." + 
-            " You may also feel these sensations in your throat or neck. Palpitations may seem alarming, but in most cases they're harmless and not a sign of a serious problem." +
-            " Sometimes you may feel an extra or missed beat. These are known as ectopic beats and are also usually nothing to worry about."))
-        .activity(new CarePlanActivity("selfCare", "Try to keep a diary of food or drink you have consumed."))
-        .activity(new CarePlanActivity("selfCare", "If your condition worsens or if you develop new or worsening symptoms call 111 back for further assessment"))
+        .textLine("Heart palpitations are heartbeats that suddenly become more noticeable")
+        .textLine("Your heart may feel like it's pounding, fluttering or beating irregularly, often for just a few seconds or minutes.")
+        .textLine("You may also feel these sensations in your throat or neck.")
+        .textLine("Palpitations may seem alarming, but in most cases they're harmless and not a sign of a serious problem.")
+        .textLine("Try to keep a diary of food or drink you have consumed.")
+        .textLine("If your condition worsens or if you develop new or worsening symptoms call 111 back for further assessment")
+        .reason(Concern.builder()
+            .condition("adverseReaction")
+            .build())
         .build();
 }
 
@@ -191,12 +211,14 @@ function CarePlan waitForAmbulance() {
     return CarePlan.builder()
             .id("waitForAmbulance")
             .title("Wait for an ambulance")
-            .text("Care advice")
-            .activity(new CarePlanActivity("selfCare", "Try to get someone to sit with you until the ambulance arrives"))
-            .activity(new CarePlanActivity("selfCare", "Unlock doors"))
-            .activity(new CarePlanActivity("selfCare", "If you have a dog put them in another room"))
-            .activity(new CarePlanActivity("selfCare", "Collect any medications to take to the hospital"))
-            .activity(new CarePlanActivity("selfCare", "Take a mobile phone if you have one"))
+            .textLine("Try to get someone to sit with you until the ambulance arrives")
+            .textLine("Unlock doors")
+            .textLine("If you have a dog put them in another room")
+            .textLine("Collect any medications to take to the hospital")
+            .textLine("Take a mobile phone if you have one")
+            .reason(Concern.builder()
+                .condition("ami")
+                .build())
             .build();
 }
 
@@ -204,9 +226,11 @@ function CarePlan aspirin() {
     return CarePlan.builder()
             .id("aspirin")
             .title("Aspirin")
-            .text("Interim Care Advice")
-            .activity(new CarePlanActivity("selfCare", "If not allergic to Aspirin take 300mg now."))
-            .build();    
+            .textLine("If not allergic to Aspirin take 300mg now.")
+            .reason(Concern.builder()
+                .condition("ami")
+                .build())
+            .build();
 }
 
 rule "Init"
@@ -370,7 +394,7 @@ then
                 .reason(Concern.builder()
                     .condition("arrhythmia")
                     .verificationStatus(VerificationStatus.CONFIRMED)
-                    .build()) 
+                    .build())
                 .build(),
             defaultCarePlan()));
     insert( new OutcomeAnswerCondition("exerciseTriggered", "palpitations2.exercise", "q", Arrays.asList("Yes") ));
@@ -474,19 +498,23 @@ then
                 .reasonCode("gp")
                 .reason(Concern.builder()
                     .condition("anxiety")
-                    .build()) 
+                    .build())
                 .build(),
             CarePlan.builder()
                 .id("anxiety")
                 .title("Anxiety")
-                .text("Care Advice")
-                .activity(new CarePlanActivity("selfCare", "Try talking about your feelings to a friend, family member, health professional or counsellor." +
-                    " You could also contact Samaritans, call 116 123 or email jo@samaritans.org if you need someone to talk to."))
-                .activity(new CarePlanActivity("selfCare", "Exercise - Activities such as running, walking, swimming and yoga can help you relax"))
-                .activity(new CarePlanActivity("selfCare", "Sleep: First of all, keep regular sleeping hours. This prgrammes the brain and internal body clock to get used to a set routine." +
-                    " Most adults need between 6 and 9 hours of sleep every night. By working out what time you need to wake up, you can set a regular bedtime schedule." + 
-                    " It is also important to try and wake up at the same time every day. While it may seem like a good idea to try to catch up on sleep after a bad night, " +
-                        "doing so on a regular basis can also disrupt your sleep routine."))
+                .textLine("Try talking about your feelings to a friend, family member, health professional or counsellor.")
+                .textLine("You could also contact Samaritans, call 116 123 or email jo@samaritans.org if you need someone to talk to.")
+                .textLine("Exercise - Activities such as running, walking, swimming and yoga can help you relax")
+                .textLine("Sleep: First of all, keep regular sleeping hours.")
+                .textLine("This programs the brain and internal body clock to get used to a set routine.")
+                .textLine("Most adults need between 6 and 9 hours of sleep every night.")
+                .textLine("By working out what time you need to wake up, you can set a regular bedtime schedule.")
+                .textLine("It is also important to try and wake up at the same time every day.")
+                .textLine("While it may seem like a good idea to try to catch up on sleep after a bad night, doing so on a regular basis can also disrupt your sleep routine.")
+                .reason(Concern.builder()
+                    .condition("anxiety")
+                    .build())
                 .build()));
     insert( new OutcomeAnswerCondition("noCarePlan", "palpitations2.hasCarePlan", "q", Arrays.asList("No") ));
 
@@ -530,15 +558,17 @@ then
                 .reasonCode("pharmacistReview")
                 .reason(Concern.builder()
                     .condition("nicotine")
-                    .build()) 
+                    .build())
                 .build(),
             CarePlan.builder()
                 .id("nicotine")
                 .title("Nicotine")
-                .text("Care Advice")
-                .activity(new CarePlanActivity("selfCare", "Speak to your pharmacist about available options for nicotine replacement"))
-                .activity(new CarePlanActivity("selfCare", "Try to relax and take your mind off smoking"))
-                .activity(new CarePlanActivity("selfCare", "Try to exercise"))
+                .textLine("Speak to your pharmacist about available options for nicotine replacement")
+                .textLine("Try to relax and take your mind off smoking")
+                .textLine("Try to exercise")
+                .reason(Concern.builder()
+                    .condition("nicotine")
+                    .build())
                 .build()
             ));
     insert( new OutcomeAnswerCondition("smoker", "palpitations2.causes", "q3", Arrays.asList("Yes") ));
@@ -559,10 +589,12 @@ then
         CarePlan.builder()
             .id("noCauses")
             .title("No Causes")
-            .text("Care Advice")
-            .activity(new CarePlanActivity("selfCare", "Try to relax"))
-            .activity(new CarePlanActivity("selfCare", "Make sure you are having enough sleep"))
-            .activity(new CarePlanActivity("selfCare", "If symptoms worsen call us back"))
+            .textLine("Try to relax")
+            .textLine("Make sure you are having enough sleep")
+            .textLine("If symptoms worsen call us back")
+            .reason(Concern.builder()
+                .condition("anxiety")
+                .build())
             .build()
         ));
     insert( new OutcomeAnswerCondition("noCausesNotMentalHealthRoute", "palpitations2.causes", "q4", Arrays.asList("Yes") ));

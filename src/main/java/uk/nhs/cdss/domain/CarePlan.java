@@ -19,20 +19,15 @@ import lombok.ToString;
 @ToString(onlyExplicitlyIncluded = true)
 public class CarePlan {
 
-  public enum Intent {
-    option
-  }
-
   @EqualsAndHashCode.Include
   @ToString.Include
   private String id;
   @ToString.Include
   private String title;
-  private Intent intent;
-  private String text;
+  @Singular
+  private List<String> textLines;
   private String description;
-  @Singular("activity")
-  private List<CarePlanActivity> activities;
+  private Concern reason;
 
   public CarePlan(String id) {
     this.id = id;

@@ -12,13 +12,14 @@ import uk.nhs.cdss.domain.enums.DeviceKind;
 @Service
 public class CDSDeviceService {
 
+  public static final String MAIN_ID = "cds-test-engine-device";
+
   @Value("${cds.fhir.server}")
   private String cdsServer;
 
   public Device getCds() {
     Device cds = new Device();
-    cds.setId(new IdType("cds-test-engine")
-      .withServerBase(cdsServer, ResourceType.Device.name()));
+    cds.setId(new IdType(MAIN_ID).withServerBase(cdsServer, ResourceType.Device.name()));
 
     return cds
         .setStatus(FHIRDeviceStatus.ACTIVE)
