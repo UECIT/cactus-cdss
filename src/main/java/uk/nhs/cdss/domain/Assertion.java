@@ -25,10 +25,6 @@ public class Assertion {
   @ToString.Exclude
   private List<QuestionnaireResponse> related;
 
-  @Singular
-  @ToString.Exclude
-  private List<Concept> components;
-
   public static Assertion of(String id, Status status) {
     return builder()
         .id(id)

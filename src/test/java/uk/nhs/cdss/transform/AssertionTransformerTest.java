@@ -6,7 +6,6 @@ import java.time.Instant;
 import java.util.Date;
 import org.hl7.fhir.dstu3.model.CodeableConcept;
 import org.hl7.fhir.dstu3.model.Observation;
-import org.hl7.fhir.dstu3.model.Observation.ObservationComponentComponent;
 import org.hl7.fhir.dstu3.model.Observation.ObservationStatus;
 import org.hl7.fhir.dstu3.model.StringType;
 import org.junit.Test;
@@ -19,18 +18,10 @@ import uk.nhs.cdss.transform.in.ValueTransformer;
 
 public class AssertionTransformerTest {
 
-  private CodeableConcept buildCode(String coding) {
-    var code = new CodeableConcept();
-    code.setText(coding);
-    return code;
-  }
-
   @Test
   public void transform_default() {
     final var OBSERVATION_ID = "observationId";
     final var CODING = "coding";
-    final var CODING_1 = "coding2";
-    final var CODING_2 = "coding2";
     final var VALUE = "value";
 
     var now = Date.from(Instant.now()).toInstant();
@@ -38,9 +29,7 @@ public class AssertionTransformerTest {
     observation.setId(OBSERVATION_ID);
     observation.setStatus(ObservationStatus.FINAL);
     observation.setIssued(Date.from(now));
-    observation.setCode(buildCode(CODING));
-    observation.addComponent(new ObservationComponentComponent(buildCode(CODING_1)));
-    observation.addComponent(new ObservationComponentComponent(buildCode(CODING_2)));
+    observation.setCode(new CodeableConcept().setText("coding"));
     observation.setValue(new StringType(VALUE));
 
     CodeableConceptTransformer codeableConceptTransformer =
@@ -58,8 +47,5 @@ public class AssertionTransformerTest {
     assertEquals("Issued date", now, result.getIssued());
     assertEquals("Code", CODING, result.getCode().getText());
     assertEquals("Value", VALUE, result.getValue().toString());
-    assertEquals("Components", 2, result.getComponents().size());
-    assertEquals("Component code", CODING_1, result.getComponents().get(0).getText());
-    assertEquals("Component code", CODING_2, result.getComponents().get(0).getText());
   }
 }

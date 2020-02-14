@@ -29,6 +29,7 @@ import uk.nhs.cdss.services.ReferenceStorageService;
 import uk.nhs.cdss.transform.Transformer;
 import uk.nhs.cdss.transform.bundle.CDSOutputBundle;
 import uk.nhs.cdss.transform.bundle.CarePlanBundle;
+import uk.nhs.cdss.transform.bundle.ObservationBundle;
 import uk.nhs.cdss.transform.bundle.ReferralRequestBundle;
 
 @Component
@@ -127,6 +128,7 @@ public class CDSOutputTransformer implements Transformer<CDSOutputBundle, Guidan
 
     var newAssertions = output.getAssertions()
         .stream()
+        .map(a -> new ObservationBundle(a, subjectRef, encounterRef))
         .map(observationTransformer::transform)
         .collect(Collectors.toList());
 

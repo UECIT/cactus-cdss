@@ -1,8 +1,6 @@
 package uk.nhs.cdss.transform.in;
 
-import java.util.stream.Collectors;
 import org.hl7.fhir.dstu3.model.Observation;
-import org.hl7.fhir.dstu3.model.Observation.ObservationComponentComponent;
 import org.hl7.fhir.dstu3.model.Observation.ObservationStatus;
 import org.springframework.stereotype.Component;
 import uk.nhs.cdss.domain.Assertion;
@@ -56,11 +54,6 @@ public final class AssertionTransformer implements Transformer<Observation, Asse
     return assertion
         .value(valueTransformer.transform(from.getValue()))
         .code(codeTransformer.transform(from.getCode()))
-        .components(from.getComponent()
-            .stream()
-            .map(ObservationComponentComponent::getCode)
-            .map(codeTransformer::transform)
-            .collect(Collectors.toUnmodifiableList()))
         .build();
   }
 
