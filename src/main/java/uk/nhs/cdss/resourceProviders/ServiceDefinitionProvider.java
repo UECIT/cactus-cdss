@@ -28,11 +28,12 @@ import org.hl7.fhir.dstu3.model.CodeableConcept;
 import org.hl7.fhir.dstu3.model.GuidanceResponse;
 import org.hl7.fhir.dstu3.model.IdType;
 import org.hl7.fhir.dstu3.model.Observation;
-import org.hl7.fhir.dstu3.model.Person;
+import org.hl7.fhir.dstu3.model.Parameters.ParametersParameterComponent;
 import org.hl7.fhir.dstu3.model.QuestionnaireResponse;
 import org.hl7.fhir.dstu3.model.Reference;
+import org.hl7.fhir.dstu3.model.Resource;
 import org.hl7.fhir.dstu3.model.ServiceDefinition;
-import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.instance.model.api.IBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RestController;
@@ -83,7 +84,7 @@ public class ServiceDefinitionProvider implements IResourceProvider {
   public GuidanceResponse evaluate(
       @IdParam IdType serviceDefinitionId,
       @OperationParam(name = REQUEST_ID, min = 1) IdType requestId,
-      @OperationParam(name = INPUT_DATA, max = MAX_UNLIMITED) List<IBaseResource> inputData,
+      @OperationParam(name = INPUT_DATA, max = MAX_UNLIMITED) List<ParametersParameterComponent> inputData,
       @OperationParam(name = PATIENT, min = 1) Reference patient,
       @OperationParam(name = ENCOUNTER, min = 1) Reference encounter,
       @OperationParam(name = INITIATING_PERSON, min = 1) Reference initiatingPerson,
@@ -91,6 +92,12 @@ public class ServiceDefinitionProvider implements IResourceProvider {
       @OperationParam(name = USER_LANGUAGE) CodeableConcept userLanguage,
       @OperationParam(name = USER_TASK) CodeableConcept userTaskContext,
       @OperationParam(name = SETTING, min = 1) CodeableConcept setting) {
+
+    // TODO Any references in the inputData need to be resolved NCTH-450
+    List<Resource> inputResources = inputData.stream()
+        .filter(ParametersParameterComponent::hasResource)
+        .map(ParametersParameterComponent::getResource)
+        .collect(Collectors.toList());
 
     Context context = Context.builder()
         .task("ServiceDefinition/$evaluate")
@@ -100,14 +107,13 @@ public class ServiceDefinitionProvider implements IResourceProvider {
         .supplier(initiatingPerson.getId())
         .build();
 
-
     EvaluationParameters evaluationParameters = EvaluationParameters.builder()
         .requestId(requestId.getId())
         .encounter(encounter)
         .patient(patient)
-        .inputData(inputData)
-        .responses(CollectionUtil.filterAndCast(inputData, QuestionnaireResponse.class))
-        .observations(CollectionUtil.filterAndCast(inputData, Observation.class))
+        .inputData(inputResources)
+        .responses(CollectionUtil.filterAndCast(inputResources, QuestionnaireResponse.class))
+        .observations(CollectionUtil.filterAndCast(inputResources, Observation.class))
         .userType(userType)
         .setting(setting)
         .userLanguage(userLanguage)
@@ -125,7 +131,7 @@ public class ServiceDefinitionProvider implements IResourceProvider {
               evaluationParameters, serviceDefinitionId.getIdPart()));
     } catch (Exception e) {
       if (e instanceof BaseServerResponseException) {
-        throw (BaseServerResponseException)e;
+        throw (BaseServerResponseException) e;
       }
       throw new InternalErrorException(e);
     }
@@ -163,7 +169,8 @@ public class ServiceDefinitionProvider implements IResourceProvider {
   public Collection<ServiceDefinition> findTriageServiceDefinitions(
       @OptionalParam(name = ServiceDefinition.SP_STATUS) TokenParam status,
       @OptionalParam(name = SP_EXPERIMENTAL) TokenParam experimental,
-      @OptionalParam(name = SP_EFFECTIVE_PERIOD + ".start") DateParam effectiveStart, //Not FHIR compliant - can only have chained params on resource (Period is not)
+      @OptionalParam(name = SP_EFFECTIVE_PERIOD + ".start") DateParam effectiveStart,
+      //Not FHIR compliant - can only have chained params on resource (Period is not)
       @OptionalParam(name = SP_EFFECTIVE_PERIOD + ".end") DateParam effectiveEnd,
       @OptionalParam(name = ServiceDefinition.SP_JURISDICTION) TokenParam jurisdiction,
       @OptionalParam(
