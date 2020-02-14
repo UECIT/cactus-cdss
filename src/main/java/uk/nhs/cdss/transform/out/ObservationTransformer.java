@@ -4,16 +4,15 @@ import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import org.hl7.fhir.dstu3.model.CareConnectObservation;
 import org.hl7.fhir.dstu3.model.Observation;
-import org.hl7.fhir.dstu3.model.Observation.ObservationComponentComponent;
 import org.hl7.fhir.dstu3.model.Observation.ObservationStatus;
 import org.springframework.stereotype.Component;
-import uk.nhs.cdss.domain.Assertion;
 import uk.nhs.cdss.domain.Assertion.Status;
 import uk.nhs.cdss.transform.Transformer;
+import uk.nhs.cdss.transform.bundle.ObservationBundle;
 
 @Component
 @RequiredArgsConstructor
-public class ObservationTransformer implements Transformer<Assertion, Observation> {
+public class ObservationTransformer implements Transformer<ObservationBundle, Observation> {
 
   private final StatusTransformer statusTransformer;
   private final ConceptTransformer codeTransformer;
@@ -38,7 +37,8 @@ public class ObservationTransformer implements Transformer<Assertion, Observatio
   }
 
   @Override
-  public CareConnectObservation transform(Assertion from) {
+  public CareConnectObservation transform(ObservationBundle bundle) {
+    var from = bundle.getAssertion();
     var observation = new CareConnectObservation();
     
     if (from.getIssued() == null) {
@@ -52,11 +52,8 @@ public class ObservationTransformer implements Transformer<Assertion, Observatio
 
     observation.setCode(codeTransformer.transform(from.getCode()));
 
-    from.getComponents()
-        .stream()
-        .map(codeTransformer::transform)
-        .map(ObservationComponentComponent::new)
-        .forEach(observation::addComponent);
+    observation.setSubject(bundle.getSubject());
+    observation.setContext(bundle.getContext());
 
     return observation;
   }
