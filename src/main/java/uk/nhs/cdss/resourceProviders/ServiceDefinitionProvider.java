@@ -19,6 +19,7 @@ import ca.uhn.fhir.rest.server.exceptions.BaseServerResponseException;
 import ca.uhn.fhir.rest.server.exceptions.InternalErrorException;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.AccessLevel;
@@ -33,7 +34,6 @@ import org.hl7.fhir.dstu3.model.QuestionnaireResponse;
 import org.hl7.fhir.dstu3.model.Reference;
 import org.hl7.fhir.dstu3.model.Resource;
 import org.hl7.fhir.dstu3.model.ServiceDefinition;
-import org.hl7.fhir.instance.model.api.IBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RestController;
@@ -192,20 +192,23 @@ public class ServiceDefinitionProvider implements IResourceProvider {
     builder.addObservationTriggerConditions(observationParams);
     builder.addPatientTriggerConditions(patientParams);
 
-    return serviceDefinitionRegistry
+    List<ServiceDefinition> serviceDefinitions = serviceDefinitionRegistry
         .getAll()
         .stream()
         .filter(builder.getConditions())
-        .peek(sd -> log.info("Service definition {} matched", sd.getDescription()))
-        .max(this::triggerCount)
+        .max(triggerCount())
         .map(serviceDefinitionTransformer::transform)
         .stream()
         .collect(Collectors.toUnmodifiableList());
+
+    log.info("Selected ServiceDefinitions: {}",
+        serviceDefinitions.stream().map(ServiceDefinition::getId).toArray());
+    return serviceDefinitions;
   }
 
-  private int triggerCount(
-      uk.nhs.cdss.domain.ServiceDefinition a,
-      uk.nhs.cdss.domain.ServiceDefinition b) {
-    return Integer.compare(a.getObservationTriggers().size(), b.getObservationTriggers().size());
+  private Comparator<uk.nhs.cdss.domain.ServiceDefinition> triggerCount() {
+    return Comparator
+        .comparing((uk.nhs.cdss.domain.ServiceDefinition sd) -> sd.getObservationTriggers().size())
+        .thenComparing((uk.nhs.cdss.domain.ServiceDefinition sd) -> sd.getUseContext().size());
   }
 }
