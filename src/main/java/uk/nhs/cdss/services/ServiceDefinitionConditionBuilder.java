@@ -23,11 +23,9 @@ import java.util.Optional;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.hl7.fhir.dstu3.model.codesystems.QuantityComparator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import uk.nhs.cdss.domain.Coding;
 import uk.nhs.cdss.domain.Concept;
 import uk.nhs.cdss.domain.DateFilter;
@@ -41,10 +39,8 @@ import uk.nhs.cdss.resourceProviders.ObservationTriggerParameter;
 import uk.nhs.cdss.resourceProviders.PatientTriggerParameter;
 
 @Getter
+@Slf4j
 public class ServiceDefinitionConditionBuilder {
-
-  @Getter(AccessLevel.NONE)
-  private final Logger log = LoggerFactory.getLogger(getClass());
 
   private Predicate<ServiceDefinition> conditions = sd -> true;
   private CodeDirectory codeDirectory;
@@ -98,6 +94,8 @@ public class ServiceDefinitionConditionBuilder {
 
     for (var orConcepts : useContextConcept.getValuesAsQueryTokens()) {
       var code = ensureSingleContext(orConcepts.getValuesAsQueryTokens());
+      var value = orConcepts.getValuesAsQueryTokens().get(0).getRightValue().getValue();
+      log.info("Use context: {}={}", code, value);
       addCondition(
           isNotRestrictedToContext(code).or(
               matchesContextRestriction(code, orConcepts, this::matchCode)));
@@ -137,7 +135,8 @@ public class ServiceDefinitionConditionBuilder {
         .collect(Collectors.toList());
   }
 
-  private boolean matchesObservationTriggers(ServiceDefinition sd, List<ObservationTriggerParameter> triggerParameters) {
+  private boolean matchesObservationTriggers(ServiceDefinition sd,
+      List<ObservationTriggerParameter> triggerParameters) {
 
     for (ObservationTrigger observationTrigger : sd.getObservationTriggers()) {
       Optional<Coding> code = Optional.ofNullable(observationTrigger.getCode())
@@ -164,7 +163,8 @@ public class ServiceDefinitionConditionBuilder {
     return true;
   }
 
-  private boolean matchesPatientTriggers(ServiceDefinition sd, PatientTriggerParameter triggerParameter) {
+  private boolean matchesPatientTriggers(ServiceDefinition sd,
+      PatientTriggerParameter triggerParameter) {
 
     for (PatientTrigger patientTrigger : sd.getPatientTriggers()) {
       DateFilter birthDate = patientTrigger.getBirthDate();
@@ -232,7 +232,8 @@ public class ServiceDefinitionConditionBuilder {
         .orElseThrow(() -> wrongCodesException);
   }
 
-  private boolean matchDateRange(DateParam startDateParam, DateParam endDateParam, DateRange range) {
+  private boolean matchDateRange(DateParam startDateParam, DateParam endDateParam,
+      DateRange range) {
     var startDate = startDateParam.getValue();
     var endDate = endDateParam.getValue();
     var startPrefix = Optional.ofNullable(startDateParam.getPrefix()).orElse(ParamPrefixEnum.EQUAL);
@@ -261,7 +262,8 @@ public class ServiceDefinitionConditionBuilder {
   }
 
   private boolean matchCode(TokenParam codeParam, UsageContext context) {
-    return codeParam.getValue().equals(codeDirectory.getCode(context.getValueCodeableConcept()).getCode());
+    return codeParam.getValue()
+        .equals(codeDirectory.getCode(context.getValueCodeableConcept()).getCode());
   }
 
   private boolean matchCode(TokenParam codeParam, Optional<Coding> coding) {
