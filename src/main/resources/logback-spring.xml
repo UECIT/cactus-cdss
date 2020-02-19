@@ -6,7 +6,11 @@
       <timestampFormat>yyyy-MM-dd'T'HH:mm:ss.SSSZ</timestampFormat>
       <appendLineSeparator>true</appendLineSeparator>
     </layout>
-
+    <springProfile name="plainlogs">
+      <encoder>
+        <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+      </encoder>
+    </springProfile>
     <springProfile name="prettylogs">
       <layout class="ch.qos.logback.contrib.json.classic.JsonLayout">
         <jsonFormatter class="ch.qos.logback.contrib.jackson.JacksonJsonFormatter">
