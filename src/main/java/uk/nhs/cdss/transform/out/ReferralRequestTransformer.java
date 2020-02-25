@@ -1,5 +1,7 @@
 package uk.nhs.cdss.transform.out;
 
+import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
+
 import com.google.common.base.Strings;
 import java.time.Duration;
 import java.time.Instant;
@@ -55,7 +57,7 @@ public class ReferralRequestTransformer implements
     result.setSubject(bundle.getSubject());
     result.setContext(bundle.getContext());
     result.setOccurrence(transformOccurrence(from.getOccurrence()));
-    result.setAuthoredOn(from.getAuthoredOn());
+    result.setAuthoredOn(defaultIfNull(from.getAuthoredOn(), new Date()));
     result.setReasonCode(transformNextActivity(from.getReasonCode()));
     result.setReasonReference(Collections.singletonList(reasonRef));
     result.setDescription(from.getDescription());
