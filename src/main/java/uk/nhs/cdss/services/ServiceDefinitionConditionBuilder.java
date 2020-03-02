@@ -8,7 +8,6 @@ import ca.uhn.fhir.rest.param.ConstructedAndListParam;
 import ca.uhn.fhir.rest.param.ConstructedOrListParam;
 import ca.uhn.fhir.rest.param.ConstructedParam;
 import ca.uhn.fhir.rest.param.DateParam;
-import ca.uhn.fhir.rest.param.ParamPrefixEnum;
 import ca.uhn.fhir.rest.param.TokenParam;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -17,7 +16,6 @@ import java.time.ZoneId;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.TemporalAmount;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiPredicate;
@@ -26,6 +24,7 @@ import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.hl7.fhir.dstu3.model.codesystems.QuantityComparator;
+import org.springframework.util.ObjectUtils;
 import uk.nhs.cdss.domain.Coding;
 import uk.nhs.cdss.domain.Concept;
 import uk.nhs.cdss.domain.DateFilter;
@@ -66,14 +65,17 @@ public class ServiceDefinitionConditionBuilder {
         String.valueOf(sd.getExperimental()).equalsIgnoreCase(experimental.getValue()));
   }
 
-  public void addEffectivePeriodConditions(DateParam effectiveFrom, DateParam effectiveEnd) {
-    if ((effectiveFrom == null || effectiveFrom.isEmpty()) &&
-        (effectiveEnd == null || effectiveEnd.isEmpty())) {
-      return;
+  public void addSearchDateTimeCondition(DateParam searchDate) {
+    if (!ObjectUtils.isEmpty(searchDate)) {
+      addCondition(sd -> sd.getEffectivePeriod() == null ||
+          matchDateWithin(searchDate, sd.getEffectivePeriod()));
     }
-
-    addCondition(sd -> sd.getEffectivePeriod() == null ||
-        matchDateRange(effectiveFrom, effectiveEnd, sd.getEffectivePeriod()));
+  }
+  
+  private boolean matchDateWithin(DateParam dateParam, DateRange range) {
+    var date = dateParam.getValue();
+    return date.after(range.getStart())
+        && date.before(range.getEnd());
   }
 
   public void addJurisdictionConditions(TokenParam jurisdiction) {
@@ -230,35 +232,6 @@ public class ServiceDefinitionConditionBuilder {
         .filter(c -> expectedContext == null || expectedContext.equals(c))
         .findAny()
         .orElseThrow(() -> wrongCodesException);
-  }
-
-  private boolean matchDateRange(DateParam startDateParam, DateParam endDateParam,
-      DateRange range) {
-    var startDate = startDateParam.getValue();
-    var endDate = endDateParam.getValue();
-    var startPrefix = Optional.ofNullable(startDateParam.getPrefix()).orElse(ParamPrefixEnum.EQUAL);
-    var endPrefix = Optional.ofNullable(endDateParam.getPrefix()).orElse(ParamPrefixEnum.EQUAL);
-
-    return matchDate(startDate, startPrefix, range.getStart())
-        && matchDate(endDate, endPrefix, range.getEnd());
-  }
-
-  private boolean matchDate(Date paramDate, ParamPrefixEnum prefix, Date sdDate) {
-    switch (prefix) {
-      case EQUAL:
-        return sdDate.equals(paramDate);
-      case NOT_EQUAL:
-        return !sdDate.equals(paramDate);
-      case GREATERTHAN:
-      case GREATERTHAN_OR_EQUALS:
-        return sdDate.after(paramDate);
-      case LESSTHAN:
-      case LESSTHAN_OR_EQUALS:
-        return sdDate.before(paramDate);
-      default:
-        throw new IllegalArgumentException(
-            "Date search params cannot have non-standard prefixes");
-    }
   }
 
   private boolean matchCode(TokenParam codeParam, UsageContext context) {

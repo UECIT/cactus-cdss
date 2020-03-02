@@ -65,7 +65,7 @@ public class ServiceDefinitionProvider implements IResourceProvider {
   private static final String SP_OBSERVATION_TYPE_CODE = "trigger-type-code-value-effective";
   private static final String SP_PATIENT_TYPE_CODE = "trigger-type-date";
   private static final String SP_CONTEXT_VALUE = "useContext-code-value";
-  private static final String SP_EFFECTIVE_PERIOD = "effectivePeriod";
+  private static final String SP_EFFECTIVE_PERIOD = "searchDateTime";
 
   private final EvaluateService evaluateService;
   private final ServiceDefinitionTransformer serviceDefinitionTransformer;
@@ -169,9 +169,7 @@ public class ServiceDefinitionProvider implements IResourceProvider {
   public Collection<ServiceDefinition> findTriageServiceDefinitions(
       @OptionalParam(name = ServiceDefinition.SP_STATUS) TokenParam status,
       @OptionalParam(name = SP_EXPERIMENTAL) TokenParam experimental,
-      @OptionalParam(name = SP_EFFECTIVE_PERIOD + ".start") DateParam effectiveStart,
-      //Not FHIR compliant - can only have chained params on resource (Period is not)
-      @OptionalParam(name = SP_EFFECTIVE_PERIOD + ".end") DateParam effectiveEnd,
+      @OptionalParam(name = SP_EFFECTIVE_PERIOD) DateParam searchDate,
       @OptionalParam(name = ServiceDefinition.SP_JURISDICTION) TokenParam jurisdiction,
       @OptionalParam(
           name = SP_CONTEXT_VALUE,
@@ -186,7 +184,7 @@ public class ServiceDefinitionProvider implements IResourceProvider {
 
     builder.addStatusConditions(status);
     builder.addExperimentalConditions(experimental);
-    builder.addEffectivePeriodConditions(effectiveStart, effectiveEnd);
+    builder.addSearchDateTimeCondition(searchDate);
     builder.addJurisdictionConditions(jurisdiction);
     builder.addUseContextCodeConditions(useContextConcept);
     builder.addObservationTriggerConditions(observationParams);
