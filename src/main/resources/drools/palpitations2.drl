@@ -242,7 +242,7 @@ then
     insert( new AnswerAssertion("common.birthDate", "q", null, codeDirectory.get(SnomedConstants.AGE)));
 
     insert( new NextQuestion("palpitations2.hasPalpitations", "common.birthDate") );    
-    insert( new AnswerAssertion("palpitations2.hasPalpitations", "q", "Yes", codeDirectory.get("palpitations"), true));
+    insert( new AnswerAssertion("palpitations2.hasPalpitations", "q", "Yes", codeDirectory.get("palpitationsNow"), true));
 
     // Have you got an ICD (implanted cardiovascular defibrillator)?
     insert( new NextQuestion("palpitations2.hasICD", "palpitations2.hasPalpitations", "q", Arrays.asList("Yes")) );
