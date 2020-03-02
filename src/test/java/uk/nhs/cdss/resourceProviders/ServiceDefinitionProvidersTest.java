@@ -172,8 +172,7 @@ public class ServiceDefinitionProvidersTest {
   public void triage_oneResult(
       TokenParam status,
       TokenParam experimental,
-      DateParam effectiveStart,
-      DateParam effectiveEnd,
+      DateParam searchDate,
       TokenParam jurisdiction,
       CompositeAndListParam<TokenParam, TokenParam> useContextConcept,
       ConstructedAndListParam<ObservationTriggerParameter> observationParams,
@@ -182,8 +181,7 @@ public class ServiceDefinitionProvidersTest {
     var result = provider.findTriageServiceDefinitions(
         status,
         experimental,
-        effectiveStart,
-        effectiveEnd,
+        searchDate,
         jurisdiction,
         useContextConcept,
         observationParams,
@@ -198,20 +196,20 @@ public class ServiceDefinitionProvidersTest {
 
   public Object parametersForTriage_oneResult() {
     return new Object[]{
-        new Object[]{null, null, null, null, null, null, null, null, "initial"},
-        new Object[]{token("ACTIVE"), null, null, null, null, null, null, null,"initial"},
-        new Object[]{null, token("false"), null, null, null, null, null, null, "initial"},
-        new Object[]{null, null, date("le2020-12-20"), date("ge2020-12-20"), null, null, null, null, "initial"},
-        new Object[]{null, null, null, null, token("GB"), null, null, null, "initial"},
-        new Object[]{null, null, null, null, null, useContext(Stream.of("non-existent"), Stream.of("invalid")), null, null, "initial"},
-        new Object[]{null, null, null, null, null, useContext(Stream.of("user"), Stream.of("Practitioner")), observationTrigger(Stream.of("anxiety"), Stream.of("present")), null, "anxiety"},
-        new Object[]{null, null, null, null, token("GB"), null, observationTrigger(Stream.of("chestPain"), Stream.of("present")), null, "chestPains"},
-        new Object[]{null, null, date("le2020-12-20"), date("ge2020-12-20"), null, null, observationTrigger(Stream.of("musculoskeletal"), Stream.of("present")), null, "musculoskeletal"},
-        new Object[]{token("ACTIVE"), token("false"), null, null, null, null, null, null, "initial"},
-        new Object[]{token("ACTIVE"), token("false"), null, null, null, null, observationTrigger(Stream.of("palpitations", "debug"), Stream.of("present", "present")), null, "palpitations2"},
-        new Object[]{token("ACTIVE"), token("true"), date("le2020-12-20"), date("ge2020-12-20"), null, null, observationTrigger(Stream.of("palpitations", "debug"), Stream.of("present", "present")), null, "palpitations"},
-        new Object[]{null, token("false"), date("le2020-12-20"), date("ge2020-12-20"), null, null, observationTrigger(Stream.of("palpitations"), Stream.of("present")), null, "palpitations2"},
-        new Object[]{null, token("false"), null, null, null, null, observationTrigger(Stream.of("palpitations"), Stream.of("present")), null, "palpitations2"}
+        new Object[]{null, null, null, null, null, null, null, "initial"},
+        new Object[]{token("ACTIVE"), null, null, null, null, null, null,"initial"},
+        new Object[]{null, token("false"), null, null, null, null, null, "initial"},
+        new Object[]{null, null, date("2020-12-20"), null, null, null, null, "initial"},
+        new Object[]{null, null, null, token("GB"), null, null, null, "initial"},
+        new Object[]{null, null, null, null, useContext(Stream.of("non-existent"), Stream.of("invalid")), null, null, "initial"},
+        new Object[]{null, null, null, null, useContext(Stream.of("user"), Stream.of("Practitioner")), observationTrigger(Stream.of("anxiety"), Stream.of("present")), null, "anxiety"},
+        new Object[]{null, null, null, token("GB"), null, observationTrigger(Stream.of("chestPain"), Stream.of("present")), null, "chestPains"},
+        new Object[]{null, null, date("2020-12-20"), null, null, observationTrigger(Stream.of("musculoskeletal"), Stream.of("present")), null, "musculoskeletal"},
+        new Object[]{token("ACTIVE"), token("false"), null, null, null, null, null, "initial"},
+        new Object[]{token("ACTIVE"), token("false"), null, null, null, observationTrigger(Stream.of("palpitations", "debug"), Stream.of("present", "present")), null, "palpitations2"},
+        new Object[]{token("ACTIVE"), token("true"), date("2020-12-20"), null, null, observationTrigger(Stream.of("palpitations", "debug"), Stream.of("present", "present")), null, "palpitations"},
+        new Object[]{null, token("false"), date("2020-12-20"), null, null, observationTrigger(Stream.of("palpitations"), Stream.of("present")), null, "palpitations2"},
+        new Object[]{null, token("false"), null, null, null, observationTrigger(Stream.of("palpitations"), Stream.of("present")), null, "palpitations2"}
     };
   }
 
@@ -221,7 +219,7 @@ public class ServiceDefinitionProvidersTest {
   public void triage_noResults(
       TokenParam status,
       TokenParam experimental,
-      DateParam effective,
+      DateParam searchDate,
       TokenParam jurisdiction,
       CompositeAndListParam<TokenParam, TokenParam> useContextConcept,
       ConstructedAndListParam<ObservationTriggerParameter> observationParams,
@@ -229,8 +227,7 @@ public class ServiceDefinitionProvidersTest {
     var result = provider.findTriageServiceDefinitions(
         status,
         experimental,
-        effective,
-        effective,
+        searchDate,
         jurisdiction,
         useContextConcept,
         observationParams,
@@ -264,8 +261,7 @@ public class ServiceDefinitionProvidersTest {
     var result = provider.findTriageServiceDefinitions(
         token("active"),
         token("false"),
-        date("le2019-12-20"),
-        date("ge2019-12-20"),
+        date("2019-12-20"),
         token("GB"),
         useContextConcept,
         observationParams,
