@@ -53,9 +53,9 @@ salience 10000
 when // Always
 then
     insert (new InitialQuestionnaire("vaginalDischarge.termsAndConditions") );
-    insert( new AnswerAssertion("vaginalDischarge.termsAndConditions", "q", "true", codeDirectory.get("termsAndConditions"), true));
+    insert( new AnswerAssertion("vaginalDischarge.termsAndConditions", "q", "Yes", codeDirectory.get("termsAndConditions"), true));
 
-    insert( new NextQuestion("vaginalDischarge.vaginalDischarge", "vaginalDischarge.termsAndConditions", "q", Arrays.asList(true, false)) );
+    insert( new NextQuestion("vaginalDischarge.vaginalDischarge", "vaginalDischarge.termsAndConditions", "q", Arrays.asList("Yes")) );
     insert( new AnswerAssertion("vaginalDischarge.vaginalDischarge", "q", "Yes", codeDirectory.get("vaginalDischarge"), true));
 
     insert( new NextQuestion("vaginalDischarge.abdominalPain", "vaginalDischarge.vaginalDischarge", "q", Arrays.asList("Yes")) );

@@ -16,7 +16,7 @@ public class VaginalDischargeTest extends BaseDroolsCDSEngineTest {
 
   @Test
   public void vaginalDischarge_termsAndConditions() throws ServiceDefinitionException {
-    answerQuestion("termsAndConditions", "q", true);
+    answerQuestion("termsAndConditions", "q", "Yes");
 
     evaluate();
 
@@ -27,7 +27,7 @@ public class VaginalDischargeTest extends BaseDroolsCDSEngineTest {
 
   @Test
   public void vaginalDischarge_inPain_unsurePregnancy() throws ServiceDefinitionException {
-    answerQuestion("termsAndConditions", "q", true);
+    answerQuestion("termsAndConditions", "q", "Yes");
     answerQuestion("vaginalDischarge", "q", "Yes");
     answerQuestion("abdominalPain", "q", "Yes");
     answerQuestion("painIntensity", "q", "inPain");
@@ -41,7 +41,7 @@ public class VaginalDischargeTest extends BaseDroolsCDSEngineTest {
 
   @Test
   public void vaginalDischarge_askAge() throws ServiceDefinitionException {
-    answerQuestion("termsAndConditions", "q", true);
+    answerQuestion("termsAndConditions", "q", "Yes");
     answerQuestion("vaginalDischarge", "q", "Yes");
     answerQuestion("abdominalPain", "q", "Yes");
     answerQuestion("painIntensity", "q", "noPain");
@@ -61,7 +61,7 @@ public class VaginalDischargeTest extends BaseDroolsCDSEngineTest {
   public void vaginalDischarge_dontAskAge() throws ServiceDefinitionException {
     addAgeAssertion("1900-12-25");
 
-    answerQuestion("termsAndConditions", "q", true);
+    answerQuestion("termsAndConditions", "q", "Yes");
     answerQuestion("vaginalDischarge", "q", "Yes");
     answerQuestion("abdominalPain", "q", "No");
 
@@ -80,7 +80,7 @@ public class VaginalDischargeTest extends BaseDroolsCDSEngineTest {
   public void vaginalDischarge_dontAskAge_under50() throws ServiceDefinitionException {
     addAgeAssertion("1985-09-07");
 
-    answerQuestion("termsAndConditions", "q", true);
+    answerQuestion("termsAndConditions", "q", "Yes");
     answerQuestion("vaginalDischarge", "q", "Yes");
     answerQuestion("abdominalPain", "q", "Yes");
     answerQuestion("painIntensity", "q", "inPain");
@@ -100,7 +100,7 @@ public class VaginalDischargeTest extends BaseDroolsCDSEngineTest {
   public void vaginalDischarge_stiOutcome_over50_secondary_concern() throws ServiceDefinitionException {
     addAgeAssertion("1942-09-07");
 
-    answerQuestion("termsAndConditions", "q", true);
+    answerQuestion("termsAndConditions", "q", "Yes");
     answerQuestion("vaginalDischarge", "q", "Yes");
     answerQuestion("abdominalPain", "q", "No");
     answerQuestion("sti", "q", "Chlamydia");
@@ -119,7 +119,7 @@ public class VaginalDischargeTest extends BaseDroolsCDSEngineTest {
   public void imageMap_head() throws ServiceDefinitionException {
     addAgeAssertion("1942-09-07");
 
-    answerQuestion("termsAndConditions", "q", true);
+    answerQuestion("termsAndConditions", "q", "Yes");
     answerQuestion("vaginalDischarge", "q", "No");
     answerQuestion("urine", "q", "No");
     answerQuestion("assault", "q", "Yes");
@@ -142,7 +142,7 @@ public class VaginalDischargeTest extends BaseDroolsCDSEngineTest {
   public void imageMap_legs() throws ServiceDefinitionException {
     addAgeAssertion("1942-09-07");
 
-    answerQuestion("termsAndConditions", "q", true);
+    answerQuestion("termsAndConditions", "q", "Yes");
     answerQuestion("vaginalDischarge", "q", "No");
     answerQuestion("urine", "q", "No");
     answerQuestion("assault", "q", "Yes");
