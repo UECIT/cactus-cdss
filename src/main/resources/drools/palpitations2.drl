@@ -149,7 +149,7 @@ function Outcome utcStroke(String id, String bodySite) {
     );
 }
 
-function Outcome utcArrhythmia(String id, String occurrence, String specialty) {
+function Outcome utcArrhythmia(String id, String occurrence, String specialty, String onset) {
     return Outcome.of(id,
         ReferralRequest.builder()
             .id("utc-arrhythmia")
@@ -158,13 +158,14 @@ function Outcome utcArrhythmia(String id, String occurrence, String specialty) {
             .reasonCode(specialty)
             .reason(Concern.builder()
                 .condition("arrhythmia")
+                .onset(onset)
                 .verificationStatus(VerificationStatus.CONFIRMED)
                 .build())
             .build()
     );
 }
 
-function Outcome gpArrhythmia(String id, String occurrence) {
+function Outcome gpArrhythmia(String id, String occurrence, String onset) {
     return Outcome.of(id,
         ReferralRequest.builder()
             .id("gp-arrhythmia")
@@ -173,6 +174,7 @@ function Outcome gpArrhythmia(String id, String occurrence) {
             .reasonCode("gp")
             .reason(Concern.builder()
                 .condition("arrhythmia")
+                .onset(onset)
                 .build())
             .build()
     );
@@ -398,7 +400,7 @@ then
                 .build(),
             defaultCarePlan()));
     insert( new OutcomeAnswerCondition("exerciseTriggered", "palpitations2.exercise", "q", Arrays.asList("Yes") ));
-    insert( utcArrhythmia("notExerciseTriggered", "PT4h", "emergencyCareReview"));
+    insert( utcArrhythmia("notExerciseTriggered", "PT4h", "emergencyCareReview", "PT0h"));
     insert( new OutcomeAnswerCondition("notExerciseTriggered", "palpitations2.exercise", "q", Arrays.asList("No") ));
 
     // When did you last experience palpitations
@@ -423,7 +425,7 @@ then
     insert( new OutcomeAnswerCondition("syncope12hrs", "palpitations2.syncope", "q", Arrays.asList("Yes", "Unsure") ));
     insert( new OutcomeAnswerCondition("syncope12hrs", "palpitations2.lastExperienced", "q1", Arrays.asList("Yes") ));
     insert( new OutcomeAnswerCondition("syncope12hrs", "palpitations2.hasPalpitations", "q", Arrays.asList("No", "Unsure") ));
-    insert( utcArrhythmia("notSyncope12hrs", "PT4h", "emergencyCareReview"));
+    insert( utcArrhythmia("notSyncope12hrs", "PT4h", "emergencyCareReview", "PT0h"));
     insert( new OutcomeAnswerCondition("notSyncope12hrs", "palpitations2.syncope", "q", Arrays.asList("No") ));
     insert( new OutcomeAnswerCondition("notSyncope12hrs", "palpitations2.lastExperienced", "q1", Arrays.asList("Yes") ));
     insert( new OutcomeAnswerCondition("notSyncope12hrs", "palpitations2.hasPalpitations", "q", Arrays.asList("No", "Unsure") ));
@@ -431,11 +433,11 @@ then
     //  If last experienced within 48 hours
     insert( new NextQuestion("palpitations2.syncope", "palpitations2.lastExperienced", "q2", Arrays.asList("Yes")));
     insert( new AnswerAssertion("palpitations2.lastExperienced", "q2", "Yes", codeDirectory.get("lastExperienced48Hrs"), true));
-    insert( utcArrhythmia("syncope48hrs", "PT8h", "primaryCareReview"));
+    insert( utcArrhythmia("syncope48hrs", "PT8h", "primaryCareReview", "PT12h"));
     insert( new OutcomeAnswerCondition("syncope48hrs", "palpitations2.syncope", "q", Arrays.asList("Yes", "Unsure") ));
     insert( new OutcomeAnswerCondition("syncope48hrs", "palpitations2.lastExperienced", "q2", Arrays.asList("Yes") ));
     insert( new OutcomeAnswerCondition("syncope48hrs", "palpitations2.hasPalpitations", "q", Arrays.asList("No", "Unsure") ));
-    insert( gpArrhythmia("notSyncope48hrs", "PT24h"));
+    insert( gpArrhythmia("notSyncope48hrs", "PT24h", "PT12h"));
     insert( new OutcomeAnswerCondition("notSyncope48hrs", "palpitations2.syncope", "q", Arrays.asList("No") ));
     insert( new OutcomeAnswerCondition("notSyncope48hrs", "palpitations2.lastExperienced", "q2", Arrays.asList("Yes") ));
     insert( new OutcomeAnswerCondition("notSyncope48hrs", "palpitations2.hasPalpitations", "q", Arrays.asList("No", "Unsure") ));
@@ -445,7 +447,7 @@ then
     insert( new AnswerAssertion("palpitations2.lastExperienced", "q3", "Yes", codeDirectory.get("lastExperiencedMoreThan48"), true));
     insert( new AnswerAssertion("palpitations2.lastExperienced", "q3", "No", codeDirectory.get("lastExperiencedMoreThan48"), true));
     insert( new AnswerAssertion("palpitations2.lastExperienced", "q3", "Unsure", codeDirectory.get("lastExperiencedMoreThan48"), true));
-    insert( gpArrhythmia("syncopeOver48hrs", "PT72h"));
+    insert( gpArrhythmia("syncopeOver48hrs", "PT72h", "PT48h"));
     insert( new OutcomeAnswerCondition("syncopeOver48hrs", "palpitations2.syncope", "q", Arrays.asList("Yes", "Unsure") ));
     insert( new OutcomeAnswerCondition("syncopeOver48hrs", "palpitations2.lastExperienced", "q3", Arrays.asList("Yes", "No", "Unsure") ));
     insert( new OutcomeAnswerCondition("syncopeOver48hrs", "palpitations2.hasPalpitations", "q", Arrays.asList("No", "Unsure") ));

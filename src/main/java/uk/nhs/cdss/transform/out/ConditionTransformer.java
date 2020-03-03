@@ -1,6 +1,8 @@
 package uk.nhs.cdss.transform.out;
 
-import java.util.Calendar;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
@@ -36,7 +38,14 @@ public class ConditionTransformer implements Transformer<ConcernBundle, Conditio
     condition.setVerificationStatus(transformVerificationStatus(concern.getVerificationStatus()));
     condition.setCode(conceptTransformer.transform(codeDirectory.get(concern.getCondition())));
     condition.setBodySite(transformBodySiteCodes(concern.getBodySites()));
-    condition.setOnset(new DateTimeType(Calendar.getInstance())); //TODO: NCTH-463 specify in scenario
+
+    Instant onsetDate = Instant.now();
+    if (concern.getOnset() != null) {
+      Duration timeSinceOnset = Duration.parse(concern.getOnset());
+      onsetDate = onsetDate.minus(timeSinceOnset);
+    }
+
+    condition.setOnset(new DateTimeType(Date.from(onsetDate)));
     condition.setStage(new CareConnectConditionStageComponent()
       .setCareConnectSummary(conceptTransformer.transform(codeDirectory.get("defaultStage"))));
 

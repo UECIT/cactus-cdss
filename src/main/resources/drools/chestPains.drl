@@ -430,6 +430,7 @@ then
                 .reasonCode("gpreview")
                 .reason(Concern.builder()
                     .condition("malignancy")
+                    .onset("PT504h")
                     .verificationStatus(VerificationStatus.CONFIRMED)
                     .build())
                 .build()));

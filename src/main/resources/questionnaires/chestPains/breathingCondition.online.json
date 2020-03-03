@@ -40,11 +40,7 @@
             "code": "hasBreathingCondition"
           },
           {
-            "stringValue": "Myasthenia",
-            "code": "hasBreathingCondition"
-          },
-          {
-            "stringValue": "Gravis",
+            "stringValue": "Myasthenia Gravis",
             "code": "hasBreathingCondition"
           },
           {

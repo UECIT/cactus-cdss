@@ -24,5 +24,6 @@ public class Concern {
   String condition;
   @Singular("bodySite")
   List<String> bodySites;
+  String onset;
 
 }
