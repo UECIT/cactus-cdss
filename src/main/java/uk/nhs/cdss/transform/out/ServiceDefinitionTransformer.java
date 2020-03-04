@@ -1,14 +1,11 @@
 package uk.nhs.cdss.transform.out;
 
-import static org.apache.commons.lang3.BooleanUtils.toBoolean;
-
 import java.util.StringJoiner;
 import lombok.RequiredArgsConstructor;
 import org.hl7.fhir.dstu3.model.ServiceDefinition;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.nhs.cdss.domain.enums.Concept;
-import uk.nhs.cdss.domain.enums.Jurisdiction;
 import uk.nhs.cdss.transform.Transformer;
 
 @Component
@@ -38,7 +35,7 @@ public class ServiceDefinitionTransformer implements
         .setPurpose(from.getPurpose())
         .setUsage(from.getUsage())
         .setStatus(statusTransformer.transform(from.getStatus()))
-        .setExperimental(toBoolean(from.getExperimental()))
+        .setExperimental(from.isExperimental())
         .setVersion(from.getVersion())
         .setDate(from.getDate())
         .setPublisher(from.getPublisher())
@@ -47,7 +44,7 @@ public class ServiceDefinitionTransformer implements
         .setEffectivePeriod(dateRangeTransformer.transform(from.getEffectivePeriod()));
 
     from.getJurisdictions().stream()
-        .map(code -> Concept.fromCode(code, Jurisdiction.class).toCodeableConcept())
+        .map(Concept::toCodeableConcept)
         .forEach(serviceDefinition::addJurisdiction);
 
     from.getUseContext().stream()
@@ -69,7 +66,7 @@ public class ServiceDefinitionTransformer implements
     return serviceDefinition;
   }
 
-  public String fullUrl(String id) {
+  private String fullUrl(String id) {
     return new StringJoiner("/")
         .add(cdsServer)
         .add("ServiceDefinition")

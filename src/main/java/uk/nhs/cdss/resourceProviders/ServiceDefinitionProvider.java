@@ -37,10 +37,17 @@ import org.hl7.fhir.dstu3.model.ServiceDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RestController;
+import uk.nhs.cdss.engine.CodeDirectory;
 import uk.nhs.cdss.logging.Context;
+import uk.nhs.cdss.registry.ServiceDefinitionRegistry;
+import uk.nhs.cdss.search.EffectivePeriodCondition;
+import uk.nhs.cdss.search.ExperimentalCondition;
+import uk.nhs.cdss.search.JurisdictionCondition;
+import uk.nhs.cdss.search.ObservationTriggerCondition;
+import uk.nhs.cdss.search.PatientTriggerCondition;
+import uk.nhs.cdss.search.StatusCondition;
+import uk.nhs.cdss.search.UseContextCondition;
 import uk.nhs.cdss.services.EvaluateService;
-import uk.nhs.cdss.services.ServiceDefinitionConditionBuilderFactory;
-import uk.nhs.cdss.services.ServiceDefinitionRegistry;
 import uk.nhs.cdss.transform.EvaluationParameters;
 import uk.nhs.cdss.transform.out.ServiceDefinitionTransformer;
 import uk.nhs.cdss.util.CollectionUtil;
@@ -67,10 +74,10 @@ public class ServiceDefinitionProvider implements IResourceProvider {
   private static final String SP_CONTEXT_VALUE = "useContext-code-value";
   private static final String SP_EFFECTIVE_PERIOD = "searchDateTime";
 
+  private final CodeDirectory codeDirectory;
   private final EvaluateService evaluateService;
   private final ServiceDefinitionTransformer serviceDefinitionTransformer;
   private final ServiceDefinitionRegistry serviceDefinitionRegistry;
-  private final ServiceDefinitionConditionBuilderFactory conditionBuilderFactory;
 
   @Getter(AccessLevel.NONE)
   private final Logger log = LoggerFactory.getLogger(getClass());
@@ -180,20 +187,16 @@ public class ServiceDefinitionProvider implements IResourceProvider {
       @OptionalParam(name = SP_PATIENT_TYPE_CODE, constructedType = PatientTriggerParameter.class)
           ConstructedParam<PatientTriggerParameter> patientParams) {
 
-    var builder = conditionBuilderFactory.load();
-
-    builder.addStatusConditions(status);
-    builder.addExperimentalConditions(experimental);
-    builder.addSearchDateTimeCondition(searchDate);
-    builder.addJurisdictionConditions(jurisdiction);
-    builder.addUseContextCodeConditions(useContextConcept);
-    builder.addObservationTriggerConditions(observationParams);
-    builder.addPatientTriggerConditions(patientParams);
-
     List<ServiceDefinition> serviceDefinitions = serviceDefinitionRegistry
         .getAll()
         .stream()
-        .filter(builder.getConditions())
+        .filter(StatusCondition.from(status))
+        .filter(ExperimentalCondition.from(experimental))
+        .filter(EffectivePeriodCondition.from(searchDate))
+        .filter(JurisdictionCondition.from(jurisdiction))
+        .filter(UseContextCondition.from(useContextConcept))
+        .filter(ObservationTriggerCondition.from(codeDirectory, observationParams))
+        .filter(PatientTriggerCondition.from(patientParams))
         .max(triggerCount())
         .map(serviceDefinitionTransformer::transform)
         .stream()

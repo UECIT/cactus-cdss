@@ -20,6 +20,14 @@ public interface Concept {
         .setSystem(getSystem());
   }
 
+  default uk.nhs.cdss.domain.Coding toDomainCoding() {
+    return new uk.nhs.cdss.domain.Coding(getSystem(), getValue(), getDisplay());
+  }
+
+  default uk.nhs.cdss.domain.Concept toDomainConcept() {
+    return new uk.nhs.cdss.domain.Concept(getValue(), toDomainCoding());
+  }
+
   static <T extends Enum<T> & Concept> T fromCode(String code, Class<T> conceptType) {
     return Enum.valueOf(conceptType, code);
   }

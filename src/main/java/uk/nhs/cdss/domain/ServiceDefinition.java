@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import lombok.Data;
+import uk.nhs.cdss.domain.enums.Jurisdiction;
 
 @Data
 public class ServiceDefinition {
@@ -14,7 +15,7 @@ public class ServiceDefinition {
   private String purpose;
   private String usage;
   private PublicationStatus status;
-  private Boolean experimental;
+  private boolean experimental;
   private String version;
   private Date date;
   private String publisher;
@@ -22,7 +23,7 @@ public class ServiceDefinition {
   private Date lastReviewDate;
   private DateRange effectivePeriod;
 
-  private List<String> jurisdictions = new ArrayList<>();
+  private List<Jurisdiction> jurisdictions = new ArrayList<>();
   private List<UsageContext> useContext = new ArrayList<>();
   private List<ObservationTrigger> observationTriggers = new ArrayList<>();
   private List<PatientTrigger> patientTriggers = new ArrayList<>();

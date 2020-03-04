@@ -22,11 +22,11 @@
   "useContext": [
     {
       "code": "setting",
-      "valueCodeableConcept": "online"
+      "value": "online"
     },
     {
       "code": "setting",
-      "valueCodeableConcept": "phone"
+      "value": "phone"
     }
   ]
 }

@@ -16,7 +16,6 @@ import ca.uhn.fhir.rest.param.ParamPrefixEnum;
 import ca.uhn.fhir.rest.param.StringParam;
 import ca.uhn.fhir.rest.param.TokenParam;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
@@ -30,20 +29,19 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import uk.nhs.cdss.config.CodeDirectoryConfig;
+import uk.nhs.cdss.config.MapperConfig;
 import uk.nhs.cdss.engine.CodeDirectory;
-import uk.nhs.cdss.services.ServiceDefinitionConditionBuilderFactory;
-import uk.nhs.cdss.services.ServiceDefinitionRegistry;
+import uk.nhs.cdss.registry.ServiceDefinitionRegistry;
 import uk.nhs.cdss.transform.out.CodingOutTransformer;
-import uk.nhs.cdss.transform.out.ConceptTransformer;
 import uk.nhs.cdss.transform.out.DataRequirementTransformer;
 import uk.nhs.cdss.transform.out.DateRangeTransformer;
-import uk.nhs.cdss.transform.out.IntRangeTransformer;
 import uk.nhs.cdss.transform.out.PublicationStatusTransformer;
 import uk.nhs.cdss.transform.out.ServiceDefinitionTransformer;
 import uk.nhs.cdss.transform.out.TopicTransformer;
 import uk.nhs.cdss.transform.out.TriggerTransformer;
 import uk.nhs.cdss.transform.out.UsageContextTransformer;
 
+@SuppressWarnings("UnstableApiUsage")
 @RunWith(JUnitParamsRunner.class)
 public class ServiceDefinitionProvidersTest {
 
@@ -53,23 +51,18 @@ public class ServiceDefinitionProvidersTest {
   @BeforeClass
   public static void beforeAll() {
     var codingTransformer = new CodingOutTransformer();
-    var conceptTransformer = new ConceptTransformer(codingTransformer);
     var transformer = new ServiceDefinitionTransformer(
         new DataRequirementTransformer(codeDirectory, codingTransformer),
         new PublicationStatusTransformer(),
         new DateRangeTransformer(),
-        new UsageContextTransformer(
-            codeDirectory,
-            codingTransformer,
-            conceptTransformer,
-            new IntRangeTransformer()),
-        new TopicTransformer(codeDirectory),
+        new UsageContextTransformer(),
+        new TopicTransformer(),
         new TriggerTransformer(codeDirectory, codingTransformer));
     provider = new ServiceDefinitionProvider(
+        codeDirectory,
         null,
         transformer,
-        new ServiceDefinitionRegistry(new ObjectMapper()),
-        new ServiceDefinitionConditionBuilderFactory(codeDirectory));
+        new ServiceDefinitionRegistry(new MapperConfig().registryObjectMapper()));
   }
 
   @Test
@@ -135,8 +128,8 @@ public class ServiceDefinitionProvidersTest {
 
     zip(codes, values, (code, value) -> {
       var ors = new ConstructedOrListParam<>(ObservationTriggerParameter.class);
-      var codeCode = codeDirectory.getCode(code);
-      var valueCode = codeDirectory.getCode(value);
+      var codeCode = codeDirectory.getCoding(code);
+      var valueCode = codeDirectory.getCoding(value);
       var observationTriggerParameter = new ObservationTriggerParameter(
           new StringParam("CareConnectObservation"),
           new StringParam("code"),

@@ -154,6 +154,12 @@
       <artifactId>commons-collections4</artifactId>
       <version>4.1</version>
     </dependency>
+    <dependency>
+      <groupId>com.arakelian</groupId>
+      <artifactId>jackson-utils</artifactId>
+      <version>3.0.0</version>
+      <scope>compile</scope>
+    </dependency>
 
   </dependencies>
 

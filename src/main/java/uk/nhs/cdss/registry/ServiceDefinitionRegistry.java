@@ -1,4 +1,4 @@
-package uk.nhs.cdss.services;
+package uk.nhs.cdss.registry;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.cache.CacheBuilder;
@@ -16,27 +16,29 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
+import javax.annotation.ParametersAreNonnullByDefault;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Service;
 import uk.nhs.cdss.domain.ServiceDefinition;
 
 @Service
+@RequiredArgsConstructor
 public class ServiceDefinitionRegistry {
 
   private final Logger log = LoggerFactory.getLogger(getClass());
-  private final ObjectMapper objectMapper;
   private final LoadingCache<String, CachedServiceDefinition> cache =
       CacheBuilder.newBuilder()
           .refreshAfterWrite(Duration.ofSeconds(5))
           .build(new Loader());
 
-  public ServiceDefinitionRegistry(ObjectMapper objectMapper) {
-    this.objectMapper = objectMapper;
-  }
+  @Qualifier("enhanced")
+  private final ObjectMapper objectMapper;
 
   public Optional<ServiceDefinition> getById(String serviceName) {
     try {
@@ -73,6 +75,7 @@ public class ServiceDefinitionRegistry {
     private Long modified;
   }
 
+  @ParametersAreNonnullByDefault
   private class Loader extends CacheLoader<String, CachedServiceDefinition> {
 
     @Override

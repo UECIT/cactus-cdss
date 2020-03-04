@@ -23,7 +23,8 @@ import uk.nhs.cdss.transform.Transformer;
 @AllArgsConstructor
 public class TriggerTransformer implements Transformer<ObservationTrigger, TriggerDefinition> {
 
-  public static final String CC_OBSERVATION_PROFILE = "https://fhir.hl7.org.uk/STU3/StructureDefinition/CareConnect-Observation-1";
+  private static final String CC_OBSERVATION_PROFILE =
+      "https://fhir.hl7.org.uk/STU3/StructureDefinition/CareConnect-Observation-1";
 
   private final CodeDirectory codeDirectory;
   private final CodingOutTransformer codingTransformer;
@@ -52,7 +53,7 @@ public class TriggerTransformer implements Transformer<ObservationTrigger, Trigg
       return;
     }
 
-    var coding = codeDirectory.getCode(code);
+    var coding = codeDirectory.getCoding(code);
     dataRequirement.addCodeFilter()
         .setPath(path)
         .addValueCoding(codingTransformer.transform(coding));

@@ -1,20 +1,13 @@
 package uk.nhs.cdss.domain;
 
 import lombok.Data;
-import org.apache.commons.lang3.StringUtils;
+import uk.nhs.cdss.domain.enums.UseContext;
+import uk.nhs.cdss.domain.enums.UseContextType;
 
 @Data
 public class UsageContext {
 
-  private String code;
-  private String valueCodeableConcept;
-  private IntRange valueRange;
+  private UseContextType code;
+  private UseContext value;
 
-  public boolean hasCodeableConcept() {
-    return StringUtils.isNotEmpty(valueCodeableConcept);
-  }
-
-  public boolean hasRange() {
-    return valueRange != null;
-  }
 }

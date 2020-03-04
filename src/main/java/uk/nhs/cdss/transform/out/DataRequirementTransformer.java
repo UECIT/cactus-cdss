@@ -5,7 +5,7 @@ import org.hl7.fhir.dstu3.model.DataRequirement;
 import org.hl7.fhir.dstu3.model.DataRequirement.DataRequirementCodeFilterComponent;
 import org.hl7.fhir.dstu3.model.StringType;
 import org.springframework.stereotype.Component;
-import uk.nhs.cdss.domain.DataRequirement.Type;
+import uk.nhs.cdss.domain.enums.FHIRType;
 import uk.nhs.cdss.engine.CodeDirectory;
 import uk.nhs.cdss.transform.Transformer;
 
@@ -22,13 +22,13 @@ public class DataRequirementTransformer
     final var PROFILE_FORMAT = "https://fhir.hl7.org.uk/STU3/StructureDefinition/CareConnect-%s-1";
 
     var dataRequirement = new DataRequirement();
-    var type = from.getType().name();
+    var type = from.getType().getValue();
     dataRequirement.setType(type);
     dataRequirement.addProfile(String.format(PROFILE_FORMAT, type));
 
-    if (from.getType() == Type.QuestionnaireResponse) {
+    if (from.getType() == FHIRType.QUESTIONNAIRE_RESPONSE) {
       dataRequirement.addCodeFilter(buildQuestionnaireFilter(from.getQuestionnaireId()));
-    } else if (from.getType() == Type.Observation) {
+    } else if (from.getType() == FHIRType.OBSERVATION) {
       dataRequirement.addCodeFilter(buildCodeFilter(from.getCode()));
     }
 
@@ -46,7 +46,7 @@ public class DataRequirementTransformer
     var filter = new DataRequirementCodeFilterComponent();
 
     filter.setPath("code");
-    var coding = codeDirectory.getCode(code);
+    var coding = codeDirectory.getCoding(code);
     filter.addValueCoding(codingTransformer.transform(coding));
 
     return filter;
