@@ -6,10 +6,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
-import org.hl7.fhir.dstu3.model.CareConnectCondition.CareConnectConditionStageComponent;
 import org.hl7.fhir.dstu3.model.CodeableConcept;
 import org.hl7.fhir.dstu3.model.Condition;
 import org.hl7.fhir.dstu3.model.Condition.ConditionClinicalStatus;
+import org.hl7.fhir.dstu3.model.Condition.ConditionStageComponent;
 import org.hl7.fhir.dstu3.model.Condition.ConditionVerificationStatus;
 import org.hl7.fhir.dstu3.model.DateTimeType;
 import org.springframework.stereotype.Component;
@@ -46,8 +46,8 @@ public class ConditionTransformer implements Transformer<ConcernBundle, Conditio
     }
 
     condition.setOnset(new DateTimeType(Date.from(onsetDate)));
-    condition.setStage(new CareConnectConditionStageComponent()
-      .setCareConnectSummary(conceptTransformer.transform(codeDirectory.get("defaultStage"))));
+    condition.setStage(new ConditionStageComponent()
+      .setSummary(conceptTransformer.transform(codeDirectory.get("defaultStage"))));
 
     condition.addEvidence()
         .setDetail(from.getQuestionnaireEvidenceDetail());
