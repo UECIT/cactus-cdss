@@ -3,6 +3,7 @@ package uk.nhs.cdss.config;
 import static uk.nhs.cdss.constants.SystemCode.INVALID_RESOURCE;
 import static uk.nhs.cdss.constants.SystemCode.NO_RECORD_FOUND;
 
+import java.util.stream.Collectors;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import uk.nhs.cdss.constants.SnomedConstants;
@@ -17,8 +18,18 @@ import uk.nhs.cdss.engine.CodeDirectory;
 public class CodeDirectoryConfig {
 
   private Concept snomed(String id, String description) {
+    if (!id.matches("[0-9]+")) {
+      // Generate a dummy digit-only ID based on the text of the ID
+      String digitId = id.chars()
+          .mapToObj(Integer::toString)
+          .collect(Collectors.joining());
+
+      var coding = new Coding(SystemURL.CS_SNOMED, digitId, description);
+      return new Concept(id, coding);
+    }
     return buildCode(SystemURL.CS_SNOMED, id, description);
   }
+
   private Concept buildCode(String systemURL, String id, String description) {
     var coding = new Coding(systemURL, id, description);
     return new Concept(id, coding);
@@ -28,6 +39,7 @@ public class CodeDirectoryConfig {
     return buildCode(SystemURL.VS_GPC_ERROR_WARNING_CODE, id, description);
   }
 
+  // @formatter:off
   @Bean
   public CodeDirectory codeDirectory() {
     CodeDirectory codeDirectory = new CodeDirectory();
