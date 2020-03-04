@@ -19,7 +19,8 @@
       "value": "present"
     },
     {
-      "code": "debug"
+      "code": "debug",
+      "value": "present"
     }
   ],
   "dataRequirements": [

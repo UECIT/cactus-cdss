@@ -30,8 +30,11 @@ public class CodeDirectory {
   public void put(Concept concept) {
     put(concept.getText(), concept);
   }
+  public void put(uk.nhs.cdss.domain.enums.Concept concept) {
+    put(concept.toDomainConcept());
+  }
 
-  public Coding getCode(String id) {
+  public Coding getCoding(String id) {
     return get(id).getCoding().get(0);
   }
 }

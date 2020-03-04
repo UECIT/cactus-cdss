@@ -20,15 +20,15 @@
   "useContext": [
     {
       "code": "age",
-      "valueCodeableConcept": "child"
+      "value": "child"
     },
     {
       "code": "user",
-      "valueCodeableConcept": "Practitioner"
+      "value": "Practitioner"
     },
     {
       "code": "setting",
-      "valueCodeableConcept": "phone"
+      "value": "phone"
     }
   ],
   "topics": [

@@ -9,6 +9,8 @@ import uk.nhs.cdss.constants.SnomedConstants;
 import uk.nhs.cdss.constants.SystemURL;
 import uk.nhs.cdss.domain.Coding;
 import uk.nhs.cdss.domain.Concept;
+import uk.nhs.cdss.domain.enums.Gender;
+import uk.nhs.cdss.domain.enums.UseContextType;
 import uk.nhs.cdss.engine.CodeDirectory;
 
 @Configuration
@@ -16,15 +18,6 @@ public class CodeDirectoryConfig {
 
   private Concept snomed(String id, String description) {
     return buildCode(SystemURL.CS_SNOMED, id, description);
-  }
-  private Concept contextType(String id, String description) {
-    return buildCode(SystemURL.CS_CONTEXT_TYPE, id, description);
-  }
-  private Concept gender(String id, String description) {
-    return buildCode(SystemURL.CS_GENDER, id, description);
-  }
-  private Concept provider(String id, String description) {
-    return buildCode(SystemURL.CS_PROVIDER_TAXONOMY, id, description);
   }
   private Concept buildCode(String systemURL, String id, String description) {
     var coding = new Coding(systemURL, id, description);
@@ -38,6 +31,9 @@ public class CodeDirectoryConfig {
   @Bean
   public CodeDirectory codeDirectory() {
     CodeDirectory codeDirectory = new CodeDirectory();
+
+    codeDirectory.put(UseContextType.GENDER);
+    codeDirectory.put(Gender.FEMALE);
 
     // Values
     codeDirectory.put("present", buildCode("value", "present", "Condition is present"));
@@ -57,7 +53,6 @@ public class CodeDirectoryConfig {
     constipation(codeDirectory);
     errors(codeDirectory);
 
-    usageContexts(codeDirectory);
     outcomes(codeDirectory);
 
     return codeDirectory;
@@ -81,41 +76,6 @@ public class CodeDirectoryConfig {
     codeDirectory.put(snomed("gum", "GUM"));
     codeDirectory.put(snomed("pharmacy", "See Pharmacist"));
     codeDirectory.put("selfCare", snomed(SnomedConstants.SELF_CARE, "After Care Instructions"));
-  }
-
-  private void usageContexts(CodeDirectory codeDirectory) {
-    codeDirectory.put("gender", contextType("gender", "Gender"));
-    codeDirectory.put("age", contextType("age", "Age Range"));
-    codeDirectory.put("focus", contextType("focus", "Clinical Focus"));
-    codeDirectory.put("user", contextType("user", "User Type"));
-    codeDirectory.put("workflow", contextType("workflow", "Workflow Setting"));
-    codeDirectory.put("task", contextType("task", "Workflow Task"));
-    codeDirectory.put("venue", contextType("venue", "Clinical Venue"));
-    codeDirectory.put("species", contextType("species", "Species"));
-    codeDirectory.put("setting", contextType("setting", "Setting"));
-
-    // gender
-    codeDirectory.put("female", gender("female", "Female"));
-    codeDirectory.put("male", gender("male", "Male"));
-    codeDirectory.put("other", gender("other", "Other"));
-    codeDirectory.put("unknown", gender("unknown", "Unknown"));
-
-    // age
-    codeDirectory.put("adult", snomed("133936004", "Adult (person)"));
-    codeDirectory.put("child", snomed("67822003", "Child (person)"));
-
-    // user type
-    codeDirectory.put("Practitioner", provider("Practitioner", "Practitioner"));
-    codeDirectory.put("Patient", provider("Patient", "Patient"));
-    codeDirectory.put("RelatedPerson", provider("RelatedPerson", "Related Person"));
-
-    // setting
-    codeDirectory.put("phone", provider("phone", "Phone call"));
-    codeDirectory.put("online", provider("online", "Online"));
-    codeDirectory.put("clinical", provider("clinical", "Clinical"));
-
-    // Topic
-    codeDirectory.put("triage", buildCode(SystemURL.CS_CDS_STUB, "TRI", "Triage"));
   }
 
   private void common(CodeDirectory codeDirectory) {

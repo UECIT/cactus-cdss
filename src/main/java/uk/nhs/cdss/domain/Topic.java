@@ -5,6 +5,6 @@ import lombok.Data;
 @Data
 public class Topic {
 
-  private String code;
+  private uk.nhs.cdss.domain.enums.Topic code;
   private boolean userSelected;
 }

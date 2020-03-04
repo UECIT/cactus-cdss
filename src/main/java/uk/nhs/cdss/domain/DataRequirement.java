@@ -2,20 +2,13 @@ package uk.nhs.cdss.domain;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uk.nhs.cdss.domain.enums.FHIRType;
 
 @Data
 @NoArgsConstructor
 public class DataRequirement {
 
-  public enum Type {
-    Age,
-    Observation,
-    Organization,
-    Patient,
-    QuestionnaireResponse
-  }
-
-  private Type type;
+  private FHIRType type;
   private String questionnaireId;
   private String code;
 

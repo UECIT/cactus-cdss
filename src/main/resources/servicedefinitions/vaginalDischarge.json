@@ -31,7 +31,7 @@
   "useContext": [
     {
       "code": "gender",
-      "valueCodeableConcept": "female"
+      "value": "female"
     }
   ]
 }
