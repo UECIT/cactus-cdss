@@ -1,15 +1,18 @@
 {
-    "id": "palpitations2.chestPain24",
-    "items": [
-      {
-        "id": "q",
-        "text": "Have you had any pain in your chest or upper back in the last 24 hours?",
-        "type": "CHOICE",
-        "required": true,
-        "options": [
-          "Yes",
-          "No"
-        ]
-      }
-    ]
-  }
+  "id": "palpitations2.chestPain24",
+  "jurisdictions": [
+    "GB"
+  ],
+  "items": [
+    {
+      "id": "q",
+      "text": "Have you had any pain in your chest or upper back in the last 24 hours?",
+      "type": "CHOICE",
+      "required": true,
+      "options": [
+        "Yes",
+        "No"
+      ]
+    }
+  ]
+}

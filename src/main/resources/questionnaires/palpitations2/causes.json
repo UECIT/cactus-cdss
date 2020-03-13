@@ -1,45 +1,48 @@
 {
-    "id": "palpitations2.causes",
-    "items": [
-      {
-        "id": "group",
-        "text": "Do any of these apply to you?",
-        "type": "GROUP",
-        "items": [
-          {
-            "id": "q1",
-            "text": "Some foods seem to bring on the palpitations",
-            "type": "CHOICE",
-            "options": [
-              "Yes"
-            ]
-          },
-          {
-            "id": "q2",
-            "text": "Some drinks seem to bring on the palpitations",
-            "type": "CHOICE",
-            "options": [
-              "Yes"
-            ]
-          },
-          {
-            "id": "q3",
-            "text": "Smoke or have given up smoking in the last month",
-            "type": "CHOICE",
-            "options": [
-              "Yes"
-            ]
-          },
-          {
-            "id": "q4",
-            "text": "None of the above",
-            "type": "CHOICE",
-            "options": [
-              "Yes"
-            ]
-          }
-        ]
-      }
-    ]
-  }
+  "id": "palpitations2.causes",
+  "jurisdictions": [
+    "GB"
+  ],
+  "items": [
+    {
+      "id": "group",
+      "text": "Do any of these apply to you?",
+      "type": "GROUP",
+      "items": [
+        {
+          "id": "q1",
+          "text": "Some foods seem to bring on the palpitations",
+          "type": "CHOICE",
+          "options": [
+            "Yes"
+          ]
+        },
+        {
+          "id": "q2",
+          "text": "Some drinks seem to bring on the palpitations",
+          "type": "CHOICE",
+          "options": [
+            "Yes"
+          ]
+        },
+        {
+          "id": "q3",
+          "text": "Smoke or have given up smoking in the last month",
+          "type": "CHOICE",
+          "options": [
+            "Yes"
+          ]
+        },
+        {
+          "id": "q4",
+          "text": "None of the above",
+          "type": "CHOICE",
+          "options": [
+            "Yes"
+          ]
+        }
+      ]
+    }
+  ]
+}
   

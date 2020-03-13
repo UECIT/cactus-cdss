@@ -1,15 +1,18 @@
 {
-    "id": "palpitations2.mentalHealthConcern",
-    "items": [
-      {
-        "id": "q",
-        "text": "Is your mental health a concern to you?",
-        "type": "CHOICE",
-        "required": true,
-        "options": [
-          "Yes",
-          "No"
-        ]
-      }
-    ]
-  }
+  "id": "palpitations2.mentalHealthConcern",
+  "jurisdictions": [
+    "GB"
+  ],
+  "items": [
+    {
+      "id": "q",
+      "text": "Is your mental health a concern to you?",
+      "type": "CHOICE",
+      "required": true,
+      "options": [
+        "Yes",
+        "No"
+      ]
+    }
+  ]
+}

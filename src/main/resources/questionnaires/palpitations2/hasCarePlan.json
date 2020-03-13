@@ -1,15 +1,18 @@
 {
-    "id": "palpitations2.familyHistory",
-    "items": [
-      {
-        "id": "q",
-        "text": "Do you have a care plan to follow?",
-        "type": "CHOICE",
-        "required": true,
-        "options": [
-          "Yes",
-          "No"
-        ]
-      }
-    ]
-  }
+  "id": "palpitations2.familyHistory",
+  "jurisdictions": [
+    "GB"
+  ],
+  "items": [
+    {
+      "id": "q",
+      "text": "Do you have a care plan to follow?",
+      "type": "CHOICE",
+      "required": true,
+      "options": [
+        "Yes",
+        "No"
+      ]
+    }
+  ]
+}

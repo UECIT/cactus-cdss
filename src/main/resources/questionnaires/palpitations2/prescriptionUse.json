@@ -1,16 +1,19 @@
 {
-    "id": "palpitations2.prescriptionUse",
-    "items": [
-      {
-        "id": "q",
-        "text": "Have you started any new prescribed medication or stopped any prescribed medication?",
-        "type": "CHOICE",
-        "required": true,
-        "options": [
-          "Yes",
-          "No",
-          "Unsure"
-        ]
-      }
-    ]
-  }
+  "id": "palpitations2.prescriptionUse",
+  "jurisdictions": [
+    "GB"
+  ],
+  "items": [
+    {
+      "id": "q",
+      "text": "Have you started any new prescribed medication or stopped any prescribed medication?",
+      "type": "CHOICE",
+      "required": true,
+      "options": [
+        "Yes",
+        "No",
+        "Unsure"
+      ]
+    }
+  ]
+}

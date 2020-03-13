@@ -1,14 +1,17 @@
 {
-    "id": "palpitations2.seenHCP",
-    "items": [
-      {
-        "id": "q",
-        "text": "Have you seen a Healthcare professional in the last 7 days about your heart problems?",
-        "type": "CHOICE",
-        "required": true,
-        "options": [
-          "Yes"
-        ]
-      }
-    ]
-  }
+  "id": "palpitations2.seenHCP",
+  "jurisdictions": [
+    "GB"
+  ],
+  "items": [
+    {
+      "id": "q",
+      "text": "Have you seen a Healthcare professional in the last 7 days about your heart problems?",
+      "type": "CHOICE",
+      "required": true,
+      "options": [
+        "Yes"
+      ]
+    }
+  ]
+}

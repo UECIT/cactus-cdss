@@ -1,15 +1,18 @@
 {
-    "id": "palpitations2.hadECG",
-    "items": [
-      {
-        "id": "q",
-        "text": "Have you had a recent 12 lead ECG?",
-        "type": "CHOICE",
-        "required": true,
-        "options": [
-          "Yes",
-          "No"
-        ]
-      }
-    ]
-  }
+  "id": "palpitations2.hadECG",
+  "jurisdictions": [
+    "GB"
+  ],
+  "items": [
+    {
+      "id": "q",
+      "text": "Have you had a recent 12 lead ECG?",
+      "type": "CHOICE",
+      "required": true,
+      "options": [
+        "Yes",
+        "No"
+      ]
+    }
+  ]
+}

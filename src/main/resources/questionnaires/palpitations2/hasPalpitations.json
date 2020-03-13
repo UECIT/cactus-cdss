@@ -1,5 +1,8 @@
 {
   "id": "palpitations2.hasPalpitations",
+  "jurisdictions": [
+    "GB"
+  ],
   "items": [
     {
       "id": "q",

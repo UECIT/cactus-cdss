@@ -1,5 +1,8 @@
 {
   "id": "palpitations.chestPain",
+  "jurisdictions": [
+    "GB"
+  ],
   "items": [
     {
       "id": "q1",

@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.nhs.cdss.domain.Question;
 import uk.nhs.cdss.services.NarrativeService;
+import uk.nhs.cdss.domain.enums.Concept;
 import uk.nhs.cdss.transform.Transformer;
 import uk.nhs.cdss.transform.bundle.QuestionnaireBundle;
 
@@ -20,6 +21,8 @@ import uk.nhs.cdss.transform.bundle.QuestionnaireBundle;
 public class QuestionnaireTransformer implements Transformer<QuestionnaireBundle, Questionnaire> {
 
   private final QuestionTransformer questionTransformer;
+  private final DateRangeTransformer dateRangeTransformer;
+  private final UsageContextTransformer usageContextTransformer;
   private final NarrativeService narrativeService;
 
   @Value("${cds.fhir.server}")
@@ -28,16 +31,36 @@ public class QuestionnaireTransformer implements Transformer<QuestionnaireBundle
   public Questionnaire transform(QuestionnaireBundle bundle) {
     var questionnaire = new Questionnaire();
     questionnaire.setId(bundle.getId());
-    questionnaire.setStatus(PublicationStatus.ACTIVE)
+    questionnaire
+        .setName(bundle.getId())
+        .setStatus(PublicationStatus.ACTIVE)
         .setUrl(fullUrl(bundle.getId()))
-        .setExperimental(false)
         .addSubjectType(ResourceType.PATIENT.toCode());
 
     questionnaire.setText(buildNarrative(bundle.getQuestionnaire()));
 
-    bundle.getQuestionnaire()
-        .getItems()
-        .stream()
+    uk.nhs.cdss.domain.Questionnaire from = bundle.getQuestionnaire();
+    questionnaire
+        .setTitle(from.getTitle())
+        .setDescription(from.getDescription())
+        .setPurpose(from.getPurpose())
+        .setExperimental(from.isExperimental())
+        .setVersion(from.getVersion())
+        .setDate(from.getDate())
+        .setPublisher(from.getPublisher())
+        .setApprovalDate(from.getApprovalDate())
+        .setLastReviewDate(from.getLastReviewDate())
+        .setEffectivePeriod(dateRangeTransformer.transform(from.getEffectivePeriod()));
+
+    from.getJurisdictions().stream()
+        .map(Concept::toCodeableConcept)
+        .forEach(questionnaire::addJurisdiction);
+
+    from.getUseContext().stream()
+        .map(usageContextTransformer::transform)
+        .forEach(questionnaire::addUseContext);
+
+    from.getItems().stream()
         .map(questionTransformer::transform)
         .forEach(questionnaire::addItem);
 
@@ -64,8 +87,8 @@ public class QuestionnaireTransformer implements Transformer<QuestionnaireBundle
     }
 
     var allLines = Stream.concat(
-          Stream.of("Patient was asked the following questions:"),
-          textLines.stream())
+        Stream.of("Patient was asked the following questions:"),
+        textLines.stream())
         .collect(Collectors.toUnmodifiableList());
 
     return narrativeService.buildNarrative(allLines);
