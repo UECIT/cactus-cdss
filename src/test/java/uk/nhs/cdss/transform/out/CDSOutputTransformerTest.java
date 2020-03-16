@@ -18,6 +18,7 @@ import uk.nhs.cdss.engine.CDSOutput;
 import uk.nhs.cdss.services.CDSDeviceService;
 import uk.nhs.cdss.services.CDSEndpointService;
 import uk.nhs.cdss.services.CDSOrganisationService;
+import uk.nhs.cdss.services.NarrativeService;
 import uk.nhs.cdss.services.ReferenceStorageService;
 import uk.nhs.cdss.transform.EvaluationParameters;
 import uk.nhs.cdss.transform.bundle.CDSOutputBundle;
@@ -50,13 +51,18 @@ public class CDSOutputTransformerTest {
         new StatusTransformer(), conceptTransformer,
         new TypeTransformer(conceptTransformer));
     var conditionTransformer = new ConditionTransformer(conceptTransformer, codeDirectory);
+    var narrativeService = new NarrativeService();
     var carePlanTransformer = new CarePlanTransformer(
         new CDSOrganisationService(new CDSEndpointService()),
         conditionTransformer,
-        mockStorageService);
+        mockStorageService,
+        narrativeService);
     var referralRequestTransformer = new ReferralRequestTransformer(
         conceptTransformer,
-        conditionTransformer, codeDirectory, mockStorageService);
+        conditionTransformer,
+        codeDirectory,
+        mockStorageService,
+        narrativeService);
 
     outputTransformer = new CDSOutputTransformer(carePlanTransformer,referralRequestTransformer,
         new RedirectTransformer(

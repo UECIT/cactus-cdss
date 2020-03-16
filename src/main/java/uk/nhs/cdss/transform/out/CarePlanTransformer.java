@@ -1,16 +1,14 @@
 package uk.nhs.cdss.transform.out;
 
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.hl7.fhir.dstu3.model.CareConnectCarePlan;
 import org.hl7.fhir.dstu3.model.CarePlan.CarePlanIntent;
 import org.hl7.fhir.dstu3.model.CarePlan.CarePlanStatus;
-import org.hl7.fhir.dstu3.model.Narrative;
-import org.hl7.fhir.dstu3.model.Narrative.NarrativeStatus;
 import org.hl7.fhir.dstu3.model.Reference;
 import org.springframework.stereotype.Component;
 import uk.nhs.cdss.domain.Concern;
 import uk.nhs.cdss.services.CDSOrganisationService;
+import uk.nhs.cdss.services.NarrativeService;
 import uk.nhs.cdss.services.ReferenceStorageService;
 import uk.nhs.cdss.transform.Transformer;
 import uk.nhs.cdss.transform.bundle.CarePlanBundle;
@@ -24,6 +22,7 @@ public class CarePlanTransformer
   private final CDSOrganisationService organisationService;
   private final ConditionTransformer conditionTransformer;
   private final ReferenceStorageService referenceStorageService;
+  private final NarrativeService narrativeService;
 
   @Override
   public CareConnectCarePlan transform(CarePlanBundle bundle) {
@@ -36,7 +35,7 @@ public class CarePlanTransformer
     result.setTitle(from.getTitle());
     result.setStatus(bundle.isDraft() ? CarePlanStatus.DRAFT : CarePlanStatus.ACTIVE);
     result.setIntent(CarePlanIntent.PLAN);
-    result.setText(transformNarrative(from.getTextLines()));
+    result.setText(narrativeService.buildNarrative(from.getTextLines()));
     result.setDescription(from.getDescription());
     result.setSubject(bundle.getSubject());
     result.setContext(bundle.getContext());
@@ -57,12 +56,5 @@ public class CarePlanTransformer
         .observationEvidenceDetail(bundle.getConditionEvidenceObservationDetail())
         .concern(concern)
         .build();
-  }
-
-  private Narrative transformNarrative(List<String> text) {
-    Narrative narrative = new Narrative();
-    narrative.setStatus(NarrativeStatus.GENERATED);
-    narrative.setDivAsString(String.join("<br />", text));
-    return narrative;
   }
 }

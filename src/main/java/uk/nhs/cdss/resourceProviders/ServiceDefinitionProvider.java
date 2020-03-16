@@ -115,7 +115,7 @@ public class ServiceDefinitionProvider implements IResourceProvider {
         .build();
 
     EvaluationParameters evaluationParameters = EvaluationParameters.builder()
-        .requestId(requestId.getId())
+        .requestId(requestId.getValue())
         .encounter(encounter)
         .patient(patient)
         .inputData(inputResources)

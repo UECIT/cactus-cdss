@@ -1,5 +1,6 @@
 package uk.nhs.cdss.transform.out;
 
+import static java.util.Collections.singletonList;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
 import com.google.common.base.Strings;
@@ -8,10 +9,13 @@ import java.time.Instant;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import org.hl7.fhir.dstu3.model.CodeableConcept;
+import org.hl7.fhir.dstu3.model.Coding;
 import org.hl7.fhir.dstu3.model.Identifier;
+import org.hl7.fhir.dstu3.model.Narrative;
 import org.hl7.fhir.dstu3.model.Period;
 import org.hl7.fhir.dstu3.model.Reference;
 import org.hl7.fhir.dstu3.model.ReferralRequest;
@@ -21,9 +25,9 @@ import org.hl7.fhir.dstu3.model.ReferralRequest.ReferralRequestStatus;
 import org.hl7.fhir.dstu3.model.Type;
 import org.springframework.stereotype.Component;
 import uk.nhs.cdss.domain.ActivityDefinition;
-import uk.nhs.cdss.domain.Concept;
 import uk.nhs.cdss.domain.Concern;
 import uk.nhs.cdss.engine.CodeDirectory;
+import uk.nhs.cdss.services.NarrativeService;
 import uk.nhs.cdss.services.ReferenceStorageService;
 import uk.nhs.cdss.transform.Transformer;
 import uk.nhs.cdss.transform.bundle.ConcernBundle;
@@ -39,6 +43,7 @@ public class ReferralRequestTransformer implements
   private final ConditionTransformer conditionTransformer;
   private final CodeDirectory codeDirectory;
   private final ReferenceStorageService referenceStorageService;
+  private final NarrativeService narrativeService;
 
   @Override
   public ReferralRequest transform(ReferralRequestBundle bundle) {
@@ -56,10 +61,13 @@ public class ReferralRequestTransformer implements
     result.setPriority(ReferralPriority.ROUTINE);
     result.setSubject(bundle.getSubject());
     result.setContext(bundle.getContext());
+    result.setText(transformNarrative(bundle.getReferralRequest()));
     result.setOccurrence(transformOccurrence(from.getOccurrence()));
     result.setAuthoredOn(defaultIfNull(from.getAuthoredOn(), new Date()));
-    result.setReasonCode(transformNextActivity(from.getReasonCode()));
-    result.setReasonReference(Collections.singletonList(reasonRef));
+    result.setReasonCode(transformNextActivity(from.getReasonCode())
+        .stream()
+        .collect(Collectors.toUnmodifiableList()));
+    result.setReasonReference(singletonList(reasonRef));
     result.setDescription(from.getDescription());
     result.setSupportingInfo(from.getSecondaryReasons()
         .stream()
@@ -70,6 +78,19 @@ public class ReferralRequestTransformer implements
     result.setRelevantHistory(transformRelevantHistory(from.getRelevantHistory()));
 
     return result;
+  }
+
+  private Narrative transformNarrative(uk.nhs.cdss.domain.ReferralRequest referralRequest) {
+    var primaryConcern = transformNextActivity(referralRequest.getReasonCode())
+        .map(CodeableConcept::getCodingFirstRep)
+        .map(Coding::getDisplay);
+    var baseText = "Plan to refer patient to '"+ referralRequest.getDescription() + "'";
+
+    var text = primaryConcern
+        .map(pc -> baseText + " based on the concern '" + pc + "'")
+        .orElse(baseText);
+
+    return narrativeService.buildNarrative(text);
   }
 
   private ConcernBundle createConcernBundle(ReferralRequestBundle bundle, Concern concern) {
@@ -97,12 +118,10 @@ public class ReferralRequestTransformer implements
         .setEnd(Date.from(now.plus(duration)));
   }
 
-  private List<CodeableConcept> transformNextActivity(String nextActivity) {
-    if (nextActivity == null) {
-      return null;
-    }
-    Concept code = codeDirectory.get(nextActivity);
-    return Collections.singletonList(conceptTransformer.transform(code));
+  private Optional<CodeableConcept> transformNextActivity(String nextActivity) {
+    return Optional.ofNullable(nextActivity)
+        .map(codeDirectory::get)
+        .map(conceptTransformer::transform);
   }
 
   private List<Reference> transformDefinition(ActivityDefinition definition) {
