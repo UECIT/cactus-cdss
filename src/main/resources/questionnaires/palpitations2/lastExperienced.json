@@ -1,39 +1,42 @@
 {
-    "id": "palpitations2.lastExperienced",
-    "items": [
-      {
-        "id": "group",
-        "text": "When did you last experience palpitations?",
-        "type": "GROUP",
-        "items": [
-          {
-            "id": "q1",
-            "text": "Less than 12 hours ago",
-            "type": "CHOICE",
-            "options": [
-              "Yes"
-            ]
-          },
-          {
-            "id": "q2",
-            "text": "Less than 48 hours ago",
-            "type": "CHOICE",
-            "options": [
-              "Yes"
-            ]
-          },
-          {
-            "id": "q3",
-            "text": "Over 48 hours ago",
-            "type": "CHOICE",
-            "options": [
-              "Yes",
-              "No",
-              "Unsure"
-            ]
-          }
-        ]
-      }
-    ]
-  }
+  "id": "palpitations2.lastExperienced",
+  "jurisdictions": [
+    "GB"
+  ],
+  "items": [
+    {
+      "id": "group",
+      "text": "When did you last experience palpitations?",
+      "type": "GROUP",
+      "items": [
+        {
+          "id": "q1",
+          "text": "Less than 12 hours ago",
+          "type": "CHOICE",
+          "options": [
+            "Yes"
+          ]
+        },
+        {
+          "id": "q2",
+          "text": "Less than 48 hours ago",
+          "type": "CHOICE",
+          "options": [
+            "Yes"
+          ]
+        },
+        {
+          "id": "q3",
+          "text": "Over 48 hours ago",
+          "type": "CHOICE",
+          "options": [
+            "Yes",
+            "No",
+            "Unsure"
+          ]
+        }
+      ]
+    }
+  ]
+}
   

@@ -1,5 +1,8 @@
 {
   "id": "palpitations.breathing",
+  "jurisdictions": [
+    "GB"
+  ],
   "items": [
     {
       "id": "q3",

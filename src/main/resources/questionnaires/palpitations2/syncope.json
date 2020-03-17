@@ -1,16 +1,19 @@
 {
-    "id": "palpitations2.syncope",
-    "items": [
-      {
-        "id": "q",
-        "text": "Syncope or near syncope",
-        "type": "CHOICE",
-        "required": true,
-        "options": [
-          "Yes",
-          "No",
-          "Unsure"
-        ]
-      }
-    ]
-  }
+  "id": "palpitations2.syncope",
+  "jurisdictions": [
+    "GB"
+  ],
+  "items": [
+    {
+      "id": "q",
+      "text": "Syncope or near syncope",
+      "type": "CHOICE",
+      "required": true,
+      "options": [
+        "Yes",
+        "No",
+        "Unsure"
+      ]
+    }
+  ]
+}

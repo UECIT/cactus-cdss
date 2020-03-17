@@ -6,11 +6,14 @@ import uk.nhs.cdss.domain.DateRange;
 import uk.nhs.cdss.transform.Transformer;
 
 @Component
-public class DateRangeTransformer
-  implements Transformer<DateRange, Period> {
+public class DateRangeTransformer implements Transformer<DateRange, Period> {
 
   @Override
   public Period transform(DateRange from) {
+    if (from == null) {
+      return null;
+    }
+
     var period = new Period();
     period.setStart(from.getStart());
     period.setEnd(from.getEnd());
