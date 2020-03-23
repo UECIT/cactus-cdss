@@ -580,6 +580,7 @@ then
                 .id("pharmacy-nicotine-168h")
                 .description("Consult GP")
                 .reasonCode("gp")
+                .occurrence("PT168h")
                 .reason(Concern.builder()
                     .condition("nicotine")
                     .build()) 
