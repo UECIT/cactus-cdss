@@ -3,17 +3,14 @@ package uk.nhs.cdss.transform.out;
 import static java.util.Collections.singletonList;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
-import com.google.common.base.Strings;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import org.hl7.fhir.dstu3.model.CodeableConcept;
-import org.hl7.fhir.dstu3.model.Coding;
 import org.hl7.fhir.dstu3.model.Identifier;
 import org.hl7.fhir.dstu3.model.Narrative;
 import org.hl7.fhir.dstu3.model.Period;
@@ -64,9 +61,7 @@ public class ReferralRequestTransformer implements
     result.setText(transformNarrative(bundle.getReferralRequest()));
     result.setOccurrence(transformOccurrence(from.getOccurrence()));
     result.setAuthoredOn(defaultIfNull(from.getAuthoredOn(), new Date()));
-    result.setReasonCode(transformNextActivity(from.getReasonCode())
-        .stream()
-        .collect(Collectors.toUnmodifiableList()));
+    result.setReasonCode(singletonList(transformNextActivity(from.getReasonCode())));
     result.setReasonReference(singletonList(reasonRef));
     result.setDescription(from.getDescription());
     result.setSupportingInfo(from.getSecondaryReasons()
@@ -81,15 +76,10 @@ public class ReferralRequestTransformer implements
   }
 
   private Narrative transformNarrative(uk.nhs.cdss.domain.ReferralRequest referralRequest) {
-    var primaryConcern = transformNextActivity(referralRequest.getReasonCode())
-        .map(CodeableConcept::getCodingFirstRep)
-        .map(Coding::getDisplay);
+    var primaryConcern = transformNextActivity(referralRequest.getReasonCode()).getCodingFirstRep().getDisplay();
     var baseText = "Plan to refer patient to '"+ referralRequest.getDescription() + "'";
 
-    var text = primaryConcern
-        .map(pc -> baseText + " based on the concern '" + pc + "'")
-        .orElse(baseText);
-
+    var text = baseText + " based on the concern '" + primaryConcern + "'";
     return narrativeService.buildNarrative(text);
   }
 
@@ -104,10 +94,6 @@ public class ReferralRequestTransformer implements
   }
 
   private Type transformOccurrence(String occurrence) {
-    if (Strings.isNullOrEmpty(occurrence)) {
-      return null;
-    }
-
     var duration = "routine".equalsIgnoreCase(occurrence)
         ? ROUTINE_APPOINTMENT_OCCURRENCE
         : Duration.parse(occurrence);
@@ -118,10 +104,8 @@ public class ReferralRequestTransformer implements
         .setEnd(Date.from(now.plus(duration)));
   }
 
-  private Optional<CodeableConcept> transformNextActivity(String nextActivity) {
-    return Optional.ofNullable(nextActivity)
-        .map(codeDirectory::get)
-        .map(conceptTransformer::transform);
+  private CodeableConcept transformNextActivity(String nextActivity) {
+    return conceptTransformer.transform(codeDirectory.get(nextActivity));
   }
 
   private List<Reference> transformDefinition(ActivityDefinition definition) {
