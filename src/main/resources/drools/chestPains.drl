@@ -228,6 +228,7 @@ then
                     .verificationStatus(VerificationStatus.CONFIRMED)
                     .build())
                 .occurrence("PT8m")
+                .reasonCode("gp") //TEMP: should not be populated in v2
                 .build(),
             applyPressureSitUpright(),
             waitForAmbulance())
@@ -291,7 +292,7 @@ then
 
 
     // Crush Injury/Fallen/Hit at high velocity
-    insert( new NextQuestion("chestPains.crushInjury", "chestPains.stabbedOrShot", "q", Arrays.asList("No")));
+    insert( new NextQuestion("chestPains.crushInjury", stabbedOrShot, "q", Arrays.asList("No")));
     insert( new AnswerAssertion("chestPains.crushInjury", "q1", "Yes", codeDirectory.get("crushInjury"), true));
     insert( new AnswerAssertion("chestPains.crushInjury", "q2", "Yes", codeDirectory.get("crushInjury"), true));
     insert( new AnswerAssertion("chestPains.crushInjury", "q3", "Yes", codeDirectory.get("crushInjury"), true));
