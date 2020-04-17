@@ -4,6 +4,7 @@ import static com.google.common.collect.Streams.zip;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.when;
 
 import ca.uhn.fhir.rest.param.CompositeAndListParam;
 import ca.uhn.fhir.rest.param.CompositeOrListParam;
@@ -24,14 +25,19 @@ import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.naming.TestCaseName;
 import org.hl7.fhir.dstu3.model.IdType;
+import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.instance.model.api.IIdType;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import uk.nhs.cdss.config.CodeDirectoryConfig;
 import uk.nhs.cdss.config.MapperConfig;
 import uk.nhs.cdss.engine.CodeDirectory;
 import uk.nhs.cdss.registry.ServiceDefinitionRegistry;
+import uk.nhs.cdss.services.DereferencingService;
+import uk.nhs.cdss.services.IResourceLocator;
 import uk.nhs.cdss.transform.out.CodingOutTransformer;
 import uk.nhs.cdss.transform.out.DataRequirementTransformer;
 import uk.nhs.cdss.transform.out.DateRangeTransformer;
@@ -44,6 +50,15 @@ import uk.nhs.cdss.transform.out.UsageContextTransformer;
 @SuppressWarnings("UnstableApiUsage")
 @RunWith(JUnitParamsRunner.class)
 public class ServiceDefinitionProvidersTest {
+
+  private static class LocatorStub implements IResourceLocator {
+    @Override
+    public <T extends IBaseResource> T findResource(IIdType id) {
+      var fakeResource = Mockito.mock(IBaseResource.class);
+      when(fakeResource.getIdElement()).thenReturn(id);
+      return null;
+    }
+  }
 
   private static ServiceDefinitionProvider provider;
   private static CodeDirectory codeDirectory = new CodeDirectoryConfig().codeDirectory();
@@ -62,7 +77,8 @@ public class ServiceDefinitionProvidersTest {
         codeDirectory,
         null,
         transformer,
-        new ServiceDefinitionRegistry(new MapperConfig().registryObjectMapper()));
+        new ServiceDefinitionRegistry(new MapperConfig().registryObjectMapper()),
+        new DereferencingService(new LocatorStub()));
   }
 
   @Test

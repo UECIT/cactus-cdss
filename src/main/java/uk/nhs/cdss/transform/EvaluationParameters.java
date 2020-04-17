@@ -13,20 +13,20 @@ import org.hl7.fhir.instance.model.api.IBase;
 @Getter
 @Builder
 public class EvaluationParameters {
-
-
-  private String requestId;
-  private Reference encounter;
-  private Reference patient;
+  private final String requestId;
+  private final Reference encounter;
+  private final Reference patient;
   @Singular("input")
-  private List<? extends IBase> inputData;
+  private final List<? extends IBase> inputData;
+  @Singular("inputParameter")
+  private final List<? extends IBase> inputParameters;
   @Singular
-  private List<QuestionnaireResponse> responses;
+  private final List<QuestionnaireResponse> responses;
   @Singular
-  private List<Observation> observations;
-  private CodeableConcept userType;
-  private CodeableConcept setting;
-  private CodeableConcept userLanguage;
-  private CodeableConcept userTaskContext;
+  private final List<Observation> observations;
+  private final CodeableConcept userType;
+  private final CodeableConcept setting;
+  private final CodeableConcept userLanguage;
+  private final CodeableConcept userTaskContext;
 
 }

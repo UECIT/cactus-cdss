@@ -29,6 +29,7 @@ import org.hl7.fhir.dstu3.model.CodeableConcept;
 import org.hl7.fhir.dstu3.model.GuidanceResponse;
 import org.hl7.fhir.dstu3.model.IdType;
 import org.hl7.fhir.dstu3.model.Observation;
+import org.hl7.fhir.dstu3.model.Parameters;
 import org.hl7.fhir.dstu3.model.Parameters.ParametersParameterComponent;
 import org.hl7.fhir.dstu3.model.QuestionnaireResponse;
 import org.hl7.fhir.dstu3.model.Reference;
@@ -47,6 +48,7 @@ import uk.nhs.cdss.search.ObservationTriggerCondition;
 import uk.nhs.cdss.search.PatientTriggerCondition;
 import uk.nhs.cdss.search.StatusCondition;
 import uk.nhs.cdss.search.UseContextCondition;
+import uk.nhs.cdss.services.DereferencingService;
 import uk.nhs.cdss.services.EvaluateService;
 import uk.nhs.cdss.transform.EvaluationParameters;
 import uk.nhs.cdss.transform.out.ServiceDefinitionTransformer;
@@ -59,6 +61,7 @@ public class ServiceDefinitionProvider implements IResourceProvider {
   private static final String EVALUATE = "$evaluate";
 
   private static final String INPUT_DATA = "inputData";
+  private static final String INPUT_PARAMETERS = "inputParameters";
   private static final String REQUEST_ID = "requestId";
   private static final String ENCOUNTER = "encounter";
   private static final String PATIENT = "patient";
@@ -78,6 +81,7 @@ public class ServiceDefinitionProvider implements IResourceProvider {
   private final EvaluateService evaluateService;
   private final ServiceDefinitionTransformer serviceDefinitionTransformer;
   private final ServiceDefinitionRegistry serviceDefinitionRegistry;
+  private final DereferencingService dereferencingService;
 
   @Getter(AccessLevel.NONE)
   private final Logger log = LoggerFactory.getLogger(getClass());
@@ -92,6 +96,7 @@ public class ServiceDefinitionProvider implements IResourceProvider {
       @IdParam IdType serviceDefinitionId,
       @OperationParam(name = REQUEST_ID, min = 1) IdType requestId,
       @OperationParam(name = INPUT_DATA, max = MAX_UNLIMITED) List<ParametersParameterComponent> inputData,
+      @OperationParam(name = INPUT_PARAMETERS, max = 1) Parameters inputParameters,
       @OperationParam(name = PATIENT, min = 1) Reference patient,
       @OperationParam(name = ENCOUNTER, min = 1) Reference encounter,
       @OperationParam(name = INITIATING_PERSON, min = 1) Reference initiatingPerson,
@@ -100,11 +105,7 @@ public class ServiceDefinitionProvider implements IResourceProvider {
       @OperationParam(name = USER_TASK) CodeableConcept userTaskContext,
       @OperationParam(name = SETTING, min = 1) CodeableConcept setting) {
 
-    // TODO Any references in the inputData need to be resolved NCTH-450
-    List<Resource> inputResources = inputData.stream()
-        .filter(ParametersParameterComponent::hasResource)
-        .map(ParametersParameterComponent::getResource)
-        .collect(Collectors.toList());
+    List<Resource> inputResources = dereferencingService.dereferenceResources(inputData);
 
     Context context = Context.builder()
         .task("ServiceDefinition/$evaluate")
@@ -119,6 +120,7 @@ public class ServiceDefinitionProvider implements IResourceProvider {
         .encounter(encounter)
         .patient(patient)
         .inputData(inputResources)
+        .inputParameters(dereferencingService.dereferenceResources(inputParameters))
         .responses(CollectionUtil.filterAndCast(inputResources, QuestionnaireResponse.class))
         .observations(CollectionUtil.filterAndCast(inputResources, Observation.class))
         .userType(userType)
