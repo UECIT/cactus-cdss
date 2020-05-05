@@ -1,7 +1,11 @@
 package uk.nhs.cdss.engine;
 
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 import uk.nhs.cdss.exception.ServiceDefinitionException;
@@ -121,9 +125,14 @@ public class Palpitations2Test extends BaseDroolsCDSEngineTest {
 
     evaluate();
 
-    assertEquals(5, output.getAssertions().size());
-    assertEquals("anxiety",
-        output.getOutcome().getRedirection().getObservationTriggers().get(0).getCode());
+    assertThat(output.getAssertions(), hasSize(5));
+    assertThat(output.getOutcome().getRedirection().getObservationTriggers().get(0).getCode(),
+        is("anxiety"));
+
+    redirect("anxiety");
+    evaluate();
+
+    assertThat(output.getQuestionnaireIds(), contains("anxiety.anxiety"));
   }
 
   @Test

@@ -23,16 +23,17 @@ public abstract class BaseDroolsCDSEngineTest {
   private DroolsCDSEngine engine;
   protected CDSOutput output;
 
-  private CDSInput input = CDSInput.builder()
-      .serviceDefinitionId(getServiceDefinition())
-      .requestId(REQUEST_1)
-      .encounterId(ENCOUNTER_1)
-      .supplierId(SUPPLIER_1)
-      .context(EvaluateContext.builder().build())
-      .build();
+  private CDSInput input;
 
   @Before
   public void setup() {
+    input = CDSInput.builder()
+        .serviceDefinitionId(getServiceDefinition())
+        .requestId(REQUEST_1)
+        .encounterId(ENCOUNTER_1)
+        .supplierId(SUPPLIER_1)
+        .context(EvaluateContext.builder().build())
+        .build();
     CodeDirectoryConfig codeDirectoryConfig = new CodeDirectoryConfig();
     engine = new DroolsCDSEngine(new CDSKnowledgeBaseFactory(false),
         codeDirectoryConfig.codeDirectory());
@@ -107,6 +108,12 @@ public abstract class BaseDroolsCDSEngineTest {
         .build();
 
     input.getAssertions().add(ageAssertion);
+  }
+
+  protected void redirect(String newServiceDef) {
+    this.input = this.input.toBuilder()
+        .serviceDefinitionId(newServiceDef)
+        .build();
   }
 
   protected abstract String getServiceDefinition();
