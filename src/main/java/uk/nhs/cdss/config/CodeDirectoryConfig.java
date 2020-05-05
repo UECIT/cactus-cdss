@@ -149,6 +149,7 @@ public class CodeDirectoryConfig {
     codeDirectory.put("arrhythmia", snomed("arrhythmia", "Cardiac Arrhythmia"));
     codeDirectory.put("adverseReaction", snomed("adverseReaction", "Adverse reaction"));
     codeDirectory.put("anxiety", snomed(SnomedConstants.ANXIETY, "Anxiety"));
+    codeDirectory.put("hasAnxiety", snomed("hasAnxiety", "Anxiety"));
     codeDirectory.put("nicotine", snomed("nicotine", "Anxiety due to nicotine withdrawal"));
 
     // Activity Categories
