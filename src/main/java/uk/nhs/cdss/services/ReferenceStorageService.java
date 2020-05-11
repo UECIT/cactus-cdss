@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import org.hl7.fhir.dstu3.model.Reference;
 import org.hl7.fhir.dstu3.model.Resource;
 import org.springframework.stereotype.Service;
+import uk.nhs.cdss.util.RetryUtils;
 
 @Service
 @AllArgsConstructor
@@ -20,7 +21,10 @@ public class ReferenceStorageService {
    */
   public Reference upsert(Resource resource) {
     if (resource.hasId()) {
-      fhirClient.update().resource(resource).execute();
+      RetryUtils.retry(() -> fhirClient.update()
+          .resource(resource)
+          .execute(),
+          fhirClient.getServerBase());
       return new Reference(resource.getId());
     } else {
       return create(resource);
@@ -28,7 +32,10 @@ public class ReferenceStorageService {
   }
 
   public Reference create(Resource resource) {
-    var id = fhirClient.create().resource(resource).execute().getId();
+    var id = RetryUtils.retry(() -> fhirClient.create()
+        .resource(resource).execute()
+        .getId(),
+        fhirClient.getServerBase());
     resource.setId(id);
     return new Reference(id);
   }
