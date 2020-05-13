@@ -13,6 +13,10 @@ public class ReferenceStorageService {
 
   private IGenericClient fhirClient;
 
+  public IGenericClient getClient() {
+    return fhirClient;
+  }
+
   /**
    * Updates a record with an existing ID, or {@link #create(Resource)} a new record if the ID is missing
    *
