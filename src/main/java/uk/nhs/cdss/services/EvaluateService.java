@@ -3,6 +3,7 @@ package uk.nhs.cdss.services;
 import lombok.AllArgsConstructor;
 import org.hl7.fhir.dstu3.model.GuidanceResponse;
 import org.springframework.stereotype.Service;
+import uk.nhs.cdss.component.ResourceSetup;
 import uk.nhs.cdss.engine.CDSEngine;
 import uk.nhs.cdss.exception.ServiceDefinitionException;
 import uk.nhs.cdss.transform.EvaluationParameters;
@@ -18,11 +19,13 @@ public class EvaluateService {
   private CDSEngine rulesEngine;
   private CDSInputTransformer inputTransformer;
   private CDSOutputTransformer outputTransformer;
+  private ResourceSetup resourceSetup;
 
   public GuidanceResponse getGuidanceResponse(
       EvaluationParameters evaluationParameters,
       String serviceDefinitionId)
       throws ServiceDefinitionException {
+    resourceSetup.cancelResources(evaluationParameters.getEncounter());
     var inputBundle = new CDSInputBundle(serviceDefinitionId, evaluationParameters);
     var input = inputTransformer.transform(inputBundle);
 
