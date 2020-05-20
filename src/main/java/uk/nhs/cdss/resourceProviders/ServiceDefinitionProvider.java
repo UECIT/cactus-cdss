@@ -48,6 +48,7 @@ import uk.nhs.cdss.search.PatientTriggerCondition;
 import uk.nhs.cdss.search.StatusCondition;
 import uk.nhs.cdss.search.UseContextCondition;
 import uk.nhs.cdss.services.EvaluateService;
+import uk.nhs.cdss.component.ParameterResourceResolver;
 import uk.nhs.cdss.transform.EvaluationParameters;
 import uk.nhs.cdss.transform.out.ServiceDefinitionTransformer;
 import uk.nhs.cdss.util.CollectionUtil;
@@ -78,6 +79,7 @@ public class ServiceDefinitionProvider implements IResourceProvider {
   private final EvaluateService evaluateService;
   private final ServiceDefinitionTransformer serviceDefinitionTransformer;
   private final ServiceDefinitionRegistry serviceDefinitionRegistry;
+  private final ParameterResourceResolver parameterResourceResolver;
 
   @Getter(AccessLevel.NONE)
   private final Logger log = LoggerFactory.getLogger(getClass());
@@ -100,11 +102,7 @@ public class ServiceDefinitionProvider implements IResourceProvider {
       @OperationParam(name = USER_TASK) CodeableConcept userTaskContext,
       @OperationParam(name = SETTING, min = 1) CodeableConcept setting) {
 
-    // TODO Any references in the inputData need to be resolved NCTH-450
-    List<Resource> inputResources = inputData.stream()
-        .filter(ParametersParameterComponent::hasResource)
-        .map(ParametersParameterComponent::getResource)
-        .collect(Collectors.toList());
+    List<Resource> inputResources = parameterResourceResolver.resolve(inputData);
 
     Context context = Context.builder()
         .task("ServiceDefinition/$evaluate")
