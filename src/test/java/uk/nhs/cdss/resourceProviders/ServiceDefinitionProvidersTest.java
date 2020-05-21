@@ -62,7 +62,8 @@ public class ServiceDefinitionProvidersTest {
         codeDirectory,
         null,
         transformer,
-        new ServiceDefinitionRegistry(new MapperConfig().registryObjectMapper()));
+        new ServiceDefinitionRegistry(new MapperConfig().registryObjectMapper()),
+        null);
   }
 
   @Test
