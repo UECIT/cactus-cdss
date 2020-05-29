@@ -2,10 +2,6 @@ package uk.nhs.cdss.config;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.model.api.annotation.ResourceDef;
-import ca.uhn.fhir.rest.client.api.IClientInterceptor;
-import ca.uhn.fhir.rest.client.api.IGenericClient;
-import ca.uhn.fhir.rest.client.api.IHttpRequest;
-import ca.uhn.fhir.rest.client.api.IHttpResponse;
 import java.util.Arrays;
 import java.util.List;
 import org.hl7.fhir.dstu3.model.CareConnectCarePlan;
@@ -30,7 +26,6 @@ import org.hl7.fhir.dstu3.model.Resource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpHeaders;
 
 @Configuration
 public class FHIRConfig {
@@ -73,23 +68,5 @@ public class FHIRConfig {
     fhirContext.registerCustomType(CoordinateResource.class);
 
     return fhirContext;
-  }
-
-  @Bean
-  public IGenericClient fhirClient() {
-    IGenericClient fhirClient = fhirContext().newRestfulGenericClient(fhirServer);
-    fhirClient.registerInterceptor(new IClientInterceptor() {
-      @Override
-      public void interceptRequest(IHttpRequest theRequest) {
-        if (theRequest.getUri().startsWith(fhirServer)) {
-          theRequest.addHeader(HttpHeaders.AUTHORIZATION, fhirServerAuthToken);
-        }
-      }
-
-      @Override
-      public void interceptResponse(IHttpResponse theResponse) {
-      }
-    });
-    return fhirClient;
   }
 }
