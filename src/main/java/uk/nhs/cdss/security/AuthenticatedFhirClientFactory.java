@@ -1,4 +1,4 @@
-package uk.nhs.cdss.component;
+package uk.nhs.cdss.security;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.rest.client.api.IGenericClient;

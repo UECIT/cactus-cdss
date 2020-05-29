@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.hl7.fhir.dstu3.model.Reference;
 import org.hl7.fhir.dstu3.model.Resource;
 import org.springframework.stereotype.Component;
+import uk.nhs.cdss.security.AuthenticatedFhirClientFactory;
 
 @Component
 @RequiredArgsConstructor

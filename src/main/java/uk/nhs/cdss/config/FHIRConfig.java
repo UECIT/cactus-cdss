@@ -23,18 +23,11 @@ import org.hl7.fhir.dstu3.model.CareConnectRelatedPerson;
 import org.hl7.fhir.dstu3.model.CareConnectSpecimen;
 import org.hl7.fhir.dstu3.model.CoordinateResource;
 import org.hl7.fhir.dstu3.model.Resource;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class FHIRConfig {
-
-  @Value("${fhir.server}")
-  private String fhirServer;
-
-  @Value("${fhir.server.auth.token}")
-  private String fhirServerAuthToken;
 
   @Bean
   public FhirContext fhirContext() {
