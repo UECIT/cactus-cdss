@@ -37,6 +37,7 @@ import org.hl7.fhir.dstu3.model.ServiceDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RestController;
+import uk.nhs.cdss.audit.AuditService;
 import uk.nhs.cdss.engine.CodeDirectory;
 import uk.nhs.cdss.logging.Context;
 import uk.nhs.cdss.registry.ServiceDefinitionRegistry;
@@ -80,6 +81,7 @@ public class ServiceDefinitionProvider implements IResourceProvider {
   private final ServiceDefinitionTransformer serviceDefinitionTransformer;
   private final ServiceDefinitionRegistry serviceDefinitionRegistry;
   private final ParameterResourceResolver parameterResourceResolver;
+  private final AuditService auditService;
 
   @Getter(AccessLevel.NONE)
   private final Logger log = LoggerFactory.getLogger(getClass());
@@ -102,13 +104,15 @@ public class ServiceDefinitionProvider implements IResourceProvider {
       @OperationParam(name = USER_TASK) CodeableConcept userTaskContext,
       @OperationParam(name = SETTING, min = 1) CodeableConcept setting) {
 
+    auditService.addAuditProperty(REQUEST_ID, requestId.getValue());
+
     List<Resource> inputResources = parameterResourceResolver.resolve(inputData);
 
     Context context = Context.builder()
         .task("ServiceDefinition/$evaluate")
         .serviceDefinition(serviceDefinitionId.toString())
         .encounter(encounter.getReference())
-        .request(requestId.toString())
+        .request(requestId.getValue())
         .supplier(initiatingPerson.getId())
         .build();
 

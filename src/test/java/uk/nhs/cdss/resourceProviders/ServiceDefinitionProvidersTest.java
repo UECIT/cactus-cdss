@@ -4,6 +4,7 @@ import static com.google.common.collect.Streams.zip;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.mock;
 
 import ca.uhn.fhir.rest.param.CompositeAndListParam;
 import ca.uhn.fhir.rest.param.CompositeOrListParam;
@@ -28,6 +29,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import uk.nhs.cdss.audit.AuditService;
 import uk.nhs.cdss.config.CodeDirectoryConfig;
 import uk.nhs.cdss.config.MapperConfig;
 import uk.nhs.cdss.engine.CodeDirectory;
@@ -63,7 +65,8 @@ public class ServiceDefinitionProvidersTest {
         null,
         transformer,
         new ServiceDefinitionRegistry(new MapperConfig().registryObjectMapper()),
-        null);
+        null,
+        mock(AuditService.class));
   }
 
   @Test
