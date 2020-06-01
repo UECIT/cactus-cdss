@@ -1,20 +1,25 @@
 package uk.nhs.cdss.services;
 
+import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.hl7.fhir.dstu3.model.Reference;
 import org.hl7.fhir.dstu3.model.Resource;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.nhs.cdss.util.RetryUtils;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ReferenceStorageService {
 
-  private IGenericClient fhirClient;
+  private final FhirContext fhirContext;
+
+  @Value("${fhir.server}")
+  private String fhirServer;
 
   public IGenericClient getClient() {
-    return fhirClient;
+    return fhirContext.newRestfulGenericClient(fhirServer);
   }
 
   /**
@@ -25,10 +30,11 @@ public class ReferenceStorageService {
    */
   public Reference upsert(Resource resource) {
     if (resource.hasId()) {
-      RetryUtils.retry(() -> fhirClient.update()
+      var client = getClient();
+      RetryUtils.retry(() -> client.update()
           .resource(resource)
           .execute(),
-          fhirClient.getServerBase());
+          client.getServerBase());
       return new Reference(resource.getId());
     } else {
       return create(resource);
@@ -36,10 +42,11 @@ public class ReferenceStorageService {
   }
 
   public Reference create(Resource resource) {
-    var id = RetryUtils.retry(() -> fhirClient.create()
+    var client = getClient();
+    var id = RetryUtils.retry(() -> client.create()
         .resource(resource).execute()
         .getId(),
-        fhirClient.getServerBase());
+        client.getServerBase());
     resource.setId(id);
     return new Reference(id);
   }
