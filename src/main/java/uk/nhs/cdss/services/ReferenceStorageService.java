@@ -6,7 +6,7 @@ import org.hl7.fhir.dstu3.model.Reference;
 import org.hl7.fhir.dstu3.model.Resource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import uk.nhs.cdss.security.AuthenticatedFhirClientFactory;
+import uk.nhs.cactus.common.security.AuthenticatedFhirClientFactory;
 import uk.nhs.cdss.util.RetryUtils;
 
 @Service

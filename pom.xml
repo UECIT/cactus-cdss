@@ -16,8 +16,10 @@
     <java.version>11</java.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
     <fhir.version>3.0.0</fhir.version>
     <drools.version>7.28.0.Final</drools.version>
+    <cactus-common.version>0.0.1-SNAPSHOT</cactus-common.version>
   </properties>
 
 	<repositories>
@@ -45,9 +47,20 @@
 			<name>bintray</name>
 			<url>https://dl.bintray.com/ems-test-harness/hapi-fhir</url>
 		</repository>
+    <repository>
+      <id>cactus-common</id>
+      <name>GitHub UECIT Apache Maven Packages</name>
+      <url>https://maven.pkg.github.com/UECIT/cactus-common</url>
+    </repository>
 	</repositories>
 
   <dependencies>
+    <dependency>
+      <groupId>uk.nhs.cactus</groupId>
+      <artifactId>common</artifactId>
+      <version>${cactus-common.version}</version>
+    </dependency>
+
     <!-- Spring Dependencies -->
     <dependency>
       <groupId>org.springframework.boot</groupId>

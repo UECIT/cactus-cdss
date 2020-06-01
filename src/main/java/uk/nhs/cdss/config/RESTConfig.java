@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.client.RestTemplate;
-import uk.nhs.cdss.security.CactusToken;
+import uk.nhs.cactus.common.security.CactusToken;
 
 public class RESTConfig {
 
