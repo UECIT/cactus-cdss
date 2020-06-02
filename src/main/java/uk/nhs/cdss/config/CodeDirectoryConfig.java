@@ -315,14 +315,14 @@ public class CodeDirectoryConfig {
     // Activities (Specialties)
     codeDirectory.put(snomed("medicalReview", "Medical review and assessment"));
     codeDirectory.put(snomed("medicalReview&surgicalReview", "Medical review and assessment. Surgical review"));
-    codeDirectory.put(snomed("primaryHcpReview", "Primary HCP review & treatment"));
+    codeDirectory.put(snomed("primaryHcpReview", "Primary HCP review &amp; treatment"));
     codeDirectory.put(snomed("hcpReview&pregnancyTest", "Primary HCP review/examination. Pregnancy test"));
     codeDirectory.put(snomed("screening&contactTracing", "Screening and testing. Contact tracing treatment"));
     codeDirectory.put(snomed("screening&vaginalExam&contactTracing", "Screening and testing/vaginal exam. Contact tracing treatment"));
     codeDirectory.put(snomed("screening&vaginalExam", "Screening and testing/vaginal exam treatment"));
     codeDirectory.put(snomed("assessment&removal", "Assessment. Removal of foreign body. Treatment"));
     codeDirectory.put(snomed("urineTesting&hcpAssessment&diagnosis", "Urine testing. HCP assessment. Diagnosis. Treatment"));
-    codeDirectory.put(snomed("catheterisation&hcpAssessment&diagnosis", "HCP assessment. Catheterisation. Diagnosis. Treatment & possible referral"));
+    codeDirectory.put(snomed("catheterisation&hcpAssessment&diagnosis", "HCP assessment. Catheterisation. Diagnosis. Treatment &amp; possible referral"));
     codeDirectory.put(snomed("pep&counselling&police", "PEP treatment. Wound management. Counselling. Police investigation"));
     codeDirectory.put(snomed("examination&diagnosis", "Examination. Diagnosis. Treatment"));
   }
