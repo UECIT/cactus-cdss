@@ -38,8 +38,8 @@ public class JWTAuthComponentTest {
   @Rule
   public ExpectedException thrown = ExpectedException.none();
 
-  private String serviceDefinitionUrl() {
-    return "http://localhost:" + port + "/fhir/ServiceDefinition/anxiety";
+  private String testURL() {
+    return "http://localhost:" + port + "/fhir/metadata";
   }
 
   @Test
@@ -58,7 +58,7 @@ public class JWTAuthComponentTest {
     }));
 
     ResponseEntity<String> result = client
-        .getForEntity(serviceDefinitionUrl(), String.class);
+        .getForEntity(testURL(), String.class);
     assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
   }
 
@@ -71,14 +71,14 @@ public class JWTAuthComponentTest {
     }));
 
     ResponseEntity<String> result = client
-        .getForEntity(serviceDefinitionUrl(), String.class);
+        .getForEntity(testURL(), String.class);
     assertThat(result.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
   }
 
   @Test
   public void rejectsMissingAuthorization() {
     ResponseEntity<String> client = new TestRestTemplate()
-        .getForEntity(serviceDefinitionUrl(), String.class);
+        .getForEntity(testURL(), String.class);
     assertThat(client.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
   }
 }
