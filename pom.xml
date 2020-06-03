@@ -61,6 +61,13 @@
       <version>${cactus-common.version}</version>
     </dependency>
 
+    <!-- AWS Dependencies -->
+    <dependency>
+      <groupId>com.amazonaws</groupId>
+      <artifactId>aws-java-sdk-sqs</artifactId>
+      <version>1.11.792</version>
+    </dependency>
+
     <!-- Testing Dependencies -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
