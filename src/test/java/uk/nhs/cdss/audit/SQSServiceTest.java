@@ -67,7 +67,9 @@ public class SQSServiceTest {
     assertThat(actual.getMessageGroupId(), is("mocksupplierid"));
     assertThat(actual.getQueueUrl(), is("mock.queue"));
     assertThat(actual.getMessageAttributes(),
-        hasEntry("sender", new MessageAttributeValue().withStringValue("cdss")));
+        hasEntry("sender", new MessageAttributeValue()
+            .withDataType("String")
+            .withStringValue("cdss")));
     assertThat(actual.getMessageDeduplicationId(), notNullValue());
   }
 
