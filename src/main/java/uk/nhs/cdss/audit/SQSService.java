@@ -19,6 +19,7 @@ import uk.nhs.cdss.audit.model.AuditSession;
 public class SQSService {
 
   private static final String SENDER = "sender";
+  private static final String STRING = "String";
   private static final String SUPPLIER = "supplierId";
 
   @Value("${sqs.audit.queue}")
@@ -39,8 +40,12 @@ public class SQSService {
       SendMessageRequest request = new SendMessageRequest()
           .withMessageGroupId(supplierId)
           .withMessageDeduplicationId(UUID.randomUUID().toString())
-          .addMessageAttributesEntry(SENDER, new MessageAttributeValue().withStringValue("cdss"))
-          .addMessageAttributesEntry(SUPPLIER, new MessageAttributeValue().withStringValue(supplierId))
+          .addMessageAttributesEntry(SENDER, new MessageAttributeValue()
+              .withDataType(STRING)
+              .withStringValue("cdss"))
+          .addMessageAttributesEntry(SUPPLIER, new MessageAttributeValue()
+              .withDataType(STRING)
+              .withStringValue(supplierId))
           .withQueueUrl(loggingQueue)
           .withMessageBody(new ObjectMapper().writeValueAsString(session));
       sqsClient.sendMessage(request);
