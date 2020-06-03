@@ -16,7 +16,7 @@ public class CDSOrganisationService {
 
   public static final String MAIN_ID = "cds-test-engine-organisation";
 
-  @Value("${cds.fhir.server}")
+  @Value("${cdss.fhir.server}")
   private String cdsServer;
 
   private final CDSEndpointService endpointService;

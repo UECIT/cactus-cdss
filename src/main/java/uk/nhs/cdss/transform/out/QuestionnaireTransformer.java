@@ -25,7 +25,7 @@ public class QuestionnaireTransformer implements Transformer<QuestionnaireBundle
   private final UsageContextTransformer usageContextTransformer;
   private final NarrativeService narrativeService;
 
-  @Value("${cds.fhir.server}")
+  @Value("${cdss.fhir.server}")
   private String cdsServer;
 
   public Questionnaire transform(QuestionnaireBundle bundle) {

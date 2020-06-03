@@ -14,7 +14,7 @@ public class CDSDeviceService {
 
   public static final String MAIN_ID = "cds-test-engine-device";
 
-  @Value("${cds.fhir.server}")
+  @Value("${cdss.fhir.server}")
   private String cdsServer;
 
   public Device getCds() {

@@ -20,7 +20,7 @@ public class ServiceDefinitionTransformer implements
   private final TopicTransformer topicTransformer;
   private final TriggerTransformer triggerTransformer;
 
-  @Value("${cds.fhir.server}")
+  @Value("${cdss.fhir.server}")
   private String cdsServer;
 
   @Override
