@@ -7,23 +7,25 @@ import org.hl7.fhir.dstu3.model.Reference;
 import org.hl7.fhir.dstu3.model.Resource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import uk.nhs.cactus.common.security.AuthenticatedFhirClientFactory;
 import uk.nhs.cdss.util.RetryUtils;
 
 @Service
 @RequiredArgsConstructor
 public class ReferenceStorageService {
 
-  private final FhirContext fhirContext;
-
   @Value("${fhir.server}")
   private String fhirServer;
 
+  private final AuthenticatedFhirClientFactory clientFactory;
+
   public IGenericClient getClient() {
-    return fhirContext.newRestfulGenericClient(fhirServer);
+    return clientFactory.getClient(fhirServer);
   }
 
   /**
-   * Updates a record with an existing ID, or {@link #create(Resource)} a new record if the ID is missing
+   * Updates a record with an existing ID, or {@link #create(Resource)} a new record if the ID is
+   * missing
    *
    * @param resource the resource to update on the remote server
    * @return a reference to the stored resource
@@ -32,8 +34,8 @@ public class ReferenceStorageService {
     if (resource.hasId()) {
       var client = getClient();
       RetryUtils.retry(() -> client.update()
-          .resource(resource)
-          .execute(),
+              .resource(resource)
+              .execute(),
           client.getServerBase());
       return new Reference(resource.getId());
     } else {
@@ -44,8 +46,8 @@ public class ReferenceStorageService {
   public Reference create(Resource resource) {
     var client = getClient();
     var id = RetryUtils.retry(() -> client.create()
-        .resource(resource).execute()
-        .getId(),
+            .resource(resource).execute()
+            .getId(),
         client.getServerBase());
     resource.setId(id);
     return new Reference(id);

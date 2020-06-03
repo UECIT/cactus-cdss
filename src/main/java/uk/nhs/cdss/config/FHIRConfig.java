@@ -2,9 +2,6 @@ package uk.nhs.cdss.config;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.model.api.annotation.ResourceDef;
-import ca.uhn.fhir.rest.client.apache.ApacheRestfulClientFactory;
-import ca.uhn.fhir.rest.client.api.IClientInterceptor;
-import ca.uhn.fhir.rest.client.api.IGenericClient;
 import java.util.Arrays;
 import java.util.List;
 import javax.annotation.PostConstruct;
@@ -34,8 +31,6 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @RequiredArgsConstructor
 public class FHIRConfig {
-
-  private final List<IClientInterceptor> clientInterceptors;
 
   @Bean
   public FhirContext fhirContext() {
@@ -69,24 +64,5 @@ public class FHIRConfig {
     fhirContext.registerCustomType(CoordinateResource.class);
 
     return fhirContext;
-  }
-
-  @PostConstruct
-  private void configureClientInterceptors() {
-    ApacheRestfulClientFactory factory = new ApacheRestfulClientFactory() {
-      @Override
-      public synchronized IGenericClient newGenericClient(String theServerBase) {
-        IGenericClient client = super.newGenericClient(theServerBase);
-
-        for (IClientInterceptor interceptor : clientInterceptors) {
-          client.registerInterceptor(interceptor);
-        }
-        return client;
-      }
-    };
-
-    FhirContext fhirContext = fhirContext();
-    factory.setFhirContext(fhirContext);
-    fhirContext.setRestfulClientFactory(factory);
   }
 }
