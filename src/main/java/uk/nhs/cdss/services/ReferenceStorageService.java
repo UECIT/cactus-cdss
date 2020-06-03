@@ -1,5 +1,6 @@
 package uk.nhs.cdss.services;
 
+import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import lombok.RequiredArgsConstructor;
 import org.hl7.fhir.dstu3.model.Reference;
@@ -31,7 +32,7 @@ public class ReferenceStorageService {
    */
   public Reference upsert(Resource resource) {
     if (resource.hasId()) {
-      IGenericClient client = getClient();
+      var client = getClient();
       RetryUtils.retry(() -> client.update()
               .resource(resource)
               .execute(),
@@ -43,7 +44,7 @@ public class ReferenceStorageService {
   }
 
   public Reference create(Resource resource) {
-    IGenericClient client = getClient();
+    var client = getClient();
     var id = RetryUtils.retry(() -> client.create()
             .resource(resource).execute()
             .getId(),

@@ -4,6 +4,8 @@ import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.model.api.annotation.ResourceDef;
 import java.util.Arrays;
 import java.util.List;
+import javax.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import org.hl7.fhir.dstu3.model.CareConnectCarePlan;
 import org.hl7.fhir.dstu3.model.CareConnectCareTeam;
 import org.hl7.fhir.dstu3.model.CareConnectCondition;
@@ -27,6 +29,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+@RequiredArgsConstructor
 public class FHIRConfig {
 
   @Bean
