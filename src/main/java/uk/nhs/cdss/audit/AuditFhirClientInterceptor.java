@@ -14,8 +14,6 @@ import uk.nhs.cdss.audit.model.HttpResponse;
 @RequiredArgsConstructor
 public class AuditFhirClientInterceptor implements IClientInterceptor {
 
-  public static final String SOURCE_HEADER = "X-Forwarded-For";
-
   private final AuditService auditService;
 
   @Value("${server.host}")
@@ -23,13 +21,12 @@ public class AuditFhirClientInterceptor implements IClientInterceptor {
 
   @Override
   public void interceptRequest(IHttpRequest theRequest) {
-    theRequest.addHeader(SOURCE_HEADER, host);
     auditService.startEntry(HttpRequest.from(theRequest));
   }
 
   @Override
   public void interceptResponse(IHttpResponse theResponse) throws IOException {
     theResponse.bufferEntity();
-   auditService.endEntry(HttpResponse.from(theResponse));
+    auditService.endEntry(HttpResponse.from(theResponse));
   }
 }
