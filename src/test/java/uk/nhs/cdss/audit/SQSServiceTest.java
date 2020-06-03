@@ -51,6 +51,7 @@ public class SQSServiceTest {
   @Test
   public void shouldSendAuditSessionToSqs() throws Exception {
     ReflectionTestUtils.setField(sqsService, "loggingQueue", "mock.queue");
+    ReflectionTestUtils.setField(sqsService, "serviceName", "cdss");
     when(mockAuthService.requireSupplierId())
         .thenReturn("mocksupplierid");
 

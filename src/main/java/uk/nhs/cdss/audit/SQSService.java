@@ -25,6 +25,9 @@ public class SQSService {
   @Value("${sqs.audit.queue}")
   private String loggingQueue;
 
+  @Value("${service.name}")
+  private String serviceName;
+
   private final AmazonSQS sqsClient;
   private final TokenAuthenticationService authenticationService;
 
@@ -42,7 +45,7 @@ public class SQSService {
           .withMessageDeduplicationId(UUID.randomUUID().toString())
           .addMessageAttributesEntry(SENDER, new MessageAttributeValue()
               .withDataType(STRING)
-              .withStringValue("cdss"))
+              .withStringValue(serviceName))
           .addMessageAttributesEntry(SUPPLIER, new MessageAttributeValue()
               .withDataType(STRING)
               .withStringValue(supplierId))
