@@ -33,22 +33,22 @@ public class SQSService {
 
   public void sendAudit(AuditSession session) {
 
-    var supplierId = authenticationService.requireSupplierId();
-    if (StringUtils.isEmpty(loggingQueue)) {
+    var supplierId = authenticationService.getCurrentSupplierId();
+    if (StringUtils.isEmpty(loggingQueue) || supplierId.isEmpty()) {
       // Nowhere to send audits, log to console for now
       log.info(session.toString());
       return;
     }
     try {
       SendMessageRequest request = new SendMessageRequest()
-          .withMessageGroupId(supplierId)
+          .withMessageGroupId(supplierId.get())
           .withMessageDeduplicationId(UUID.randomUUID().toString())
           .addMessageAttributesEntry(SENDER, new MessageAttributeValue()
               .withDataType(STRING)
               .withStringValue(serviceName))
           .addMessageAttributesEntry(SUPPLIER, new MessageAttributeValue()
               .withDataType(STRING)
-              .withStringValue(supplierId))
+              .withStringValue(supplierId.get()))
           .withQueueUrl(loggingQueue)
           .withMessageBody(new ObjectMapper().writeValueAsString(session));
       sqsClient.sendMessage(request);
