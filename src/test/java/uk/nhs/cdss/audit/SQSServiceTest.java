@@ -41,8 +41,8 @@ public class SQSServiceTest {
   @Test
   public void shouldNotSendIfNoQueue() {
     ReflectionTestUtils.setField(sqsService, "loggingQueue", null);
-    when(mockAuthService.requireSupplierId())
-        .thenReturn("mocksupplierid");
+    when(mockAuthService.getCurrentSupplierId())
+        .thenReturn(Optional.of("mocksupplierid"));
 
     sqsService.sendAudit(AuditSession.builder().build());
 
