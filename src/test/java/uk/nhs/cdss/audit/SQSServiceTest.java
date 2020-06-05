@@ -14,6 +14,7 @@ import com.amazonaws.services.sqs.model.SendMessageRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Instant;
 import java.util.Collections;
+import java.util.Optional;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -40,8 +41,8 @@ public class SQSServiceTest {
   @Test
   public void shouldNotSendIfNoQueue() {
     ReflectionTestUtils.setField(sqsService, "loggingQueue", null);
-    when(mockAuthService.requireSupplierId())
-        .thenReturn("mocksupplierid");
+    when(mockAuthService.getCurrentSupplierId())
+        .thenReturn(Optional.of("mocksupplierid"));
 
     sqsService.sendAudit(AuditSession.builder().build());
 
@@ -52,12 +53,11 @@ public class SQSServiceTest {
   public void shouldSendAuditSessionToSqs() throws Exception {
     ReflectionTestUtils.setField(sqsService, "loggingQueue", "mock.queue");
     ReflectionTestUtils.setField(sqsService, "serviceName", "cdss");
-    when(mockAuthService.requireSupplierId())
-        .thenReturn("mocksupplierid");
+    when(mockAuthService.getCurrentSupplierId())
+        .thenReturn(Optional.of("mocksupplierid"));
 
     AuditSession session = testSession();
     sqsService.sendAudit(session);
-
 
     var captor = ArgumentCaptor.forClass(SendMessageRequest.class);
     verify(mockSqs).sendMessage(captor.capture());
