@@ -23,6 +23,7 @@ import uk.nhs.cdss.services.ReferenceStorageService;
 import uk.nhs.cdss.transform.EvaluationParameters;
 import uk.nhs.cdss.transform.bundle.CDSOutputBundle;
 import uk.nhs.cdss.transform.out.ObservationTransformer.StatusTransformer;
+import uk.nhs.cdss.transform.out.one_one.ReferralRequestOneOneTransformer;
 
 public class CDSOutputTransformerTest {
 
@@ -57,7 +58,7 @@ public class CDSOutputTransformerTest {
         conditionTransformer,
         mockStorageService,
         narrativeService);
-    var referralRequestTransformer = new ReferralRequestTransformer(
+    var referralRequestTransformer = new ReferralRequestOneOneTransformer(
         conceptTransformer,
         conditionTransformer,
         codeDirectory,

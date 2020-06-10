@@ -1,31 +1,16 @@
 package uk.nhs.cdss.transform.bundle;
 
+import lombok.Builder;
+import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import uk.nhs.cdss.engine.CDSOutput;
 import uk.nhs.cdss.transform.EvaluationParameters;
 
+@Value
+@RequiredArgsConstructor
+@Builder
 public class CDSOutputBundle {
-  private final CDSOutput output;
-  private final String serviceDefinitionId;
-  private final EvaluationParameters parameters;
-
-  public CDSOutputBundle(
-      CDSOutput output,
-      String serviceDefinitionId,
-      EvaluationParameters parameters) {
-    this.output = output;
-    this.serviceDefinitionId = serviceDefinitionId;
-    this.parameters = parameters;
-  }
-
-  public CDSOutput getOutput() {
-    return output;
-  }
-
-  public String getServiceDefinitionId() {
-    return serviceDefinitionId;
-  }
-
-  public EvaluationParameters getParameters() {
-    return parameters;
-  }
+  CDSOutput output;
+  String serviceDefinitionId;
+  EvaluationParameters parameters;
 }
