@@ -22,7 +22,7 @@ import uk.nhs.cdss.transform.out.ConceptTransformer;
 import uk.nhs.cdss.transform.out.ConditionTransformer;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ReferralRequestOneOneTransformerTest {
+public class ReferralRequestTwoTransformerTest {
 
   @InjectMocks
   private ReferralRequestTwoTransformer referralRequestTwoTransformer;
