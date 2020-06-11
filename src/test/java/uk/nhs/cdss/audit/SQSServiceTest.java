@@ -33,6 +33,9 @@ public class SQSServiceTest {
   private SQSService sqsService;
 
   @Mock
+  private ObjectMapper mockMapper;
+
+  @Mock
   private AmazonSQSClient mockSqs;
 
   @Mock
@@ -57,14 +60,16 @@ public class SQSServiceTest {
         .thenReturn(Optional.of("mocksupplierid"));
 
     AuditSession session = testSession();
+    when(mockMapper.writeValueAsString(session))
+        .thenReturn("testMessageBody");
+
     sqsService.sendAudit(session);
 
     var captor = ArgumentCaptor.forClass(SendMessageRequest.class);
     verify(mockSqs).sendMessage(captor.capture());
 
     SendMessageRequest actual = captor.getValue();
-    assertThat(actual.getMessageBody(),
-        is(new ObjectMapper().writeValueAsString(session)));
+    assertThat(actual.getMessageBody(), is("testMessageBody"));
     assertThat(actual.getMessageGroupId(), is("mocksupplierid"));
     assertThat(actual.getQueueUrl(), is("mock.queue"));
     assertThat(actual.getMessageAttributes(),
