@@ -48,7 +48,7 @@ public class JWTAuthComponentTest {
     String token = Jwts.builder()
         .setSubject("user")
         .claim("supplierId", "supplier")
-        .signWith(SignatureAlgorithm.HS512, jwtSecret)
+        .signWith(SignatureAlgorithm.HS512, jwtSecret.getBytes())
         .compact();
 
     TestRestTemplate client = new TestRestTemplate();
