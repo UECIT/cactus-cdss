@@ -20,7 +20,6 @@ public class MapperConfig {
    * as ISO 8601 dates, behaviour which was not yet the default in our version of jackson.
    * @return The mapper with the configured modifiers.
    */
-  @Bean("enhanced")
   public ObjectMapper registryObjectMapper() {
 
     var uppercaseEnumModule = new SimpleModule()
