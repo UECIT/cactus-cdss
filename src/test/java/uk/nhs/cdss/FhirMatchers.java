@@ -38,22 +38,7 @@ public class FhirMatchers {
     String expectedMessage = "DataRequirement({type: " + expected.getType() + "}, "
         + "{codeFilter: [" + codeFiltersString + "]})";
 
-    return new FunctionMatcher<>(actual -> {
-      if (!actual.getType().equals(expected.getType())
-          || actual.getCodeFilter().size() != expected.getCodeFilter().size()) {
-        return false;
-      }
-
-      for (int i = 0; i < expected.getCodeFilter().size(); i++) {
-        var actualCf = actual.getCodeFilter().get(i);
-        var expectedCf = expected.getCodeFilter().get(i);
-        if (!actualCf.getPath().equals(expectedCf.getPath())
-            || !actualCf.getValueSet().equalsDeep(expectedCf.getValueSet())) {
-          return false;
-        }
-      }
-      return true;
-    }, expectedMessage);
+    return new FunctionMatcher<>(actual -> actual.equalsDeep(expected), expectedMessage);
   }
 
 }
