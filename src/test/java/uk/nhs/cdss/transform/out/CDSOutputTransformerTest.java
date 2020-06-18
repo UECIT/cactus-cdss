@@ -70,6 +70,7 @@ public class CDSOutputTransformerTest {
             new TriggerTransformer(codeDirectory, codingTransformer)), observationTransformer,
         new OperationOutcomeTransformer(conceptTransformer, codeDirectory),
         new RequestGroupTransformer(mockStorageService, new CDSDeviceService()),
+        new QuestionnaireDataRequirementTransformer(),
         mockStorageService);
   }
 

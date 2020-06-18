@@ -8,8 +8,6 @@ import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hl7.fhir.dstu3.model.CarePlan;
-import org.hl7.fhir.dstu3.model.DataRequirement;
-import org.hl7.fhir.dstu3.model.DataRequirement.DataRequirementCodeFilterComponent;
 import org.hl7.fhir.dstu3.model.GuidanceResponse;
 import org.hl7.fhir.dstu3.model.GuidanceResponse.GuidanceResponseStatus;
 import org.hl7.fhir.dstu3.model.Observation;
@@ -43,23 +41,8 @@ public class CDSOutputTransformer implements Transformer<CDSOutputBundle, Guidan
   private final ObservationTransformer observationTransformer;
   private final OperationOutcomeTransformer operationOutcomeTransformer;
   private final RequestGroupTransformer requestGroupTransformer;
+  private final QuestionnaireDataRequirementTransformer dataRequirementTransformer;
   private final ReferenceStorageService storageService;
-
-  private DataRequirement buildDataRequirement(String questionnaireId) {
-    var dataRequirement = new DataRequirement();
-    dataRequirement.setId("DR-" + questionnaireId);
-    dataRequirement.setType("Questionnaire");
-    dataRequirement.addProfile(
-        "https://fhir.hl7.org.uk/STU3/StructureDefinition/CareConnect-Questionnaire-1");
-
-    var codeFilter = new DataRequirementCodeFilterComponent();
-    codeFilter.setPath("url");
-    codeFilter.setValueSet(
-        new StringType("Questionnaire/" + questionnaireId));
-    dataRequirement.addCodeFilter(codeFilter);
-
-    return dataRequirement;
-  }
 
   private ParametersParameterComponent buildParameter(Observation observation) {
     final var NAME = "outputData";
@@ -148,7 +131,7 @@ public class CDSOutputTransformer implements Transformer<CDSOutputBundle, Guidan
 
     output.getQuestionnaireIds()
         .stream()
-        .map(this::buildDataRequirement)
+        .map(dataRequirementTransformer::transform)
         .forEach(response::addDataRequirement);
 
     if (outcome != null) {
