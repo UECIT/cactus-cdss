@@ -37,7 +37,6 @@ public class ServiceDefinitionRegistry {
           .refreshAfterWrite(Duration.ofSeconds(5))
           .build(new Loader());
 
-  @Qualifier("enhanced")
   private final ObjectMapper objectMapper;
 
   public Optional<ServiceDefinition> getById(String serviceName) {
