@@ -62,6 +62,7 @@ public class ServiceDefinitionProvider implements IResourceProvider {
 
   private static final String INPUT_DATA = "inputData";
   private static final String REQUEST_ID = "requestId";
+  private static final String CASE_ID = "caseId";
   private static final String ENCOUNTER = "encounter";
   private static final String PATIENT = "patient";
   private static final String INITIATING_PERSON = "initiatingPerson";
@@ -105,6 +106,7 @@ public class ServiceDefinitionProvider implements IResourceProvider {
       @OperationParam(name = SETTING, min = 1) CodeableConcept setting) {
 
     auditService.addAuditProperty(REQUEST_ID, requestId.getValue());
+    auditService.addAuditProperty(CASE_ID, encounter.getReferenceElement().getIdPart());
 
     List<Resource> inputResources = parameterResourceResolver.resolve(inputData);
 
