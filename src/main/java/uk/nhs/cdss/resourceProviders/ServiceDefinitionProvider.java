@@ -62,7 +62,6 @@ public class ServiceDefinitionProvider implements IResourceProvider {
 
   private static final String INPUT_DATA = "inputData";
   private static final String REQUEST_ID = "requestId";
-  private static final String CASE_ID = "caseId";
   private static final String ENCOUNTER = "encounter";
   private static final String PATIENT = "patient";
   private static final String INITIATING_PERSON = "initiatingPerson";
@@ -70,6 +69,10 @@ public class ServiceDefinitionProvider implements IResourceProvider {
   private static final String SETTING = "setting";
   private static final String USER_LANGUAGE = "userLanguage";
   private static final String USER_TASK = "userTaskContext";
+
+  private static final String CASE_ID = "caseId";
+  private static final String OPERATION = "operation";
+  private static final String SERVICE_SEARCH = "service_search";
 
   private static final String SP_EXPERIMENTAL = "experimental";
   private static final String SP_OBSERVATION_TYPE_CODE = "trigger-type-code-value-effective";
@@ -190,6 +193,8 @@ public class ServiceDefinitionProvider implements IResourceProvider {
           ConstructedAndListParam<ObservationTriggerParameter> observationParams,
       @OptionalParam(name = SP_PATIENT_TYPE_CODE, constructedType = PatientTriggerParameter.class)
           ConstructedParam<PatientTriggerParameter> patientParams) {
+
+    auditService.addAuditProperty(OPERATION, SERVICE_SEARCH);
 
     List<ServiceDefinition> serviceDefinitions = serviceDefinitionRegistry
         .getAll()
