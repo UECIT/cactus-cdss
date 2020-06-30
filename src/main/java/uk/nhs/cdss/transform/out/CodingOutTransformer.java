@@ -1,5 +1,7 @@
 package uk.nhs.cdss.transform.out;
 
+import static org.apache.commons.lang3.StringUtils.trimToEmpty;
+
 import org.hl7.fhir.dstu3.model.Coding;
 import org.springframework.stereotype.Component;
 import uk.nhs.cdss.transform.Transformer;
@@ -12,7 +14,7 @@ public class CodingOutTransformer implements Transformer<uk.nhs.cdss.domain.Codi
     var coding = new Coding();
     coding.setCode(from.getCode());
     coding.setSystem(from.getSystem());
-    coding.setDisplay(from.getDescription());
+    coding.setDisplay(trimToEmpty(from.getDescription()));
     return coding;
   }
 }

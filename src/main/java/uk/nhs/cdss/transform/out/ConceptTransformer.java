@@ -11,8 +11,7 @@ import uk.nhs.cdss.transform.Transformer;
 
 @Component
 @RequiredArgsConstructor
-public class ConceptTransformer implements
-    Transformer<Concept, CodeableConcept> {
+public class ConceptTransformer implements Transformer<Concept, CodeableConcept> {
 
   private final CodingOutTransformer codingTransformer;
 
