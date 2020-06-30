@@ -107,10 +107,10 @@ public class CarePlanTransformerTest {
 
     CareConnectCarePlan transformed = carePlanTransformer.transform(input);
 
-//    assertThat(transformed, FhirMatchers.isValidV1CarePlan()); TODO: CDSCT-358 Draft not valid 1.1.1
+    assertThat(transformed, FhirMatchers.isValidV1CarePlan());
 
     assertThat(transformed.getText(), FhirMatchers.hasText("Care Plan Narrative"));
-//    assertThat(transformed.getStatus(), is(CarePlanStatus.DRAFT)); TODO: CDSCT-358 Draft not valid 1.1.1
+    assertThat(transformed.getStatus(), is(CarePlanStatus.DRAFT));
     assertThat(transformed.getTitle(), is("Care Plan Title"));
     assertThat(transformed.getDescription(), is("This is a care plan; it describes care."));
     assertThat(transformed.getSubject(), FhirMatchers.referenceTo("subject/ref"));
