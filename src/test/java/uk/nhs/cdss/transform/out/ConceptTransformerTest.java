@@ -1,5 +1,6 @@
 package uk.nhs.cdss.transform.out;
 
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -29,8 +30,7 @@ public class ConceptTransformerTest {
   }
 
   @Test
-  public void transform_shouldTransform() {
-
+  public void transform_withFull_shouldTransform() {
     var coding1 = new Coding("1", "1");
     var coding2 = new Coding("2", "2");
 
@@ -44,6 +44,16 @@ public class ConceptTransformerTest {
     var transformedConcept = conceptTransformer.transform(initialConcept);
 
     assertThat(transformedConcept.getCoding(), hasItems(transformedCoding1, transformedCoding2));
+    assertThat(transformedConcept.getText(), is("validText"));
+  }
+
+  @Test
+  public void transform_withMinimum_shouldTransform() {
+    var initialConcept = new Concept("validText");
+
+    var transformedConcept = conceptTransformer.transform(initialConcept);
+
+    assertThat(transformedConcept.getCoding(), empty());
     assertThat(transformedConcept.getText(), is("validText"));
   }
 }

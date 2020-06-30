@@ -1,7 +1,9 @@
 package uk.nhs.cdss.transform.in;
 
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 
@@ -29,8 +31,7 @@ public class CodeableConceptTransformerTest {
   }
 
   @Test
-  public void transform_shouldTransform() {
-
+  public void transform_withFull_shouldTransform() {
     var coding1 = new Coding();
     var coding2 = new Coding();
 
@@ -48,5 +49,15 @@ public class CodeableConceptTransformerTest {
 
     assertThat(transformedConcept.getCoding(), hasItems(transformedCoding1, transformedCoding2));
     assertThat(transformedConcept.getText(), is("validText"));
+  }
+
+  @Test
+  public void transform_withMinimum_shouldTransform() {
+    var initialConcept = new CodeableConcept();
+
+    var transformedConcept = codeableConceptTransformer.transform(initialConcept);
+
+    assertThat(transformedConcept.getCoding(), empty());
+    assertThat(transformedConcept.getText(), isEmptyOrNullString());
   }
 }
