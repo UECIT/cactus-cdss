@@ -7,7 +7,7 @@ import org.hl7.fhir.dstu3.model.DataRequirement.DataRequirementCodeFilterCompone
 import org.hl7.fhir.dstu3.model.StringType;
 import org.junit.Before;
 import org.junit.Test;
-import uk.nhs.cdss.FhirMatchers;
+import uk.nhs.cdss.testHelpers.matchers.FhirMatchers;
 
 public class QuestionnaireDataRequirementTransformerTest {
 

@@ -19,7 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
-import uk.nhs.cdss.fixtures.CDSOutputBundleFixture;
+import uk.nhs.cdss.testHelpers.fixtures.CDSOutputBundleFixture;
 import uk.nhs.cdss.services.ReferenceStorageService;
 import uk.nhs.cdss.transform.bundle.CDSOutputBundle;
 

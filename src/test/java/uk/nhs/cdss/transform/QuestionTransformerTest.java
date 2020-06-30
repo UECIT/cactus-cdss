@@ -7,9 +7,9 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import static uk.nhs.cdss.ModelMatchers.hasValue;
-import static uk.nhs.cdss.ModelMatchers.isConstraint;
-import static uk.nhs.cdss.ModelMatchers.isOption;
+import static uk.nhs.cdss.testHelpers.matchers.ModelMatchers.hasValue;
+import static uk.nhs.cdss.testHelpers.matchers.ModelMatchers.isConstraint;
+import static uk.nhs.cdss.testHelpers.matchers.ModelMatchers.isOption;
 
 import org.hl7.fhir.dstu3.model.Questionnaire.QuestionnaireItemType;
 import org.junit.Test;
