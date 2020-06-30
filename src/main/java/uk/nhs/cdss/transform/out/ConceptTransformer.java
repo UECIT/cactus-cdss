@@ -2,6 +2,7 @@ package uk.nhs.cdss.transform.out;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import org.hl7.fhir.dstu3.model.CodeableConcept;
 import org.hl7.fhir.dstu3.model.Coding;
 import org.springframework.stereotype.Component;
@@ -9,15 +10,11 @@ import uk.nhs.cdss.domain.Concept;
 import uk.nhs.cdss.transform.Transformer;
 
 @Component
+@RequiredArgsConstructor
 public class ConceptTransformer implements
     Transformer<Concept, CodeableConcept> {
 
-  private CodingOutTransformer codingTransformer;
-
-  public ConceptTransformer(
-      CodingOutTransformer codingTransformer) {
-    this.codingTransformer = codingTransformer;
-  }
+  private final CodingOutTransformer codingTransformer;
 
   @Override
   public CodeableConcept transform(Concept from) {
