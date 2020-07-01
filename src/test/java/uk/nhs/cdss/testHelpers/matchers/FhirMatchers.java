@@ -27,7 +27,9 @@ import org.hl7.fhir.dstu3.model.Resource;
 public class FhirMatchers {
 
   public Matcher<DataRequirement> sameElement(DataRequirement expected) {
-    return new FunctionMatcher<>(actual -> actual.equalsDeep(expected), expected.toString());
+    return new FunctionMatcher<>(
+        actual -> actual.equalsDeep(expected),
+        expected.toString());
   }
 
   public static Matcher<Narrative> hasText(String text) {
