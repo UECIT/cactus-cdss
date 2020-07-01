@@ -3,6 +3,7 @@ package uk.nhs.cdss.domain;
 import java.util.Arrays;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -10,6 +11,7 @@ import lombok.ToString;
 @Builder(toBuilder = true)
 @AllArgsConstructor
 @ToString
+@EqualsAndHashCode
 public class EvaluateContext {
 
   private Role role;
