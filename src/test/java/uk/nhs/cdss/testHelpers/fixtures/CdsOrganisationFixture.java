@@ -1,4 +1,4 @@
-package uk.nhs.cdss.fixtures;
+package uk.nhs.cdss.testHelpers.fixtures;
 
 import lombok.experimental.UtilityClass;
 import org.hl7.fhir.dstu3.model.CareConnectOrganization;

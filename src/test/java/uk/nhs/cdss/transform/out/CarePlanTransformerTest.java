@@ -22,13 +22,13 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import uk.nhs.cdss.FhirMatchers;
 import uk.nhs.cdss.domain.CarePlan;
 import uk.nhs.cdss.domain.Concern;
-import uk.nhs.cdss.fixtures.CdsOrganisationFixture;
 import uk.nhs.cdss.services.CDSOrganisationService;
 import uk.nhs.cdss.services.NarrativeService;
 import uk.nhs.cdss.services.ReferenceStorageService;
+import uk.nhs.cdss.testHelpers.fixtures.CdsOrganisationFixture;
+import uk.nhs.cdss.testHelpers.matchers.FhirMatchers;
 import uk.nhs.cdss.transform.bundle.CarePlanBundle;
 import uk.nhs.cdss.transform.bundle.ConcernBundle;
 

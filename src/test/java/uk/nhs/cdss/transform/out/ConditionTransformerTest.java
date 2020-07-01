@@ -30,12 +30,12 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import uk.nhs.cdss.FhirMatchers;
 import uk.nhs.cdss.domain.Concept;
 import uk.nhs.cdss.domain.Concern;
 import uk.nhs.cdss.domain.Concern.ClinicalStatus;
 import uk.nhs.cdss.domain.Concern.VerificationStatus;
 import uk.nhs.cdss.engine.CodeDirectory;
+import uk.nhs.cdss.testHelpers.matchers.FhirMatchers;
 import uk.nhs.cdss.transform.bundle.ConcernBundle;
 
 @RunWith(MockitoJUnitRunner.class)
