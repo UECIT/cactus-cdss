@@ -1,16 +1,17 @@
-package uk.nhs.cdss;
+package uk.nhs.cdss.testHelpers.matchers;
 
 import static org.hamcrest.Matchers.either;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasProperty;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.hamcrest.Matcher;
 import org.hl7.fhir.dstu3.model.Questionnaire.QuestionnaireItemEnableWhenComponent;
 import org.hl7.fhir.dstu3.model.Questionnaire.QuestionnaireItemOptionComponent;
 
-public final class ModelMatchers {
-
-  private ModelMatchers() { }
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public class ModelMatchers {
 
   public static <T> Matcher<T> answerIsForQuestion(String question) {
     return hasProperty("questionId", equalTo(question));

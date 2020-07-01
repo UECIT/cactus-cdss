@@ -9,8 +9,8 @@ import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInA
 import static org.hamcrest.core.CombinableMatcher.both;
 import static org.hamcrest.core.Every.everyItem;
 import static org.junit.Assert.assertEquals;
-import static uk.nhs.cdss.ModelMatchers.answerIsForQuestion;
-import static uk.nhs.cdss.ModelMatchers.hasValue;
+import static uk.nhs.cdss.testHelpers.matchers.ModelMatchers.answerIsForQuestion;
+import static uk.nhs.cdss.testHelpers.matchers.ModelMatchers.hasValue;
 
 import java.util.Collection;
 import org.hl7.fhir.dstu3.model.QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent;
