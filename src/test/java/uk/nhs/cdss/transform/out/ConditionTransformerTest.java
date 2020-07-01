@@ -1,16 +1,17 @@
 package uk.nhs.cdss.transform.out;
 
+import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
-import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -69,7 +70,7 @@ public class ConditionTransformerTest {
 
   @Before
   public void setup() {
-    Concept stageConcept = new Concept("defaultStage");
+    Concept stageConcept = concept("defaultStage");
     when(codeDirectory.get("defaultStage"))
         .thenReturn(stageConcept);
     when(conceptTransformer.transform(stageConcept))
@@ -96,24 +97,19 @@ public class ConditionTransformerTest {
     Reference subject = new Reference("subject/ref");
     Reference response = new Reference("response/ref");
     Reference observation = new Reference("obs/ref");
-    Concern concern = Concern.builder()
-        .clinicalStatus(ClinicalStatus.ACTIVE)
-        .verificationStatus(VerificationStatus.PROVISIONAL)
-        .condition("a-condition")
-        .bodySite("head")
-        .build();
+
     ConcernBundle input = ConcernBundle.builder()
-        .concern(concern)
+        .concern(concern(ClinicalStatus.ACTIVE, null))
         .context(context)
         .subject(subject)
         .questionnaireEvidenceDetail(Collections.singletonList(response))
         .observationEvidenceDetail(Collections.singletonList(observation))
         .build();
 
-    Concept conditionConcept = new Concept("condition");
+    Concept conditionConcept = concept("condition");
     CodeableConcept conditionCode = new CodeableConcept()
         .addCoding(new Coding("sys", "a-condition", "A condition"));
-    Concept headConcept = new Concept("head");
+    Concept headConcept = concept("head");
     CodeableConcept headCode = new CodeableConcept()
         .addCoding(new Coding("sys", "a-head", "A head"));
 
@@ -121,13 +117,13 @@ public class ConditionTransformerTest {
         .thenReturn(ConditionClinicalStatus.ACTIVE);
     when(verificationStatusTransformer.transform(VerificationStatus.PROVISIONAL))
         .thenReturn(ConditionVerificationStatus.PROVISIONAL);
-    when(codeDirectory.get("a-condition"))
+    when(codeDirectory.get("condition"))
         .thenReturn(conditionConcept);
-    when(conceptTransformer.transform(argThat(is(conditionConcept))))
+    when(conceptTransformer.transform(conditionConcept))
         .thenReturn(conditionCode); //mock is returning the wrong thing!?
     when(codeDirectory.get("head"))
         .thenReturn(headConcept);
-    when(conceptTransformer.transform(argThat(is(headConcept))))
+    when(conceptTransformer.transform(headConcept))
         .thenReturn(headCode);
 
     Condition transformed = conditionTransformer.transform(input);
@@ -152,7 +148,71 @@ public class ConditionTransformerTest {
 
   @Test
   public void shouldTransformConcern_withProvidedOnset() {
+    Reference context = new Reference("context/ref");
+    Reference subject = new Reference("subject/ref");
+    Reference response = new Reference("response/ref");
+    Reference observation = new Reference("obs/ref");
 
+    ConcernBundle input = ConcernBundle.builder()
+        .concern(concern(ClinicalStatus.ACTIVE, "PT10H"))
+        .context(context)
+        .subject(subject)
+        .questionnaireEvidenceDetail(Collections.singletonList(response))
+        .observationEvidenceDetail(Collections.singletonList(observation))
+        .build();
+
+    Concept conditionConcept = concept("condition");
+    CodeableConcept conditionCode = new CodeableConcept()
+        .addCoding(new Coding("sys", "a-condition", "A condition"));
+    Concept headConcept = concept("head");
+    CodeableConcept headCode = new CodeableConcept()
+        .addCoding(new Coding("sys", "a-head", "A head"));
+
+    when(clinicalStatusTransformer.transform(ClinicalStatus.ACTIVE))
+        .thenReturn(ConditionClinicalStatus.ACTIVE);
+    when(verificationStatusTransformer.transform(VerificationStatus.PROVISIONAL))
+        .thenReturn(ConditionVerificationStatus.PROVISIONAL);
+    when(codeDirectory.get("condition"))
+        .thenReturn(conditionConcept);
+    when(conceptTransformer.transform(conditionConcept))
+        .thenReturn(conditionCode); //mock is returning the wrong thing!?
+    when(codeDirectory.get("head"))
+        .thenReturn(headConcept);
+    when(conceptTransformer.transform(headConcept))
+        .thenReturn(headCode);
+
+    Condition transformed = conditionTransformer.transform(input);
+
+    assertThat(transformed, FhirMatchers.isValidV1Condition());
+
+    List<List<Reference>> evidenceLists = transformed.getEvidence().stream()
+        .map(ConditionEvidenceComponent::getDetail)
+        .collect(Collectors.toList());
+    assertThat(transformed.getSubject(), FhirMatchers.referenceTo("subject/ref"));
+    assertThat(transformed.getContext(), FhirMatchers.referenceTo("context/ref"));
+    assertThat(evidenceLists,
+        containsInAnyOrder(Collections.singletonList(observation), Collections.singletonList(response)));
+    assertThat(transformed.getClinicalStatus(), is(ConditionClinicalStatus.ACTIVE));
+    assertThat(transformed.getVerificationStatus(), is(ConditionVerificationStatus.PROVISIONAL));
+    assertThat(transformed.getCode(), is(conditionCode));
+    assertThat(transformed.getBodySite(), contains(headCode));
+    assertThat(transformed.getOnsetDateTimeType().getValue().toInstant(),
+        is(FIXED_INSTANT.minus(10, ChronoUnit.HOURS)));
+    assertThat(transformed.getStage().getSummary(), is(STAGE_CODE));
+  }
+
+  private Concern concern(ClinicalStatus status, String onset) {
+    return Concern.builder()
+        .clinicalStatus(status)
+        .verificationStatus(VerificationStatus.PROVISIONAL)
+        .condition("condition")
+        .bodySite("head")
+        .onset(defaultIfNull(onset, null))
+        .build();
+  }
+
+  private Concept concept(String concept) {
+    return new Concept(concept, new uk.nhs.cdss.domain.Coding("sys", concept));
   }
 
 }
