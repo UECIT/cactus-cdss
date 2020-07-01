@@ -1,6 +1,6 @@
 package uk.nhs.cdss.services;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.hl7.fhir.dstu3.model.GuidanceResponse;
 import org.springframework.stereotype.Service;
 import uk.nhs.cdss.component.ResourceSetup;
@@ -13,13 +13,13 @@ import uk.nhs.cdss.transform.in.CDSInputTransformer;
 import uk.nhs.cdss.transform.out.CDSOutputTransformer;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class EvaluateService {
 
-  private CDSEngine rulesEngine;
-  private CDSInputTransformer inputTransformer;
-  private CDSOutputTransformer outputTransformer;
-  private ResourceSetup resourceSetup;
+  private final CDSEngine rulesEngine;
+  private final CDSInputTransformer inputTransformer;
+  private final CDSOutputTransformer outputTransformer;
+  private final ResourceSetup resourceSetup;
 
   public GuidanceResponse getGuidanceResponse(
       EvaluationParameters evaluationParameters,
