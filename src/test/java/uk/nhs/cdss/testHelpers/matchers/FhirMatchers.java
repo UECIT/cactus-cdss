@@ -21,6 +21,7 @@ import org.hl7.fhir.dstu3.model.Condition.ConditionEvidenceComponent;
 import org.hl7.fhir.dstu3.model.DataRequirement;
 import org.hl7.fhir.dstu3.model.Narrative;
 import org.hl7.fhir.dstu3.model.Reference;
+import org.hl7.fhir.dstu3.model.Resource;
 
 @UtilityClass
 public class FhirMatchers {
@@ -40,6 +41,10 @@ public class FhirMatchers {
         actual.hasReference()
             ? actual.getReference().equals(ref)
             : actual.getResource().getIdElement().getValue().equals(ref), "reference to " + ref);
+  }
+
+  public static Matcher<Reference> referenceTo(Resource resource) {
+    return referenceTo(resource.getId());
   }
 
   public static Matcher<CareConnectCarePlan> isValidV1CarePlan() {
