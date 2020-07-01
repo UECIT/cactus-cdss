@@ -5,6 +5,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneId;
 import org.hl7.fhir.dstu3.model.GuidanceResponse;
 import org.hl7.fhir.dstu3.model.Reference;
 import org.hl7.fhir.dstu3.model.Resource;
@@ -51,7 +54,12 @@ public class CDSOutputTransformerTest {
     var observationTransformer = new ObservationTransformer(
         new StatusTransformer(), conceptTransformer,
         new TypeTransformer(conceptTransformer));
-    var conditionTransformer = new ConditionTransformer(conceptTransformer, codeDirectory);
+    var conditionTransformer = new ConditionTransformer(
+        conceptTransformer,
+        codeDirectory,
+        new ConditionClinicalStatusTransformer(),
+        new ConditionVerificationStatusTransformer(),
+        Clock.fixed(Instant.now(), ZoneId.systemDefault()));
     var narrativeService = new NarrativeService();
     var carePlanTransformer = new CarePlanTransformer(
         new CDSOrganisationService(new CDSEndpointService()),

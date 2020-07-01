@@ -31,6 +31,6 @@ public class QuestionnaireDataRequirementTransformerTest {
           .setValueSet(new StringType("Questionnaire/initial")));
 
     assertThat(dataRequirement,
-        FhirMatchers.sameDataRequirement(expectedDataRequirement));
+        FhirMatchers.sameElement(expectedDataRequirement));
   }
 }
