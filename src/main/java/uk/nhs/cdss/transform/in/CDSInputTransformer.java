@@ -8,7 +8,7 @@ import uk.nhs.cdss.transform.bundle.CDSInputBundle;
 
 @Component
 @AllArgsConstructor
-public final class CDSInputTransformer implements Transformer<CDSInputBundle, CDSInput> {
+public class CDSInputTransformer implements Transformer<CDSInputBundle, CDSInput> {
 
   private final QuestionnaireResponseTransformer responseTransformer;
   private final AssertionTransformer assertionTransformer;

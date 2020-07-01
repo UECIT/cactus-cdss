@@ -1,8 +1,8 @@
 package uk.nhs.cdss.transform.out;
 
+import java.time.Clock;
 import java.util.Date;
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 import org.hl7.fhir.dstu3.model.Reference;
 import org.hl7.fhir.dstu3.model.RequestGroup;
 import org.hl7.fhir.dstu3.model.RequestGroup.RequestIntent;
@@ -14,12 +14,12 @@ import uk.nhs.cdss.services.ReferenceStorageService;
 import uk.nhs.cdss.transform.bundle.CDSOutputBundle;
 
 @Component
-@AllArgsConstructor
-@Slf4j
+@RequiredArgsConstructor
 public class RequestGroupTransformer {
 
   private final ReferenceStorageService storageService;
   private final CDSDeviceService cdsDeviceService;
+  private final Clock clock;
 
   public RequestGroup transform(CDSOutputBundle outputBundle) {
 
@@ -31,7 +31,7 @@ public class RequestGroupTransformer {
         .setPriority(RequestPriority.ROUTINE)
         .setSubject(subject)
         .setContext(context)
-        .setAuthoredOn(new Date())
+        .setAuthoredOn(Date.from(clock.instant()))
         .setAuthor(new Reference(cdsDeviceService.getCds()));
 
     storageService.create(requestGroup); // Save to get the ID

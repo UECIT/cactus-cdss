@@ -1,13 +1,13 @@
 package uk.nhs.cdss.transform.out;
 
 import static org.junit.Assert.assertThat;
+import static uk.nhs.cdss.testHelpers.matchers.FhirMatchers.sameElement;
 
 import org.hl7.fhir.dstu3.model.DataRequirement;
 import org.hl7.fhir.dstu3.model.DataRequirement.DataRequirementCodeFilterComponent;
 import org.hl7.fhir.dstu3.model.StringType;
 import org.junit.Before;
 import org.junit.Test;
-import uk.nhs.cdss.testHelpers.matchers.FhirMatchers;
 
 public class QuestionnaireDataRequirementTransformerTest {
 
@@ -30,7 +30,6 @@ public class QuestionnaireDataRequirementTransformerTest {
           .setPath("url")
           .setValueSet(new StringType("Questionnaire/initial")));
 
-    assertThat(dataRequirement,
-        FhirMatchers.sameElement(expectedDataRequirement));
+    assertThat(dataRequirement, sameElement(expectedDataRequirement));
   }
 }

@@ -6,6 +6,8 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
+import static uk.nhs.cdss.testHelpers.matchers.FhirMatchers.isValidV1Condition;
+import static uk.nhs.cdss.testHelpers.matchers.FhirMatchers.referenceTo;
 
 import java.time.Clock;
 import java.time.Instant;
@@ -35,7 +37,6 @@ import uk.nhs.cdss.domain.Concern;
 import uk.nhs.cdss.domain.Concern.ClinicalStatus;
 import uk.nhs.cdss.domain.Concern.VerificationStatus;
 import uk.nhs.cdss.engine.CodeDirectory;
-import uk.nhs.cdss.testHelpers.matchers.FhirMatchers;
 import uk.nhs.cdss.transform.bundle.ConcernBundle;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -128,13 +129,13 @@ public class ConditionTransformerTest {
 
     Condition transformed = conditionTransformer.transform(input);
 
-    assertThat(transformed, FhirMatchers.isValidV1Condition());
+    assertThat(transformed, isValidV1Condition());
 
     List<List<Reference>> evidenceLists = transformed.getEvidence().stream()
         .map(ConditionEvidenceComponent::getDetail)
         .collect(Collectors.toList());
-    assertThat(transformed.getSubject(), FhirMatchers.referenceTo("subject/ref"));
-    assertThat(transformed.getContext(), FhirMatchers.referenceTo("context/ref"));
+    assertThat(transformed.getSubject(), referenceTo("subject/ref"));
+    assertThat(transformed.getContext(), referenceTo("context/ref"));
     assertThat(evidenceLists,
         containsInAnyOrder(Collections.singletonList(observation), Collections.singletonList(response)));
     assertThat(transformed.getClinicalStatus(), is(ConditionClinicalStatus.ACTIVE));
@@ -183,13 +184,13 @@ public class ConditionTransformerTest {
 
     Condition transformed = conditionTransformer.transform(input);
 
-    assertThat(transformed, FhirMatchers.isValidV1Condition());
+    assertThat(transformed, isValidV1Condition());
 
     List<List<Reference>> evidenceLists = transformed.getEvidence().stream()
         .map(ConditionEvidenceComponent::getDetail)
         .collect(Collectors.toList());
-    assertThat(transformed.getSubject(), FhirMatchers.referenceTo("subject/ref"));
-    assertThat(transformed.getContext(), FhirMatchers.referenceTo("context/ref"));
+    assertThat(transformed.getSubject(), referenceTo("subject/ref"));
+    assertThat(transformed.getContext(), referenceTo("context/ref"));
     assertThat(evidenceLists,
         containsInAnyOrder(Collections.singletonList(observation), Collections.singletonList(response)));
     assertThat(transformed.getClinicalStatus(), is(ConditionClinicalStatus.ACTIVE));

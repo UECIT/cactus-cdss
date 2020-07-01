@@ -5,7 +5,7 @@ import static org.apache.commons.collections4.ListUtils.union;
 import java.sql.Date;
 import java.util.List;
 import java.util.stream.Collectors;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.hl7.fhir.dstu3.model.DataRequirement;
 import org.hl7.fhir.dstu3.model.DateTimeType;
 import org.springframework.stereotype.Component;
@@ -14,15 +14,15 @@ import uk.nhs.cdss.domain.Redirection;
 import uk.nhs.cdss.transform.Transformer;
 
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class RedirectTransformer implements Transformer<Redirection, List<DataRequirement>> {
 
-  private TriggerTransformer triggerTransformer;
+  private final TriggerTransformer triggerTransformer;
 
   @Override
   public List<DataRequirement> transform(Redirection from) {
     List<DataRequirement> observationDataRequirements = from.getObservationTriggers().stream()
-        .map(trigger -> triggerTransformer.buildDataRequirementFromObservation(trigger))
+        .map(triggerTransformer::buildDataRequirementFromObservation)
         .collect(Collectors.toList());
     List<DataRequirement> patientDataRequirements = from.getPatientTriggers().stream()
         .map(this::createPatientDataRequirement)
