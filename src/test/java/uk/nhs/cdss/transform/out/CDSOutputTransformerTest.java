@@ -47,7 +47,7 @@ public class CDSOutputTransformerTest {
       }
     });
 
-
+    Clock fixedClock = Clock.fixed(Instant.now(), ZoneId.systemDefault());
     var codingTransformer = new CodingOutTransformer();
     var conceptTransformer = new ConceptTransformer(codingTransformer);
     var codeDirectory = new CodeDirectoryConfig().codeDirectory();
@@ -59,7 +59,8 @@ public class CDSOutputTransformerTest {
         codeDirectory,
         new ConditionClinicalStatusTransformer(),
         new ConditionVerificationStatusTransformer(),
-        Clock.fixed(Instant.now(), ZoneId.systemDefault()));
+        fixedClock
+        );
     var narrativeService = new NarrativeService();
     var carePlanTransformer = new CarePlanTransformer(
         new CDSOrganisationService(new CDSEndpointService()),
@@ -77,7 +78,7 @@ public class CDSOutputTransformerTest {
         new RedirectTransformer(
             new TriggerTransformer(codeDirectory, codingTransformer)), observationTransformer,
         new OperationOutcomeTransformer(conceptTransformer, codeDirectory),
-        new RequestGroupTransformer(mockStorageService, new CDSDeviceService()),
+        new RequestGroupTransformer(mockStorageService, new CDSDeviceService(), fixedClock),
         new QuestionnaireDataRequirementTransformer(),
         mockStorageService);
   }

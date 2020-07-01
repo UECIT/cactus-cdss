@@ -4,6 +4,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.mockito.Mockito.when;
+import static uk.nhs.cdss.testHelpers.matchers.FhirMatchers.sameElement;
 
 import java.sql.Date;
 import java.time.LocalDate;
@@ -20,7 +21,6 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.nhs.cdss.domain.ObservationTrigger;
 import uk.nhs.cdss.domain.Redirection;
-import uk.nhs.cdss.testHelpers.matchers.FhirMatchers;
 
 @RunWith(MockitoJUnitRunner.class)
 public class RedirectTransformerTest {
@@ -54,7 +54,7 @@ public class RedirectTransformerTest {
         .setValue(new DateTimeType(
             Date.from(LocalDate.of(2001, 1, 1).atStartOfDay().toInstant(ZoneOffset.UTC))));
     assertThat(requirements,
-        contains(is(expectedObsRequirement), FhirMatchers.sameElement(expectedPatientRequirement)));
+        contains(is(expectedObsRequirement), sameElement(expectedPatientRequirement)));
   }
 
 }

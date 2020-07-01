@@ -8,9 +8,11 @@ import static org.hl7.fhir.dstu3.model.Condition.ConditionVerificationStatus.CON
 import static org.hl7.fhir.dstu3.model.Condition.ConditionVerificationStatus.DIFFERENTIAL;
 import static org.hl7.fhir.dstu3.model.Condition.ConditionVerificationStatus.PROVISIONAL;
 import static org.hl7.fhir.dstu3.model.Condition.ConditionVerificationStatus.UNKNOWN;
+
 import com.google.common.collect.Iterables;
 import java.util.List;
-import lombok.experimental.UtilityClass;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.hamcrest.Matcher;
 import org.hl7.fhir.dstu3.model.CareConnectCarePlan;
 import org.hl7.fhir.dstu3.model.CarePlan.CarePlanIntent;
@@ -21,12 +23,16 @@ import org.hl7.fhir.dstu3.model.Condition.ConditionEvidenceComponent;
 import org.hl7.fhir.dstu3.model.DataRequirement;
 import org.hl7.fhir.dstu3.model.Narrative;
 import org.hl7.fhir.dstu3.model.Reference;
+import org.hl7.fhir.dstu3.model.RequestGroup;
+import org.hl7.fhir.dstu3.model.RequestGroup.RequestIntent;
+import org.hl7.fhir.dstu3.model.RequestGroup.RequestPriority;
+import org.hl7.fhir.dstu3.model.RequestGroup.RequestStatus;
 import org.hl7.fhir.dstu3.model.Resource;
 
-@UtilityClass
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class FhirMatchers {
 
-  public Matcher<DataRequirement> sameElement(DataRequirement expected) {
+  public static Matcher<DataRequirement> sameElement(DataRequirement expected) {
     return new FunctionMatcher<>(
         actual -> actual.equalsDeep(expected),
         expected.toString());
@@ -86,5 +92,21 @@ public class FhirMatchers {
             .noneMatch(ConditionEvidenceComponent::hasCode), "valid 1.1.1 condition");
   }
 
+  public static Matcher<RequestGroup> isValidV1RequestGroup() {
+    return new FunctionMatcher<>(requestGroup ->
+        !requestGroup.hasBasedOn()
+        && !requestGroup.hasReplaces()
+        && !requestGroup.hasGroupIdentifier()
+        && List.of(RequestStatus.ACTIVE, RequestStatus.COMPLETED, RequestStatus.CANCELLED)
+            .contains(requestGroup.getStatus())
+        && requestGroup.getIntent().equals(RequestIntent.PLAN)
+        && requestGroup.getPriority().equals(RequestPriority.ROUTINE)
+        && requestGroup.hasSubject()
+        && requestGroup.hasContext()
+        && requestGroup.hasAuthor()
+        && !requestGroup.hasReason()
+        && !requestGroup.hasNote()
+        && !requestGroup.hasAction(), "valid 1.1.1 request group");
+  }
 
 }

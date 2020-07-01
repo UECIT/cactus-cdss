@@ -6,6 +6,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.nhs.cdss.testHelpers.matchers.FhirMatchers.referenceTo;
 
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
@@ -23,7 +24,6 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.nhs.cactus.common.security.AuthenticatedFhirClientFactory;
-import uk.nhs.cdss.testHelpers.matchers.FhirMatchers;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ReferenceStorageServiceTest {
@@ -67,7 +67,7 @@ public class ReferenceStorageServiceTest {
 
     Reference returned = storageService.create(resourceToCreate);
 
-    assertThat(returned, FhirMatchers.referenceTo(resourceToCreate));
+    assertThat(returned, referenceTo(resourceToCreate));
   }
 
   @Test
@@ -83,7 +83,7 @@ public class ReferenceStorageServiceTest {
 
     Reference returned = storageService.upsert(resourceToCreate);
 
-    assertThat(returned, FhirMatchers.referenceTo(resourceToCreate));
+    assertThat(returned, referenceTo(resourceToCreate));
     verify(mockClient, never()).update();
   }
 
@@ -101,7 +101,7 @@ public class ReferenceStorageServiceTest {
 
     Reference returned = storageService.upsert(resourceToUpdate);
 
-    assertThat(returned, FhirMatchers.referenceTo(resourceToUpdate));
+    assertThat(returned, referenceTo(resourceToUpdate));
     verify(mockUpdate).execute();
     verify(mockClient, never()).create();
   }
