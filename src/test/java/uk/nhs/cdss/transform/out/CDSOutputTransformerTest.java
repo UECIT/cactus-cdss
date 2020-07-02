@@ -1,112 +1,380 @@
 package uk.nhs.cdss.transform.out;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
+import static org.exparity.hamcrest.date.DateMatchers.sameInstant;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.sameInstance;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.hamcrest.MockitoHamcrest.argThat;
+import static uk.nhs.cdss.testHelpers.matchers.FhirMatchers.isParameter;
+import static uk.nhs.cdss.testHelpers.matchers.FhirMatchers.isParametersContaining;
+import static uk.nhs.cdss.testHelpers.matchers.FhirMatchers.referenceTo;
 
 import java.time.Clock;
 import java.time.Instant;
-import java.time.ZoneId;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import org.hamcrest.Matcher;
+import org.hl7.fhir.dstu3.model.CareConnectCarePlan;
+import org.hl7.fhir.dstu3.model.CareConnectObservation;
+import org.hl7.fhir.dstu3.model.DataRequirement;
 import org.hl7.fhir.dstu3.model.GuidanceResponse;
+import org.hl7.fhir.dstu3.model.GuidanceResponse.GuidanceResponseStatus;
+import org.hl7.fhir.dstu3.model.QuestionnaireResponse;
 import org.hl7.fhir.dstu3.model.Reference;
-import org.hl7.fhir.dstu3.model.Resource;
-import org.junit.Before;
+import org.hl7.fhir.dstu3.model.RequestGroup;
+import org.hl7.fhir.dstu3.model.RequestGroup.RequestGroupActionComponent;
 import org.junit.Test;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import uk.nhs.cdss.config.CodeDirectoryConfig;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
+import uk.nhs.cdss.domain.Assertion;
+import uk.nhs.cdss.domain.Assertion.Status;
+import uk.nhs.cdss.domain.CarePlan;
 import uk.nhs.cdss.domain.Outcome;
+import uk.nhs.cdss.domain.ReferralRequest;
 import uk.nhs.cdss.engine.CDSOutput;
-import uk.nhs.cdss.services.CDSDeviceService;
-import uk.nhs.cdss.services.CDSEndpointService;
-import uk.nhs.cdss.services.CDSOrganisationService;
-import uk.nhs.cdss.services.NarrativeService;
 import uk.nhs.cdss.services.ReferenceStorageService;
+import uk.nhs.cdss.testHelpers.matchers.FunctionMatcher;
 import uk.nhs.cdss.transform.EvaluationParameters;
 import uk.nhs.cdss.transform.bundle.CDSOutputBundle;
-import uk.nhs.cdss.transform.out.ObservationTransformer.StatusTransformer;
-import uk.nhs.cdss.transform.out.one_one.ReferralRequestOneOneTransformer;
+import uk.nhs.cdss.transform.bundle.CarePlanBundle;
+import uk.nhs.cdss.transform.bundle.ObservationBundle;
+import uk.nhs.cdss.transform.bundle.ReferralRequestBundle;
 
+@RunWith(MockitoJUnitRunner.class)
 public class CDSOutputTransformerTest {
 
+  private static final long FIXED_INSTANT = Instant.parse("2020-07-01T15:17:36Z").toEpochMilli();
+
+  @Mock
+  private CarePlanTransformer carePlanTransformer;
+
+  @Mock
+  private ReferralRequestTransformer referralRequestTransformer;
+
+  @Mock
+  private RedirectTransformer redirectTransformer;
+
+  @Mock
+  private ObservationTransformer observationTransformer;
+
+  @Mock
+  private OperationOutcomeTransformer operationOutcomeTransformer;
+
+  @Mock
+  private RequestGroupTransformer requestGroupTransformer;
+
+  @Mock
+  private QuestionnaireDataRequirementTransformer dataRequirementTransformer;
+
+  @Mock
+  private ReferenceStorageService storageService;
+
+  @Mock
+  private Clock clock;
+
+  @InjectMocks
   private CDSOutputTransformer outputTransformer;
 
-  @Before
-  public void setup() {
-    var mockStorageService = mock(ReferenceStorageService.class);
-    when(mockStorageService.create(any())).thenAnswer(new Answer<Reference>() {
-      private long nextResourceId = 1;
-
-      @Override
-      public Reference answer(InvocationOnMock invocationOnMock) {
-        Resource resource = invocationOnMock.getArgument(0);
-        String id = resource.getResourceType().name() + "/" + nextResourceId++;
-        resource.setId(id);
-        return new Reference(id);
-      }
-    });
-
-
-    var codingTransformer = new CodingOutTransformer();
-    var conceptTransformer = new ConceptTransformer(codingTransformer);
-    var codeDirectory = new CodeDirectoryConfig().codeDirectory();
-    var observationTransformer = new ObservationTransformer(
-        new StatusTransformer(), conceptTransformer,
-        new TypeTransformer(conceptTransformer));
-    var conditionTransformer = new ConditionTransformer(
-        conceptTransformer,
-        codeDirectory,
-        new ConditionClinicalStatusTransformer(),
-        new ConditionVerificationStatusTransformer(),
-        Clock.fixed(Instant.now(), ZoneId.systemDefault()));
-    var narrativeService = new NarrativeService();
-    var carePlanTransformer = new CarePlanTransformer(
-        new CDSOrganisationService(new CDSEndpointService()),
-        conditionTransformer,
-        mockStorageService,
-        narrativeService);
-    var referralRequestTransformer = new ReferralRequestOneOneTransformer(
-        conceptTransformer,
-        conditionTransformer,
-        codeDirectory,
-        mockStorageService,
-        narrativeService);
-
-    outputTransformer = new CDSOutputTransformer(carePlanTransformer,referralRequestTransformer,
-        new RedirectTransformer(
-            new TriggerTransformer(codeDirectory, codingTransformer)), observationTransformer,
-        new OperationOutcomeTransformer(conceptTransformer, codeDirectory),
-        new RequestGroupTransformer(mockStorageService, new CDSDeviceService()),
-        new QuestionnaireDataRequirementTransformer(),
-        mockStorageService);
-  }
-
   @Test(expected = IllegalStateException.class)
-  public void missingResultNotAccepted() {
-    CDSOutput output = new CDSOutput();
-
+  public void transform_withNoOutcomeAndNoQuestionnaires_shouldFail() {
     EvaluationParameters params = EvaluationParameters.builder()
         .encounter(new Reference("Encounter/5"))
         .build();
 
-    CDSOutputBundle bundle = new CDSOutputBundle(output, "1", params);
+    CDSOutputBundle bundle = new CDSOutputBundle(new CDSOutput(), "1", params);
     outputTransformer.transform(bundle);
   }
 
   @Test
-  public void validOutputAccepted() {
-    CDSOutput output = new CDSOutput();
-    output.setOutcome(new Outcome("outcome"));
+  public void transform_withFinalResult_shouldTransform() {
+    var observation1 = Assertion.of("Observation/validObservation1", Status.FINAL);
+    var observation2 = Assertion.of("Observation/validObservation2", Status.AMENDED);
 
+    var carePlan1 = CarePlan.builder().id("CarePlan/validCarePlan1").build();
+    var carePlan2 = CarePlan.builder().id("CarePlan/validCarePlan2").build();
+
+    var referralRequest = ReferralRequest.builder()
+        .id("ReferralRequest/validReferralRequest")
+        .build();
+
+    CDSOutput output = new CDSOutput();
+    output.setOutcome(Outcome.of("outcome", referralRequest, carePlan1, carePlan2));
+    output.getAssertions().add(observation1);
+    output.getAssertions().add(observation2);
+
+    var questionnaireResponse1 = new QuestionnaireResponse();
+    questionnaireResponse1.setId("QuestionnaireResponse/validQuestionnaireResponse1");
+    var questionnaireResponse2 = new QuestionnaireResponse();
+    questionnaireResponse2.setId("QuestionnaireResponse/validQuestionnaireResponse2");
+
+    var context = new Reference("Encounter/validEncounter");
+    var patient = new Reference("Patient/validPatient");
     EvaluationParameters params = EvaluationParameters.builder()
-        .encounter(new Reference("Encounter/5"))
+        .encounter(context)
+        .patient(patient)
+        .requestId("validRequestId")
+        .response(questionnaireResponse1)
+        .response(questionnaireResponse2)
         .build();
 
     CDSOutputBundle bundle = new CDSOutputBundle(output, "1", params);
+
+    Function<Assertion, FunctionMatcher<ObservationBundle>> isObservationBundleFor = a ->
+        new FunctionMatcher<>(ob ->
+            ob.getAssertion() == a
+                && ob.getContext() == context
+                && ob.getSubject() == patient,
+            "bundle for " + a.getId());
+    var transformedObservation1 = new CareConnectObservation();
+    transformedObservation1.setId("Observation/validObservation1");
+    var transformedObservation2 = new CareConnectObservation();
+    transformedObservation2.setId("Observation/validObservation2");
+
+    BiFunction<CarePlan, Boolean, FunctionMatcher<CarePlanBundle>> isCarePlanBundleFor = (cp, isDraft) ->
+        new FunctionMatcher<>(cpb ->
+            cpb.getCarePlan() == cp
+                && cpb.getContext() == context
+                && cpb.getSubject() == patient
+                && cpb.isDraft() == isDraft
+                && contains(
+                referenceTo("QuestionnaireResponse/validQuestionnaireResponse1"),
+                referenceTo("QuestionnaireResponse/validQuestionnaireResponse2"))
+                .matches(cpb.getConditionEvidenceResponseDetail())
+                && contains(
+                referenceTo("Observation/validObservation1"),
+                referenceTo("Observation/validObservation2"))
+                .matches(cpb.getConditionEvidenceObservationDetail()),
+            "bundle for " + cp.getId());
+    var transformedCarePlan1 = new CareConnectCarePlan();
+    transformedCarePlan1.setId("CarePlan/validCarePlan1");
+    var transformedCarePlan2 = new CareConnectCarePlan();
+    transformedCarePlan2.setId("CarePlan/validCarePlan2");
+
+    var transformedRequestGroup = new RequestGroup();
+    transformedRequestGroup.setId("RequestGroup/validRequestGroup");
+
+    BiFunction<ReferralRequest, Boolean, FunctionMatcher<ReferralRequestBundle>> isReferralRequestBundleFor = (rr, isDraft) ->
+        new FunctionMatcher<>(rrb ->
+            rrb.getReferralRequest() == rr
+                && rrb.getContext() == context
+                && rrb.getSubject() == patient
+                && rrb.getRequestGroupId().equals("RequestGroup/validRequestGroup")
+                && rrb.isDraft() == isDraft
+                && contains(
+                referenceTo("QuestionnaireResponse/validQuestionnaireResponse1"),
+                referenceTo("QuestionnaireResponse/validQuestionnaireResponse2"))
+                .matches(rrb.getConditionEvidenceResponseDetail())
+                && contains(
+                referenceTo("Observation/validObservation1"),
+                referenceTo("Observation/validObservation2"))
+                .matches(rrb.getConditionEvidenceObservationDetail()),
+            "bundle for " + rr.getId());
+    var transformedReferralRequest = new org.hl7.fhir.dstu3.model.ReferralRequest();
+    transformedReferralRequest.setId("ReferralRequest/validReferralRequest");
+
+    when(clock.millis()).thenReturn(FIXED_INSTANT);
+    when(observationTransformer.transform(argThat(isObservationBundleFor.apply(observation1))))
+        .thenReturn(transformedObservation1);
+    when(observationTransformer.transform(argThat(isObservationBundleFor.apply(observation2))))
+        .thenReturn(transformedObservation2);
+    when(storageService.create(argThat(isParametersContaining(
+        isParameter("outputData", transformedObservation1),
+        isParameter("outputData", transformedObservation2),
+        isParameter("outputData", questionnaireResponse1),
+        isParameter("outputData", questionnaireResponse2)
+    )))).thenReturn(new Reference("Parameters/validOutputParameters"));
+    when(requestGroupTransformer.transform(bundle)).thenReturn(transformedRequestGroup);
+    when(carePlanTransformer.transform(argThat(isCarePlanBundleFor.apply(carePlan1, false))))
+        .thenReturn(transformedCarePlan1);
+    when(carePlanTransformer.transform(argThat(isCarePlanBundleFor.apply(carePlan2, false))))
+        .thenReturn(transformedCarePlan2);
+    when(referralRequestTransformer.transform(argThat(isReferralRequestBundleFor.apply(referralRequest, false))))
+        .thenReturn(transformedReferralRequest);
+    when(storageService.create(argThat(sameInstance(transformedCarePlan1))))
+        .thenReturn(new Reference("CarePlan/validCarePlan1"));
+    when(storageService.create(argThat(sameInstance(transformedCarePlan2))))
+        .thenReturn(new Reference("CarePlan/validCarePlan2"));
+    when(storageService.create(argThat(sameInstance(transformedReferralRequest))))
+        .thenReturn(new Reference("ReferralRequest/validReferralRequest"));
+
     GuidanceResponse guidanceResponse = outputTransformer.transform(bundle);
 
-    assertEquals("Encounter/5", guidanceResponse.getContext().getReference());
+    assertThat(guidanceResponse.getStatus(), is(GuidanceResponseStatus.SUCCESS));
+    assertThat(guidanceResponse.getOccurrenceDateTime(), sameInstant(FIXED_INSTANT));
+    assertThat(guidanceResponse.getRequestId(), is("validRequestId"));
+    assertThat(guidanceResponse.getModule(), referenceTo("ServiceDefinition/1"));
+    assertThat(guidanceResponse.getContext(), is(context));
+    assertThat(guidanceResponse.getSubject(), is(patient));
+    assertThat(guidanceResponse.getOutputParameters(), referenceTo("Parameters/validOutputParameters"));
+    assertThat(guidanceResponse.getResult(), referenceTo("RequestGroup/validRequestGroup"));
+
+    verify(storageService).upsert(transformedRequestGroup);
+    assertThat(transformedRequestGroup.getAction(), hasItems(
+        isAction("CarePlan/validCarePlan1"),
+        isAction("CarePlan/validCarePlan2"),
+        isAction("ReferralRequest/validReferralRequest")
+    ));
   }
+
+  @Test
+  public void transform_withInterimResult_shouldTransform() {
+    var observation1 = Assertion.of("Observation/validObservation1", Status.FINAL);
+    var observation2 = Assertion.of("Observation/validObservation2", Status.AMENDED);
+
+    var questionnaireId1 = "Questionnaire/1";
+    var questionnaireId2 = "Questionnaire/2";
+
+    var carePlan1 = CarePlan.builder().id("CarePlan/validCarePlan1").build();
+    var carePlan2 = CarePlan.builder().id("CarePlan/validCarePlan2").build();
+
+    var referralRequest = ReferralRequest.builder()
+        .id("ReferralRequest/validReferralRequest")
+        .build();
+
+    CDSOutput output = new CDSOutput();
+    output.setOutcome(Outcome.of("outcome", referralRequest, carePlan1, carePlan2).interim());
+    output.getAssertions().add(observation1);
+    output.getAssertions().add(observation2);
+    output.getQuestionnaireIds().add(questionnaireId1);
+    output.getQuestionnaireIds().add(questionnaireId2);
+
+    var questionnaireResponse1 = new QuestionnaireResponse();
+    questionnaireResponse1.setId("QuestionnaireResponse/validQuestionnaireResponse1");
+    questionnaireResponse1.setQuestionnaire(new Reference(questionnaireId1));
+    var questionnaireResponse2 = new QuestionnaireResponse();
+    questionnaireResponse2.setId("QuestionnaireResponse/validQuestionnaireResponse2");
+    questionnaireResponse2.setQuestionnaire(new Reference(questionnaireId2));
+
+    var context = new Reference("Encounter/validEncounter");
+    var patient = new Reference("Patient/validPatient");
+    EvaluationParameters params = EvaluationParameters.builder()
+        .encounter(context)
+        .patient(patient)
+        .requestId("validRequestId")
+        .response(questionnaireResponse1)
+        .response(questionnaireResponse2)
+        .build();
+
+    CDSOutputBundle bundle = new CDSOutputBundle(output, "1", params);
+
+    Function<Assertion, FunctionMatcher<ObservationBundle>> isObservationBundleFor = a ->
+        new FunctionMatcher<>(ob ->
+            ob.getAssertion() == a
+                && ob.getContext() == context
+                && ob.getSubject() == patient,
+            "bundle for " + a.getId());
+    var transformedObservation1 = new CareConnectObservation();
+    transformedObservation1.setId("Observation/validObservation1");
+    var transformedObservation2 = new CareConnectObservation();
+    transformedObservation2.setId("Observation/validObservation2");
+
+    var transformedDataRequirement1 = new DataRequirement();
+    var transformedDataRequirement2 = new DataRequirement();
+
+    BiFunction<CarePlan, Boolean, FunctionMatcher<CarePlanBundle>> isCarePlanBundleFor = (cp, isDraft) ->
+        new FunctionMatcher<>(cpb ->
+            cpb.getCarePlan() == cp
+                && cpb.getContext() == context
+                && cpb.getSubject() == patient
+                && cpb.isDraft() == isDraft
+                && contains(
+                referenceTo("QuestionnaireResponse/validQuestionnaireResponse1"),
+                referenceTo("QuestionnaireResponse/validQuestionnaireResponse2"))
+                .matches(cpb.getConditionEvidenceResponseDetail())
+                && contains(
+                referenceTo("Observation/validObservation1"),
+                referenceTo("Observation/validObservation2"))
+                .matches(cpb.getConditionEvidenceObservationDetail()),
+            "bundle for " + cp.getId());
+    var transformedCarePlan1 = new CareConnectCarePlan();
+    transformedCarePlan1.setId("CarePlan/validCarePlan1");
+    var transformedCarePlan2 = new CareConnectCarePlan();
+    transformedCarePlan2.setId("CarePlan/validCarePlan2");
+
+    var transformedRequestGroup = new RequestGroup();
+    transformedRequestGroup.setId("RequestGroup/validRequestGroup");
+
+    BiFunction<ReferralRequest, Boolean, FunctionMatcher<ReferralRequestBundle>> isReferralRequestBundleFor = (rr, isDraft) ->
+        new FunctionMatcher<>(rrb ->
+            rrb.getReferralRequest() == rr
+                && rrb.getContext() == context
+                && rrb.getSubject() == patient
+                && rrb.getRequestGroupId().equals("RequestGroup/validRequestGroup")
+                && rrb.isDraft() == isDraft
+                && contains(
+                referenceTo("QuestionnaireResponse/validQuestionnaireResponse1"),
+                referenceTo("QuestionnaireResponse/validQuestionnaireResponse2"))
+                .matches(rrb.getConditionEvidenceResponseDetail())
+                && contains(
+                referenceTo("Observation/validObservation1"),
+                referenceTo("Observation/validObservation2"))
+                .matches(rrb.getConditionEvidenceObservationDetail()),
+            "bundle for " + rr.getId());
+    var transformedReferralRequest = new org.hl7.fhir.dstu3.model.ReferralRequest();
+    transformedReferralRequest.setId("ReferralRequest/validReferralRequest");
+
+    when(clock.millis()).thenReturn(FIXED_INSTANT);
+    when(observationTransformer.transform(argThat(isObservationBundleFor.apply(observation1))))
+        .thenReturn(transformedObservation1);
+    when(observationTransformer.transform(argThat(isObservationBundleFor.apply(observation2))))
+        .thenReturn(transformedObservation2);
+    when(storageService.create(argThat(isParametersContaining(
+        isParameter("outputData", transformedObservation1),
+        isParameter("outputData", transformedObservation2),
+        isParameter("outputData", questionnaireResponse1),
+        isParameter("outputData", questionnaireResponse2)
+    )))).thenReturn(new Reference("Parameters/validOutputParameters"));
+    when(dataRequirementTransformer.transform(questionnaireId1))
+        .thenReturn(transformedDataRequirement1);
+    when(dataRequirementTransformer.transform(questionnaireId2))
+        .thenReturn(transformedDataRequirement2);
+    when(requestGroupTransformer.transform(bundle)).thenReturn(transformedRequestGroup);
+    when(carePlanTransformer.transform(argThat(isCarePlanBundleFor.apply(carePlan1, true))))
+        .thenReturn(transformedCarePlan1);
+    when(carePlanTransformer.transform(argThat(isCarePlanBundleFor.apply(carePlan2, true))))
+        .thenReturn(transformedCarePlan2);
+    when(referralRequestTransformer.transform(argThat(isReferralRequestBundleFor.apply(referralRequest, true))))
+        .thenReturn(transformedReferralRequest);
+    when(storageService.create(argThat(sameInstance(transformedCarePlan1))))
+        .thenReturn(new Reference("CarePlan/validCarePlan1"));
+    when(storageService.create(argThat(sameInstance(transformedCarePlan2))))
+        .thenReturn(new Reference("CarePlan/validCarePlan2"));
+    when(storageService.create(argThat(sameInstance(transformedReferralRequest))))
+        .thenReturn(new Reference("ReferralRequest/validReferralRequest"));
+
+    GuidanceResponse guidanceResponse = outputTransformer.transform(bundle);
+
+    assertThat(guidanceResponse.getStatus(), is(GuidanceResponseStatus.DATAREQUESTED));
+    assertThat(guidanceResponse.getOccurrenceDateTime(), sameInstant(FIXED_INSTANT));
+    assertThat(guidanceResponse.getRequestId(), is("validRequestId"));
+    assertThat(guidanceResponse.getModule(), referenceTo("ServiceDefinition/1"));
+    assertThat(guidanceResponse.getContext(), is(context));
+    assertThat(guidanceResponse.getSubject(), is(patient));
+    assertThat(guidanceResponse.getOutputParameters(), referenceTo("Parameters/validOutputParameters"));
+    assertThat(guidanceResponse.getResult(), referenceTo("RequestGroup/validRequestGroup"));
+
+    verify(storageService).upsert(transformedRequestGroup);
+    assertThat(transformedRequestGroup.getAction(), hasItems(
+        isAction("CarePlan/validCarePlan1"),
+        isAction("CarePlan/validCarePlan2"),
+        isAction("ReferralRequest/validReferralRequest")
+    ));
+  }
+
+  private static Matcher<RequestGroupActionComponent> isAction(String reference) {
+    return new FunctionMatcher<>(
+        ac -> referenceTo(reference).matches(ac.getResource()),
+        "is a request group action referencing " + reference);
+  }
+
+  // TODO: if outcome.getException should throw
+  // TODO: if outcome.getError
+  // TODO: if redirection
 
 }

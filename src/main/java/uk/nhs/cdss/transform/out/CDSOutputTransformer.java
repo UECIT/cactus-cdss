@@ -1,5 +1,6 @@
 package uk.nhs.cdss.transform.out;
 
+import java.time.Clock;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -7,7 +8,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hl7.fhir.dstu3.model.CarePlan;
 import org.hl7.fhir.dstu3.model.GuidanceResponse;
 import org.hl7.fhir.dstu3.model.GuidanceResponse.GuidanceResponseStatus;
 import org.hl7.fhir.dstu3.model.Observation;
@@ -22,7 +22,6 @@ import org.hl7.fhir.dstu3.model.RequestGroup.RequestGroupActionComponent;
 import org.hl7.fhir.dstu3.model.Resource;
 import org.hl7.fhir.dstu3.model.StringType;
 import org.springframework.stereotype.Component;
-import uk.nhs.cdss.domain.Outcome;
 import uk.nhs.cdss.services.ReferenceStorageService;
 import uk.nhs.cdss.transform.Transformer;
 import uk.nhs.cdss.transform.bundle.CDSOutputBundle;
@@ -43,6 +42,7 @@ public class CDSOutputTransformer implements Transformer<CDSOutputBundle, Guidan
   private final RequestGroupTransformer requestGroupTransformer;
   private final QuestionnaireDataRequirementTransformer dataRequirementTransformer;
   private final ReferenceStorageService storageService;
+  private final Clock clock;
 
   private ParametersParameterComponent buildParameter(Observation observation) {
     final var NAME = "outputData";
@@ -57,17 +57,6 @@ public class CDSOutputTransformer implements Transformer<CDSOutputBundle, Guidan
     response.setStatus(QuestionnaireResponseStatus.COMPLETED);
     parameter.setResource(response);
     return parameter;
-  }
-
-  private void updateRequestGroup(RequestGroup group,
-      ReferralRequest referralRequest, List<CarePlan> carePlans) {
-    Stream.concat(Stream.of(referralRequest), carePlans.stream())
-        .filter(Objects::nonNull)
-        .map(this::createResource)
-        .map(id -> new RequestGroupActionComponent().setResource(new Reference(id)))
-        .forEach(group.getAction()::add);
-
-    storageService.upsert(group);
   }
 
   private String createResource(Resource resource) {
@@ -89,7 +78,7 @@ public class CDSOutputTransformer implements Transformer<CDSOutputBundle, Guidan
     var subjectRef = bundle.getParameters().getPatient();
 
     var response = new GuidanceResponse()
-        .setOccurrenceDateTime(new Date())
+        .setOccurrenceDateTime(new Date(clock.millis()))
         .setRequestId(bundle.getParameters().getRequestId())
         .setModule(serviceDefinition)
         .setContext(encounterRef)
@@ -177,20 +166,20 @@ public class CDSOutputTransformer implements Transformer<CDSOutputBundle, Guidan
       CDSOutputBundle bundle,
       Reference subject,
       Reference context,
-      List<Reference> questionaireResponse,
+      List<Reference> questionnaireResponse,
       List<Reference> observations) {
 
     var requestGroup = requestGroupTransformer.transform(bundle);
 
-    Outcome outcome = bundle.getOutput().getOutcome();
-    final List<CarePlan> carePlans = outcome.getCarePlans()
+    var outcome = bundle.getOutput().getOutcome();
+    final var carePlans = outcome.getCarePlans()
         .stream()
         .map(cp -> CarePlanBundle.builder()
               .carePlan(cp)
               .subject(subject)
               .context(context)
               .draft(outcome.isDraft())
-              .conditionEvidenceResponseDetail(questionaireResponse)
+              .conditionEvidenceResponseDetail(questionnaireResponse)
               .conditionEvidenceObservationDetail(observations)
               .build())
         .map(carePlanTransformer::transform)
@@ -205,14 +194,20 @@ public class CDSOutputTransformer implements Transformer<CDSOutputBundle, Guidan
           .context(context)
           .referralRequest(outcome.getReferralRequest())
           .draft(outcome.isDraft())
-          .conditionEvidenceResponseDetail(questionaireResponse)
+          .conditionEvidenceResponseDetail(questionnaireResponse)
           .conditionEvidenceObservationDetail(observations)
           .build();
 
       referralRequest = referralRequestTransformer.transform(refReqBundle);
     }
 
-    updateRequestGroup(requestGroup, referralRequest, carePlans);
+    Stream.concat(Stream.of(referralRequest), carePlans.stream())
+        .filter(Objects::nonNull)
+        .map(this::createResource)
+        .map(id -> new RequestGroupActionComponent().setResource(new Reference(id)))
+        .forEach(requestGroup.getAction()::add);
+
+    storageService.upsert(requestGroup);
     return requestGroup;
   }
 }
