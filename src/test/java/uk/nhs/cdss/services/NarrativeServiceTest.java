@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.springframework.util.StringUtils.countOccurrencesOf;
+import static uk.nhs.cdss.testHelpers.matchers.FhirMatchers.hasText;
 
 import java.util.List;
 import org.hl7.fhir.dstu3.model.Narrative.NarrativeStatus;
@@ -25,7 +26,7 @@ public class NarrativeServiceTest {
   public void buildNarrative_withText_shouldBuildNarrative() {
     var returnedNarrative = narrativeService.buildNarrative("uniqueText");
 
-    assertThat(returnedNarrative.getDivAsString(), containsString("uniqueText"));
+    assertThat(returnedNarrative, hasText("uniqueText"));
     assertThat(returnedNarrative.getStatus(), is(NarrativeStatus.GENERATED));
   }
 

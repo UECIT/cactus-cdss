@@ -25,7 +25,9 @@ import org.hl7.fhir.dstu3.model.QuestionnaireResponse;
 import org.hl7.fhir.dstu3.model.Reference;
 import org.hl7.fhir.dstu3.model.RequestGroup;
 import org.hl7.fhir.dstu3.model.RequestGroup.RequestGroupActionComponent;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -79,13 +81,18 @@ public class CDSOutputTransformerTest {
   @InjectMocks
   private CDSOutputTransformer outputTransformer;
 
-  @Test(expected = IllegalStateException.class)
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
+
+  @Test
   public void transform_withNoOutcomeAndNoQuestionnaires_shouldFail() {
     EvaluationParameters params = EvaluationParameters.builder()
         .encounter(new Reference("Encounter/5"))
         .build();
 
     CDSOutputBundle bundle = new CDSOutputBundle(new CDSOutput(), "1", params);
+
+    expectedException.expect(IllegalStateException.class);
     outputTransformer.transform(bundle);
   }
 

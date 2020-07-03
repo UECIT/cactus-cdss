@@ -15,13 +15,14 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
+import org.hl7.fhir.dstu3.model.Base;
 import org.hl7.fhir.dstu3.model.CareConnectCarePlan;
 import org.hl7.fhir.dstu3.model.CarePlan.CarePlanIntent;
 import org.hl7.fhir.dstu3.model.CarePlan.CarePlanStatus;
 import org.hl7.fhir.dstu3.model.Condition;
 import org.hl7.fhir.dstu3.model.Condition.ConditionClinicalStatus;
 import org.hl7.fhir.dstu3.model.Condition.ConditionEvidenceComponent;
-import org.hl7.fhir.dstu3.model.DataRequirement;
+import org.hl7.fhir.dstu3.model.Element;
 import org.hl7.fhir.dstu3.model.Narrative;
 import org.hl7.fhir.dstu3.model.Parameters;
 import org.hl7.fhir.dstu3.model.Parameters.ParametersParameterComponent;
@@ -35,7 +36,12 @@ import org.hl7.fhir.dstu3.model.Resource;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class FhirMatchers {
 
-  public static Matcher<DataRequirement> sameElement(DataRequirement expected) {
+  public static Matcher<Element> sameElement(Element expected) {
+    return new FunctionMatcher<>(
+        actual -> actual.equalsDeep(expected),
+        expected.toString());
+  }
+  public static Matcher<Base> sameElement(Base expected) {
     return new FunctionMatcher<>(
         actual -> actual.equalsDeep(expected),
         expected.toString());
@@ -120,8 +126,7 @@ public class FhirMatchers {
 
   public static Matcher<ParametersParameterComponent> isParameter(String name, Resource value) {
     return new FunctionMatcher<>(
-        parameter -> Matchers.is(name).matches(parameter.getName())
-            && Matchers.is(value).matches(parameter.getResource()),
+        parameter -> name.equals(parameter.getName()) && value.equalsDeep(parameter.getResource()),
         "is Parameter with name " + name);
   }
 }
