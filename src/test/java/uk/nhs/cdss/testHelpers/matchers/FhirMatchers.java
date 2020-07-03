@@ -8,6 +8,7 @@ import static org.hl7.fhir.dstu3.model.Condition.ConditionVerificationStatus.CON
 import static org.hl7.fhir.dstu3.model.Condition.ConditionVerificationStatus.DIFFERENTIAL;
 import static org.hl7.fhir.dstu3.model.Condition.ConditionVerificationStatus.PROVISIONAL;
 import static org.hl7.fhir.dstu3.model.Condition.ConditionVerificationStatus.UNKNOWN;
+
 import com.google.common.collect.Iterables;
 import java.util.List;
 import lombok.AccessLevel;
@@ -25,13 +26,20 @@ import org.hl7.fhir.dstu3.model.Narrative;
 import org.hl7.fhir.dstu3.model.Parameters;
 import org.hl7.fhir.dstu3.model.Parameters.ParametersParameterComponent;
 import org.hl7.fhir.dstu3.model.Reference;
+import org.hl7.fhir.dstu3.model.RequestGroup;
+import org.hl7.fhir.dstu3.model.RequestGroup.RequestIntent;
+import org.hl7.fhir.dstu3.model.RequestGroup.RequestPriority;
+import org.hl7.fhir.dstu3.model.RequestGroup.RequestStatus;
+import org.hl7.fhir.dstu3.model.Resource;
 import org.hl7.fhir.dstu3.model.Resource;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class FhirMatchers {
 
   public static Matcher<DataRequirement> sameElement(DataRequirement expected) {
-    return new FunctionMatcher<>(actual -> actual.equalsDeep(expected), expected.toString());
+    return new FunctionMatcher<>(
+        actual -> actual.equalsDeep(expected),
+        expected.toString());
   }
 
   public static Matcher<Narrative> hasText(String text) {
@@ -45,6 +53,10 @@ public class FhirMatchers {
         actual.hasReference()
             ? actual.getReference().equals(ref)
             : actual.getResource().getIdElement().getValue().equals(ref), "reference to " + ref);
+  }
+
+  public static Matcher<Reference> referenceTo(Resource resource) {
+    return referenceTo(resource.getId());
   }
 
   public static Matcher<CareConnectCarePlan> isValidV1CarePlan() {
@@ -84,6 +96,22 @@ public class FhirMatchers {
             .noneMatch(ConditionEvidenceComponent::hasCode), "valid 1.1.1 condition");
   }
 
+  public static Matcher<RequestGroup> isValidV1RequestGroup() {
+    return new FunctionMatcher<>(requestGroup ->
+        !requestGroup.hasBasedOn()
+        && !requestGroup.hasReplaces()
+        && !requestGroup.hasGroupIdentifier()
+        && List.of(RequestStatus.ACTIVE, RequestStatus.COMPLETED, RequestStatus.CANCELLED)
+            .contains(requestGroup.getStatus())
+        && requestGroup.getIntent().equals(RequestIntent.PLAN)
+        && requestGroup.getPriority().equals(RequestPriority.ROUTINE)
+        && requestGroup.hasSubject()
+        && requestGroup.hasContext()
+        && requestGroup.hasAuthor()
+        && !requestGroup.hasReason()
+        && !requestGroup.hasNote()
+        && !requestGroup.hasAction(), "valid 1.1.1 request group");
+  }
   public static Matcher<Parameters> isParametersContaining(
       Matcher<ParametersParameterComponent>... matchers) {
     return new FunctionMatcher<>(

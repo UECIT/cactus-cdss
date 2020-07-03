@@ -7,6 +7,9 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.samePropertyValuesAs;
 import static org.mockito.Mockito.when;
 import static org.mockito.hamcrest.MockitoHamcrest.argThat;
+import static uk.nhs.cdss.testHelpers.matchers.FhirMatchers.hasText;
+import static uk.nhs.cdss.testHelpers.matchers.FhirMatchers.isValidV1CarePlan;
+import static uk.nhs.cdss.testHelpers.matchers.FhirMatchers.referenceTo;
 
 import java.util.Collections;
 import java.util.List;
@@ -28,7 +31,6 @@ import uk.nhs.cdss.services.CDSOrganisationService;
 import uk.nhs.cdss.services.NarrativeService;
 import uk.nhs.cdss.services.ReferenceStorageService;
 import uk.nhs.cdss.testHelpers.fixtures.CdsOrganisationFixture;
-import uk.nhs.cdss.testHelpers.matchers.FhirMatchers;
 import uk.nhs.cdss.transform.bundle.CarePlanBundle;
 import uk.nhs.cdss.transform.bundle.ConcernBundle;
 
@@ -107,15 +109,15 @@ public class CarePlanTransformerTest {
 
     CareConnectCarePlan transformed = carePlanTransformer.transform(input);
 
-    assertThat(transformed, FhirMatchers.isValidV1CarePlan());
+    assertThat(transformed, isValidV1CarePlan());
 
-    assertThat(transformed.getText(), FhirMatchers.hasText("Care Plan Narrative"));
+    assertThat(transformed.getText(), hasText("Care Plan Narrative"));
     assertThat(transformed.getStatus(), is(CarePlanStatus.DRAFT));
     assertThat(transformed.getTitle(), is("Care Plan Title"));
     assertThat(transformed.getDescription(), is("This is a care plan; it describes care."));
-    assertThat(transformed.getSubject(), FhirMatchers.referenceTo("subject/ref"));
-    assertThat(transformed.getContext(), FhirMatchers.referenceTo("context/ref"));
-    assertThat(transformed.getAuthor(), contains(FhirMatchers.referenceTo("test-cds")));
+    assertThat(transformed.getSubject(), referenceTo("subject/ref"));
+    assertThat(transformed.getContext(), referenceTo("context/ref"));
+    assertThat(transformed.getAuthor(), contains(referenceTo("test-cds")));
     assertThat(transformed.getAddresses(), contains(conditionRef));
     assertThat(transformed.getSupportingInfo(), containsInAnyOrder(observation, response));
   }
@@ -162,15 +164,15 @@ public class CarePlanTransformerTest {
 
     CareConnectCarePlan transformed = carePlanTransformer.transform(input);
 
-    assertThat(transformed, FhirMatchers.isValidV1CarePlan());
+    assertThat(transformed, isValidV1CarePlan());
 
-    assertThat(transformed.getText(), FhirMatchers.hasText("Care Plan Narrative"));
+    assertThat(transformed.getText(), hasText("Care Plan Narrative"));
     assertThat(transformed.getStatus(), is(CarePlanStatus.ACTIVE));
     assertThat(transformed.getTitle(), is("Care Plan Title"));
     assertThat(transformed.getDescription(), is("This is a care plan; it describes care."));
-    assertThat(transformed.getSubject(), FhirMatchers.referenceTo("subject/ref"));
-    assertThat(transformed.getContext(), FhirMatchers.referenceTo("context/ref"));
-    assertThat(transformed.getAuthor(), contains(FhirMatchers.referenceTo("test-cds")));
+    assertThat(transformed.getSubject(), referenceTo("subject/ref"));
+    assertThat(transformed.getContext(), referenceTo("context/ref"));
+    assertThat(transformed.getAuthor(), contains(referenceTo("test-cds")));
     assertThat(transformed.getAddresses(), contains(conditionRef));
     assertThat(transformed.getSupportingInfo(), containsInAnyOrder(observation, response));
   }
