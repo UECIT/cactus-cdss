@@ -15,8 +15,6 @@ import static uk.nhs.cdss.testHelpers.matchers.FhirMatchers.referenceTo;
 
 import java.time.Clock;
 import java.time.Instant;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 import org.hamcrest.Matcher;
 import org.hl7.fhir.dstu3.model.CareConnectCarePlan;
 import org.hl7.fhir.dstu3.model.CareConnectObservation;
@@ -125,32 +123,11 @@ public class CDSOutputTransformerTest {
 
     CDSOutputBundle bundle = new CDSOutputBundle(output, "1", params);
 
-    Function<Assertion, FunctionMatcher<ObservationBundle>> isObservationBundleFor = a ->
-        new FunctionMatcher<>(ob ->
-            ob.getAssertion() == a
-                && ob.getContext() == context
-                && ob.getSubject() == patient,
-            "bundle for " + a.getId());
     var transformedObservation1 = new CareConnectObservation();
     transformedObservation1.setId("Observation/validObservation1");
     var transformedObservation2 = new CareConnectObservation();
     transformedObservation2.setId("Observation/validObservation2");
 
-    BiFunction<CarePlan, Boolean, FunctionMatcher<CarePlanBundle>> isCarePlanBundleFor = (cp, isDraft) ->
-        new FunctionMatcher<>(cpb ->
-            cpb.getCarePlan() == cp
-                && cpb.getContext() == context
-                && cpb.getSubject() == patient
-                && cpb.isDraft() == isDraft
-                && contains(
-                referenceTo("QuestionnaireResponse/validQuestionnaireResponse1"),
-                referenceTo("QuestionnaireResponse/validQuestionnaireResponse2"))
-                .matches(cpb.getConditionEvidenceResponseDetail())
-                && contains(
-                referenceTo("Observation/validObservation1"),
-                referenceTo("Observation/validObservation2"))
-                .matches(cpb.getConditionEvidenceObservationDetail()),
-            "bundle for " + cp.getId());
     var transformedCarePlan1 = new CareConnectCarePlan();
     transformedCarePlan1.setId("CarePlan/validCarePlan1");
     var transformedCarePlan2 = new CareConnectCarePlan();
@@ -159,29 +136,13 @@ public class CDSOutputTransformerTest {
     var transformedRequestGroup = new RequestGroup();
     transformedRequestGroup.setId("RequestGroup/validRequestGroup");
 
-    BiFunction<ReferralRequest, Boolean, FunctionMatcher<ReferralRequestBundle>> isReferralRequestBundleFor = (rr, isDraft) ->
-        new FunctionMatcher<>(rrb ->
-            rrb.getReferralRequest() == rr
-                && rrb.getContext() == context
-                && rrb.getSubject() == patient
-                && rrb.getRequestGroupId().equals("RequestGroup/validRequestGroup")
-                && rrb.isDraft() == isDraft
-                && contains(
-                referenceTo("QuestionnaireResponse/validQuestionnaireResponse1"),
-                referenceTo("QuestionnaireResponse/validQuestionnaireResponse2"))
-                .matches(rrb.getConditionEvidenceResponseDetail())
-                && contains(
-                referenceTo("Observation/validObservation1"),
-                referenceTo("Observation/validObservation2"))
-                .matches(rrb.getConditionEvidenceObservationDetail()),
-            "bundle for " + rr.getId());
     var transformedReferralRequest = new org.hl7.fhir.dstu3.model.ReferralRequest();
     transformedReferralRequest.setId("ReferralRequest/validReferralRequest");
 
     when(clock.millis()).thenReturn(FIXED_INSTANT);
-    when(observationTransformer.transform(argThat(isObservationBundleFor.apply(observation1))))
+    when(observationTransformer.transform(argThat(isObservationBundleFor(observation1))))
         .thenReturn(transformedObservation1);
-    when(observationTransformer.transform(argThat(isObservationBundleFor.apply(observation2))))
+    when(observationTransformer.transform(argThat(isObservationBundleFor(observation2))))
         .thenReturn(transformedObservation2);
     when(storageService.create(argThat(isParametersContaining(
         isParameter("outputData", transformedObservation1),
@@ -190,11 +151,11 @@ public class CDSOutputTransformerTest {
         isParameter("outputData", questionnaireResponse2)
     )))).thenReturn(new Reference("Parameters/validOutputParameters"));
     when(requestGroupTransformer.transform(bundle)).thenReturn(transformedRequestGroup);
-    when(carePlanTransformer.transform(argThat(isCarePlanBundleFor.apply(carePlan1, false))))
+    when(carePlanTransformer.transform(argThat(isCarePlanBundleFor(carePlan1, false))))
         .thenReturn(transformedCarePlan1);
-    when(carePlanTransformer.transform(argThat(isCarePlanBundleFor.apply(carePlan2, false))))
+    when(carePlanTransformer.transform(argThat(isCarePlanBundleFor(carePlan2, false))))
         .thenReturn(transformedCarePlan2);
-    when(referralRequestTransformer.transform(argThat(isReferralRequestBundleFor.apply(referralRequest, false))))
+    when(referralRequestTransformer.transform(argThat(isReferralRequestBundleFor(referralRequest, false))))
         .thenReturn(transformedReferralRequest);
     when(storageService.create(argThat(sameInstance(transformedCarePlan1))))
         .thenReturn(new Reference("CarePlan/validCarePlan1"));
@@ -263,12 +224,6 @@ public class CDSOutputTransformerTest {
 
     CDSOutputBundle bundle = new CDSOutputBundle(output, "1", params);
 
-    Function<Assertion, FunctionMatcher<ObservationBundle>> isObservationBundleFor = a ->
-        new FunctionMatcher<>(ob ->
-            ob.getAssertion() == a
-                && ob.getContext() == context
-                && ob.getSubject() == patient,
-            "bundle for " + a.getId());
     var transformedObservation1 = new CareConnectObservation();
     transformedObservation1.setId("Observation/validObservation1");
     var transformedObservation2 = new CareConnectObservation();
@@ -277,21 +232,6 @@ public class CDSOutputTransformerTest {
     var transformedDataRequirement1 = new DataRequirement();
     var transformedDataRequirement2 = new DataRequirement();
 
-    BiFunction<CarePlan, Boolean, FunctionMatcher<CarePlanBundle>> isCarePlanBundleFor = (cp, isDraft) ->
-        new FunctionMatcher<>(cpb ->
-            cpb.getCarePlan() == cp
-                && cpb.getContext() == context
-                && cpb.getSubject() == patient
-                && cpb.isDraft() == isDraft
-                && contains(
-                referenceTo("QuestionnaireResponse/validQuestionnaireResponse1"),
-                referenceTo("QuestionnaireResponse/validQuestionnaireResponse2"))
-                .matches(cpb.getConditionEvidenceResponseDetail())
-                && contains(
-                referenceTo("Observation/validObservation1"),
-                referenceTo("Observation/validObservation2"))
-                .matches(cpb.getConditionEvidenceObservationDetail()),
-            "bundle for " + cp.getId());
     var transformedCarePlan1 = new CareConnectCarePlan();
     transformedCarePlan1.setId("CarePlan/validCarePlan1");
     var transformedCarePlan2 = new CareConnectCarePlan();
@@ -300,29 +240,13 @@ public class CDSOutputTransformerTest {
     var transformedRequestGroup = new RequestGroup();
     transformedRequestGroup.setId("RequestGroup/validRequestGroup");
 
-    BiFunction<ReferralRequest, Boolean, FunctionMatcher<ReferralRequestBundle>> isReferralRequestBundleFor = (rr, isDraft) ->
-        new FunctionMatcher<>(rrb ->
-            rrb.getReferralRequest() == rr
-                && rrb.getContext() == context
-                && rrb.getSubject() == patient
-                && rrb.getRequestGroupId().equals("RequestGroup/validRequestGroup")
-                && rrb.isDraft() == isDraft
-                && contains(
-                referenceTo("QuestionnaireResponse/validQuestionnaireResponse1"),
-                referenceTo("QuestionnaireResponse/validQuestionnaireResponse2"))
-                .matches(rrb.getConditionEvidenceResponseDetail())
-                && contains(
-                referenceTo("Observation/validObservation1"),
-                referenceTo("Observation/validObservation2"))
-                .matches(rrb.getConditionEvidenceObservationDetail()),
-            "bundle for " + rr.getId());
     var transformedReferralRequest = new org.hl7.fhir.dstu3.model.ReferralRequest();
     transformedReferralRequest.setId("ReferralRequest/validReferralRequest");
 
     when(clock.millis()).thenReturn(FIXED_INSTANT);
-    when(observationTransformer.transform(argThat(isObservationBundleFor.apply(observation1))))
+    when(observationTransformer.transform(argThat(isObservationBundleFor(observation1))))
         .thenReturn(transformedObservation1);
-    when(observationTransformer.transform(argThat(isObservationBundleFor.apply(observation2))))
+    when(observationTransformer.transform(argThat(isObservationBundleFor(observation2))))
         .thenReturn(transformedObservation2);
     when(storageService.create(argThat(isParametersContaining(
         isParameter("outputData", transformedObservation1),
@@ -335,11 +259,11 @@ public class CDSOutputTransformerTest {
     when(dataRequirementTransformer.transform(questionnaireId2))
         .thenReturn(transformedDataRequirement2);
     when(requestGroupTransformer.transform(bundle)).thenReturn(transformedRequestGroup);
-    when(carePlanTransformer.transform(argThat(isCarePlanBundleFor.apply(carePlan1, true))))
+    when(carePlanTransformer.transform(argThat(isCarePlanBundleFor(carePlan1, true))))
         .thenReturn(transformedCarePlan1);
-    when(carePlanTransformer.transform(argThat(isCarePlanBundleFor.apply(carePlan2, true))))
+    when(carePlanTransformer.transform(argThat(isCarePlanBundleFor(carePlan2, true))))
         .thenReturn(transformedCarePlan2);
-    when(referralRequestTransformer.transform(argThat(isReferralRequestBundleFor.apply(referralRequest, true))))
+    when(referralRequestTransformer.transform(argThat(isReferralRequestBundleFor(referralRequest, true))))
         .thenReturn(transformedReferralRequest);
     when(storageService.create(argThat(sameInstance(transformedCarePlan1))))
         .thenReturn(new Reference("CarePlan/validCarePlan1"));
@@ -365,6 +289,51 @@ public class CDSOutputTransformerTest {
         isAction("CarePlan/validCarePlan2"),
         isAction("ReferralRequest/validReferralRequest")
     ));
+  }
+
+  private static Matcher<ObservationBundle> isObservationBundleFor(Assertion assertion) {
+    return new FunctionMatcher<>(bundle ->
+        bundle.getAssertion() == assertion
+            && referenceTo("Encounter/validEncounter").matches(bundle.getContext())
+            && referenceTo("Patient/validPatient").matches(bundle.getSubject()),
+        "bundle for " + assertion.getId());
+  }
+
+  private static Matcher<CarePlanBundle> isCarePlanBundleFor(CarePlan carePlan, boolean isDraft) {
+    return new FunctionMatcher<>(bundle ->
+        bundle.getCarePlan() == carePlan
+            && referenceTo("Encounter/validEncounter").matches(bundle.getContext())
+            && referenceTo("Patient/validPatient").matches(bundle.getSubject())
+            && bundle.isDraft() == isDraft
+            && contains(
+            referenceTo("QuestionnaireResponse/validQuestionnaireResponse1"),
+            referenceTo("QuestionnaireResponse/validQuestionnaireResponse2"))
+            .matches(bundle.getConditionEvidenceResponseDetail())
+            && contains(
+            referenceTo("Observation/validObservation1"),
+            referenceTo("Observation/validObservation2"))
+            .matches(bundle.getConditionEvidenceObservationDetail()),
+        "bundle for " + carePlan.getId());
+  }
+
+  private static Matcher<ReferralRequestBundle> isReferralRequestBundleFor(
+      ReferralRequest referralRequest,
+      boolean isDraft) {
+    return new FunctionMatcher<>(bundle ->
+        bundle.getReferralRequest() == referralRequest
+            && referenceTo("Encounter/validEncounter").matches(bundle.getContext())
+            && referenceTo("Patient/validPatient").matches(bundle.getSubject())
+            && bundle.getRequestGroupId().equals("RequestGroup/validRequestGroup")
+            && bundle.isDraft() == isDraft
+            && contains(
+            referenceTo("QuestionnaireResponse/validQuestionnaireResponse1"),
+            referenceTo("QuestionnaireResponse/validQuestionnaireResponse2"))
+            .matches(bundle.getConditionEvidenceResponseDetail())
+            && contains(
+            referenceTo("Observation/validObservation1"),
+            referenceTo("Observation/validObservation2"))
+            .matches(bundle.getConditionEvidenceObservationDetail()),
+        "bundle for " + referralRequest.getId());
   }
 
   private static Matcher<RequestGroupActionComponent> isAction(String reference) {
