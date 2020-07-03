@@ -31,7 +31,6 @@ import org.hl7.fhir.dstu3.model.RequestGroup.RequestIntent;
 import org.hl7.fhir.dstu3.model.RequestGroup.RequestPriority;
 import org.hl7.fhir.dstu3.model.RequestGroup.RequestStatus;
 import org.hl7.fhir.dstu3.model.Resource;
-import org.hl7.fhir.dstu3.model.Resource;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class FhirMatchers {
