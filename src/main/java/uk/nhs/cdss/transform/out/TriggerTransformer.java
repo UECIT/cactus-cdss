@@ -26,6 +26,8 @@ public class TriggerTransformer implements Transformer<ObservationTrigger, Trigg
   private static final String CC_OBSERVATION_PROFILE =
       "https://fhir.hl7.org.uk/STU3/StructureDefinition/CareConnect-Observation-1";
 
+  private static final String OBSERVATION_TYPE = "Observation";
+
   private final CodeDirectory codeDirectory;
   private final CodingOutTransformer codingTransformer;
 
@@ -38,7 +40,7 @@ public class TriggerTransformer implements Transformer<ObservationTrigger, Trigg
 
   public DataRequirement buildDataRequirementFromObservation(ObservationTrigger from) {
     DataRequirement dataRequirement = new DataRequirement()
-        .setType("CareConnectObservation")
+        .setType(OBSERVATION_TYPE)
         .setProfile(singletonList(new UriType(CC_OBSERVATION_PROFILE)));
 
     addCodeFilter(dataRequirement, "code", from.getCode());

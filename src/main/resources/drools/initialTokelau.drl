@@ -11,11 +11,12 @@ import uk.nhs.cdss.domain.Outcome
 import uk.nhs.cdss.domain.ReferralRequest
 import uk.nhs.cdss.domain.Redirection
 import uk.nhs.cdss.domain.Assertion
+import uk.nhs.cdss.domain.enums.ObservationTriggerValue;
 
 import uk.nhs.cdss.constants.SnomedConstants
 
 import uk.nhs.cdss.engine.CodeDirectory
-import uk.nhs.cdss.domain.Concept
+import uk.nhs.cdss.domain.enums.Concept
 
 global CodeDirectory codeDirectory;
 
@@ -27,7 +28,7 @@ then
 
     insert( new NextQuestion("initial.initial", "common.birthDate") );
 
-    Concept present = codeDirectory.get("present");
+    Concept present = ObservationTriggerValue.PRESENT;
     insert( new AnswerAssertion("initial.initial", "q", "chestPain", codeDirectory.get("chestPain"), present));
     insert( new AnswerAssertion("initial.initial", "q", "palpitations", codeDirectory.get("palpitations"), present));
     insert( new AnswerAssertion("initial.initial", "q", "genitoUrinaryProblems", codeDirectory.get("genitoUrinaryProblems"), present));
