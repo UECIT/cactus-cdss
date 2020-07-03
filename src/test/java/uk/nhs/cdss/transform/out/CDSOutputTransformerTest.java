@@ -2,7 +2,7 @@ package uk.nhs.cdss.transform.out;
 
 import static org.exparity.hamcrest.date.DateMatchers.sameInstant;
 import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
@@ -183,7 +183,7 @@ public class CDSOutputTransformerTest {
     assertThat(guidanceResponse.getResult(), referenceTo("RequestGroup/validRequestGroup"));
 
     verify(storageService).upsert(transformedRequestGroup);
-    assertThat(transformedRequestGroup.getAction(), hasItems(
+    assertThat(transformedRequestGroup.getAction(), containsInAnyOrder(
         isAction("CarePlan/validCarePlan1"),
         isAction("CarePlan/validCarePlan2"),
         isAction("ReferralRequest/validReferralRequest")
@@ -291,7 +291,7 @@ public class CDSOutputTransformerTest {
     assertThat(guidanceResponse.getResult(), referenceTo("RequestGroup/validRequestGroup"));
 
     verify(storageService).upsert(transformedRequestGroup);
-    assertThat(transformedRequestGroup.getAction(), hasItems(
+    assertThat(transformedRequestGroup.getAction(), containsInAnyOrder(
         isAction("CarePlan/validCarePlan1"),
         isAction("CarePlan/validCarePlan2"),
         isAction("ReferralRequest/validReferralRequest")
