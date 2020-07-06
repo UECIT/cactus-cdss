@@ -11,6 +11,7 @@ import uk.nhs.cdss.constants.SystemURL;
 import uk.nhs.cdss.domain.Coding;
 import uk.nhs.cdss.domain.Concept;
 import uk.nhs.cdss.domain.enums.Gender;
+import uk.nhs.cdss.domain.enums.ObservationTriggerValue;
 import uk.nhs.cdss.domain.enums.UseContextType;
 import uk.nhs.cdss.engine.CodeDirectory;
 
@@ -50,8 +51,8 @@ public class CodeDirectoryConfig {
     codeDirectory.put(Gender.FEMALE);
 
     // Values
-    codeDirectory.put("present", buildCode("value", "present", "Condition is present"));
-    codeDirectory.put("absent", buildCode("value", "absent", "Condition is absent"));
+    codeDirectory.put("present", ObservationTriggerValue.PRESENT);
+    codeDirectory.put("absent", ObservationTriggerValue.ABSENT);
 
     // Severity qualifiers
     codeDirectory.put("lifeThreatening", snomed("442452003", "Life threatening severity (qualifier value)"));

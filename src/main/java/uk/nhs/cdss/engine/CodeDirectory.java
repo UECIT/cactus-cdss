@@ -27,6 +27,11 @@ public class CodeDirectory {
     }
     concepts.put(id, concept);
   }
+
+  public void put(String id, uk.nhs.cdss.domain.enums.Concept concept) {
+    put(id, concept.toDomainConcept());
+  }
+
   public void put(Concept concept) {
     put(concept.getText(), concept);
   }

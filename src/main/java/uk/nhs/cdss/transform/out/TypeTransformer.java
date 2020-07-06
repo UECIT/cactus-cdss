@@ -26,6 +26,8 @@ public class TypeTransformer implements Transformer<Object, Type> {
       return new StringType((String) from);
     } else if (from instanceof Concept) {
       return codeTransformer.transform((Concept) from);
+    } else if (from instanceof uk.nhs.cdss.domain.enums.Concept) {
+      return codeTransformer.transform(((uk.nhs.cdss.domain.enums.Concept) from).toDomainConcept());
     }
 
     throw new IllegalArgumentException(
