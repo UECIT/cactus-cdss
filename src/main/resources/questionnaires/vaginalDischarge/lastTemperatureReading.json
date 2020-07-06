@@ -4,7 +4,7 @@
       {
         "id": "q",
         "text": "Date and time last temperature reading performed",
-        "type": "DATE",
+        "type": "DATE_TIME",
         "required": true
       }
     ]
