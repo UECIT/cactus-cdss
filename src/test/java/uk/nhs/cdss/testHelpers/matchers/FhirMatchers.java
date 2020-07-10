@@ -32,6 +32,7 @@ import org.hl7.fhir.dstu3.model.RequestGroup.RequestIntent;
 import org.hl7.fhir.dstu3.model.RequestGroup.RequestPriority;
 import org.hl7.fhir.dstu3.model.RequestGroup.RequestStatus;
 import org.hl7.fhir.dstu3.model.Resource;
+import org.hl7.fhir.dstu3.model.Type;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class FhirMatchers {
@@ -117,6 +118,8 @@ public class FhirMatchers {
         && !requestGroup.hasNote()
         && !requestGroup.hasAction(), "valid 1.1.1 request group");
   }
+
+  @SafeVarargs
   public static Matcher<Parameters> isParametersContaining(
       Matcher<ParametersParameterComponent>... matchers) {
     return new FunctionMatcher<>(
@@ -128,5 +131,11 @@ public class FhirMatchers {
     return new FunctionMatcher<>(
         parameter -> name.equals(parameter.getName()) && value.equalsDeep(parameter.getResource()),
         "is Parameter with name " + name);
+  }
+
+  public static Matcher<ParametersParameterComponent> isParameter(String name, Type value) {
+    return new FunctionMatcher<>(
+        parameter -> name.equals(parameter.getName()) && value.equalsDeep(parameter.getValue()),
+        "is parameter with type = " + value);
   }
 }

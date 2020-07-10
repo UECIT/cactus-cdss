@@ -25,10 +25,14 @@ import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.hl7.fhir.dstu3.model.BooleanType;
 import org.hl7.fhir.dstu3.model.CodeableConcept;
+import org.hl7.fhir.dstu3.model.DateTimeType;
 import org.hl7.fhir.dstu3.model.GuidanceResponse;
 import org.hl7.fhir.dstu3.model.IdType;
+import org.hl7.fhir.dstu3.model.Identifier;
 import org.hl7.fhir.dstu3.model.Observation;
+import org.hl7.fhir.dstu3.model.Parameters;
 import org.hl7.fhir.dstu3.model.Parameters.ParametersParameterComponent;
 import org.hl7.fhir.dstu3.model.QuestionnaireResponse;
 import org.hl7.fhir.dstu3.model.Reference;
@@ -59,6 +63,7 @@ import uk.nhs.cdss.util.CollectionUtil;
 public class ServiceDefinitionProvider implements IResourceProvider {
 
   private static final String EVALUATE = "$evaluate";
+  private static final String IS_VALID = "$isValid";
 
   private static final String INPUT_DATA = "inputData";
   private static final String REQUEST_ID = "requestId";
@@ -93,6 +98,20 @@ public class ServiceDefinitionProvider implements IResourceProvider {
   @Override
   public Class<ServiceDefinition> getResourceType() {
     return ServiceDefinition.class;
+  }
+
+  @Operation(name = IS_VALID)
+  public Parameters isValid(
+      @OperationParam(name = REQUEST_ID) IdType requestId,
+      @OperationParam(name = "ODSCode", min = 1) Identifier odsCode,
+      @OperationParam(name = "evaluateAtDateTime") DateTimeType evaluateTime,
+      @OperationParam(name = "dateOfBirth") DateTimeType dateOfBirth
+  ) {
+    auditService.addAuditProperty(OPERATION, IS_VALID);
+    return new Parameters()
+        .addParameter(new ParametersParameterComponent()
+          .setName("return")
+          .setValue(new BooleanType(true)));
   }
 
   @Operation(name = EVALUATE)
