@@ -74,6 +74,7 @@ public class CodeDirectoryConfig {
   }
 
   private void bodyLocations(CodeDirectory codeDirectory) {
+    // Snomed codes need to change to this format, where a string id (used internally by the CDSS) is provided along with the numeric snomed code
     codeDirectory.put("head", snomed("774007", "Head and neck"));
     codeDirectory.put(snomed("chest", "Chest"));
     codeDirectory.put(snomed("heart", "Heart"));
