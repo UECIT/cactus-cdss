@@ -75,6 +75,10 @@ public class ServiceDefinitionProvider implements IResourceProvider {
   private static final String USER_LANGUAGE = "userLanguage";
   private static final String USER_TASK = "userTaskContext";
 
+  private static final String ODS_CODE = "ODSCode";
+  private static final String EVALUATE_AT = "evaluateAtDateTime";
+  private static final String DATE_OF_BIRTH = "dateOfBirth";
+
   private static final String CASE_ID = "caseId";
   private static final String OPERATION = "operation";
   private static final String SERVICE_SEARCH = "service_search";
@@ -103,9 +107,9 @@ public class ServiceDefinitionProvider implements IResourceProvider {
   @Operation(name = IS_VALID)
   public Parameters isValid(
       @OperationParam(name = REQUEST_ID) IdType requestId,
-      @OperationParam(name = "ODSCode", min = 1) Identifier odsCode,
-      @OperationParam(name = "evaluateAtDateTime") DateTimeType evaluateTime,
-      @OperationParam(name = "dateOfBirth") DateTimeType dateOfBirth
+      @OperationParam(name = ODS_CODE, min = 1) Identifier odsCode,
+      @OperationParam(name = EVALUATE_AT) DateTimeType evaluateTime,
+      @OperationParam(name = DATE_OF_BIRTH) DateTimeType dateOfBirth
   ) {
     auditService.addAuditProperty(OPERATION, IS_VALID);
     return new Parameters()
