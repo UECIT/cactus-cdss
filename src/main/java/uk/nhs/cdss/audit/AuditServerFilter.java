@@ -53,7 +53,6 @@ public class AuditServerFilter extends OncePerRequestFilter {
 
     try {
       filterChain.doFilter(requestWrapper, responseWrapper);
-      responseWrapper.copyBodyToResponse();
     } finally {
       var content = responseWrapper.getContentAsByteArray();
       responseWrapper.copyBodyToResponse();
