@@ -53,13 +53,16 @@ public class AuditServerFilter extends OncePerRequestFilter {
 
     try {
       filterChain.doFilter(requestWrapper, responseWrapper);
+      responseWrapper.copyBodyToResponse();
     } finally {
+      var content = responseWrapper.getContentAsByteArray();
+      responseWrapper.copyBodyToResponse();
+
       AuditSession auditSession = auditService
           .completeAuditSession(HttpRequest.from(requestWrapper),
-              HttpResponse.from(responseWrapper));
+              HttpResponse.from(responseWrapper, content));
 
       auditSender.sendAudit(auditSession);
-      responseWrapper.copyBodyToResponse();
     }
   }
 }
