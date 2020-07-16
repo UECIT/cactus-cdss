@@ -1,9 +1,22 @@
 package uk.nhs.cdss.audit;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
+
 import com.amazonaws.services.sqs.AmazonSQSClient;
 import com.amazonaws.services.sqs.model.MessageAttributeValue;
 import com.amazonaws.services.sqs.model.SendMessageRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.Instant;
+import java.util.Collections;
+import java.util.Optional;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -17,13 +30,6 @@ import uk.nhs.cactus.common.security.TokenAuthenticationService;
 import uk.nhs.cdss.audit.model.AuditEntry;
 import uk.nhs.cdss.audit.model.AuditSession;
 import uk.nhs.cdss.audit.sqs.AWSAuditSender;
-
-import java.time.Instant;
-import java.util.Collections;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AWSAuditSenderTest {
@@ -54,11 +60,23 @@ public class AWSAuditSenderTest {
   }
 
   @Test
+  public void shouldNotSendAuditSession_noSupplierId() {
+    ReflectionTestUtils.setField(sqsService, "loggingQueue", "mock.queue");
+    when(mockAuthService.getCurrentSupplierId()).thenReturn(Optional.empty());
+
+    AuditSession session = testSession();
+
+    sqsService.sendAudit(session);
+
+    verify(mockSqs, never()).sendMessage(any());
+  }
+
+  @Test
   public void shouldSendAuditSessionToSqs() throws Exception {
     ReflectionTestUtils.setField(sqsService, "loggingQueue", "mock.queue");
     ReflectionTestUtils.setField(sqsService, "serviceName", "cdss");
-    when(mockAuthService.requireSupplierId())
-        .thenReturn("mocksupplierid");
+    when(mockAuthService.getCurrentSupplierId())
+        .thenReturn(Optional.of("mocksupplierid"));
 
     AuditSession session = testSession();
     when(mockMapper.writeValueAsString(session))

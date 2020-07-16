@@ -10,7 +10,6 @@ import com.google.common.base.Preconditions;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -40,8 +39,14 @@ public class AWSAuditSender implements AuditSender {
     public void sendAudit(AuditSession session) {
         Preconditions.checkArgument(isNotEmpty(loggingQueue), "SQS Queue url must be provided");
 
-        var supplierId = authenticationService.requireSupplierId();
+        authenticationService.getCurrentSupplierId()
+            .ifPresentOrElse(
+                supplierId -> sendRequest(session, supplierId),
+                () -> log.info("No supplier id found, not sending audit: {}", session)
+            );
+    }
 
+    private void sendRequest(AuditSession session, String supplierId) {
         try {
             SendMessageRequest request = new SendMessageRequest()
                 .withMessageGroupId(supplierId)
