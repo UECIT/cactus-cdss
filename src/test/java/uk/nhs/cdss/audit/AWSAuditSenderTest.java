@@ -62,9 +62,7 @@ public class AWSAuditSenderTest {
   @Test
   public void shouldNotSendAuditSession_noSupplierId() {
     ReflectionTestUtils.setField(sqsService, "loggingQueue", "mock.queue");
-    ReflectionTestUtils.setField(sqsService, "serviceName", "cdss");
-    when(mockAuthService.getCurrentSupplierId())
-        .thenReturn(Optional.empty());
+    when(mockAuthService.getCurrentSupplierId()).thenReturn(Optional.empty());
 
     AuditSession session = testSession();
 
