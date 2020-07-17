@@ -6,5 +6,4 @@ import uk.nhs.cdss.transform.bundle.ReferralRequestBundle;
 
 public interface ReferralRequestTransformer extends
     Transformer<ReferralRequestBundle, ReferralRequest> {
-
 }

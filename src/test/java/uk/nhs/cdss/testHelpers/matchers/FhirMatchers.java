@@ -26,6 +26,7 @@ import org.hl7.fhir.dstu3.model.Element;
 import org.hl7.fhir.dstu3.model.Narrative;
 import org.hl7.fhir.dstu3.model.Parameters;
 import org.hl7.fhir.dstu3.model.Parameters.ParametersParameterComponent;
+import org.hl7.fhir.dstu3.model.ProcedureRequest;
 import org.hl7.fhir.dstu3.model.Reference;
 import org.hl7.fhir.dstu3.model.RequestGroup;
 import org.hl7.fhir.dstu3.model.RequestGroup.RequestIntent;
@@ -117,6 +118,12 @@ public class FhirMatchers {
         && !requestGroup.hasReason()
         && !requestGroup.hasNote()
         && !requestGroup.hasAction(), "valid 1.1.1 request group");
+  }
+
+  public static Matcher<ProcedureRequest> isValidV2ProcedureRequest() {
+    return new FunctionMatcher<>(pr -> {
+      return true;
+    }, "valid 2.0 procedure request");
   }
 
   @SafeVarargs
