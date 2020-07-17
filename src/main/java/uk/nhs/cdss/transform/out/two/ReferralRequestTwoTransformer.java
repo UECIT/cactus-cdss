@@ -83,7 +83,6 @@ public class ReferralRequestTwoTransformer implements ReferralRequestTransformer
     List<Reference> relevantHistory = transformRelevantHistory(from.getRelevantHistory());
     result.setRelevantHistory(relevantHistory);
 
-    // PR added later to avoid paradox.
     List<Reference> supportingInfo = from.getSecondaryReasons()
         .stream()
         .map(concern -> createConcernBundle(bundle, concern))
