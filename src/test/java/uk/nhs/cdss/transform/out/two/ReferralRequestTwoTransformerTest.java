@@ -19,8 +19,6 @@ import org.hl7.fhir.dstu3.model.CodeableConcept;
 import org.hl7.fhir.dstu3.model.Condition;
 import org.hl7.fhir.dstu3.model.Identifier;
 import org.hl7.fhir.dstu3.model.Period;
-import org.hl7.fhir.dstu3.model.ProcedureRequest;
-import org.hl7.fhir.dstu3.model.ProcedureRequest.ProcedureRequestStatus;
 import org.hl7.fhir.dstu3.model.Reference;
 import org.hl7.fhir.dstu3.model.ReferralRequest;
 import org.hl7.fhir.dstu3.model.ReferralRequest.ReferralCategory;
@@ -107,8 +105,6 @@ public class ReferralRequestTwoTransformerTest {
 
     ReferralRequest expectedReferralSent = expectedMinimumReferralRequest();
 
-    ProcedureRequest procedureRequest = new ProcedureRequest()
-        .setStatus(ProcedureRequestStatus.COMPLETED);
     Reference procedureRef = new Reference("ProcedureRequest/1234");
 
     final Concept testConcept = new Concept("test", new Coding("system", "code"));
@@ -118,8 +114,6 @@ public class ReferralRequestTwoTransformerTest {
     when(conceptTransformer.transform(testConcept)).thenReturn(expectedReasonCode);
     ArgumentCaptor<ProcedureRequestBundle> captor = ArgumentCaptor.forClass(ProcedureRequestBundle.class);
     when(procedureRequestTransformer.transform(captor.capture()))
-        .thenReturn(procedureRequest);
-    when(referenceStorageService.create(procedureRequest))
         .thenReturn(procedureRef);
 
     ReferralRequest actual = referralRequestTwoTransformer.transform(inputBundle);

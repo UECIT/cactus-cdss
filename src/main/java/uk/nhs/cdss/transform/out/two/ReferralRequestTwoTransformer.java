@@ -83,7 +83,7 @@ public class ReferralRequestTwoTransformer implements ReferralRequestTransformer
     List<Reference> relevantHistory = transformRelevantHistory(from.getRelevantHistory());
     result.setRelevantHistory(relevantHistory);
 
-    // Don't include PR for now - added later to avoid paradox
+    // PR added later to avoid paradox.
     List<Reference> supportingInfo = from.getSecondaryReasons()
         .stream()
         .map(concern -> createConcernBundle(bundle, concern))
@@ -95,8 +95,7 @@ public class ReferralRequestTwoTransformer implements ReferralRequestTransformer
         .nextActivity(from.getReasonCode())
         .referralRequest(result.copy()) //For testability we don't want to modify the instance sent.
         .build();
-    Reference procedureRequest = referenceStorageService
-        .create(procedureRequestTransformer.transform(procedureRequestBundle));
+    Reference procedureRequest = procedureRequestTransformer.transform(procedureRequestBundle);
 
     supportingInfo.add(procedureRequest);
     result.setSupportingInfo(supportingInfo);

@@ -9,6 +9,7 @@ import org.hl7.fhir.dstu3.model.ProcedureRequest;
 import org.hl7.fhir.dstu3.model.ProcedureRequest.ProcedureRequestIntent;
 import org.hl7.fhir.dstu3.model.ProcedureRequest.ProcedureRequestPriority;
 import org.hl7.fhir.dstu3.model.ProcedureRequest.ProcedureRequestStatus;
+import org.hl7.fhir.dstu3.model.Reference;
 import org.hl7.fhir.dstu3.model.ReferralRequest;
 import org.springframework.stereotype.Component;
 import uk.nhs.cdss.engine.CodeDirectory;
@@ -18,18 +19,18 @@ import uk.nhs.cdss.transform.out.two.ProcedureRequestTransformer.ProcedureReques
 
 @Component
 @RequiredArgsConstructor
-public class ProcedureRequestTransformer implements Transformer<ProcedureRequestBundle, ProcedureRequest> {
+public class ProcedureRequestTransformer implements Transformer<ProcedureRequestBundle, Reference> {
 
   private final CodeDirectory codeDirectory;
   private final ConceptTransformer conceptTransformer;
   private final ReferenceStorageService storageService;
 
   @Override
-  public ProcedureRequest transform(ProcedureRequestBundle nextActivity) {
+  public Reference transform(ProcedureRequestBundle nextActivity) {
     CodeableConcept code = conceptTransformer
         .transform(codeDirectory.get(nextActivity.getNextActivity()));
     ReferralRequest referralRequest = nextActivity.getReferralRequest();
-    return new ProcedureRequest()
+    ProcedureRequest procedureRequest = new ProcedureRequest()
         .setStatus(ProcedureRequestStatus.fromCode(referralRequest.getStatus().toCode()))
         .setIntent(ProcedureRequestIntent.fromCode(referralRequest.getIntent().toCode()))
         .setPriority(ProcedureRequestPriority.ROUTINE)
@@ -41,6 +42,9 @@ public class ProcedureRequestTransformer implements Transformer<ProcedureRequest
         .setReasonReference(referralRequest.getReasonReference())
         .setSupportingInfo(referralRequest.getSupportingInfo())
         .setRelevantHistory(referralRequest.getRelevantHistory());
+    Reference reference = storageService.create(procedureRequest);
+    procedureRequest.addSupportingInfo(reference); // Reference itself - this will be updated in later spec versions.
+    return storageService.upsert(procedureRequest);
   }
 
   @Value
