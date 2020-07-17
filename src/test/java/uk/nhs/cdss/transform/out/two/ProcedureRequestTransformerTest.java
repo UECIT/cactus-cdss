@@ -1,9 +1,11 @@
 package uk.nhs.cdss.transform.out.two;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.both;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
 import static org.mockito.hamcrest.MockitoHamcrest.argThat;
+import static uk.nhs.cdss.testHelpers.matchers.FhirMatchers.isValidV2ProcedureRequest;
 import static uk.nhs.cdss.testHelpers.matchers.FhirMatchers.sameElement;
 
 import java.util.ArrayList;
@@ -67,13 +69,13 @@ public class ProcedureRequestTransformerTest {
         .setSupportingInfo(referralRequest.getSupportingInfo())
         .setRelevantHistory(referralRequest.getRelevantHistory());
     Reference expectedRef = new Reference("ProcedureRequest/9999");
-    when(storageService.create(argThat(sameElement(expected))))
-        .thenReturn(expectedRef);
+    when(storageService.create(argThat(
+        both(sameElement(expected)).and(isValidV2ProcedureRequest())))).thenReturn(expectedRef);
     ArrayList<Reference> updated = new ArrayList<>(expected.getSupportingInfo());
     updated.add(expectedRef);
     ProcedureRequest updatedPR = expected.copy().setSupportingInfo(updated);
-    when(storageService.upsert(argThat(sameElement(updatedPR))))
-        .thenReturn(expectedRef);
+    when(storageService.upsert(argThat(
+        both(sameElement(updatedPR)).and(isValidV2ProcedureRequest())))).thenReturn(expectedRef);
 
     Reference procedureReqRef = procedureRequestTransformer.transform(inputBundle);
 

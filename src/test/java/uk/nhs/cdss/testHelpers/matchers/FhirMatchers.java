@@ -27,6 +27,7 @@ import org.hl7.fhir.dstu3.model.Narrative;
 import org.hl7.fhir.dstu3.model.Parameters;
 import org.hl7.fhir.dstu3.model.Parameters.ParametersParameterComponent;
 import org.hl7.fhir.dstu3.model.ProcedureRequest;
+import org.hl7.fhir.dstu3.model.ProcedureRequest.ProcedureRequestPriority;
 import org.hl7.fhir.dstu3.model.Reference;
 import org.hl7.fhir.dstu3.model.RequestGroup;
 import org.hl7.fhir.dstu3.model.RequestGroup.RequestIntent;
@@ -122,9 +123,24 @@ public class FhirMatchers {
   }
 
   public static Matcher<ProcedureRequest> isValidV2ProcedureRequest() {
-    return new FunctionMatcher<>(pr -> {
-      return true;
-    }, "valid 2.0 procedure request");
+    return new FunctionMatcher<>(pr ->
+        !pr.hasBasedOn()
+        && !pr.hasRequisition()
+        && pr.hasStatus()
+        && pr.hasIntent()
+        && pr.getPriority().equals(ProcedureRequestPriority.ROUTINE)
+        && !pr.getDoNotPerform()
+        && pr.hasCode()
+        && pr.hasSubject()
+        && pr.hasContext()
+        && pr.hasOccurrence()
+        && !pr.hasAsNeeded()
+        && !pr.hasAuthoredOn()
+        && !pr.hasRequester()
+        && !pr.hasReasonCode()
+        && pr.hasReasonReference()
+        && !pr.hasSpecimen()
+        && !pr.hasNote(), "valid 2.0 procedure request");
   }
 
   @SafeVarargs
