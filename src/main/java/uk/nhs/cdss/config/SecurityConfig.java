@@ -25,9 +25,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         .and()
         .authorizeRequests()
-        // TODO CDSCT-71 - remove ServiceDefinition exception by proxying through EMS
-        // TODO CDSCT-218 - remove image exception by proxying through EMS
-        .antMatchers(HttpMethod.OPTIONS, "/image/**", "/fhir/ServiceDefinition/**").permitAll()
+        // TODO CDSCT-233
+        .antMatchers(HttpMethod.OPTIONS, "/image/**").permitAll()
         .antMatchers(HttpMethod.GET, "/image/**").permitAll()
         .anyRequest().authenticated()
         .and()
