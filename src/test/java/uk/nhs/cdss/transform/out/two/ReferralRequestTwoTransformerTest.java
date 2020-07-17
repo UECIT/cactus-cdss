@@ -33,10 +33,10 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.nhs.cdss.domain.Coding;
 import uk.nhs.cdss.domain.Concept;
-import uk.nhs.cdss.domain.ReferralRequest.ReferralRequestBuilder;
 import uk.nhs.cdss.engine.CodeDirectory;
 import uk.nhs.cdss.services.NarrativeService;
 import uk.nhs.cdss.services.ReferenceStorageService;
+import uk.nhs.cdss.testHelpers.fixtures.ReferralRequestFixtures;
 import uk.nhs.cdss.transform.bundle.ReferralRequestBundle;
 import uk.nhs.cdss.transform.out.ConceptTransformer;
 import uk.nhs.cdss.transform.out.ConditionTransformer;
@@ -79,7 +79,7 @@ public class ReferralRequestTwoTransformerTest {
   public void shouldTransformReferralRequestWithReasonCode() {
     final String reasonCode = "R3450N_C0D3";
     ReferralRequestBundle inputBundle = ReferralRequestBundle.builder()
-        .referralRequest(minimumReferralRequestBuilder()
+        .referralRequest(ReferralRequestFixtures.minimumReferralRequestBuilder()
             .reasonCode(reasonCode)
             .build())
         .build();
@@ -98,7 +98,7 @@ public class ReferralRequestTwoTransformerTest {
   public void shouldTransformReferralRequestWithProcedureRequest() {
     final String reasonCode = "R3450N_C0D3";
     ReferralRequestBundle inputBundle = ReferralRequestBundle.builder()
-        .referralRequest(minimumReferralRequestBuilder()
+        .referralRequest(ReferralRequestFixtures.minimumReferralRequestBuilder()
             .reasonCode(reasonCode)
             .build())
         .build();
@@ -137,11 +137,6 @@ public class ReferralRequestTwoTransformerTest {
         .setRelevantHistory(Collections.emptyList())
         .setReasonReference(Collections.singletonList(new Reference()))
         .setDefinition(Collections.emptyList());
-  }
-
-  private ReferralRequestBuilder minimumReferralRequestBuilder() {
-    return uk.nhs.cdss.domain.ReferralRequest.builder()
-        .occurrence("PT1S");
   }
 
 }

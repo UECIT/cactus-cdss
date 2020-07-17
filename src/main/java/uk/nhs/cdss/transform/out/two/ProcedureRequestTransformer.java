@@ -1,5 +1,6 @@
 package uk.nhs.cdss.transform.out.two;
 
+import java.util.ArrayList;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
@@ -43,7 +44,9 @@ public class ProcedureRequestTransformer implements Transformer<ProcedureRequest
         .setSupportingInfo(referralRequest.getSupportingInfo())
         .setRelevantHistory(referralRequest.getRelevantHistory());
     Reference reference = storageService.create(procedureRequest);
-    procedureRequest.addSupportingInfo(reference); // Reference itself - this will be updated in later spec versions.
+    ArrayList<Reference> updatedSupportingInfo = new ArrayList<>(referralRequest.getSupportingInfo());
+    updatedSupportingInfo.add(reference);// Reference itself - this will be updated in later spec versions.
+    procedureRequest.setSupportingInfo(updatedSupportingInfo);
     return storageService.upsert(procedureRequest);
   }
 
