@@ -39,14 +39,14 @@ import org.hl7.fhir.dstu3.model.Type;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class FhirMatchers {
 
-  public static <T extends Element> Matcher<Element> sameElement(T expected) {
+  public static <T extends Element> Matcher<T> sameElement(T expected) {
     return new FunctionMatcher<>(
         actual -> actual.equalsDeep(expected),
         expected.toString());
   }
 
   public static <T extends Base> Matcher<T> sameElement(T expected) {
-        return new FunctionMatcher<>(
+    return new FunctionMatcher<>(
         actual -> actual.equalsDeep(expected),
         expected.toString());
   }
