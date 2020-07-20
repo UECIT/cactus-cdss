@@ -3,14 +3,13 @@ package uk.nhs.cdss.transform.out.two;
 import static java.util.Collections.singletonList;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
+import java.time.Clock;
 import java.time.Duration;
-import java.time.Instant;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
-import org.hl7.fhir.dstu3.model.CodeableConcept;
 import org.hl7.fhir.dstu3.model.Identifier;
 import org.hl7.fhir.dstu3.model.Narrative;
 import org.hl7.fhir.dstu3.model.Period;
@@ -33,6 +32,7 @@ import uk.nhs.cdss.transform.bundle.ReferralRequestBundle;
 import uk.nhs.cdss.transform.out.ConceptTransformer;
 import uk.nhs.cdss.transform.out.ConditionTransformer;
 import uk.nhs.cdss.transform.out.ReferralRequestTransformer;
+import uk.nhs.cdss.transform.out.two.ProcedureRequestTransformer.ProcedureRequestBundle;
 
 @Component
 @Profile(ApiProfiles.TWO)
@@ -40,48 +40,72 @@ import uk.nhs.cdss.transform.out.ReferralRequestTransformer;
 public class ReferralRequestTwoTransformer implements ReferralRequestTransformer {
 
   private static final Duration ROUTINE_APPOINTMENT_OCCURRENCE = Duration.parse("P7D");
+
   private final ConceptTransformer conceptTransformer;
   private final ConditionTransformer conditionTransformer;
+  private final ProcedureRequestTransformer procedureRequestTransformer;
   private final CodeDirectory codeDirectory;
   private final ReferenceStorageService referenceStorageService;
   private final NarrativeService narrativeService;
+  private final Clock clock;
 
   @Override
   public ReferralRequest transform(ReferralRequestBundle bundle) {
 
     ReferralRequest result = new ReferralRequest();
     var from = bundle.getReferralRequest();
+    Reference subject = bundle.getSubject();
+    Reference context = bundle.getContext();
+
     Reference reasonRef = referenceStorageService.create(
         conditionTransformer.transform(createConcernBundle(bundle, from.getReason())));
 
     result.setDefinition(transformDefinition(from.getDefinition()));
     result.setGroupIdentifier(new Identifier()
         .setValue(bundle.getRequestGroupId()));
-    result.setStatus(bundle.isDraft() ? ReferralRequestStatus.DRAFT :ReferralRequestStatus.ACTIVE);
-    result.setIntent(ReferralCategory.PLAN);
+
+    ReferralRequestStatus status =
+        bundle.isDraft() ? ReferralRequestStatus.DRAFT : ReferralRequestStatus.ACTIVE;
+    result.setStatus(status);
+
+    ReferralCategory intent = ReferralCategory.PLAN;
+    result.setIntent(intent);
     result.setPriority(ReferralPriority.ROUTINE);
-    result.setSubject(bundle.getSubject());
-    result.setContext(bundle.getContext());
+    result.setSubject(subject);
+    result.setContext(context);
     result.setText(transformNarrative(bundle.getReferralRequest()));
-    result.setOccurrence(transformOccurrence(from.getOccurrence()));
-    result.setAuthoredOn(defaultIfNull(from.getAuthoredOn(), new Date()));
+    Type occurrence = transformOccurrence(from.getOccurrence());
+    result.setOccurrence(occurrence);
+    result.setAuthoredOn(defaultIfNull(from.getAuthoredOn(), Date.from(clock.instant())));
     result.setReasonReference(singletonList(reasonRef));
     result.setDescription(from.getDescription());
 
-    //TODO: This should be a procedure request
-    result.setSupportingInfo(from.getSecondaryReasons()
+    List<Reference> relevantHistory = transformRelevantHistory(from.getRelevantHistory());
+    result.setRelevantHistory(relevantHistory);
+
+    List<Reference> supportingInfo = from.getSecondaryReasons()
         .stream()
         .map(concern -> createConcernBundle(bundle, concern))
         .map(conditionTransformer::transform)
         .map(referenceStorageService::create)
-        .collect(Collectors.toList()));
-    result.setRelevantHistory(transformRelevantHistory(from.getRelevantHistory()));
+        .collect(Collectors.toList());
+
+    ProcedureRequestBundle procedureRequestBundle = ProcedureRequestBundle.builder()
+        .nextActivity(from.getReasonCode())
+        .referralRequest(result.copy()) //For testability we don't want to modify the instance sent.
+        .build();
+    Reference procedureRequest = procedureRequestTransformer.transform(procedureRequestBundle);
+
+    supportingInfo.add(procedureRequest);
+    result.setSupportingInfo(supportingInfo);
 
     return result;
   }
 
   private Narrative transformNarrative(uk.nhs.cdss.domain.ReferralRequest referralRequest) {
-    var primaryConcern = transformNextActivity(referralRequest.getReasonCode()).getCodingFirstRep().getDisplay();
+    String primaryConcern = conceptTransformer
+        .transform(codeDirectory.get(referralRequest.getReasonCode()))
+        .getCodingFirstRep().getDisplay();
     var baseText = "Plan to refer patient to '"+ referralRequest.getDescription() + "'";
 
     var text = baseText + " based on the concern '" + primaryConcern + "'";
@@ -103,14 +127,10 @@ public class ReferralRequestTwoTransformer implements ReferralRequestTransformer
         ? ROUTINE_APPOINTMENT_OCCURRENCE
         : Duration.parse(occurrence);
 
-    var now = Instant.now();
+    var now = clock.instant();
     return new Period()
         .setStart(Date.from(now))
         .setEnd(Date.from(now.plus(duration)));
-  }
-
-  private CodeableConcept transformNextActivity(String nextActivity) {
-    return conceptTransformer.transform(codeDirectory.get(nextActivity));
   }
 
   private List<Reference> transformDefinition(ActivityDefinition definition) {

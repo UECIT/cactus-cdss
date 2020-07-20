@@ -26,6 +26,8 @@ import org.hl7.fhir.dstu3.model.Element;
 import org.hl7.fhir.dstu3.model.Narrative;
 import org.hl7.fhir.dstu3.model.Parameters;
 import org.hl7.fhir.dstu3.model.Parameters.ParametersParameterComponent;
+import org.hl7.fhir.dstu3.model.ProcedureRequest;
+import org.hl7.fhir.dstu3.model.ProcedureRequest.ProcedureRequestPriority;
 import org.hl7.fhir.dstu3.model.Reference;
 import org.hl7.fhir.dstu3.model.RequestGroup;
 import org.hl7.fhir.dstu3.model.RequestGroup.RequestIntent;
@@ -37,12 +39,13 @@ import org.hl7.fhir.dstu3.model.Type;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class FhirMatchers {
 
-  public static Matcher<Element> sameElement(Element expected) {
+  public static <T extends Element> Matcher<T> sameElement(T expected) {
     return new FunctionMatcher<>(
         actual -> actual.equalsDeep(expected),
         expected.toString());
   }
-  public static Matcher<Base> sameElement(Base expected) {
+
+  public static <T extends Base> Matcher<T> sameElement(T expected) {
     return new FunctionMatcher<>(
         actual -> actual.equalsDeep(expected),
         expected.toString());
@@ -117,6 +120,27 @@ public class FhirMatchers {
         && !requestGroup.hasReason()
         && !requestGroup.hasNote()
         && !requestGroup.hasAction(), "valid 1.1.1 request group");
+  }
+
+  public static Matcher<ProcedureRequest> isValidV2ProcedureRequest() {
+    return new FunctionMatcher<>(pr ->
+        !pr.hasBasedOn()
+        && !pr.hasRequisition()
+        && pr.hasStatus()
+        && pr.hasIntent()
+        && pr.getPriority().equals(ProcedureRequestPriority.ROUTINE)
+        && !pr.getDoNotPerform()
+        && pr.hasCode()
+        && pr.hasSubject()
+        && pr.hasContext()
+        && pr.hasOccurrence()
+        && !pr.hasAsNeeded()
+        && !pr.hasAuthoredOn()
+        && !pr.hasRequester()
+        && !pr.hasReasonCode()
+        && pr.hasReasonReference()
+        && !pr.hasSpecimen()
+        && !pr.hasNote(), "valid 2.0 procedure request");
   }
 
   @SafeVarargs
