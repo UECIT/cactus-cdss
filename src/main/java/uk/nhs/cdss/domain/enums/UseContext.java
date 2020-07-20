@@ -20,9 +20,9 @@ public enum UseContext implements Concept {
   PATIENT(Systems.PROVIDER, "Patient", "Patient"),
   RELATED_PERSON(Systems.PROVIDER, "RelatedPerson", "Related Person"),
 
-  PHONE(Systems.UEC_COMM, "telephony", "Telephony"),
-  ONLINE(Systems.UEC_COMM, "online", "Online"),
-  CLINICAL(Systems.UEC_COMM, "face-to-face", "Face to face");
+  PHONE(SettingUseContext.PHONE),
+  ONLINE(SettingUseContext.ONLINE),
+  CLINICAL(SettingUseContext.CLINICAL);
 
   private final String system;
   private final String value;

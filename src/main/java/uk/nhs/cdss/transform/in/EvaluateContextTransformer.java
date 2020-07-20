@@ -4,6 +4,7 @@ import org.hl7.fhir.dstu3.model.CodeableConcept;
 import org.springframework.stereotype.Component;
 import uk.nhs.cdss.domain.EvaluateContext;
 import uk.nhs.cdss.domain.EvaluateContext.Role;
+import uk.nhs.cdss.domain.enums.SettingUseContext;
 import uk.nhs.cdss.transform.EvaluationParameters;
 import uk.nhs.cdss.transform.Transformer;
 
@@ -15,10 +16,16 @@ public final class EvaluateContextTransformer implements
   public EvaluateContext transform(EvaluationParameters from) {
     return EvaluateContext.builder()
         .role(transformRole(from.getUserType()))
-        .setting(transformContext(from.getSetting()))
+        .setting(setting(from.getSetting()))
         .language(transformContext(from.getUserLanguage()))
         .task(transformContext(from.getUserTaskContext()))
         .build();
+  }
+
+  private String setting(CodeableConcept from) {
+    return from == null
+        ? null
+        : SettingUseContext.fromCode(from.getCodingFirstRep().getCode()).getInternalName();
   }
 
   private Role transformRole(CodeableConcept from) {
