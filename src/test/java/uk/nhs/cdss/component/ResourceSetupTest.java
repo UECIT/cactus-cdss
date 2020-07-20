@@ -54,7 +54,9 @@ public class ResourceSetupTest {
     Reference ref = new Reference("http://url/fhir/Encounter/123");
     List<CarePlan> existing = Arrays.asList(
         new CarePlan().setStatus(CarePlanStatus.ACTIVE),
-        new CarePlan().setStatus(CarePlanStatus.DRAFT)
+        new CarePlan().setStatus(CarePlanStatus.DRAFT),
+        new CarePlan().setStatus(CarePlanStatus.CANCELLED),
+        new CarePlan().setStatus(CarePlanStatus.COMPLETED)
     );
 
     mockSearch(CarePlan.class, existing);
@@ -76,7 +78,9 @@ public class ResourceSetupTest {
     Reference ref = new Reference("http://url/fhir/Encounter/123");
     List<ReferralRequest> existing = Arrays.asList(
         new ReferralRequest().setStatus(ReferralRequestStatus.ACTIVE),
-        new ReferralRequest().setStatus(ReferralRequestStatus.DRAFT)
+        new ReferralRequest().setStatus(ReferralRequestStatus.DRAFT),
+        new ReferralRequest().setStatus(ReferralRequestStatus.CANCELLED),
+        new ReferralRequest().setStatus(ReferralRequestStatus.COMPLETED)
     );
 
     mockSearch(CarePlan.class, emptyList());
@@ -84,7 +88,7 @@ public class ResourceSetupTest {
 
     resourceSetup.cancelResources(ref);
 
-    verify(storageService, times(2))
+    verify(storageService, times(3))
         .upsert(argThat(res ->
             res instanceof ReferralRequest
                 && ((ReferralRequest)res).getStatus().equals(ReferralRequestStatus.CANCELLED)));
@@ -120,13 +124,14 @@ public class ResourceSetupTest {
   }
 
   @Test
-  public void doesntCancelAlreadyCancelledResources() {
+  public void doesntCancelAlreadyCancelledOrCompletedResources() {
     Reference ref = new Reference("http://url/fhir/Encounter/123");
     List<ReferralRequest> existingReferrals = Collections.singletonList(
         new ReferralRequest().setStatus(ReferralRequestStatus.CANCELLED)
     );
-    List<CarePlan> existingCarePlans = Collections.singletonList(
-        new CarePlan().setStatus(CarePlanStatus.CANCELLED)
+    List<CarePlan> existingCarePlans = List.of(
+        new CarePlan().setStatus(CarePlanStatus.CANCELLED),
+        new CarePlan().setStatus(CarePlanStatus.COMPLETED)
     );
 
     mockSearch(CarePlan.class, existingCarePlans);

@@ -38,7 +38,7 @@ public class ResourceSetup {
         .stream()
         .map(BundleEntryComponent::getResource)
         .map(ReferralRequest.class::cast)
-        .filter(rr -> !rr.getStatus().equals(ReferralRequestStatus.CANCELLED))
+        .filter(rr -> rr.getStatus() != ReferralRequestStatus.CANCELLED)
         .forEach(rr -> {
           rr.setStatus(ReferralRequestStatus.CANCELLED);
           storageService.upsert(rr);
@@ -55,7 +55,8 @@ public class ResourceSetup {
         .stream()
         .map(BundleEntryComponent::getResource)
         .map(CarePlan.class::cast)
-        .filter(cp -> !cp.getStatus().equals(CarePlanStatus.CANCELLED))
+        .filter(cp -> cp.getStatus() != CarePlanStatus.CANCELLED
+            && cp.getStatus() != CarePlanStatus.COMPLETED)
         .forEach(cp -> {
           cp.setStatus(CarePlanStatus.CANCELLED);
           storageService.upsert(cp);
