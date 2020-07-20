@@ -32,6 +32,8 @@ import org.junit.runner.RunWith;
 import uk.nhs.cdss.audit.AuditService;
 import uk.nhs.cdss.config.CodeDirectoryConfig;
 import uk.nhs.cdss.config.MapperConfig;
+import uk.nhs.cdss.domain.enums.SettingUseContext;
+import uk.nhs.cdss.domain.enums.UseContextType;
 import uk.nhs.cdss.engine.CodeDirectory;
 import uk.nhs.cdss.registry.ServiceDefinitionRegistry;
 import uk.nhs.cdss.transform.out.CodingOutTransformer;
@@ -273,51 +275,53 @@ public class ServiceDefinitionProvidersTest {
     String childBirthDate = LocalDate.now().minusYears(3).format(DateTimeFormatter.ISO_LOCAL_DATE);
     String adultBirthDate = LocalDate.now().minusYears(23).format(DateTimeFormatter.ISO_LOCAL_DATE);
 
-
+    String settingType = UseContextType.SETTING.getValue();
+    String telephony = SettingUseContext.PHONE.getValue();
+    String clinical = SettingUseContext.CLINICAL.getValue();
     return new Object[]{
         new Object[]{
-            useContext(Stream.of("age", "user", "setting"), Stream.of("133936004", "Practitioner", "phone")),
+            useContext(Stream.of("age", "user", settingType), Stream.of("133936004", "Practitioner", telephony)),
             observationTrigger(Stream.of("soreThroat", "lifeThreatening"), Stream.of("present", "absent")),
             adultBirthDate,
             "Sore Throat - Adult, Call Handler"
         },
         new Object[]{
-            useContext(Stream.of("age", "user", "setting"), Stream.of("133936004", "Practitioner", "clinical")),
+            useContext(Stream.of("age", "user", settingType), Stream.of("133936004", "Practitioner", clinical)),
             observationTrigger(Stream.of("soreThroat", "lifeThreatening"), Stream.of("present", "absent")),
             adultBirthDate,
             "Sore Throat - Adult, Clinical"
         },
         new Object[]{
-            useContext(Stream.of("age", "user", "setting"), Stream.of("67822003", "Practitioner", "phone")),
+            useContext(Stream.of("age", "user", settingType), Stream.of("67822003", "Practitioner", telephony)),
             observationTrigger(Stream.of("soreThroat", "lifeThreatening"), Stream.of("present", "absent")),
             childBirthDate,
             "Sore Throat - Child, Call Handler"
         },
         new Object[]{
-            useContext(Stream.of("age", "user", "setting"), Stream.of("67822003", "Practitioner", "clinical")),
+            useContext(Stream.of("age", "user", settingType), Stream.of("67822003", "Practitioner", clinical)),
             observationTrigger(Stream.of("soreThroat", "lifeThreatening"), Stream.of("present", "absent")),
             childBirthDate,
             "Sore Throat - Child, Clinical"
         },
         new Object[]{
-            useContext(Stream.of("age", "user", "setting"), Stream.of("133936004", "Practitioner", "phone")),
+            useContext(Stream.of("age", "user", settingType), Stream.of("133936004", "Practitioner", telephony)),
             observationTrigger(Stream.of("constipation", "lifeThreatening"), Stream.of("present", "absent")),
             adultBirthDate,
             "Constipation - Adult, Call Handler"
         },
         new Object[]{
-            useContext(Stream.of("age", "user", "setting"), Stream.of("133936004", "Practitioner", "clinical")),
+            useContext(Stream.of("age", "user", settingType), Stream.of("133936004", "Practitioner", clinical)),
             observationTrigger(Stream.of("constipation", "lifeThreatening"), Stream.of("present", "absent")),
             adultBirthDate,
             "Constipation - Adult, Clinical"},
         new Object[]{
-            useContext(Stream.of("age", "user", "setting"), Stream.of("67822003", "Practitioner", "phone")),
+            useContext(Stream.of("age", "user", settingType), Stream.of("67822003", "Practitioner", telephony)),
             observationTrigger(Stream.of("constipation", "lifeThreatening"), Stream.of("present", "absent")),
             childBirthDate,
             "Constipation - Child, Call Handler"
         },
         new Object[]{
-            useContext(Stream.of("age", "user", "setting"), Stream.of("67822003", "Practitioner", "clinical")),
+            useContext(Stream.of("age", "user", settingType), Stream.of("67822003", "Practitioner", clinical)),
             observationTrigger(Stream.of("constipation", "lifeThreatening"), Stream.of("present", "absent")),
             childBirthDate,
             "Constipation - Child, Clinical"

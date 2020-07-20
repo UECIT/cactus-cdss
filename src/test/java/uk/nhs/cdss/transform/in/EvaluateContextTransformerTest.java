@@ -24,7 +24,7 @@ public class EvaluateContextTransformerTest {
   public void shouldTransformWithRoleAndContext() {
     EvaluationParameters inputParams = EvaluationParameters.builder()
         .userType(codeableConcept("Patient"))
-        .setting(codeableConcept("setting"))
+        .setting(codeableConcept("face-to-face"))
         .userLanguage(codeableConcept("language"))
         .userTaskContext(codeableConcept("context"))
         .build();
@@ -35,7 +35,7 @@ public class EvaluateContextTransformerTest {
         .role(Role.PATIENT)
         .task("context")
         .language("language")
-        .setting("setting")
+        .setting("clinical")
         .build();
 
     assertThat(returned, is(expected));
