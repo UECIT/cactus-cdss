@@ -443,10 +443,9 @@ then
     insert( new OutcomeAnswerCondition("notSyncope48hrs", "palpitations2.hasPalpitations", "q", Arrays.asList("No", "Unsure") ));
 
     //  If last experienced more than 48 hours
-    insert( new NextQuestion("palpitations2.syncope", "palpitations2.lastExperienced", "q3", Arrays.asList("Yes")));
+    insert( new NextQuestion("palpitations2.syncope", "palpitations2.lastExperienced", "q3", Arrays.asList("Yes", "No", "Unsure")));
     insert( new AnswerAssertion("palpitations2.lastExperienced", "q3", "Yes", codeDirectory.get("lastExperiencedMoreThan48"), true));
-    insert( new AnswerAssertion("palpitations2.lastExperienced", "q3", "No", codeDirectory.get("lastExperiencedMoreThan48"), true));
-    insert( new AnswerAssertion("palpitations2.lastExperienced", "q3", "Unsure", codeDirectory.get("lastExperiencedMoreThan48"), true));
+    insert( new AnswerAssertion("palpitations2.lastExperienced", "q3", "No", codeDirectory.get("lastExperiencedMoreThan48"), false));
     insert( gpArrhythmia("syncopeOver48hrs", "PT72h", "PT48h"));
     insert( new OutcomeAnswerCondition("syncopeOver48hrs", "palpitations2.syncope", "q", Arrays.asList("Yes", "Unsure") ));
     insert( new OutcomeAnswerCondition("syncopeOver48hrs", "palpitations2.lastExperienced", "q3", Arrays.asList("Yes", "No", "Unsure") ));

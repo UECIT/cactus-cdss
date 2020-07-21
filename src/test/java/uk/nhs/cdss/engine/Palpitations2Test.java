@@ -7,6 +7,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
+import java.util.List;
 import org.junit.Test;
 import uk.nhs.cdss.exception.ServiceDefinitionException;
 
@@ -33,6 +34,18 @@ public class Palpitations2Test extends BaseDroolsCDSEngineTest {
     evaluate();
 
     assertEquals("ed-arrhythmia-emergency", output.getOutcome().getReferralRequest().getId());
+  }
+
+  @Test
+  public void regression_lastExperienced_moreThan48hours_no() throws ServiceDefinitionException {
+    // CDSCT-261
+    addAgeAssertion("1900-12-25");
+    answerQuestion("hasPalpitations", "q", "No");
+    answerQuestion("lastExperienced", "q3", "No");
+
+    evaluate();
+
+    assertEquals(List.of("palpitations2.syncope"), output.getQuestionnaireIds());
   }
 
   @Test
