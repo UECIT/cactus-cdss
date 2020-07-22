@@ -1,10 +1,16 @@
 package uk.nhs.cdss.engine;
 
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 
+import com.google.common.collect.Iterables;
 import org.junit.Test;
+import uk.nhs.cdss.domain.Assertion;
+import uk.nhs.cdss.domain.enums.ObservationTriggerValue;
 import uk.nhs.cdss.exception.ServiceDefinitionException;
 
 public class PalpitationsTest extends BaseDroolsCDSEngineTest {
@@ -24,8 +30,9 @@ public class PalpitationsTest extends BaseDroolsCDSEngineTest {
 
     evaluate();
 
-    assertEquals(1, output.getAssertions().size());
-    assertEquals(true, output.getAssertions().get(0).getValue());
+    assertThat(output.getAssertions(), hasSize(1));
+    Assertion assertion = Iterables.getOnlyElement(output.getAssertions());
+    assertThat(assertion.getValue(), is(ObservationTriggerValue.PRESENT));
   }
 
   @Test
