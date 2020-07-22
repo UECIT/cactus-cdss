@@ -38,12 +38,13 @@ import uk.nhs.cdss.domain.Concern.ClinicalStatus;
 import uk.nhs.cdss.domain.Concern.VerificationStatus;
 import uk.nhs.cdss.engine.CodeDirectory;
 import uk.nhs.cdss.transform.bundle.ConcernBundle;
+import uk.nhs.cdss.transform.out.one_one.ConditionOneOneTransformer;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ConditionTransformerTest {
+public class ConditionOneOneTransformerTest {
 
   @InjectMocks
-  private ConditionTransformer conditionTransformer;
+  private ConditionOneOneTransformer conditionTransformer;
 
   @Mock
   private ConceptTransformer conceptTransformer;

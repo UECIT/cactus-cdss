@@ -35,6 +35,7 @@ import org.hl7.fhir.dstu3.model.RequestGroup.RequestPriority;
 import org.hl7.fhir.dstu3.model.RequestGroup.RequestStatus;
 import org.hl7.fhir.dstu3.model.Resource;
 import org.hl7.fhir.dstu3.model.Type;
+import uk.nhs.cdss.domain.enums.ConditionCategory;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class FhirMatchers {
@@ -95,6 +96,24 @@ public class FhirMatchers {
             && List.of(PROVISIONAL, DIFFERENTIAL, CONFIRMED, UNKNOWN)
             .contains(condition.getVerificationStatus())
             && !condition.hasCategory()
+            && condition.hasCode()
+            && condition.hasSubject()
+            && condition.hasContext()
+            && !condition.hasAssertedDate()
+            && !condition.hasAsserter()
+            && !condition.hasNote()
+            && condition.getEvidence().stream()
+            .noneMatch(ConditionEvidenceComponent::hasCode), "valid 1.1.1 condition");
+  }
+
+  public static Matcher<Condition> isValidV2Condition() {
+    return new FunctionMatcher<>(condition ->
+        !condition.hasId()
+            && List.of(ConditionClinicalStatus.ACTIVE, RECURRENCE)
+            .contains(condition.getClinicalStatus())
+            && List.of(PROVISIONAL, DIFFERENTIAL, CONFIRMED, UNKNOWN)
+            .contains(condition.getVerificationStatus())
+            && condition.getCategoryFirstRep().equalsDeep(ConditionCategory.CONCERN.toCodeableConcept())
             && condition.hasCode()
             && condition.hasSubject()
             && condition.hasContext()
