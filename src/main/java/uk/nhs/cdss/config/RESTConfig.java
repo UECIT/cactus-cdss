@@ -8,25 +8,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.client.RestTemplate;
 import uk.nhs.cactus.common.security.CactusToken;
 
-import java.time.Duration;
-
 @Configuration
 public class RESTConfig {
 
   @Bean
   public RestTemplate restTemplate(RestTemplateBuilder builder) {
     return builder.build();
-  }
-
-  @Bean
-  public RestTemplate auditRestTemplate() {
-    // Currently only used for local-only services (i.e. audit server)
-    // a timeout of 50 should be acceptable locally
-    var timeout = Duration.ofMillis(50);
-    return new RestTemplateBuilder()
-            .setConnectTimeout(timeout)
-            .setReadTimeout(timeout)
-            .build();
   }
 
   @Bean

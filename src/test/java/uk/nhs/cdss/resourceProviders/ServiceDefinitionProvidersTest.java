@@ -29,7 +29,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import uk.nhs.cdss.audit.AuditService;
+import uk.nhs.cactus.common.audit.AuditService;
 import uk.nhs.cdss.config.CodeDirectoryConfig;
 import uk.nhs.cdss.config.MapperConfig;
 import uk.nhs.cdss.engine.CodeDirectory;

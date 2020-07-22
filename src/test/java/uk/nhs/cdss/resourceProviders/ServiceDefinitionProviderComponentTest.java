@@ -20,8 +20,8 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import uk.nhs.cdss.audit.AuditThreadStore;
-import uk.nhs.cdss.audit.model.AuditSession;
+import uk.nhs.cactus.common.audit.AuditThreadStore;
+import uk.nhs.cactus.common.audit.model.AuditSession;
 import uk.nhs.cdss.testHelpers.matchers.FunctionMatcher;
 
 @SpringBootTest
@@ -52,7 +52,7 @@ public class ServiceDefinitionProviderComponentTest {
     assertThat(response,
         isParametersContaining(isParameter("return", new BooleanType(true))));
     assertThat(auditThreadStore.getCurrentAuditSession(),
-        isPresentAnd(hasAdditionalProperty("operation", "$isValid")));
+        isPresentAnd(hasAdditionalProperty("operation", "is_valid")));
   }
 
   private static Matcher<AuditSession> hasAdditionalProperty(String name, String value) {
