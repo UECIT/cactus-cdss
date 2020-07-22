@@ -7,8 +7,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
+import com.google.common.collect.Iterables;
 import java.util.List;
 import org.junit.Test;
+import uk.nhs.cdss.domain.Assertion;
+import uk.nhs.cdss.domain.enums.Gender;
+import uk.nhs.cdss.domain.enums.ObservationTriggerValue;
 import uk.nhs.cdss.exception.ServiceDefinitionException;
 
 public class Palpitations2Test extends BaseDroolsCDSEngineTest {
@@ -19,9 +23,10 @@ public class Palpitations2Test extends BaseDroolsCDSEngineTest {
 
     evaluate();
 
-    assertEquals(1, output.getAssertions().size());
-    assertEquals("chestPain", output.getAssertions().get(0).getCode().getText());
-    assertEquals(true, output.getAssertions().get(0).getValue());
+    assertThat(output.getAssertions(), hasSize(1));
+    Assertion assertion = Iterables.getOnlyElement(output.getAssertions());
+    assertThat(assertion.getCode().getText(), is("chestPain"));
+    assertThat(assertion.getValue(), is(ObservationTriggerValue.PRESENT));
   }
 
   @Test
@@ -64,7 +69,7 @@ public class Palpitations2Test extends BaseDroolsCDSEngineTest {
   @Test
   public void shouldNotAskMuteLogicUnderConditions() throws ServiceDefinitionException {
     addAgeAssertion("1900-12-25");
-    addGenderAssertion("male");
+    addGenderAssertion(Gender.MALE);
 
     answerQuestion("hasPalpitations", "q", "Yes");
     answerQuestion("hasICD", "q", "No");
@@ -98,7 +103,7 @@ public class Palpitations2Test extends BaseDroolsCDSEngineTest {
   @Test
   public void shouldAskFamilyHistory_femaleUnder12() throws ServiceDefinitionException {
     addAgeAssertion("2011-09-07");
-    addGenderAssertion("female");
+    addGenderAssertion(Gender.FEMALE);
 
     answerQuestion("hasPalpitations", "q", "Yes");
     answerQuestion("hasICD", "q", "Unsure");
@@ -114,7 +119,7 @@ public class Palpitations2Test extends BaseDroolsCDSEngineTest {
   @Test
   public void initialQuestionGivenAssertions() throws ServiceDefinitionException {
     addAgeAssertion("1900-12-25");
-    addGenderAssertion("male");
+    addGenderAssertion(Gender.MALE);
 
     evaluate();
 

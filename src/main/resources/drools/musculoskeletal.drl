@@ -11,6 +11,8 @@ import uk.nhs.cdss.domain.Concern
 import uk.nhs.cdss.domain.Concern.ClinicalStatus
 import uk.nhs.cdss.domain.Concern.VerificationStatus
 import uk.nhs.cdss.domain.ReferralRequest
+import uk.nhs.cdss.domain.enums.ObservationTriggerValue
+import uk.nhs.cdss.domain.enums.Concept
 
 import uk.nhs.cdss.engine.CodeDirectory
 
@@ -20,7 +22,8 @@ rule "Init"
 when
 then
     insert( new InitialQuestionnaire("musculoskeletal.musculoskeletal") );
-    insert( new AnswerAssertion("musculoskeletal.musculoskeletal", "q", "Yes", codeDirectory.get("musculoskeletal"), true));
+    Concept present = ObservationTriggerValue.PRESENT;
+    insert( new AnswerAssertion("musculoskeletal.musculoskeletal", "q", "Yes", codeDirectory.get("musculoskeletal"), present));
     insert(  Outcome.of("musculoskeletal",
         ReferralRequest.builder()
             .id("musculoskeletal")

@@ -11,6 +11,8 @@ import uk.nhs.cdss.domain.Concern
 import uk.nhs.cdss.domain.Concern.ClinicalStatus
 import uk.nhs.cdss.domain.Concern.VerificationStatus
 import uk.nhs.cdss.domain.ReferralRequest
+import uk.nhs.cdss.domain.enums.ObservationTriggerValue
+import uk.nhs.cdss.domain.enums.Concept
 
 import uk.nhs.cdss.engine.CodeDirectory
 
@@ -20,7 +22,8 @@ rule "Init"
 when
 then
     insert( new InitialQuestionnaire("anxiety.anxiety") );
-    insert( new AnswerAssertion("anxiety.anxiety", "q", "Yes", codeDirectory.get("hasAnxiety"), true));
+    Concept present = ObservationTriggerValue.PRESENT;
+    insert( new AnswerAssertion("anxiety.anxiety", "q", "Yes", codeDirectory.get("hasAnxiety"), present));
     insert( Outcome.of("anxiety",
         ReferralRequest.builder()
             .id("gp-anxiety-72h")

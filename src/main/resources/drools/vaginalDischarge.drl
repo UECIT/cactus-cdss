@@ -18,10 +18,11 @@ import uk.nhs.cdss.domain.QuestionnaireResponse
 import uk.nhs.cdss.domain.CarePlan
 import uk.nhs.cdss.domain.ReferralRequest
 import uk.nhs.cdss.domain.Coordinates
-import uk.nhs.cdss.domain.Concept
 import uk.nhs.cdss.domain.Concern
 import uk.nhs.cdss.domain.Concern.ClinicalStatus
 import uk.nhs.cdss.domain.Concern.VerificationStatus
+import uk.nhs.cdss.domain.enums.ObservationTriggerValue
+import uk.nhs.cdss.domain.enums.Concept
 
 import uk.nhs.cdss.constants.SnomedConstants
 
@@ -52,24 +53,27 @@ rule "Init"
 salience 10000
 when // Always
 then
+    Concept present = ObservationTriggerValue.PRESENT;
+    Concept absent = ObservationTriggerValue.ABSENT;
+
     insert (new InitialQuestionnaire("vaginalDischarge.termsAndConditions") );
-    insert( new AnswerAssertion("vaginalDischarge.termsAndConditions", "q", "Yes", codeDirectory.get("termsAndConditions"), true));
+    insert( new AnswerAssertion("vaginalDischarge.termsAndConditions", "q", "Yes", codeDirectory.get("termsAndConditions"), present));
 
     insert( new NextQuestion("vaginalDischarge.vaginalDischarge", "vaginalDischarge.termsAndConditions", "q", Arrays.asList("Yes")) );
-    insert( new AnswerAssertion("vaginalDischarge.vaginalDischarge", "q", "Yes", codeDirectory.get("vaginalDischarge"), true));
+    insert( new AnswerAssertion("vaginalDischarge.vaginalDischarge", "q", "Yes", codeDirectory.get("vaginalDischarge"), present));
 
     insert( new NextQuestion("vaginalDischarge.abdominalPain", "vaginalDischarge.vaginalDischarge", "q", Arrays.asList("Yes")) );
-    insert( new AnswerAssertion("vaginalDischarge.abdominalPain", "q", "Yes", codeDirectory.get("abdominalPain"), true));
-    insert( new AnswerAssertion("vaginalDischarge.abdominalPain", "q", "No", codeDirectory.get("abdominalPain"), false));
+    insert( new AnswerAssertion("vaginalDischarge.abdominalPain", "q", "Yes", codeDirectory.get("abdominalPain"), present));
+    insert( new AnswerAssertion("vaginalDischarge.abdominalPain", "q", "No", codeDirectory.get("abdominalPain"), absent));
 
     insert( new NextQuestion("vaginalDischarge.over50", "vaginalDischarge.abdominalPain", "q", Arrays.asList("No")) );
 
     insert( new NextQuestion("vaginalDischarge.painIntensity", "vaginalDischarge.abdominalPain", "q", Arrays.asList("Yes")) );
-    insert( new AnswerAssertion("vaginalDischarge.painIntensity", "q", "inPain", codeDirectory.get("painPresent"), true) );
+    insert( new AnswerAssertion("vaginalDischarge.painIntensity", "q", "inPain", codeDirectory.get("painPresent"), present) );
 
     insert( new NextQuestion("vaginalDischarge.over50", "vaginalDischarge.painIntensity") );
-    insert( new AnswerAssertion("vaginalDischarge.over50", "q", "Yes", codeDirectory.get("over50"), true) );
-    insert( new AnswerAssertion("vaginalDischarge.over50", "q", "No", codeDirectory.get("over50"), false) );
+    insert( new AnswerAssertion("vaginalDischarge.over50", "q", "Yes", codeDirectory.get("over50"), present) );
+    insert( new AnswerAssertion("vaginalDischarge.over50", "q", "No", codeDirectory.get("over50"), absent) );
 
     insert( new ConditionalNextQuestion("over50ToPregnant", "common.pregnant", "vaginalDischarge.over50", "q", Arrays.asList("No")) );
     insert( new NextQuestionCondition("over50ToPregnant", "vaginalDischarge.painIntensity", "q", Arrays.asList("inPain")) );
@@ -135,7 +139,7 @@ then
                 .build()) );
     insert( new OutcomeAnswerCondition("ed-ectopic-ruptured-1h", "vaginalDischarge.painSymptoms", "q", Arrays.asList("No") ));
 
-    insert( new AnswerAssertion("vaginalDischarge.fever", "q", "Yes", codeDirectory.get("fever"), true) );
+    insert( new AnswerAssertion("vaginalDischarge.fever", "q", "Yes", codeDirectory.get("fever"), present) );
     insert( new NextQuestion("vaginalDischarge.lastTemperatureReading", "vaginalDischarge.fever", "q", Arrays.asList("Yes")) );
     insert( Outcome.of("ed-ectopic-pelvic-4h", ReferralRequest.builder()
                 .id("ed-ectopic-pelvic-4h")
@@ -170,10 +174,10 @@ then
     insert( new OutcomeAnswerCondition("gp-ectopic-pelvic-6h", "vaginalDischarge.fever", "q", Arrays.asList("No") ));
     insert( new OutcomeAnswerCondition("gp-ectopic-pelvic-6h", "vaginalDischarge.painIntensity", "q", Arrays.asList("inPain") ));
 
-    insert( new AnswerAssertion("vaginalDischarge.sti", "q", "Gonorrhoea", codeDirectory.get("gonorrhoea"), true) );
-    insert( new AnswerAssertion("vaginalDischarge.sti", "q", "Chlamydia", codeDirectory.get("chlamydia"), true) );
-    insert( new AnswerAssertion("vaginalDischarge.sti", "q", "Mycoplasma", codeDirectory.get("mycoplasma"), true) );
-    insert( new AnswerAssertion("vaginalDischarge.sti", "q", "Genitalium", codeDirectory.get("genitalium"), true) );
+    insert( new AnswerAssertion("vaginalDischarge.sti", "q", "Gonorrhoea", codeDirectory.get("gonorrhoea"), present) );
+    insert( new AnswerAssertion("vaginalDischarge.sti", "q", "Chlamydia", codeDirectory.get("chlamydia"), present) );
+    insert( new AnswerAssertion("vaginalDischarge.sti", "q", "Mycoplasma", codeDirectory.get("mycoplasma"), present) );
+    insert( new AnswerAssertion("vaginalDischarge.sti", "q", "Genitalium", codeDirectory.get("genitalium"), present) );
 
     insert( Outcome.of("gum-stiReocurrence", ReferralRequest.builder()
                 .id("gum-stiReocurrence")
@@ -192,10 +196,10 @@ then
     insert( new OutcomeAnswerCondition("gum-stiReocurrence", "vaginalDischarge.sti", "q", Arrays.asList("Gonorrhoea", "Chlamydia", "Mycoplasma", "Genitalium")) );
 
     insert( new NextQuestion("vaginalDischarge.dischargeDescription", "vaginalDischarge.sti", "q", Arrays.asList("none")) );
-    insert( new AnswerAssertion("vaginalDischarge.dischargeDescription", "q", "whiteOrFishyDischarge", codeDirectory.get("whiteOrFishyDischarge"), true) );
-    insert( new AnswerAssertion("vaginalDischarge.dischargeDescription", "q", "bloodStainedDischarge", codeDirectory.get("bloodStainedDischarge"), true) );
-    insert( new AnswerAssertion("vaginalDischarge.dischargeDescription", "q", "colouredDischarge", codeDirectory.get("colouredDischarge"), true) );
-    insert( new AnswerAssertion("vaginalDischarge.dischargeDescription", "q", "none", codeDirectory.get("genericDischarge"), true) );
+    insert( new AnswerAssertion("vaginalDischarge.dischargeDescription", "q", "whiteOrFishyDischarge", codeDirectory.get("whiteOrFishyDischarge"), present) );
+    insert( new AnswerAssertion("vaginalDischarge.dischargeDescription", "q", "bloodStainedDischarge", codeDirectory.get("bloodStainedDischarge"), present) );
+    insert( new AnswerAssertion("vaginalDischarge.dischargeDescription", "q", "colouredDischarge", codeDirectory.get("colouredDischarge"), present) );
+    insert( new AnswerAssertion("vaginalDischarge.dischargeDescription", "q", "none", codeDirectory.get("genericDischarge"), present) );
 
     insert( Outcome.of("gp-candida-48h", ReferralRequest.builder()
                 .id("gp-candida-48h")
@@ -252,9 +256,9 @@ then
     insert( new ConditionalNextQuestion("lastTempToForeignBodyMildPain", "vaginalDischarge.foreignBody", "vaginalDischarge.lastTemperatureReading") );
     insert( new NextQuestionCondition("lastTempToForeignBodyMildPain", "vaginalDischarge.painIntensity", "q", Arrays.asList("noPain")) );
 
-    insert( new AnswerAssertion("vaginalDischarge.foreignBody", "q", "Yes", codeDirectory.get("foreignBody"), true) );
-    insert( new AnswerAssertion("vaginalDischarge.foreignBody", "q", "Unsure", codeDirectory.get("foreignBody"), true) );
-    insert( new AnswerAssertion("vaginalDischarge.foreignBody", "q", "No", codeDirectory.get("foreignBody"), false) );
+    insert( new AnswerAssertion("vaginalDischarge.foreignBody", "q", "Yes", codeDirectory.get("foreignBody"), present) );
+    insert( new AnswerAssertion("vaginalDischarge.foreignBody", "q", "Unsure", codeDirectory.get("foreignBody"), present) );
+    insert( new AnswerAssertion("vaginalDischarge.foreignBody", "q", "No", codeDirectory.get("foreignBody"), absent) );
 
     insert( new NextQuestion("vaginalDischarge.rash", "vaginalDischarge.foreignBody", "q", Arrays.asList("Yes", "Unsure")) );
     insert( Outcome.of("utc-strepto", ReferralRequest.builder()
@@ -273,12 +277,12 @@ then
     insert( new OutcomeAnswerCondition("utc-strepto", "vaginalDischarge.rash", "q") );
 
     insert( new NextQuestion("vaginalDischarge.blisters", "vaginalDischarge.foreignBody", "q", Arrays.asList("No")) );
-    insert( new AnswerAssertion("vaginalDischarge.blisters", "q", "Yes", codeDirectory.get("blisters"), true) );
-    insert( new AnswerAssertion("vaginalDischarge.blisters", "q", "No", codeDirectory.get("blisters"), false) );
+    insert( new AnswerAssertion("vaginalDischarge.blisters", "q", "Yes", codeDirectory.get("blisters"), present) );
+    insert( new AnswerAssertion("vaginalDischarge.blisters", "q", "No", codeDirectory.get("blisters"), absent) );
 
     insert( new NextQuestion("vaginalDischarge.herpes", "vaginalDischarge.blisters", "q", Arrays.asList("Yes")) );
-    insert( new AnswerAssertion("vaginalDischarge.herpes", "q", "Yes", codeDirectory.get("herpes"), true) );
-    insert( new AnswerAssertion("vaginalDischarge.herpes", "q", "No", codeDirectory.get("herpes"), false) );
+    insert( new AnswerAssertion("vaginalDischarge.herpes", "q", "Yes", codeDirectory.get("herpes"), present) );
+    insert( new AnswerAssertion("vaginalDischarge.herpes", "q", "No", codeDirectory.get("herpes"), absent) );
     insert( Outcome.of("gp-herpes", ReferralRequest.builder()
                 .id("gp-herpes")
                 .description("General practice")
@@ -310,13 +314,13 @@ then
 
     insert( new NextQuestion("vaginalDischarge.urine", "vaginalDischarge.blisters", "q", Arrays.asList("No")) );
     insert( new NextQuestion("vaginalDischarge.urine", "vaginalDischarge.vaginalDischarge", "q", Arrays.asList("No")) );
-    insert( new AnswerAssertion("vaginalDischarge.urine", "q", "Yes", codeDirectory.get("urine"), true) );
-    insert( new AnswerAssertion("vaginalDischarge.urine", "q", "No", codeDirectory.get("urine"), false) );
+    insert( new AnswerAssertion("vaginalDischarge.urine", "q", "Yes", codeDirectory.get("urine"), present) );
+    insert( new AnswerAssertion("vaginalDischarge.urine", "q", "No", codeDirectory.get("urine"), absent) );
 
     insert( new NextQuestion("vaginalDischarge.symptoms", "vaginalDischarge.urine", "q", Arrays.asList("Yes")) );
-    insert( new AnswerAssertion("vaginalDischarge.symptoms", "q", "burningOrStinging", codeDirectory.get("burningOrStinging"), true) );
-    insert( new AnswerAssertion("vaginalDischarge.symptoms", "q", "urineUnable", codeDirectory.get("urineUnable"), true) );
-    insert( new AnswerAssertion("vaginalDischarge.symptoms", "q", "none", codeDirectory.get("noUrineSymptoms"), true) );
+    insert( new AnswerAssertion("vaginalDischarge.symptoms", "q", "burningOrStinging", codeDirectory.get("burningOrStinging"), present) );
+    insert( new AnswerAssertion("vaginalDischarge.symptoms", "q", "urineUnable", codeDirectory.get("urineUnable"), present) );
+    insert( new AnswerAssertion("vaginalDischarge.symptoms", "q", "none", codeDirectory.get("noUrineSymptoms"), present) );
     insert( Outcome.of("gp-uti", ReferralRequest.builder()
                 .id("gp-uti")
                 .description("General practice")
@@ -347,10 +351,10 @@ then
     insert( new OutcomeAnswerCondition("utc-urineRetention", "vaginalDischarge.symptoms", "q", Arrays.asList("urineUnable")) );
 
     insert( new NextQuestion("vaginalDischarge.potentialDischargeDescription", "vaginalDischarge.symptoms", "q", Arrays.asList("none")) );
-    insert( new AnswerAssertion("vaginalDischarge.potentialDischargeDescription", "q", "whiteOrFishyDischarge", codeDirectory.get("whiteOrFishyDischarge"), true) );
-    insert( new AnswerAssertion("vaginalDischarge.potentialDischargeDescription", "q", "bloodStainedDischarge", codeDirectory.get("bloodStainedDischarge"), true) );
-    insert( new AnswerAssertion("vaginalDischarge.potentialDischargeDescription", "q", "colouredDischarge", codeDirectory.get("colouredDischarge"), true) );
-    insert( new AnswerAssertion("vaginalDischarge.potentialDischargeDescription", "q", "none", codeDirectory.get("genericDischarge"), true) );
+    insert( new AnswerAssertion("vaginalDischarge.potentialDischargeDescription", "q", "whiteOrFishyDischarge", codeDirectory.get("whiteOrFishyDischarge"), present) );
+    insert( new AnswerAssertion("vaginalDischarge.potentialDischargeDescription", "q", "bloodStainedDischarge", codeDirectory.get("bloodStainedDischarge"), present) );
+    insert( new AnswerAssertion("vaginalDischarge.potentialDischargeDescription", "q", "colouredDischarge", codeDirectory.get("colouredDischarge"), present) );
+    insert( new AnswerAssertion("vaginalDischarge.potentialDischargeDescription", "q", "none", codeDirectory.get("genericDischarge"), present) );
 
     insert( Outcome.of("gp-candida-routine", ReferralRequest.builder()
                 .id("gp-candida-routine")
@@ -404,18 +408,18 @@ then
     insert( new OutcomeAnswerCondition("selfCare", "vaginalDischarge.potentialDischargeDescription", "q", Arrays.asList("none")) );
     
     insert( new NextQuestion("vaginalDischarge.assault", "vaginalDischarge.urine", "q", Arrays.asList("No")) );
-    insert( new AnswerAssertion("vaginalDischarge.assault", "q", "Yes", codeDirectory.get("assault"), true) );
-    insert( new AnswerAssertion("vaginalDischarge.assault", "q", "No", codeDirectory.get("assault"), false) );
+    insert( new AnswerAssertion("vaginalDischarge.assault", "q", "Yes", codeDirectory.get("assault"), present) );
+    insert( new AnswerAssertion("vaginalDischarge.assault", "q", "No", codeDirectory.get("assault"), absent) );
     
     insert( new NextQuestion("vaginalDischarge.injuries", "vaginalDischarge.assault", "q", Arrays.asList("Yes")) );
-    insert( new AnswerAssertion("vaginalDischarge.injuries", "q", "Yes", codeDirectory.get("injuries"), true) );
-    insert( new AnswerAssertion("vaginalDischarge.injuries", "q", "No", codeDirectory.get("injuries"), true) );
-    insert( new AnswerAssertion("vaginalDischarge.injuries", "q", "Unsure", codeDirectory.get("injuries"), true) );
+    insert( new AnswerAssertion("vaginalDischarge.injuries", "q", "Yes", codeDirectory.get("injuries"), present) );
+    insert( new AnswerAssertion("vaginalDischarge.injuries", "q", "No", codeDirectory.get("injuries"), present) );
+    insert( new AnswerAssertion("vaginalDischarge.injuries", "q", "Unsure", codeDirectory.get("injuries"), present) );
     
     insert( new NextQuestion("vaginalDischarge.injuriesPlacement", "vaginalDischarge.injuries", "q", Arrays.asList("Yes", "No", "Unsure")) );
 
     insert( new NextQuestion("vaginalDischarge.problemDescription", "vaginalDischarge.assault", "q", Arrays.asList("No")) );
-    insert( new AnswerAssertion("vaginalDischarge.problemDescription", "q", "Yes", codeDirectory.get("problemDescription"), true) );
+    insert( new AnswerAssertion("vaginalDischarge.problemDescription", "q", "Yes", codeDirectory.get("problemDescription"), present) );
     insert( Outcome.of("gp-dyspareunia", ReferralRequest.builder()
                 .id("gp-dyspareunia")
                 .description("Contact General Practice")
@@ -442,7 +446,7 @@ then
         .id("over50")
         .status(Assertion.Status.AMENDED)
         .code(codeDirectory.get("over50"))
-        .value(Constraints.convertAge($value) > 50)
+        .value(Constraints.convertAge($value) > 50 ? ObservationTriggerValue.PRESENT : ObservationTriggerValue.ABSENT)
         .build() );
 end
 
