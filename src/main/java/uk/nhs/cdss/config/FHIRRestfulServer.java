@@ -3,16 +3,17 @@ package uk.nhs.cdss.config;
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.parser.StrictErrorHandler;
 import ca.uhn.fhir.rest.server.ETagSupportEnum;
+import ca.uhn.fhir.rest.server.HardcodedServerAddressStrategy;
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import ca.uhn.fhir.rest.server.RestfulServer;
 import ca.uhn.fhir.rest.server.interceptor.CorsInterceptor;
 import java.util.Arrays;
 import java.util.Collection;
 import javax.annotation.PostConstruct;
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
+import lombok.RequiredArgsConstructor;
 import org.hl7.fhir.dstu3.model.CoordinateResource;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -20,12 +21,15 @@ import org.springframework.web.cors.CorsConfiguration;
 
 @Configuration
 @WebServlet(urlPatterns = {"/fhir/*"}, displayName = "FHIR Server")
+@RequiredArgsConstructor
 public class FHIRRestfulServer extends RestfulServer {
 
   private static final long serialVersionUID = 1L;
 
-  @Autowired
-  private Collection<IResourceProvider> resourceProviders;
+  @Value("${cdss.fhir.server}")
+  private String cdssFhirServer;
+
+  private final Collection<IResourceProvider> resourceProviders;
 
   /**
    * HAPI FHIR Restful Server
@@ -33,13 +37,14 @@ public class FHIRRestfulServer extends RestfulServer {
    * @see ca.uhn.fhir.rest.server.RestfulServer#initialize()
    */
   @Override
-  protected void initialize() throws ServletException {
+  protected void initialize() {
 
     FhirContext ctx = FhirContext.forDstu3();
     ctx.setParserErrorHandler(new StrictErrorHandler());
     ctx.registerCustomType(CoordinateResource.class);
     setFhirContext(ctx);
     setETagSupport(ETagSupportEnum.ENABLED);
+    setServerAddressStrategy(new HardcodedServerAddressStrategy(cdssFhirServer));
 
     CorsConfiguration config = new CorsConfiguration();
     config.setMaxAge(10L);

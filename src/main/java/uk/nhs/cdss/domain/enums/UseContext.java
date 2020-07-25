@@ -20,9 +20,9 @@ public enum UseContext implements Concept {
   PATIENT(Systems.PROVIDER, "Patient", "Patient"),
   RELATED_PERSON(Systems.PROVIDER, "RelatedPerson", "Related Person"),
 
-  PHONE(Systems.PROVIDER, "phone", "Phone call"),
-  ONLINE(Systems.PROVIDER, "online", "Online"),
-  CLINICAL(Systems.PROVIDER, "clinical", "Clinical");
+  PHONE(SettingUseContext.PHONE),
+  ONLINE(SettingUseContext.ONLINE),
+  CLINICAL(SettingUseContext.CLINICAL);
 
   private final String system;
   private final String value;
@@ -35,6 +35,7 @@ public enum UseContext implements Concept {
   private static class Systems {
     private static final String SNOMED = SystemURL.CS_SNOMED;
     private static final String PROVIDER = SystemURL.CS_PROVIDER_TAXONOMY;
+    private static final String UEC_COMM = "https://fhir.nhs.uk/STU3/CodeSystem/UEC-CommunicationChannel-1";
   }
 
 }

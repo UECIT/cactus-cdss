@@ -12,6 +12,7 @@ import uk.nhs.cdss.domain.Concept;
 import uk.nhs.cdss.domain.EvaluateContext;
 import uk.nhs.cdss.domain.EvaluateContext.Role;
 import uk.nhs.cdss.domain.QuestionnaireResponse;
+import uk.nhs.cdss.domain.enums.Gender;
 import uk.nhs.cdss.exception.ServiceDefinitionException;
 
 public abstract class BaseDroolsCDSEngineTest {
@@ -85,7 +86,7 @@ public abstract class BaseDroolsCDSEngineTest {
     input.getResponses().add(response);
   }
 
-  protected void addGenderAssertion(String gender) {
+  protected void addGenderAssertion(Gender gender) {
     var code = new Concept(
         SnomedConstants.GENDER,
         new Coding(SystemURL.CS_SNOMED, SnomedConstants.GENDER));

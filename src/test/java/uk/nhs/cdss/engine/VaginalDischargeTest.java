@@ -10,6 +10,7 @@ import com.google.common.collect.Iterables;
 import org.junit.Test;
 import uk.nhs.cdss.domain.Assertion;
 import uk.nhs.cdss.domain.Coordinates;
+import uk.nhs.cdss.domain.enums.ObservationTriggerValue;
 import uk.nhs.cdss.exception.ServiceDefinitionException;
 
 public class VaginalDischargeTest extends BaseDroolsCDSEngineTest {
@@ -20,9 +21,11 @@ public class VaginalDischargeTest extends BaseDroolsCDSEngineTest {
 
     evaluate();
 
-    assertEquals(1, output.getAssertions().size());
-    assertEquals("termsAndConditions", output.getAssertions().get(0).getCode().getText());
-    assertEquals(true, output.getAssertions().get(0).getValue());
+    assertThat(output.getAssertions(), hasSize(1));
+    Assertion assertion = Iterables.getOnlyElement(output.getAssertions());
+
+    assertThat(assertion.getCode().getText(), is("termsAndConditions"));
+    assertThat(assertion.getValue(), is(ObservationTriggerValue.PRESENT));
   }
 
   @Test
