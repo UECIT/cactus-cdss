@@ -32,7 +32,6 @@ import org.junit.runner.RunWith;
 import uk.nhs.cactus.common.audit.AuditService;
 import uk.nhs.cactus.common.audit.config.MapperConfig;
 import uk.nhs.cdss.config.CodeDirectoryConfig;
-import uk.nhs.cdss.config.MapperConfig;
 import uk.nhs.cdss.domain.enums.SettingUseContext;
 import uk.nhs.cdss.domain.enums.UseContextType;
 import uk.nhs.cdss.engine.CodeDirectory;
