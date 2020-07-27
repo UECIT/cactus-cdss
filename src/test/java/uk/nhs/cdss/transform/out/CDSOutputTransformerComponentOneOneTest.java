@@ -25,7 +25,7 @@ import uk.nhs.cdss.transform.bundle.CDSOutputBundle;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
-@TestPropertySource(properties = "spring.profiles.active=1.1")
+@TestPropertySource(properties = { "spring.profiles.active=1.1", "cognito.user.pool=" })
 public class CDSOutputTransformerComponentOneOneTest {
 
   @Autowired

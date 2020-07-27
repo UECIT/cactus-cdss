@@ -1,6 +1,8 @@
 package uk.nhs.cdss.resourceProviders;
 
 import static ca.uhn.fhir.rest.annotation.OperationParam.MAX_UNLIMITED;
+import static uk.nhs.cactus.common.audit.model.AuditProperties.INTERACTION_ID;
+import static uk.nhs.cactus.common.audit.model.AuditProperties.OPERATION_TYPE;
 
 import ca.uhn.fhir.rest.annotation.IdParam;
 import ca.uhn.fhir.rest.annotation.Operation;
@@ -21,6 +23,7 @@ import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -41,7 +44,9 @@ import org.hl7.fhir.dstu3.model.ServiceDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RestController;
-import uk.nhs.cdss.audit.AuditService;
+import uk.nhs.cactus.common.audit.AuditService;
+import uk.nhs.cactus.common.audit.model.OperationType;
+import uk.nhs.cdss.component.ParameterResourceResolver;
 import uk.nhs.cdss.engine.CodeDirectory;
 import uk.nhs.cdss.logging.Context;
 import uk.nhs.cdss.registry.ServiceDefinitionRegistry;
@@ -53,7 +58,6 @@ import uk.nhs.cdss.search.PatientTriggerCondition;
 import uk.nhs.cdss.search.StatusCondition;
 import uk.nhs.cdss.search.UseContextCondition;
 import uk.nhs.cdss.services.EvaluateService;
-import uk.nhs.cdss.component.ParameterResourceResolver;
 import uk.nhs.cdss.transform.EvaluationParameters;
 import uk.nhs.cdss.transform.out.ServiceDefinitionTransformer;
 import uk.nhs.cdss.util.CollectionUtil;
@@ -78,10 +82,6 @@ public class ServiceDefinitionProvider implements IResourceProvider {
   private static final String ODS_CODE = "ODSCode";
   private static final String EVALUATE_AT = "evaluateAtDateTime";
   private static final String DATE_OF_BIRTH = "dateOfBirth";
-
-  private static final String CASE_ID = "caseId";
-  private static final String OPERATION = "operation";
-  private static final String SERVICE_SEARCH = "service_search";
 
   private static final String SP_EXPERIMENTAL = "experimental";
   private static final String SP_OBSERVATION_TYPE_CODE = "trigger-type-code-value-effective";
@@ -111,7 +111,8 @@ public class ServiceDefinitionProvider implements IResourceProvider {
       @OperationParam(name = EVALUATE_AT) DateTimeType evaluateTime,
       @OperationParam(name = DATE_OF_BIRTH) DateTimeType dateOfBirth
   ) {
-    auditService.addAuditProperty(OPERATION, IS_VALID);
+    auditService.addAuditProperty(INTERACTION_ID, requestId.getIdPart());
+    auditService.addAuditProperty(OPERATION_TYPE, OperationType.IS_VALID.getName());
     return new Parameters()
         .addParameter(new ParametersParameterComponent()
           .setName("return")
@@ -131,8 +132,8 @@ public class ServiceDefinitionProvider implements IResourceProvider {
       @OperationParam(name = USER_TASK) CodeableConcept userTaskContext,
       @OperationParam(name = SETTING, min = 1) CodeableConcept setting) {
 
-    auditService.addAuditProperty(REQUEST_ID, requestId.getValue());
-    auditService.addAuditProperty(CASE_ID, encounter.getReferenceElement().getIdPart());
+    auditService.addAuditProperty(INTERACTION_ID, encounter.getReferenceElement().getIdPart());
+    auditService.addAuditProperty(OPERATION_TYPE, OperationType.ENCOUNTER.getName());
 
     List<Resource> inputResources = parameterResourceResolver.resolve(inputData);
 
@@ -217,7 +218,8 @@ public class ServiceDefinitionProvider implements IResourceProvider {
       @OptionalParam(name = SP_PATIENT_TYPE_CODE, constructedType = PatientTriggerParameter.class)
           ConstructedParam<PatientTriggerParameter> patientParams) {
 
-    auditService.addAuditProperty(OPERATION, SERVICE_SEARCH);
+    auditService.addAuditProperty(INTERACTION_ID, UUID.randomUUID().toString());
+    auditService.addAuditProperty(OPERATION_TYPE, OperationType.SERVICE_SEARCH.getName());
 
     List<ServiceDefinition> serviceDefinitions = serviceDefinitionRegistry
         .getAll()
