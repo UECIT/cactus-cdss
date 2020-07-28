@@ -17,8 +17,6 @@ import ca.uhn.fhir.rest.param.ConstructedParam;
 import ca.uhn.fhir.rest.param.DateParam;
 import ca.uhn.fhir.rest.param.TokenParam;
 import ca.uhn.fhir.rest.server.IResourceProvider;
-import ca.uhn.fhir.rest.server.exceptions.BaseServerResponseException;
-import ca.uhn.fhir.rest.server.exceptions.InternalErrorException;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import java.util.Collection;
 import java.util.Comparator;
@@ -46,6 +44,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RestController;
 import uk.nhs.cactus.common.audit.AuditService;
 import uk.nhs.cactus.common.audit.model.OperationType;
+import uk.nhs.cactus.common.security.TokenAuthenticationService;
 import uk.nhs.cdss.component.ParameterResourceResolver;
 import uk.nhs.cdss.engine.CodeDirectory;
 import uk.nhs.cdss.logging.Context;
@@ -95,6 +94,7 @@ public class ServiceDefinitionProvider implements IResourceProvider {
   private final ServiceDefinitionRegistry serviceDefinitionRegistry;
   private final ParameterResourceResolver parameterResourceResolver;
   private final AuditService auditService;
+  private final TokenAuthenticationService tokenAuthenticationService;
 
   @Getter(AccessLevel.NONE)
   private final Logger log = LoggerFactory.getLogger(getClass());
@@ -106,6 +106,7 @@ public class ServiceDefinitionProvider implements IResourceProvider {
 
   @Operation(name = IS_VALID)
   public Parameters isValid(
+      @IdParam IdType serviceDefinitionId,
       @OperationParam(name = REQUEST_ID) IdType requestId,
       @OperationParam(name = ODS_CODE, min = 1) Identifier odsCode,
       @OperationParam(name = EVALUATE_AT) DateTimeType evaluateTime,
@@ -113,10 +114,17 @@ public class ServiceDefinitionProvider implements IResourceProvider {
   ) {
     auditService.addAuditProperty(INTERACTION_ID, requestId.getIdPart());
     auditService.addAuditProperty(OPERATION_TYPE, OperationType.IS_VALID.getName());
-    return new Parameters()
-        .addParameter(new ParametersParameterComponent()
-          .setName("return")
-          .setValue(new BooleanType(true)));
+
+    return Context.builder()
+        .supplier(tokenAuthenticationService.requireSupplierId())
+        .resource(serviceDefinitionId.toString())
+        .request(requestId.getValue())
+        .build()
+        .wrap("ServiceDefinition/$isValid", () ->
+            new Parameters()
+                .addParameter(new ParametersParameterComponent()
+                    .setName("return")
+                    .setValue(new BooleanType(true))));
   }
 
   @Operation(name = EVALUATE)
@@ -135,72 +143,72 @@ public class ServiceDefinitionProvider implements IResourceProvider {
     auditService.addAuditProperty(INTERACTION_ID, encounter.getReferenceElement().getIdPart());
     auditService.addAuditProperty(OPERATION_TYPE, OperationType.ENCOUNTER.getName());
 
-    List<Resource> inputResources = parameterResourceResolver.resolve(inputData);
-
-    Context context = Context.builder()
-        .task("ServiceDefinition/$evaluate")
-        .serviceDefinition(serviceDefinitionId.toString())
+    return Context.builder()
+        .supplier(tokenAuthenticationService.requireSupplierId())
+        .resource(serviceDefinitionId.toString())
         .encounter(encounter.getReference())
         .request(requestId.getValue())
-        .supplier(initiatingPerson.getId())
-        .build();
+        .build()
+        .wrap("ServiceDefinition/$evaluate", () -> {
+          List<Resource> inputResources = parameterResourceResolver.resolve(inputData);
 
-    EvaluationParameters evaluationParameters = EvaluationParameters.builder()
-        .requestId(requestId.getValue())
-        .encounter(encounter)
-        .patient(patient)
-        .inputData(inputResources)
-        .responses(CollectionUtil.filterAndCast(inputResources, QuestionnaireResponse.class))
-        .observations(CollectionUtil.filterAndCast(inputResources, Observation.class))
-        .userType(userType)
-        .setting(setting)
-        .userLanguage(userLanguage)
-        .userTaskContext(userTaskContext)
-        .build();
+          EvaluationParameters evaluationParameters = EvaluationParameters.builder()
+              .requestId(requestId.getValue())
+              .encounter(encounter)
+              .patient(patient)
+              .inputData(inputResources)
+              .responses(CollectionUtil.filterAndCast(inputResources, QuestionnaireResponse.class))
+              .observations(CollectionUtil.filterAndCast(inputResources, Observation.class))
+              .userType(userType)
+              .setting(setting)
+              .userLanguage(userLanguage)
+              .userTaskContext(userTaskContext)
+              .build();
 
-    return evaluate(serviceDefinitionId, context, evaluationParameters);
-  }
-
-  private GuidanceResponse evaluate(IdType serviceDefinitionId,
-      Context context, EvaluationParameters evaluationParameters) {
-    try {
-      return context.wrap(() ->
-          evaluateService.getGuidanceResponse(
-              evaluationParameters, serviceDefinitionId.getIdPart()));
-    } catch (Exception e) {
-      if (e instanceof BaseServerResponseException) {
-        throw (BaseServerResponseException) e;
-      }
-      throw new InternalErrorException(e);
-    }
+          return evaluateService.getGuidanceResponse(
+              evaluationParameters, serviceDefinitionId.getIdPart());
+        });
   }
 
   @Read
   public ServiceDefinition getServiceDefinitionById(@IdParam IdType id) {
-    return serviceDefinitionRegistry
-        .getById(id.getIdPart())
-        .map(serviceDefinitionTransformer::transform)
-        .orElseThrow(() -> new ResourceNotFoundException(
-            "Unable to load service definition " + id));
+    return Context.builder()
+        .supplier(tokenAuthenticationService.requireSupplierId())
+        .resource(id.toString())
+        .build().wrap("ServiceDefinition/read", () ->
+            serviceDefinitionRegistry
+                .getById(id.getIdPart())
+                .map(serviceDefinitionTransformer::transform)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                    "Unable to load service definition " + id)));
   }
 
   @Search
   public Collection<ServiceDefinition> findServiceDefinitionById(
       @RequiredParam(name = ServiceDefinition.SP_RES_ID) String id) {
-    return serviceDefinitionRegistry
-        .getById(id)
-        .map(serviceDefinitionTransformer::transform)
-        .stream()
-        .collect(Collectors.toUnmodifiableList());
+
+    return Context.builder()
+        .supplier(tokenAuthenticationService.requireSupplierId())
+        .resource(id)
+        .build().wrap("ServiceDefinition/search", () ->
+            serviceDefinitionRegistry
+                .getById(id)
+                .map(serviceDefinitionTransformer::transform)
+                .stream()
+                .collect(Collectors.toUnmodifiableList()));
   }
 
   @Search
   public Collection<ServiceDefinition> findAllServiceDefinitions() {
-    return serviceDefinitionRegistry
-        .getAll()
-        .stream()
-        .map(serviceDefinitionTransformer::transform)
-        .collect(Collectors.toUnmodifiableList());
+
+    return Context.builder()
+        .supplier(tokenAuthenticationService.requireSupplierId())
+        .build().wrap("ServiceDefinition/list", () ->
+            serviceDefinitionRegistry
+                .getAll()
+                .stream()
+                .map(serviceDefinitionTransformer::transform)
+                .collect(Collectors.toUnmodifiableList()));
   }
 
   @Search(queryName = "triage")
@@ -221,24 +229,29 @@ public class ServiceDefinitionProvider implements IResourceProvider {
     auditService.addAuditProperty(INTERACTION_ID, UUID.randomUUID().toString());
     auditService.addAuditProperty(OPERATION_TYPE, OperationType.SERVICE_SEARCH.getName());
 
-    List<ServiceDefinition> serviceDefinitions = serviceDefinitionRegistry
-        .getAll()
-        .stream()
-        .filter(StatusCondition.from(status))
-        .filter(ExperimentalCondition.from(experimental))
-        .filter(EffectivePeriodCondition.from(searchDate))
-        .filter(JurisdictionCondition.from(jurisdiction))
-        .filter(UseContextCondition.from(useContextConcept))
-        .filter(ObservationTriggerCondition.from(codeDirectory, observationParams))
-        .filter(PatientTriggerCondition.from(patientParams))
-        .max(triggerCount())
-        .map(serviceDefinitionTransformer::transform)
-        .stream()
-        .collect(Collectors.toUnmodifiableList());
+    return Context.builder()
+        .supplier(tokenAuthenticationService.requireSupplierId())
+        .build()
+        .wrap("ServiceDefinition/triageSearch", () -> {
+          List<ServiceDefinition> serviceDefinitions = serviceDefinitionRegistry
+              .getAll()
+              .stream()
+              .filter(StatusCondition.from(status))
+              .filter(ExperimentalCondition.from(experimental))
+              .filter(EffectivePeriodCondition.from(searchDate))
+              .filter(JurisdictionCondition.from(jurisdiction))
+              .filter(UseContextCondition.from(useContextConcept))
+              .filter(ObservationTriggerCondition.from(codeDirectory, observationParams))
+              .filter(PatientTriggerCondition.from(patientParams))
+              .max(triggerCount())
+              .map(serviceDefinitionTransformer::transform)
+              .stream()
+              .collect(Collectors.toUnmodifiableList());
 
-    log.info("Selected ServiceDefinitions: {}",
-        serviceDefinitions.stream().map(ServiceDefinition::getId).toArray());
-    return serviceDefinitions;
+          log.info("Selected ServiceDefinitions: {}",
+              serviceDefinitions.stream().map(ServiceDefinition::getId).toArray());
+          return serviceDefinitions;
+        });
   }
 
   private Comparator<uk.nhs.cdss.domain.ServiceDefinition> triggerCount() {

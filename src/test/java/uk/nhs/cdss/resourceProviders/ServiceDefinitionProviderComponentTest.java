@@ -19,9 +19,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.nhs.cactus.common.audit.AuditThreadStore;
 import uk.nhs.cactus.common.audit.model.AuditSession;
+import uk.nhs.cactus.common.security.TokenAuthenticationService;
 import uk.nhs.cdss.testHelpers.matchers.FunctionMatcher;
 
 @SpringBootTest
@@ -34,6 +36,9 @@ public class ServiceDefinitionProviderComponentTest {
   @Autowired
   private AuditThreadStore auditThreadStore;
 
+  @MockBean
+  public TokenAuthenticationService tokenAuthenticationService;
+
   @Before
   public void setup() {
     auditThreadStore.setCurrentSession(AuditSession.builder().build());
@@ -41,13 +46,14 @@ public class ServiceDefinitionProviderComponentTest {
 
   @Test
   public void isValid_returns() {
+    IdType serviceId = new IdType("ServiceDefinition/1");
     IdType requestId = new IdType(UUID.randomUUID().toString());
     Identifier odsCode = new Identifier().setSystem("gp").setUse(IdentifierUse.OFFICIAL);
     DateTimeType evalDate = new DateTimeType("2020-07-10T13:40:00.000Z");
     DateTimeType birthDate = new DateTimeType("1996-06-19T22:40:00.000Z");
 
     Parameters response =
-        serviceDefinitionProvider.isValid(requestId, odsCode, evalDate, birthDate);
+        serviceDefinitionProvider.isValid(serviceId, requestId, odsCode, evalDate, birthDate);
 
     assertThat(response,
         isParametersContaining(isParameter("return", new BooleanType(true))));

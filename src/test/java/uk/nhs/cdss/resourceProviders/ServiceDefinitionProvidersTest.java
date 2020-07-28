@@ -31,6 +31,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import uk.nhs.cactus.common.audit.AuditService;
 import uk.nhs.cactus.common.audit.config.MapperConfig;
+import uk.nhs.cactus.common.security.TokenAuthenticationService;
 import uk.nhs.cdss.config.CodeDirectoryConfig;
 import uk.nhs.cdss.domain.enums.SettingUseContext;
 import uk.nhs.cdss.domain.enums.UseContextType;
@@ -68,7 +69,8 @@ public class ServiceDefinitionProvidersTest {
         transformer,
         new ServiceDefinitionRegistry(new MapperConfig().registryObjectMapper()),
         null,
-        mock(AuditService.class));
+        mock(AuditService.class),
+        mock(TokenAuthenticationService.class));
   }
 
   @Test
@@ -117,7 +119,8 @@ public class ServiceDefinitionProvidersTest {
     return new DateParam(date);
   }
 
-  private CompositeAndListParam<TokenParam, TokenParam> useContext(Stream<String> contexts, Stream<String> codes) {
+  private CompositeAndListParam<TokenParam, TokenParam> useContext(Stream<String> contexts,
+      Stream<String> codes) {
     var ands = new CompositeAndListParam<>(TokenParam.class, TokenParam.class);
 
     zip(contexts, codes, (context, code) ->
@@ -128,7 +131,8 @@ public class ServiceDefinitionProvidersTest {
     return ands;
   }
 
-  private ConstructedAndListParam<ObservationTriggerParameter> observationTrigger(Stream<String> codes, Stream<String> values) {
+  private ConstructedAndListParam<ObservationTriggerParameter> observationTrigger(
+      Stream<String> codes, Stream<String> values) {
 
     var ands = new ConstructedAndListParam<>(ObservationTriggerParameter.class);
 
@@ -196,19 +200,33 @@ public class ServiceDefinitionProvidersTest {
   public Object parametersForTriage_oneResult() {
     return new Object[]{
         new Object[]{null, null, null, null, null, null, null, "initial"},
-        new Object[]{token("ACTIVE"), null, null, null, null, null, null,"initial"},
+        new Object[]{token("ACTIVE"), null, null, null, null, null, null, "initial"},
         new Object[]{null, token("false"), null, null, null, null, null, "initial"},
         new Object[]{null, null, date("2020-12-20"), null, null, null, null, "initial"},
         new Object[]{null, null, null, token("GB"), null, null, null, "initial"},
-        new Object[]{null, null, null, null, useContext(Stream.of("non-existent"), Stream.of("invalid")), null, null, "initial"},
-        new Object[]{null, null, null, null, useContext(Stream.of("user"), Stream.of("Practitioner")), observationTrigger(Stream.of("anxiety"), Stream.of("present")), null, "anxiety"},
-        new Object[]{null, null, null, token("GB"), null, observationTrigger(Stream.of("chestPain"), Stream.of("present")), null, "chestPains"},
-        new Object[]{null, null, date("2020-12-20"), null, null, observationTrigger(Stream.of("musculoskeletal"), Stream.of("present")), null, "musculoskeletal"},
+        new Object[]{null, null, null, null,
+            useContext(Stream.of("non-existent"), Stream.of("invalid")), null, null, "initial"},
+        new Object[]{null, null, null, null,
+            useContext(Stream.of("user"), Stream.of("Practitioner")),
+            observationTrigger(Stream.of("anxiety"), Stream.of("present")), null, "anxiety"},
+        new Object[]{null, null, null, token("GB"), null,
+            observationTrigger(Stream.of("chestPain"), Stream.of("present")), null, "chestPains"},
+        new Object[]{null, null, date("2020-12-20"), null, null,
+            observationTrigger(Stream.of("musculoskeletal"), Stream.of("present")), null,
+            "musculoskeletal"},
         new Object[]{token("ACTIVE"), token("false"), null, null, null, null, null, "initial"},
-        new Object[]{token("ACTIVE"), token("false"), null, null, null, observationTrigger(Stream.of("palpitations", "debug"), Stream.of("present", "present")), null, "palpitations2"},
-        new Object[]{token("ACTIVE"), token("true"), date("2020-12-20"), null, null, observationTrigger(Stream.of("palpitations", "debug"), Stream.of("present", "present")), null, "palpitations"},
-        new Object[]{null, token("false"), date("2020-12-20"), null, null, observationTrigger(Stream.of("palpitations"), Stream.of("present")), null, "palpitations2"},
-        new Object[]{null, token("false"), null, null, null, observationTrigger(Stream.of("palpitations"), Stream.of("present")), null, "palpitations2"}
+        new Object[]{token("ACTIVE"), token("false"), null, null, null,
+            observationTrigger(Stream.of("palpitations", "debug"), Stream.of("present", "present")),
+            null, "palpitations2"},
+        new Object[]{token("ACTIVE"), token("true"), date("2020-12-20"), null, null,
+            observationTrigger(Stream.of("palpitations", "debug"), Stream.of("present", "present")),
+            null, "palpitations"},
+        new Object[]{null, token("false"), date("2020-12-20"), null, null,
+            observationTrigger(Stream.of("palpitations"), Stream.of("present")), null,
+            "palpitations2"},
+        new Object[]{null, token("false"), null, null, null,
+            observationTrigger(Stream.of("palpitations"), Stream.of("present")), null,
+            "palpitations2"}
     };
   }
 
@@ -280,49 +298,65 @@ public class ServiceDefinitionProvidersTest {
     String clinical = SettingUseContext.CLINICAL.getValue();
     return new Object[]{
         new Object[]{
-            useContext(Stream.of("age", "user", settingType), Stream.of("133936004", "Practitioner", telephony)),
-            observationTrigger(Stream.of("soreThroat", "lifeThreatening"), Stream.of("present", "absent")),
+            useContext(Stream.of("age", "user", settingType),
+                Stream.of("133936004", "Practitioner", telephony)),
+            observationTrigger(Stream.of("soreThroat", "lifeThreatening"),
+                Stream.of("present", "absent")),
             adultBirthDate,
             "Sore Throat - Adult, Call Handler"
         },
         new Object[]{
-            useContext(Stream.of("age", "user", settingType), Stream.of("133936004", "Practitioner", clinical)),
-            observationTrigger(Stream.of("soreThroat", "lifeThreatening"), Stream.of("present", "absent")),
+            useContext(Stream.of("age", "user", settingType),
+                Stream.of("133936004", "Practitioner", clinical)),
+            observationTrigger(Stream.of("soreThroat", "lifeThreatening"),
+                Stream.of("present", "absent")),
             adultBirthDate,
             "Sore Throat - Adult, Clinical"
         },
         new Object[]{
-            useContext(Stream.of("age", "user", settingType), Stream.of("67822003", "Practitioner", telephony)),
-            observationTrigger(Stream.of("soreThroat", "lifeThreatening"), Stream.of("present", "absent")),
+            useContext(Stream.of("age", "user", settingType),
+                Stream.of("67822003", "Practitioner", telephony)),
+            observationTrigger(Stream.of("soreThroat", "lifeThreatening"),
+                Stream.of("present", "absent")),
             childBirthDate,
             "Sore Throat - Child, Call Handler"
         },
         new Object[]{
-            useContext(Stream.of("age", "user", settingType), Stream.of("67822003", "Practitioner", clinical)),
-            observationTrigger(Stream.of("soreThroat", "lifeThreatening"), Stream.of("present", "absent")),
+            useContext(Stream.of("age", "user", settingType),
+                Stream.of("67822003", "Practitioner", clinical)),
+            observationTrigger(Stream.of("soreThroat", "lifeThreatening"),
+                Stream.of("present", "absent")),
             childBirthDate,
             "Sore Throat - Child, Clinical"
         },
         new Object[]{
-            useContext(Stream.of("age", "user", settingType), Stream.of("133936004", "Practitioner", telephony)),
-            observationTrigger(Stream.of("constipation", "lifeThreatening"), Stream.of("present", "absent")),
+            useContext(Stream.of("age", "user", settingType),
+                Stream.of("133936004", "Practitioner", telephony)),
+            observationTrigger(Stream.of("constipation", "lifeThreatening"),
+                Stream.of("present", "absent")),
             adultBirthDate,
             "Constipation - Adult, Call Handler"
         },
         new Object[]{
-            useContext(Stream.of("age", "user", settingType), Stream.of("133936004", "Practitioner", clinical)),
-            observationTrigger(Stream.of("constipation", "lifeThreatening"), Stream.of("present", "absent")),
+            useContext(Stream.of("age", "user", settingType),
+                Stream.of("133936004", "Practitioner", clinical)),
+            observationTrigger(Stream.of("constipation", "lifeThreatening"),
+                Stream.of("present", "absent")),
             adultBirthDate,
             "Constipation - Adult, Clinical"},
         new Object[]{
-            useContext(Stream.of("age", "user", settingType), Stream.of("67822003", "Practitioner", telephony)),
-            observationTrigger(Stream.of("constipation", "lifeThreatening"), Stream.of("present", "absent")),
+            useContext(Stream.of("age", "user", settingType),
+                Stream.of("67822003", "Practitioner", telephony)),
+            observationTrigger(Stream.of("constipation", "lifeThreatening"),
+                Stream.of("present", "absent")),
             childBirthDate,
             "Constipation - Child, Call Handler"
         },
         new Object[]{
-            useContext(Stream.of("age", "user", settingType), Stream.of("67822003", "Practitioner", clinical)),
-            observationTrigger(Stream.of("constipation", "lifeThreatening"), Stream.of("present", "absent")),
+            useContext(Stream.of("age", "user", settingType),
+                Stream.of("67822003", "Practitioner", clinical)),
+            observationTrigger(Stream.of("constipation", "lifeThreatening"),
+                Stream.of("present", "absent")),
             childBirthDate,
             "Constipation - Child, Clinical"
         },
