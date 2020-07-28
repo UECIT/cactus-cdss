@@ -1,7 +1,6 @@
 package uk.nhs.cdss.domain.enums;
 
 import static uk.nhs.cdss.constants.SystemURL.CS_CONTEXT_TYPE;
-import static uk.nhs.cdss.constants.SystemURL.CS_SNOMED;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -18,9 +17,13 @@ public enum UseContextType implements Concept {
   TASK(CS_CONTEXT_TYPE, "task", "Workflow Task"),
   VENUE(CS_CONTEXT_TYPE, "venue", "Clinical Venue"),
   SPECIES(CS_CONTEXT_TYPE, "species", "Species"),
-  SETTING(CS_SNOMED, "725221000000100", "Setting and place");
+  SETTING(Systems.UEC_USAGE_CONTEXT, "setting", "Setting");
 
   private final String system;
   private final String value;
   private final String display;
+
+  private static class Systems {
+    private static final String UEC_USAGE_CONTEXT = "https://fhir.nhs.uk/STU3/CodeSystem/UEC-UsageContextType-1";
+  }
 }
