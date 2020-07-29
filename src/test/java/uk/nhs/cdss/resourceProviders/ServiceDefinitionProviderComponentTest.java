@@ -19,11 +19,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.nhs.cactus.common.audit.AuditThreadStore;
 import uk.nhs.cactus.common.audit.model.AuditSession;
-import uk.nhs.cactus.common.security.TokenAuthenticationService;
 import uk.nhs.cdss.testHelpers.matchers.FunctionMatcher;
 
 @SpringBootTest
@@ -35,9 +33,6 @@ public class ServiceDefinitionProviderComponentTest {
 
   @Autowired
   private AuditThreadStore auditThreadStore;
-
-  @MockBean
-  public TokenAuthenticationService tokenAuthenticationService;
 
   @Before
   public void setup() {

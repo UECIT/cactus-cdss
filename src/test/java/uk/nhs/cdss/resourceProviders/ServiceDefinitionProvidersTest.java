@@ -31,7 +31,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import uk.nhs.cactus.common.audit.AuditService;
 import uk.nhs.cactus.common.audit.config.MapperConfig;
-import uk.nhs.cactus.common.security.TokenAuthenticationService;
 import uk.nhs.cdss.config.CodeDirectoryConfig;
 import uk.nhs.cdss.domain.enums.SettingUseContext;
 import uk.nhs.cdss.domain.enums.UseContextType;
@@ -63,14 +62,14 @@ public class ServiceDefinitionProvidersTest {
         new UsageContextTransformer(),
         new TopicTransformer(),
         new TriggerTransformer(codeDirectory, codingTransformer));
+
     provider = new ServiceDefinitionProvider(
         codeDirectory,
         null,
         transformer,
         new ServiceDefinitionRegistry(new MapperConfig().registryObjectMapper()),
         null,
-        mock(AuditService.class),
-        mock(TokenAuthenticationService.class));
+        mock(AuditService.class));
   }
 
   @Test

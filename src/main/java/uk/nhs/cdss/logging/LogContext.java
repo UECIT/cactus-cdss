@@ -18,15 +18,14 @@ import org.slf4j.MDC;
 @Value
 @Builder
 @Slf4j
-public class Context {
+public class LogContext {
 
   private static ObjectMapper objectMapper = new ObjectMapper();
 
   String
       encounter,
       request,
-      resource,
-      supplier;
+      resource;
 
   /**
    * Apply the values in this Context to the MDC while executing the provided task

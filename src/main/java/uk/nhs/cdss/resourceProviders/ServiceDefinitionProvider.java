@@ -44,10 +44,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RestController;
 import uk.nhs.cactus.common.audit.AuditService;
 import uk.nhs.cactus.common.audit.model.OperationType;
-import uk.nhs.cactus.common.security.TokenAuthenticationService;
 import uk.nhs.cdss.component.ParameterResourceResolver;
 import uk.nhs.cdss.engine.CodeDirectory;
-import uk.nhs.cdss.logging.Context;
+import uk.nhs.cdss.logging.LogContext;
 import uk.nhs.cdss.registry.ServiceDefinitionRegistry;
 import uk.nhs.cdss.search.EffectivePeriodCondition;
 import uk.nhs.cdss.search.ExperimentalCondition;
@@ -94,7 +93,6 @@ public class ServiceDefinitionProvider implements IResourceProvider {
   private final ServiceDefinitionRegistry serviceDefinitionRegistry;
   private final ParameterResourceResolver parameterResourceResolver;
   private final AuditService auditService;
-  private final TokenAuthenticationService tokenAuthenticationService;
 
   @Getter(AccessLevel.NONE)
   private final Logger log = LoggerFactory.getLogger(getClass());
@@ -115,8 +113,7 @@ public class ServiceDefinitionProvider implements IResourceProvider {
     auditService.addAuditProperty(INTERACTION_ID, requestId.getIdPart());
     auditService.addAuditProperty(OPERATION_TYPE, OperationType.IS_VALID.getName());
 
-    return Context.builder()
-        .supplier(tokenAuthenticationService.requireSupplierId())
+    return LogContext.builder()
         .resource(serviceDefinitionId.toString())
         .request(requestId.getValue())
         .build()
@@ -143,8 +140,7 @@ public class ServiceDefinitionProvider implements IResourceProvider {
     auditService.addAuditProperty(INTERACTION_ID, encounter.getReferenceElement().getIdPart());
     auditService.addAuditProperty(OPERATION_TYPE, OperationType.ENCOUNTER.getName());
 
-    return Context.builder()
-        .supplier(tokenAuthenticationService.requireSupplierId())
+    return LogContext.builder()
         .resource(serviceDefinitionId.toString())
         .encounter(encounter.getReference())
         .request(requestId.getValue())
@@ -172,8 +168,7 @@ public class ServiceDefinitionProvider implements IResourceProvider {
 
   @Read
   public ServiceDefinition getServiceDefinitionById(@IdParam IdType id) {
-    return Context.builder()
-        .supplier(tokenAuthenticationService.requireSupplierId())
+    return LogContext.builder()
         .resource(id.toString())
         .build().wrap("ServiceDefinition/read", () ->
             serviceDefinitionRegistry
@@ -187,8 +182,7 @@ public class ServiceDefinitionProvider implements IResourceProvider {
   public Collection<ServiceDefinition> findServiceDefinitionById(
       @RequiredParam(name = ServiceDefinition.SP_RES_ID) String id) {
 
-    return Context.builder()
-        .supplier(tokenAuthenticationService.requireSupplierId())
+    return LogContext.builder()
         .resource(id)
         .build().wrap("ServiceDefinition/search", () ->
             serviceDefinitionRegistry
@@ -200,15 +194,11 @@ public class ServiceDefinitionProvider implements IResourceProvider {
 
   @Search
   public Collection<ServiceDefinition> findAllServiceDefinitions() {
-
-    return Context.builder()
-        .supplier(tokenAuthenticationService.requireSupplierId())
-        .build().wrap("ServiceDefinition/list", () ->
-            serviceDefinitionRegistry
-                .getAll()
-                .stream()
-                .map(serviceDefinitionTransformer::transform)
-                .collect(Collectors.toUnmodifiableList()));
+    return serviceDefinitionRegistry
+        .getAll()
+        .stream()
+        .map(serviceDefinitionTransformer::transform)
+        .collect(Collectors.toUnmodifiableList());
   }
 
   @Search(queryName = "triage")
@@ -229,29 +219,24 @@ public class ServiceDefinitionProvider implements IResourceProvider {
     auditService.addAuditProperty(INTERACTION_ID, UUID.randomUUID().toString());
     auditService.addAuditProperty(OPERATION_TYPE, OperationType.SERVICE_SEARCH.getName());
 
-    return Context.builder()
-        .supplier(tokenAuthenticationService.requireSupplierId())
-        .build()
-        .wrap("ServiceDefinition/triageSearch", () -> {
-          List<ServiceDefinition> serviceDefinitions = serviceDefinitionRegistry
-              .getAll()
-              .stream()
-              .filter(StatusCondition.from(status))
-              .filter(ExperimentalCondition.from(experimental))
-              .filter(EffectivePeriodCondition.from(searchDate))
-              .filter(JurisdictionCondition.from(jurisdiction))
-              .filter(UseContextCondition.from(useContextConcept))
-              .filter(ObservationTriggerCondition.from(codeDirectory, observationParams))
-              .filter(PatientTriggerCondition.from(patientParams))
-              .max(triggerCount())
-              .map(serviceDefinitionTransformer::transform)
-              .stream()
-              .collect(Collectors.toUnmodifiableList());
+    List<ServiceDefinition> serviceDefinitions = serviceDefinitionRegistry
+        .getAll()
+        .stream()
+        .filter(StatusCondition.from(status))
+        .filter(ExperimentalCondition.from(experimental))
+        .filter(EffectivePeriodCondition.from(searchDate))
+        .filter(JurisdictionCondition.from(jurisdiction))
+        .filter(UseContextCondition.from(useContextConcept))
+        .filter(ObservationTriggerCondition.from(codeDirectory, observationParams))
+        .filter(PatientTriggerCondition.from(patientParams))
+        .max(triggerCount())
+        .map(serviceDefinitionTransformer::transform)
+        .stream()
+        .collect(Collectors.toUnmodifiableList());
 
-          log.info("Selected ServiceDefinitions: {}",
-              serviceDefinitions.stream().map(ServiceDefinition::getId).toArray());
-          return serviceDefinitions;
-        });
+    log.info("Selected ServiceDefinitions: {}",
+        serviceDefinitions.stream().map(ServiceDefinition::getId).toArray());
+    return serviceDefinitions;
   }
 
   private Comparator<uk.nhs.cdss.domain.ServiceDefinition> triggerCount() {
