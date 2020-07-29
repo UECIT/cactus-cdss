@@ -17,8 +17,6 @@ import ca.uhn.fhir.rest.param.ConstructedParam;
 import ca.uhn.fhir.rest.param.DateParam;
 import ca.uhn.fhir.rest.param.TokenParam;
 import ca.uhn.fhir.rest.server.IResourceProvider;
-import ca.uhn.fhir.rest.server.exceptions.BaseServerResponseException;
-import ca.uhn.fhir.rest.server.exceptions.InternalErrorException;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import java.util.Collection;
 import java.util.Comparator;
@@ -48,7 +46,7 @@ import uk.nhs.cactus.common.audit.AuditService;
 import uk.nhs.cactus.common.audit.model.OperationType;
 import uk.nhs.cdss.component.ParameterResourceResolver;
 import uk.nhs.cdss.engine.CodeDirectory;
-import uk.nhs.cdss.logging.Context;
+import uk.nhs.cdss.logging.LogContext;
 import uk.nhs.cdss.registry.ServiceDefinitionRegistry;
 import uk.nhs.cdss.search.EffectivePeriodCondition;
 import uk.nhs.cdss.search.ExperimentalCondition;
@@ -113,10 +111,15 @@ public class ServiceDefinitionProvider implements IResourceProvider {
   ) {
     auditService.addAuditProperty(INTERACTION_ID, requestId.getIdPart());
     auditService.addAuditProperty(OPERATION_TYPE, OperationType.IS_VALID.getName());
-    return new Parameters()
-        .addParameter(new ParametersParameterComponent()
-          .setName("return")
-          .setValue(new BooleanType(true)));
+
+    return LogContext.builder()
+        .request(requestId.getValue())
+        .build()
+        .wrap("ServiceDefinition/$isValid", () ->
+            new Parameters()
+                .addParameter(new ParametersParameterComponent()
+                    .setName("return")
+                    .setValue(new BooleanType(true))));
   }
 
   @Operation(name = EVALUATE)
@@ -135,63 +138,56 @@ public class ServiceDefinitionProvider implements IResourceProvider {
     auditService.addAuditProperty(INTERACTION_ID, encounter.getReferenceElement().getIdPart());
     auditService.addAuditProperty(OPERATION_TYPE, OperationType.ENCOUNTER.getName());
 
-    List<Resource> inputResources = parameterResourceResolver.resolve(inputData);
-
-    Context context = Context.builder()
-        .task("ServiceDefinition/$evaluate")
-        .serviceDefinition(serviceDefinitionId.toString())
+    return LogContext.builder()
+        .resource(serviceDefinitionId.toString())
         .encounter(encounter.getReference())
         .request(requestId.getValue())
-        .supplier(initiatingPerson.getId())
-        .build();
+        .build()
+        .wrap("ServiceDefinition/$evaluate", () -> {
+          List<Resource> inputResources = parameterResourceResolver.resolve(inputData);
 
-    EvaluationParameters evaluationParameters = EvaluationParameters.builder()
-        .requestId(requestId.getValue())
-        .encounter(encounter)
-        .patient(patient)
-        .inputData(inputResources)
-        .responses(CollectionUtil.filterAndCast(inputResources, QuestionnaireResponse.class))
-        .observations(CollectionUtil.filterAndCast(inputResources, Observation.class))
-        .userType(userType)
-        .setting(setting)
-        .userLanguage(userLanguage)
-        .userTaskContext(userTaskContext)
-        .build();
+          EvaluationParameters evaluationParameters = EvaluationParameters.builder()
+              .requestId(requestId.getValue())
+              .encounter(encounter)
+              .patient(patient)
+              .inputData(inputResources)
+              .responses(CollectionUtil.filterAndCast(inputResources, QuestionnaireResponse.class))
+              .observations(CollectionUtil.filterAndCast(inputResources, Observation.class))
+              .userType(userType)
+              .setting(setting)
+              .userLanguage(userLanguage)
+              .userTaskContext(userTaskContext)
+              .build();
 
-    return evaluate(serviceDefinitionId, context, evaluationParameters);
-  }
-
-  private GuidanceResponse evaluate(IdType serviceDefinitionId,
-      Context context, EvaluationParameters evaluationParameters) {
-    try {
-      return context.wrap(() ->
-          evaluateService.getGuidanceResponse(
-              evaluationParameters, serviceDefinitionId.getIdPart()));
-    } catch (Exception e) {
-      if (e instanceof BaseServerResponseException) {
-        throw (BaseServerResponseException) e;
-      }
-      throw new InternalErrorException(e);
-    }
+          return evaluateService.getGuidanceResponse(
+              evaluationParameters, serviceDefinitionId.getIdPart());
+        });
   }
 
   @Read
   public ServiceDefinition getServiceDefinitionById(@IdParam IdType id) {
-    return serviceDefinitionRegistry
-        .getById(id.getIdPart())
-        .map(serviceDefinitionTransformer::transform)
-        .orElseThrow(() -> new ResourceNotFoundException(
-            "Unable to load service definition " + id));
+    return LogContext.builder()
+        .resource(id.toString())
+        .build().wrap("ServiceDefinition/read", () ->
+            serviceDefinitionRegistry
+                .getById(id.getIdPart())
+                .map(serviceDefinitionTransformer::transform)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                    "Unable to load service definition " + id)));
   }
 
   @Search
   public Collection<ServiceDefinition> findServiceDefinitionById(
       @RequiredParam(name = ServiceDefinition.SP_RES_ID) String id) {
-    return serviceDefinitionRegistry
-        .getById(id)
-        .map(serviceDefinitionTransformer::transform)
-        .stream()
-        .collect(Collectors.toUnmodifiableList());
+
+    return LogContext.builder()
+        .resource(id)
+        .build().wrap("ServiceDefinition/search", () ->
+            serviceDefinitionRegistry
+                .getById(id)
+                .map(serviceDefinitionTransformer::transform)
+                .stream()
+                .collect(Collectors.toUnmodifiableList()));
   }
 
   @Search
