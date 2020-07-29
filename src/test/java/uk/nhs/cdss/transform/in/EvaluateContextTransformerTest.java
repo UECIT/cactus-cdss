@@ -11,7 +11,7 @@ import uk.nhs.cdss.domain.EvaluateContext;
 import uk.nhs.cdss.domain.EvaluateContext.Role;
 import uk.nhs.cdss.transform.EvaluationParameters;
 
-public class EvaluateLogContextTransformerTest {
+public class EvaluateContextTransformerTest {
 
   public EvaluateContextTransformer contextTransformer;
 
