@@ -41,7 +41,6 @@ public class ServiceDefinitionProviderComponentTest {
 
   @Test
   public void isValid_returns() {
-    IdType serviceId = new IdType("ServiceDefinition/1");
     IdType requestId = new IdType(UUID.randomUUID().toString());
     Identifier odsCode = new Identifier().setSystem("gp").setUse(IdentifierUse.OFFICIAL);
     DateTimeType evalDate = new DateTimeType("2020-07-10T13:40:00.000Z");
