@@ -104,7 +104,6 @@ public class ServiceDefinitionProvider implements IResourceProvider {
 
   @Operation(name = IS_VALID)
   public Parameters isValid(
-      @IdParam IdType serviceDefinitionId,
       @OperationParam(name = REQUEST_ID) IdType requestId,
       @OperationParam(name = ODS_CODE, min = 1) Identifier odsCode,
       @OperationParam(name = EVALUATE_AT) DateTimeType evaluateTime,
@@ -114,7 +113,6 @@ public class ServiceDefinitionProvider implements IResourceProvider {
     auditService.addAuditProperty(OPERATION_TYPE, OperationType.IS_VALID.getName());
 
     return LogContext.builder()
-        .resource(serviceDefinitionId.toString())
         .request(requestId.getValue())
         .build()
         .wrap("ServiceDefinition/$isValid", () ->

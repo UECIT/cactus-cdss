@@ -48,7 +48,7 @@ public class ServiceDefinitionProviderComponentTest {
     DateTimeType birthDate = new DateTimeType("1996-06-19T22:40:00.000Z");
 
     Parameters response =
-        serviceDefinitionProvider.isValid(serviceId, requestId, odsCode, evalDate, birthDate);
+        serviceDefinitionProvider.isValid(requestId, odsCode, evalDate, birthDate);
 
     assertThat(response,
         isParametersContaining(isParameter("return", new BooleanType(true))));
