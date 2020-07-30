@@ -286,32 +286,32 @@ public class CodeDirectoryConfig {
     codeDirectory.put(snomed("problemDescription", "Free text description of genital problem and duration"));
 
     // Concerns
-    codeDirectory.put(snomed("ectopic", "Ectopic pregnancy"));
-    codeDirectory.put(snomed("rupturedEctopic", "Ruptured Ectopic pregnancy"));
-    codeDirectory.put(snomed("pelvicInflammatory", "Pelvic Inflammatory Disease"));
-    codeDirectory.put(snomed("rupturedEctopicPid", "Ruptured Ectopic pregnancy PID"));
-    codeDirectory.put(snomed("candida", "Candida"));
-    codeDirectory.put(snomed("bacterialVaginosis", "Bacterial Vaginosis"));
-    codeDirectory.put(snomed("cervical&uterine", "Cervical abnormalities. Uterine infection"));
-    codeDirectory.put(snomed("cervical", "Cervical abnormalities"));
-    codeDirectory.put(snomed("stiReoccurrence", "STI reoccurrence"));
-    codeDirectory.put(snomed("sti", "Sexually Transmitted Infection"));
-    codeDirectory.put(snomed("newStiInfection", "New STI infection"));
-    codeDirectory.put(snomed("foreign&cervical", "Foreign body. Cervical abnormalities"));
-    codeDirectory.put(snomed("strepto", "Streptococcal toxic shock syndrome"));
-    codeDirectory.put(snomed("primaryHerpes", "Primary Herpes"));
-    codeDirectory.put(snomed("shingles", "Shingles"));
-    codeDirectory.put(snomed("uti", "Urinary Tract Infection"));
-    codeDirectory.put(snomed("cystitis&incontinence", "Interstitial cystitis. Incontinence problems"));
-    codeDirectory.put(snomed("acuteUrineRetention", "Acute retention of urine"));
-    codeDirectory.put(snomed("uti&sti&neurogenic", "Urinary Tract Infection. STI infection. Neurogenic issues"));
-    codeDirectory.put(snomed("detrusor&bladder", "Detrusor Abnormalities. Bladder tumour. Bladder stones"));
-    codeDirectory.put(snomed("stiTesting", "Additional testing. HIV. Syphilis"));
-    codeDirectory.put(snomed("rapeCare", "Rape Care"));
-    codeDirectory.put(snomed("abuse&trafficking", "Sexual Abuse. Victim of people trafficking"));
-    codeDirectory.put(snomed("dyspareunia", "Dyspareunia"));
-    codeDirectory.put(snomed("bacterialOrYeastInfection", "Bacterial / Yeast infection"));
-    codeDirectory.put(snomed("bacterialInfection", "Bacterial Infection"));
+    codeDirectory.put("ectopic", snomed("34801009", "Ectopic pregnancy (disorder)"));
+    codeDirectory.put("rupturedEctopic", snomed("17433009", "Ruptured ectopic pregnancy (disorder)"));
+    codeDirectory.put("pelvicInflammatory", snomed("237037006", "Acute pelvic inflammatory disease (disorder)"));
+    codeDirectory.put("rupturedEctopicPid", snomed("17433009", "Ruptured ectopic pregnancy (disorder)"));
+    codeDirectory.put("candida", snomed("78048006", "Candidiasis (disorder)"));
+    codeDirectory.put("bacterialVaginosis", snomed("419760006", "Bacterial vaginosis (disorder)"));
+    codeDirectory.put("cervical&uterine", snomed("301775005", "Infection of uterus (disorder)"));
+    codeDirectory.put("cervical", snomed("301775005", "Infection of uterus (disorder)"));
+    codeDirectory.put("stiReoccurrence", snomed("8098009", "Sexually transmitted infectious disease (disorder)"));
+    codeDirectory.put("sti", snomed("8098009", "Sexually transmitted infectious disease (disorder)"));
+    codeDirectory.put("newStiInfection", snomed("8098009", "Sexually transmitted infectious disease (disorder)"));
+    codeDirectory.put("foreign&cervical", snomed("262623002", "Foreign body in cervix (disorder)"));
+    codeDirectory.put("strepto", snomed("240451000", "Streptococcal toxic shock syndrome (disorder)"));
+    codeDirectory.put("primaryHerpes", snomed("40981003", "Primary herpes simplex (disorder)"));
+    codeDirectory.put("shingles", snomed("4740000", "Herpes zoster (disorder)"));
+    codeDirectory.put("uti", snomed("68566005", "Urinary tract infectious disease (disorder)"));
+    codeDirectory.put("cystitis&incontinence", snomed("197834003", "Chronic interstitial cystitis (disorder)"));
+    codeDirectory.put("acuteUrineRetention", snomed("236648008", "Acute retention of urine (disorder)"));
+    codeDirectory.put("uti&sti&neurogenic", snomed("68566005", "Urinary tract infectious disease (disorder)"));
+    codeDirectory.put("detrusor&bladder", snomed("61033006", "Detrusor instability of bladder (disorder)"));
+    codeDirectory.put("stiTesting", snomed("40675008", "Serologic test for syphilis (procedure)"));
+    codeDirectory.put("rapeCare", snomed("386405009", "Rape trauma treatment (procedure)"));
+    codeDirectory.put("abuse&trafficking", snomed("225826001", "Victim of sexual abuse (finding)"));
+    codeDirectory.put("dyspareunia", snomed("71315007", "Dyspareunia (finding)"));
+    codeDirectory.put("bacterialOrYeastInfection", snomed("87628006", "Bacterial infectious disease (disorder)"));
+    codeDirectory.put("bacterialInfection", snomed("87628006", "Bacterial infectious disease (disorder)"));
 
     // Activities (Specialties)
     codeDirectory.put(snomed("medicalReview", "Medical review and assessment"));
