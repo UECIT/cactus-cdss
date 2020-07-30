@@ -144,23 +144,23 @@ public class CodeDirectoryConfig {
     codeDirectory.put(snomed("between45and50", "Between 45 and 50"));
 
     // Concerns
-    codeDirectory.put("ami", snomed("ami", "Acute Myocardial Infarction (Heart Attack)"));
-    codeDirectory.put("mi", snomed("mi", "Myocardial Infarction"));
-    codeDirectory.put("hypertension", snomed("hypertension", "Hypertension (Hypotension)"));
-    codeDirectory.put("stroke", snomed("stroke", "Cerebrovascular Accident (Stroke)"));
-    codeDirectory.put("arrhythmia", snomed("arrhythmia", "Cardiac Arrhythmia"));
-    codeDirectory.put("adverseReaction", snomed("adverseReaction", "Adverse reaction"));
-    codeDirectory.put("anxiety", snomed(SnomedConstants.ANXIETY, "Anxiety"));
-    codeDirectory.put("hasAnxiety", snomed("hasAnxiety", "Anxiety"));
-    codeDirectory.put("nicotine", snomed("nicotine", "Anxiety due to nicotine withdrawal"));
+    codeDirectory.put("ami", snomed("57054005", "Acute myocardial infarction (disorder)"));
+    codeDirectory.put("mi", snomed("22298006", "Myocardial infarction (disorder)"));
+    codeDirectory.put("hypertension", snomed("38341003", "Hypertensive disorder, systemic arterial (disorder)"));
+    codeDirectory.put("stroke", snomed("230690007", "Cerebrovascular accident (disorder)"));
+    codeDirectory.put("arrhythmia", snomed("698247007", "Cardiac arrhythmia (disorder)"));
+    codeDirectory.put("adverseReaction", snomed("281647001", "Adverse reaction (disorder)"));
+    codeDirectory.put("anxiety", snomed(SnomedConstants.ANXIETY, "Anxiety (finding)"));
+    codeDirectory.put("hasAnxiety", snomed("48694002", "Anxiety (finding)"));
+    codeDirectory.put("nicotine", snomed("90755006", "Nicotine withdrawal (disorder)"));
 
     // Activity Categories
     codeDirectory.put("activity-other", buildCode("http://hl7.org/fhir/care-plan-activity-category", "other", "Other"));
 
     // Activities (Specialties)
-    codeDirectory.put("cardio", snomed("cardio", "Cardiologist review"));
-    codeDirectory.put("primaryCareReview", snomed("primaryCareReview", "Primary Care Physician Review"));
-    codeDirectory.put("emergencyCareReview", snomed("emergencyCareReview", "Emergency Care Physician Review"));
+    codeDirectory.put("cardio", snomed("183519002", "Referral to cardiology service (procedure)"));
+    codeDirectory.put("primaryCareReview", snomed("703978000", "Referral to primary care service (procedure)"));
+    codeDirectory.put("emergencyCareReview", snomed("1083331000000102", "Signposting to emergency care practitioner (procedure)"));
     codeDirectory.put("hcpReview", snomed("hcpReview", "HCP Review"));
     codeDirectory.put("pharmacistReview", snomed("hcpReview", "Review with pharmacist"));
   }
@@ -217,26 +217,26 @@ public class CodeDirectoryConfig {
     codeDirectory.put("previousProblems", snomed("previousProblems", "Previous heart problems"));
 
     // Concerns
-    codeDirectory.put("haemorrhageTrauma", snomed("haemorrhageTrauma", "Haemorrhage and Internal organ trauma"));
+    codeDirectory.put("haemorrhageTrauma", snomed("110149000", "Traumatic hemorrhage (disorder)"));
     codeDirectory.put("organTrauma", snomed("organTrauma", "Internal organ trauma"));
-    codeDirectory.put("bleedingTrauma", snomed("bleedingTrauma", "Internal bleeding and organ trauma"));
-    codeDirectory.put("bleedingWound", snomed("bleedingWound", "Internal bleeding and wound assessment"));
-    codeDirectory.put("possibleMI", snomed("possibleMI", "Possible MI"));
-    codeDirectory.put("aneurysm", snomed("aneurysm", "Dissecting aneurism"));
+    codeDirectory.put("bleedingTrauma", snomed("110149000", "Traumatic hemorrhage (disorder)"));
+    codeDirectory.put("bleedingWound", snomed("239161005", "Wound hemorrhage (finding)"));
+    codeDirectory.put("possibleMI", snomed("22298006", "Myocardial infarction (disorder)"));
+    codeDirectory.put("aneurysm", snomed("432119003", "Aneurysm (disorder)"));
     codeDirectory.put("aneurysmRisk", snomed("aneurysmRisk", "Risk of dissecting aneurism"));
     codeDirectory.put("comorbids", snomed("comorbids", "Possible infection impacted by comorbids"));
     codeDirectory.put("comorbidsFull", snomed("comorbidsFull", "Full review for infection impacted by comorbids"));
-    codeDirectory.put("malignancy", snomed("malignancy", "Underlying malignancy"));
-    codeDirectory.put("pe", snomed("pe", "Possible PE"));
+    codeDirectory.put("malignancy", snomed("86049000", "Malignant neoplasm, primary (morphologic abnormality)"));
+    codeDirectory.put("pe", snomed("59282003", "Pulmonary embolism (disorder)"));
     codeDirectory.put("immuneFull", snomed("immuneFull", "Full review for infection impacted by immunity"));
-    codeDirectory.put("angina", snomed("angina", "Possible angina"));
-    codeDirectory.put("progressiveRespiratoryInfection", snomed("progressiveRespiratoryInfection", "Possible progressive lower respiratory tract infection"));
-    codeDirectory.put("respiratoryInfection", snomed("respiratoryInfection", "Possible lower respiratory tract infection"));
-    codeDirectory.put("infection", snomed("infection", "Full review for infection"));
-    codeDirectory.put("careHCPReview", snomed("careHCPReview", "Full review primary care HCP"));
-    codeDirectory.put("coronarySyndrome", snomed("coronarySyndrome", "Acute coronary syndrome"));
-    codeDirectory.put("assessCoronarySyndrome", snomed("assessCoronarySyndrome", "Assess for underlying acute coronary syndrome"));
-    codeDirectory.put("pericarditis", snomed("pericarditis", "Possible Pericarditis"));
+    codeDirectory.put("angina", snomed("194828000", "Angina (disorder)"));
+    codeDirectory.put("progressiveRespiratoryInfection", snomed("50417007", "Lower respiratory tract infection (disorder)"));
+    codeDirectory.put("respiratoryInfection", snomed("50417007", "Lower respiratory tract infection (disorder)"));
+    codeDirectory.put("infection", snomed("40733004", "Infectious disease (disorder)"));
+    codeDirectory.put("careHCPReview", snomed("703978000", "Referral to primary care service (procedure)"));
+    codeDirectory.put("coronarySyndrome", snomed("94659003", "Acute coronary syndrome (disorder)"));
+    codeDirectory.put("assessCoronarySyndrome", snomed("94659003", "Acute coronary syndrome (disorder)"));
+    codeDirectory.put("pericarditis", snomed("3238004", "Pericarditis (disorder)"));
 
     // Redirects
     codeDirectory.put("musculoskeletal", snomed("musculoskeletal", "Redirect to musculoskeletal"));
@@ -254,7 +254,6 @@ public class CodeDirectoryConfig {
     codeDirectory.put("interventionCardiology", snomed("interventionCardiology", "Medical intervention, VQ scan, bloods CT, referral to cardiologist"));
     codeDirectory.put("assessReview", snomed("assessReview", "Medical assessment and review"));
     codeDirectory.put("clinicalIntervention", snomed("clinicalIntervention", "Clinical review, intervention and investigation"));
-
   }
 
   private void vaginalDischarge(CodeDirectory codeDirectory) {
