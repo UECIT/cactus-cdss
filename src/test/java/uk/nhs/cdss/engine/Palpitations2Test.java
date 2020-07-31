@@ -94,7 +94,7 @@ public class Palpitations2Test extends BaseDroolsCDSEngineTest {
     answerQuestion("drugUse", "q", "No");
     answerQuestion("prescriptionUse", "q", "No");
     answerQuestion("anxiety", "q", "No");
-    answerQuestion("ageRange", "q", "12-45");
+    answerQuestion("ageRange", "group", "12-45");
 
     evaluate();
 
