@@ -108,7 +108,7 @@ public class Palpitations2Test extends BaseDroolsCDSEngineTest {
     answerQuestion("hasICD", "q", "No");
     answerQuestion("symptoms", "q", "none");
     answerCommonQuestion("gender", "q", "Female");
-    answerQuestion("ageRange", "q", "12-45");
+    answerQuestion("ageRange", "group", "12-45");
     answerCommonQuestion("pregnant", "q", "No");
     answerQuestion("familyHistory", "q", "Yes");
 
