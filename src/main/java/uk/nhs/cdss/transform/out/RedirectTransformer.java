@@ -31,12 +31,11 @@ public class RedirectTransformer implements Transformer<Redirection, List<DataRe
   }
 
   private DataRequirement createPatientDataRequirement(PatientTrigger trigger) {
-
     DataRequirement dataRequirement = new DataRequirement();
     dataRequirement.setType("Patient")
         .addDateFilter()
-          .setPath("birthDate")
-          .setValue(new DateTimeType(Date.from(trigger.getBirthDate().getInstant())));
+        .setPath("birthDate")
+        .setValue(new DateTimeType(Date.from(trigger.getBirthDate().getInstant())));
     return dataRequirement;
   }
 }

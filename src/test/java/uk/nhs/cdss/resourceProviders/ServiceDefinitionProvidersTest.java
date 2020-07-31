@@ -137,7 +137,7 @@ public class ServiceDefinitionProvidersTest {
       var codeCode = codeDirectory.getCoding(code);
       var valueCode = codeDirectory.getCoding(value);
       var observationTriggerParameter = new ObservationTriggerParameter(
-          new StringParam("CareConnectObservation"),
+          new StringParam("Observation"),
           new StringParam("code"),
           token(codeCode.getCode(), codeCode.getSystem()),
           new StringParam("value"),

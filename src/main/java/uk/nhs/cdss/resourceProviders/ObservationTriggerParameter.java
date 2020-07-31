@@ -11,7 +11,8 @@ import lombok.ToString;
 @Getter
 @ToString
 public class ObservationTriggerParameter {
-  private StringParam observationType; //Should always be "CareConnectObservation"?
+
+  private StringParam observationType; //Should always be "Observation"
   private StringParam codePath; //Should always be "code"
   private TokenParam code; // system|code
   private StringParam valuePath; //Should always be "value"
