@@ -25,7 +25,7 @@ import uk.nhs.cdss.domain.Concern
 import uk.nhs.cdss.domain.Concern.ClinicalStatus
 import uk.nhs.cdss.domain.Concern.VerificationStatus
 import uk.nhs.cdss.domain.enums.ObservationTriggerValue
-import uk.nhs.cdss.domain.enums.Concept
+import uk.nhs.cdss.domain.Concept
 
 import uk.nhs.cdss.engine.CodeDirectory
 import uk.nhs.cdss.engine.Constraints
@@ -240,7 +240,7 @@ rule "Init"
 salience 10000
 when // Always
 then
-    Concept present = ObservationTriggerValue.PRESENT;
+    Concept present = ObservationTriggerValue.PRESENT.toDomainConcept();
 
     // Are you experiencing palpitations now?
     insert( new InitialQuestionnaire("common.birthDate"));
@@ -266,27 +266,27 @@ then
     insert( new OutcomeAnswerCondition("symptoms", "palpitations2.symptoms", "q", Arrays.asList("chestPains", "neckPain", "breathingProblems", "syncope") ));
 
     insert( new NextQuestion("palpitations2.ageRange", "palpitations2.symptoms", "q", Arrays.asList("none")));
-    insert( new AnswerAssertion("palpitations2.ageRange", "q", "<12", codeDirectory.get("under12"), present));
-    insert( new AnswerAssertion("palpitations2.ageRange", "q", "12-45", codeDirectory.get("between12and45"), present));
-    insert( new AnswerAssertion("palpitations2.ageRange", "q", "45-50", codeDirectory.get("between45and50"), present));
-    insert( new AnswerAssertion("palpitations2.ageRange", "q", ">50", codeDirectory.get("over50"), present));
+    insert( new AnswerAssertion("palpitations2.ageRange", "group", "<12", codeDirectory.get("under12"), present));
+    insert( new AnswerAssertion("palpitations2.ageRange", "group", "12-45", codeDirectory.get("between12and45"), present));
+    insert( new AnswerAssertion("palpitations2.ageRange", "group", "45-50", codeDirectory.get("between45and50"), present));
+    insert( new AnswerAssertion("palpitations2.ageRange", "group", ">50", codeDirectory.get("over50"), present));
 
     insert( new NextQuestion("common.gender", "palpitations2.ageRange"));
 
     insert( new ConditionalNextQuestion("genderToPregnant", "common.pregnant", "common.gender", "q", Arrays.asList("Female")) );
-    insert( new NextQuestionCondition("genderToPregnant", "palpitations2.ageRange", "q", Arrays.asList("12-45", "45-50")) );
+    insert( new NextQuestionCondition("genderToPregnant", "palpitations2.ageRange", "group", Arrays.asList("12-45", "45-50")) );
 
     insert( new ConditionalNextQuestion("genderToFamilyHistoryUnder12", "palpitations2.familyHistory", "common.gender") );
-    insert( new NextQuestionCondition("genderToFamilyHistoryUnder12", "palpitations2.ageRange", "q", Arrays.asList("<12")) );
+    insert( new NextQuestionCondition("genderToFamilyHistoryUnder12", "palpitations2.ageRange", "group", Arrays.asList("<12")) );
     insert( new ConditionalNextQuestion("genderToFamilyHistoryOver12", "palpitations2.familyHistory", "common.gender") );
-    insert( new NextQuestionCondition("genderToFamilyHistoryOver12", "palpitations2.ageRange", "q", Arrays.asList("12-45")) );
+    insert( new NextQuestionCondition("genderToFamilyHistoryOver12", "palpitations2.ageRange", "group", Arrays.asList("12-45")) );
     insert( new NextQuestionCondition("genderToFamilyHistoryOver12", "common.gender", "q", Arrays.asList("Male")) );
 
     insert( new ConditionalNextQuestion("genderToPersonalHistoryOver50", "palpitations2.personalHistory", "common.gender") );
-    insert( new NextQuestionCondition("genderToPersonalHistoryOver50", "palpitations2.ageRange", "q", Arrays.asList(">50")) );
+    insert( new NextQuestionCondition("genderToPersonalHistoryOver50", "palpitations2.ageRange", "group", Arrays.asList(">50")) );
     insert( new NextQuestionCondition("genderToPersonalHistoryOver50", "palpitations2.hasPalpitations", "q", Arrays.asList("Yes") ));
     insert( new ConditionalNextQuestion("genderToPersonalHistoryOver12", "palpitations2.personalHistory", "common.gender") );
-    insert( new NextQuestionCondition("genderToPersonalHistoryOver12", "palpitations2.ageRange", "q", Arrays.asList("45-50")) );
+    insert( new NextQuestionCondition("genderToPersonalHistoryOver12", "palpitations2.ageRange", "group", Arrays.asList("45-50")) );
     insert( new NextQuestionCondition("genderToPersonalHistoryOver12", "common.gender", "q", Arrays.asList("Male")) );
     insert( new NextQuestionCondition("genderToPersonalHistoryOver12", "palpitations2.hasPalpitations", "q", Arrays.asList("Yes") ));
 
@@ -298,9 +298,9 @@ then
     insert( new OutcomeAnswerCondition("pregnancy-noPalpitations", "palpitations2.hasPalpitations", "q", Arrays.asList("No") ));
 
     insert( new ConditionalNextQuestion("pregnancyToFamilyHistory", "palpitations2.familyHistory", "common.pregnant", "q", Arrays.asList("No", "Unsure")) );
-    insert( new NextQuestionCondition("pregnancyToFamilyHistory", "palpitations2.ageRange", "q", Arrays.asList("12-45")) );
+    insert( new NextQuestionCondition("pregnancyToFamilyHistory", "palpitations2.ageRange", "group", Arrays.asList("12-45")) );
     insert( new ConditionalNextQuestion("pregnancyToPersonalHistory", "palpitations2.personalHistory", "common.pregnant", "q", Arrays.asList("No", "Unsure")) );
-    insert( new NextQuestionCondition("pregnancyToPersonalHistory", "palpitations2.ageRange", "q", Arrays.asList("45-50")) );
+    insert( new NextQuestionCondition("pregnancyToPersonalHistory", "palpitations2.ageRange", "group", Arrays.asList("45-50")) );
     insert( new NextQuestionCondition("pregnancyToPersonalHistory", "palpitations2.hasPalpitations", "q", Arrays.asList("Yes") ));
 
     // Family history of sudden cardiac death under the age of 40 years
@@ -448,7 +448,7 @@ then
     //  If last experienced more than 48 hours
     insert( new NextQuestion("palpitations2.syncope", "palpitations2.lastExperienced", "q3", Arrays.asList("Yes", "No", "Unsure")));
     insert( new AnswerAssertion("palpitations2.lastExperienced", "q3", "Yes", codeDirectory.get("lastExperiencedMoreThan48"), present));
-    insert( new AnswerAssertion("palpitations2.lastExperienced", "q3", "No", codeDirectory.get("lastExperiencedMoreThan48"), ObservationTriggerValue.ABSENT));
+    insert( new AnswerAssertion("palpitations2.lastExperienced", "q3", "No", codeDirectory.get("lastExperiencedMoreThan48"), ObservationTriggerValue.ABSENT.toDomainConcept()));
     insert( gpArrhythmia("syncopeOver48hrs", "PT72h", "PT48h"));
     insert( new OutcomeAnswerCondition("syncopeOver48hrs", "palpitations2.syncope", "q", Arrays.asList("Yes", "Unsure") ));
     insert( new OutcomeAnswerCondition("syncopeOver48hrs", "palpitations2.lastExperienced", "q3", Arrays.asList("Yes", "No", "Unsure") ));
@@ -532,15 +532,15 @@ then
     insert( new NextQuestion("palpitations2.ageRange", "palpitations2.anxiety", "q", Arrays.asList("No")));
 
     insert( new ConditionalNextQuestion("genderToCausesOver50", "palpitations2.causes", "common.gender") );
-    insert( new NextQuestionCondition("genderToCausesOver50", "palpitations2.ageRange", "q", Arrays.asList(">50")) );
+    insert( new NextQuestionCondition("genderToCausesOver50", "palpitations2.ageRange", "group", Arrays.asList(">50")) );
     insert( new NextQuestionCondition("genderToCausesOver50", "palpitations2.hasPalpitations", "q", Arrays.asList("No", "Unsure") ));
     insert( new ConditionalNextQuestion("genderToCausesOver12", "palpitations2.causes", "common.gender") );
-    insert( new NextQuestionCondition("genderToCausesOver12", "palpitations2.ageRange", "q", Arrays.asList("45-50")) );
+    insert( new NextQuestionCondition("genderToCausesOver12", "palpitations2.ageRange", "group", Arrays.asList("45-50")) );
     insert( new NextQuestionCondition("genderToCausesOver12", "common.gender", "q", Arrays.asList("Male")) );
     insert( new NextQuestionCondition("genderToCausesOver12", "palpitations2.hasPalpitations", "q", Arrays.asList("No", "Unsure") ));
 
     insert( new ConditionalNextQuestion("pregnancyToCauses", "palpitations2.causes", "common.pregnant", "q", Arrays.asList("No", "Unsure")) );
-    insert( new NextQuestionCondition("pregnancyToCauses", "palpitations2.ageRange", "q", Arrays.asList("45-50")) );
+    insert( new NextQuestionCondition("pregnancyToCauses", "palpitations2.ageRange", "group", Arrays.asList("45-50")) );
     insert( new NextQuestionCondition("pregnancyToCauses", "palpitations2.hasPalpitations", "q", Arrays.asList("No", "Unsure") ));
 
     insert( new ConditionalNextQuestion("familyHistoryToCauses", "palpitations2.causes", "palpitations2.familyHistory", "q", Arrays.asList("No", "Unsure")) );
@@ -632,7 +632,7 @@ then
         .id(assertionId)
         .status(Assertion.Status.AMENDED)
         .code(codeDirectory.get(assertionId))
-        .value(ObservationTriggerValue.PRESENT)
+        .value(ObservationTriggerValue.PRESENT.toDomainConcept())
         .build() );
 end
 

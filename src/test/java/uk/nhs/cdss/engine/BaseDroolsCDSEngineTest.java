@@ -93,7 +93,7 @@ public abstract class BaseDroolsCDSEngineTest {
     var genderAssertion = Assertion.builder()
         .status(Status.FINAL)
         .code(code)
-        .value(gender)
+        .value(gender.toDomainConcept())
         .build();
     input.getAssertions().add(genderAssertion);
   }

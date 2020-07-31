@@ -6,6 +6,7 @@ import uk.nhs.cdss.constants.SnomedConstants
 
 import uk.nhs.cdss.domain.Assertion
 import uk.nhs.cdss.domain.enums.Gender;
+import uk.nhs.cdss.domain.enums.ObservationTriggerValue
 
 import uk.nhs.cdss.engine.CodeDirectory
 
@@ -15,11 +16,11 @@ rule "Init common"
     salience 10001
 when
 then
-    insert( new AnswerAssertion("common.gender", "q", "Male", codeDirectory.get(SnomedConstants.GENDER), Gender.MALE));
-    insert( new AnswerAssertion("common.gender", "q", "Female", codeDirectory.get(SnomedConstants.GENDER), Gender.FEMALE));
-    insert( new AnswerAssertion("common.gender", "q", "Other", codeDirectory.get(SnomedConstants.GENDER), Gender.OTHER));
+    insert( new AnswerAssertion("common.gender", "q", "Male", codeDirectory.get(SnomedConstants.GENDER), Gender.MALE.toDomainConcept()));
+    insert( new AnswerAssertion("common.gender", "q", "Female", codeDirectory.get(SnomedConstants.GENDER), Gender.FEMALE.toDomainConcept()));
+    insert( new AnswerAssertion("common.gender", "q", "Other", codeDirectory.get(SnomedConstants.GENDER), Gender.OTHER.toDomainConcept()));
 
     // Is there any possibility of pregnancy?
-    insert( new AnswerAssertion("common.pregnant", "q", "Yes", codeDirectory.get("pregnant"), true));
+    insert( new AnswerAssertion("common.pregnant", "q", "Yes", codeDirectory.get("pregnant"), ObservationTriggerValue.PRESENT));
 
 end
