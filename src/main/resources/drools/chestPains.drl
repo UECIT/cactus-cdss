@@ -23,7 +23,7 @@ import uk.nhs.cdss.domain.Concern
 import uk.nhs.cdss.domain.Concern.ClinicalStatus
 import uk.nhs.cdss.domain.Concern.VerificationStatus
 import uk.nhs.cdss.domain.enums.ObservationTriggerValue
-import uk.nhs.cdss.domain.enums.Concept
+import uk.nhs.cdss.domain.Concept
 
 import uk.nhs.cdss.constants.SnomedConstants
 
@@ -197,7 +197,7 @@ salience 10000
 when
     EvaluateContext($setting := setting)
 then
-    Concept present = ObservationTriggerValue.PRESENT;
+    Concept present = ObservationTriggerValue.PRESENT.toDomainConcept();
 
     // Pain caused by injury?
     String causedByInjury = "chestPains.causedByInjury." + $setting;
