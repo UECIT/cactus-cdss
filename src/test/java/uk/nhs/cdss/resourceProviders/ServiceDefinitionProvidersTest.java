@@ -156,7 +156,7 @@ public class ServiceDefinitionProvidersTest {
   private ConstructedParam<PatientTriggerParameter> patientParam(String date) {
 
     PatientTriggerParameter patientTriggerParameter = new PatientTriggerParameter(
-        new StringParam("CareConnectPatient"),
+        new StringParam("Patient"),
         new StringParam("birthDate"),
         date(date)
     );
