@@ -22,7 +22,7 @@ import uk.nhs.cdss.domain.Concern
 import uk.nhs.cdss.domain.Concern.ClinicalStatus
 import uk.nhs.cdss.domain.Concern.VerificationStatus
 import uk.nhs.cdss.domain.enums.ObservationTriggerValue
-import uk.nhs.cdss.domain.enums.Concept
+import uk.nhs.cdss.domain.Concept
 
 import uk.nhs.cdss.constants.SnomedConstants
 
@@ -53,8 +53,8 @@ rule "Init"
 salience 10000
 when // Always
 then
-    Concept present = ObservationTriggerValue.PRESENT;
-    Concept absent = ObservationTriggerValue.ABSENT;
+    Concept present = ObservationTriggerValue.PRESENT.toDomainConcept();
+    Concept absent = ObservationTriggerValue.ABSENT.toDomainConcept();
 
     insert (new InitialQuestionnaire("vaginalDischarge.termsAndConditions") );
     insert( new AnswerAssertion("vaginalDischarge.termsAndConditions", "q", "Yes", codeDirectory.get("termsAndConditions"), present));

@@ -18,7 +18,7 @@ import uk.nhs.cdss.domain.Concern
 import uk.nhs.cdss.domain.Concern.ClinicalStatus
 import uk.nhs.cdss.domain.Concern.VerificationStatus
 import uk.nhs.cdss.domain.enums.ObservationTriggerValue
-import uk.nhs.cdss.domain.enums.Concept
+import uk.nhs.cdss.domain.Concept
 
 import uk.nhs.cdss.engine.CodeDirectory
 
@@ -29,7 +29,7 @@ salience 10000
 when
     eval( true )
 then
-    Concept present = ObservationTriggerValue.PRESENT;
+    Concept present = ObservationTriggerValue.PRESENT.toDomainConcept();
 
     // Chest pains
     insert( new InitialQuestionnaire("palpitations.chestPain") );

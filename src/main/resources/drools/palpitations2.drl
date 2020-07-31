@@ -25,7 +25,7 @@ import uk.nhs.cdss.domain.Concern
 import uk.nhs.cdss.domain.Concern.ClinicalStatus
 import uk.nhs.cdss.domain.Concern.VerificationStatus
 import uk.nhs.cdss.domain.enums.ObservationTriggerValue
-import uk.nhs.cdss.domain.enums.Concept
+import uk.nhs.cdss.domain.Concept
 
 import uk.nhs.cdss.engine.CodeDirectory
 import uk.nhs.cdss.engine.Constraints
@@ -240,7 +240,7 @@ rule "Init"
 salience 10000
 when // Always
 then
-    Concept present = ObservationTriggerValue.PRESENT;
+    Concept present = ObservationTriggerValue.PRESENT.toDomainConcept();
 
     // Are you experiencing palpitations now?
     insert( new InitialQuestionnaire("common.birthDate"));
@@ -448,7 +448,7 @@ then
     //  If last experienced more than 48 hours
     insert( new NextQuestion("palpitations2.syncope", "palpitations2.lastExperienced", "q3", Arrays.asList("Yes", "No", "Unsure")));
     insert( new AnswerAssertion("palpitations2.lastExperienced", "q3", "Yes", codeDirectory.get("lastExperiencedMoreThan48"), present));
-    insert( new AnswerAssertion("palpitations2.lastExperienced", "q3", "No", codeDirectory.get("lastExperiencedMoreThan48"), ObservationTriggerValue.ABSENT));
+    insert( new AnswerAssertion("palpitations2.lastExperienced", "q3", "No", codeDirectory.get("lastExperiencedMoreThan48"), ObservationTriggerValue.ABSENT.toDomainConcept()));
     insert( gpArrhythmia("syncopeOver48hrs", "PT72h", "PT48h"));
     insert( new OutcomeAnswerCondition("syncopeOver48hrs", "palpitations2.syncope", "q", Arrays.asList("Yes", "Unsure") ));
     insert( new OutcomeAnswerCondition("syncopeOver48hrs", "palpitations2.lastExperienced", "q3", Arrays.asList("Yes", "No", "Unsure") ));
@@ -632,7 +632,7 @@ then
         .id(assertionId)
         .status(Assertion.Status.AMENDED)
         .code(codeDirectory.get(assertionId))
-        .value(ObservationTriggerValue.PRESENT)
+        .value(ObservationTriggerValue.PRESENT.toDomainConcept())
         .build() );
 end
 
