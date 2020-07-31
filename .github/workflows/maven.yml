@@ -52,17 +52,6 @@ jobs:
           tag_with_sha: true
           build_args: GITHUB_USER=${{ github.actor }},GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
 
-  invoke-deployment:
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/master')
-    needs: publish-app
-    steps:
-      - name: Invoke deployment hook
-        uses: distributhor/workflow-webhook@v1
-        env:
-          webhook_url: ${{ secrets.WEBHOOK_URL }}
-          webhook_secret: ${{ secrets.WEBHOOK_SECRET }}
-
   deploy-staging:
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
