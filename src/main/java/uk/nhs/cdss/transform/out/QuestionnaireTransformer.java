@@ -34,7 +34,6 @@ public class QuestionnaireTransformer implements Transformer<QuestionnaireBundle
     questionnaire
         .setName(bundle.getId())
         .setStatus(PublicationStatus.ACTIVE)
-        .setUrl(fullUrl(bundle.getId()))
         .addSubjectType(ResourceType.PATIENT.toCode());
 
     questionnaire.setText(buildNarrative(bundle.getQuestionnaire()));
