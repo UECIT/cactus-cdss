@@ -83,6 +83,24 @@ public class Palpitations2Test extends BaseDroolsCDSEngineTest {
     assertNull(output.getOutcome());
   }
 
+  @Test //CDSCT-465
+  public void muteLogicBug_anxiety() throws Exception {
+    addAgeAssertion("2011-09-07");
+    addGenderAssertion(Gender.FEMALE);
+
+    answerQuestion("hasPalpitations", "q", "No");
+    answerQuestion("lastExperienced", "q3", "No");
+    answerQuestion("syncope", "q", "No");
+    answerQuestion("drugUse", "q", "No");
+    answerQuestion("prescriptionUse", "q", "No");
+    answerQuestion("anxiety", "q", "No");
+    answerQuestion("ageRange", "group", "12-45");
+
+    evaluate();
+
+    assertThat(output.getQuestionnaireIds(), contains("common.pregnant"));
+  }
+
   @Test
   public void shouldAskMuteLogicUnderConditions() throws ServiceDefinitionException {
     addAgeAssertion("1900-12-25");
@@ -90,7 +108,7 @@ public class Palpitations2Test extends BaseDroolsCDSEngineTest {
     answerQuestion("hasICD", "q", "No");
     answerQuestion("symptoms", "q", "none");
     answerCommonQuestion("gender", "q", "Female");
-    answerQuestion("ageRange", "q", "12-45");
+    answerQuestion("ageRange", "group", "12-45");
     answerCommonQuestion("pregnant", "q", "No");
     answerQuestion("familyHistory", "q", "Yes");
 
