@@ -16,7 +16,7 @@ public class OptionTypeTransformer implements
 
   private Type getType(OptionType option) {
     return new Coding(
-        "defaultCoding.com",
+        "https://uec-connect.nhs.uk/CodeSystem/Questionnaire-Options-1",
         defaultIfNull(option.getCode(), option.getStringValue()),
         option.getStringValue());
   }
