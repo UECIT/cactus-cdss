@@ -26,7 +26,7 @@ public class Palpitations2Test extends BaseDroolsCDSEngineTest {
     assertThat(output.getAssertions(), hasSize(1));
     Assertion assertion = Iterables.getOnlyElement(output.getAssertions());
     assertThat(assertion.getCode().getText(), is("chestPain"));
-    assertThat(assertion.getValue(), is(ObservationTriggerValue.PRESENT));
+    assertThat(assertion.getValue(), is(ObservationTriggerValue.PRESENT.toDomainConcept()));
   }
 
   @Test

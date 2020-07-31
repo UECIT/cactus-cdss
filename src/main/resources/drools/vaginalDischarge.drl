@@ -446,7 +446,9 @@ then
         .id("over50")
         .status(Assertion.Status.AMENDED)
         .code(codeDirectory.get("over50"))
-        .value(Constraints.convertAge($value) > 50 ? ObservationTriggerValue.PRESENT : ObservationTriggerValue.ABSENT)
+        .value(Constraints.convertAge($value) > 50 
+            ? ObservationTriggerValue.PRESENT.toDomainConcept() 
+            : ObservationTriggerValue.ABSENT.toDomainConcept())
         .build() );
 end
 

@@ -25,7 +25,7 @@ public class VaginalDischargeTest extends BaseDroolsCDSEngineTest {
     Assertion assertion = Iterables.getOnlyElement(output.getAssertions());
 
     assertThat(assertion.getCode().getText(), is("termsAndConditions"));
-    assertThat(assertion.getValue(), is(ObservationTriggerValue.PRESENT));
+    assertThat(assertion.getValue(), is(ObservationTriggerValue.PRESENT.toDomainConcept()));
   }
 
   @Test
