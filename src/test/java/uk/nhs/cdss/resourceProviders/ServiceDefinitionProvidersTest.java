@@ -137,7 +137,7 @@ public class ServiceDefinitionProvidersTest {
       var codeCode = codeDirectory.getCoding(code);
       var valueCode = codeDirectory.getCoding(value);
       var observationTriggerParameter = new ObservationTriggerParameter(
-          new StringParam("CareConnectObservation"),
+          new StringParam("Observation"),
           new StringParam("code"),
           token(codeCode.getCode(), codeCode.getSystem()),
           new StringParam("value"),
@@ -156,7 +156,7 @@ public class ServiceDefinitionProvidersTest {
   private ConstructedParam<PatientTriggerParameter> patientParam(String date) {
 
     PatientTriggerParameter patientTriggerParameter = new PatientTriggerParameter(
-        new StringParam("CareConnectPatient"),
+        new StringParam("Patient"),
         new StringParam("birthDate"),
         date(date)
     );
@@ -241,8 +241,8 @@ public class ServiceDefinitionProvidersTest {
         new Object[]{token("DRAFT"), null, null, null, null, null, null},
         new Object[]{token("RETIRED"), null, null, null, null, null, null},
         new Object[]{null, token("true"), null, null, null, null, null},
-        new Object[]{null, null, date("2120-12-20"), null, null, null, null},
-        new Object[]{null, null, date("gt2120-12-20"), null, null, null, null},
+        new Object[]{null, null, date("2041-12-20"), null, null, null, null},
+        new Object[]{null, null, date("gt2041-12-20"), null, null, null, null},
         new Object[]{null, null, date("lt1920-12-20"), null, null, null, null},
         new Object[]{null, null, null, token("ES"), null, null, null},
     };

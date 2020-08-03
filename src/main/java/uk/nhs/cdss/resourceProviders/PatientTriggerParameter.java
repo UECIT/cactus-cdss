@@ -10,7 +10,7 @@ import lombok.ToString;
 @Getter
 @ToString
 public class PatientTriggerParameter {
-  private StringParam type; //Should always be "CareConnectPatient"
+  private StringParam type; //Should always be "Patient"
   private StringParam birthDatePath; //Should always be "birthDate"
   private DateParam birthDate;
 }

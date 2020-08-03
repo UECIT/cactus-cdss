@@ -29,7 +29,6 @@ public class ServiceDefinitionTransformer implements
     serviceDefinition.setId(from.getId());
 
     serviceDefinition.setName(from.getId())
-        .setUrl(fullUrl(from.getId()))
         .setTitle(from.getTitle())
         .setDescription(from.getDescription())
         .setPurpose(from.getPurpose())
@@ -64,13 +63,5 @@ public class ServiceDefinitionTransformer implements
         .forEach(serviceDefinition::addTopic);
 
     return serviceDefinition;
-  }
-
-  private String fullUrl(String id) {
-    return new StringJoiner("/")
-        .add(cdsServer)
-        .add("ServiceDefinition")
-        .add(id)
-        .toString();
   }
 }

@@ -18,14 +18,16 @@ import uk.nhs.cdss.domain.enums.Concept;
 
 @UtilityClass
 public class Matchers {
+
   public boolean dateInRange(Date date, DateRange range) {
     return date.after(range.getStart())
-        && date.before(range.getEnd());
+        && (range.getEnd() == null || date.before(range.getEnd()));
   }
 
   public boolean isConcept(TokenParam tokenParam, Concept concept) {
     return isCoding(tokenParam, concept.toDomainCoding());
   }
+
   public boolean isCoding(TokenParam tokenParam, Coding coding) {
     return nullOrEquals(tokenParam.getSystem(), coding.getSystem())
         && nullOrEquals(tokenParam.getValue(), coding.getCode());
@@ -34,6 +36,7 @@ public class Matchers {
   public Predicate<Concept> isConcept(TokenParam tokenParam) {
     return concept -> isConcept(tokenParam, concept);
   }
+
   public Predicate<Coding> isCoding(TokenParam tokenParam) {
     return coding -> isCoding(tokenParam, coding);
   }

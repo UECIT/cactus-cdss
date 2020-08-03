@@ -48,7 +48,7 @@ public class RedirectTransformerTest {
     List<DataRequirement> requirements = redirectTransformer.transform(redirection);
 
     DataRequirement expectedPatientRequirement = new DataRequirement();
-    expectedPatientRequirement.setType("CareConnectPatient")
+    expectedPatientRequirement.setType("Patient")
         .addDateFilter()
         .setPath("birthDate")
         .setValue(new DateTimeType(

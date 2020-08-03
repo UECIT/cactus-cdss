@@ -15,8 +15,7 @@ public class OptionTypeTransformer implements
     Transformer<OptionType, QuestionnaireItemOptionComponent> {
 
   private Type getType(OptionType option) {
-    return new Coding(
-        "defaultCoding.com",
+    return new Coding(null,
         defaultIfNull(option.getCode(), option.getStringValue()),
         option.getStringValue());
   }
