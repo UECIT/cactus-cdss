@@ -84,13 +84,13 @@ public class CodeDirectoryConfig {
   }
 
   private void outcomes(CodeDirectory codeDirectory) {
-    codeDirectory.put(snomed("call999", "Call 999"));
-    codeDirectory.put(snomed("primaryCare", "Speak to Primary Care professional"));
-    codeDirectory.put(snomed("ed", "ED"));
-    codeDirectory.put(snomed("gp", "GP"));
-    codeDirectory.put(snomed("utc", "UTC"));
-    codeDirectory.put(snomed("gum", "GUM"));
-    codeDirectory.put(snomed("pharmacy", "See Pharmacist"));
+    codeDirectory.put("call999", snomed("1090341000000100", "Referral to emergency ambulance service (procedure)"));
+    codeDirectory.put("primaryCare", snomed("1106941000000107", "Signposting to general practitioner triage appointment (procedure)")); //386479004 | Triage: telephone (procedure) |
+    codeDirectory.put("ed", snomed("989511000000108", "Referral to Accident and Emergency clinic (procedure)"));
+    codeDirectory.put("gp", snomed("1106941000000107", "Signposting to general practitioner triage appointment (procedure)"));
+    codeDirectory.put("utc", snomed("821631000000100", "Referral to National Health Service treatment centre (procedure)"));
+    codeDirectory.put("gum", snomed("415272006", "Referral to genitourinary clinic (procedure)"));
+    codeDirectory.put("pharmacy", snomed("306179008", "Referral to pharmacy service (procedure)"));
     codeDirectory.put("selfCare", snomed(SnomedConstants.SELF_CARE, "After Care Instructions"));
   }
 
@@ -152,7 +152,7 @@ public class CodeDirectoryConfig {
     codeDirectory.put("adverseReaction", snomed("281647001", "Adverse reaction (disorder)"));
     codeDirectory.put("anxiety", snomed(SnomedConstants.ANXIETY, "Anxiety (finding)"));
     codeDirectory.put("hasAnxiety", snomed("48694002", "Anxiety (finding)"));
-    codeDirectory.put("nicotine", snomed("90755006", "Nicotine withdrawal (disorder)"));
+    codeDirectory.put("nicotine", snomed("90755006", "Nicotine withdrawal (disorder)")); //48694002 | Anxiety (finding)
 
     // Activity Categories
     codeDirectory.put("activity-other", buildCode("http://hl7.org/fhir/care-plan-activity-category", "other", "Other"));
@@ -161,8 +161,8 @@ public class CodeDirectoryConfig {
     codeDirectory.put("cardio", snomed("183519002", "Referral to cardiology service (procedure)"));
     codeDirectory.put("primaryCareReview", snomed("703978000", "Referral to primary care service (procedure)"));
     codeDirectory.put("emergencyCareReview", snomed("1083331000000102", "Signposting to emergency care practitioner (procedure)"));
-    codeDirectory.put("hcpReview", snomed("hcpReview", "HCP Review"));
-    codeDirectory.put("pharmacistReview", snomed("hcpReview", "Review with pharmacist"));
+    codeDirectory.put("hcpReview", snomed("306338003", "Referral to nurse practitioner (procedure)"));
+    codeDirectory.put("pharmacistReview", snomed("306362008", "Referral to pharmacist (procedure)"));
   }
 
   private void constipation(CodeDirectory codeDirectory) {
@@ -218,28 +218,28 @@ public class CodeDirectoryConfig {
 
     // Concerns
     codeDirectory.put("haemorrhageTrauma", snomed("110149000", "Traumatic hemorrhage (disorder)"));
-    codeDirectory.put("organTrauma", snomed("organTrauma", "Internal organ trauma"));
+    codeDirectory.put("organTrauma", snomed("110149000", "Traumatic hemorrhage (disorder)")); //Used above code in absence of organ/body site
     codeDirectory.put("bleedingTrauma", snomed("110149000", "Traumatic hemorrhage (disorder)"));
     codeDirectory.put("bleedingWound", snomed("239161005", "Wound hemorrhage (finding)"));
     codeDirectory.put("possibleMI", snomed("22298006", "Myocardial infarction (disorder)"));
     codeDirectory.put("aneurysm", snomed("432119003", "Aneurysm (disorder)"));
-    codeDirectory.put("aneurysmRisk", snomed("aneurysmRisk", "Risk of dissecting aneurism"));
-    codeDirectory.put("comorbids", snomed("comorbids", "Possible infection impacted by comorbids"));
-    codeDirectory.put("comorbidsFull", snomed("comorbidsFull", "Full review for infection impacted by comorbids"));
+    codeDirectory.put("aneurysmRisk", snomed("432119003", "Aneurysm (disorder)")); //717641000000105 | At risk of (record artifact) |
+    codeDirectory.put("comorbids", snomed("398192003", "Co-morbid conditions (finding)")); //40733004 | Infectious disease (disorder) |
+    codeDirectory.put("comorbidsFull", snomed("398192003", "Co-morbid conditions (finding)")); //40733004 | Infectious disease (disorder) //918771000000104 | Opportunistic patient review (procedure) |
     codeDirectory.put("malignancy", snomed("86049000", "Malignant neoplasm, primary (morphologic abnormality)"));
     codeDirectory.put("pe", snomed("59282003", "Pulmonary embolism (disorder)"));
-    codeDirectory.put("immuneFull", snomed("immuneFull", "Full review for infection impacted by immunity"));
+    codeDirectory.put("immuneFull", snomed("40733004", "Infectious disease (disorder)")); //Placeholder code for: "immuneFull", "Full review for infection impacted by immunity"
     codeDirectory.put("angina", snomed("194828000", "Angina (disorder)"));
-    codeDirectory.put("progressiveRespiratoryInfection", snomed("50417007", "Lower respiratory tract infection (disorder)"));
+    codeDirectory.put("progressiveRespiratoryInfection", snomed("50417007", "Lower respiratory tract infection (disorder)")); //255314001 | Progressive (qualifier value)
     codeDirectory.put("respiratoryInfection", snomed("50417007", "Lower respiratory tract infection (disorder)"));
     codeDirectory.put("infection", snomed("40733004", "Infectious disease (disorder)"));
     codeDirectory.put("careHCPReview", snomed("703978000", "Referral to primary care service (procedure)"));
     codeDirectory.put("coronarySyndrome", snomed("94659003", "Acute coronary syndrome (disorder)"));
-    codeDirectory.put("assessCoronarySyndrome", snomed("94659003", "Acute coronary syndrome (disorder)"));
+    codeDirectory.put("assessCoronarySyndrome", snomed("763000000", "Assessment using Framingham coronary heart disease 10 year risk score (procedure)")); //Placeholder
     codeDirectory.put("pericarditis", snomed("3238004", "Pericarditis (disorder)"));
 
     // Redirects
-    codeDirectory.put("musculoskeletal", snomed("musculoskeletal", "Redirect to musculoskeletal"));
+    codeDirectory.put("musculoskeletal", snomed("872781000000100", "Musculoskeletal care pathway (regime/therapy)")); //3457005 | Patient referral (procedure) |
 
     // Activities (Specialties)
     codeDirectory.put("transfusion&intervention", snomed("transfusion&intervention", "Blood transfusion. Surgical intervention X-RAY/CT"));
@@ -287,14 +287,14 @@ public class CodeDirectoryConfig {
 
     // Concerns
     codeDirectory.put("ectopic", snomed("34801009", "Ectopic pregnancy (disorder)"));
-    codeDirectory.put("rupturedEctopic", snomed("17433009", "Ruptured ectopic pregnancy (disorder)"));
+    codeDirectory.put("rupturedEctopic", snomed("17433009", "Ruptured ectopic pregnancy (disorder)")); //237037006 | Acute pelvic inflammatory disease (disorder)
     codeDirectory.put("pelvicInflammatory", snomed("237037006", "Acute pelvic inflammatory disease (disorder)"));
     codeDirectory.put("rupturedEctopicPid", snomed("17433009", "Ruptured ectopic pregnancy (disorder)"));
     codeDirectory.put("candida", snomed("78048006", "Candidiasis (disorder)"));
     codeDirectory.put("bacterialVaginosis", snomed("419760006", "Bacterial vaginosis (disorder)"));
     codeDirectory.put("cervical&uterine", snomed("301775005", "Infection of uterus (disorder)"));
     codeDirectory.put("cervical", snomed("301775005", "Infection of uterus (disorder)"));
-    codeDirectory.put("stiReoccurrence", snomed("8098009", "Sexually transmitted infectious disease (disorder)"));
+    codeDirectory.put("stiReoccurrence", snomed("8098009", "Sexually transmitted infectious disease (disorder)")); //246455001 | Recurrence (qualifier value)
     codeDirectory.put("sti", snomed("8098009", "Sexually transmitted infectious disease (disorder)"));
     codeDirectory.put("newStiInfection", snomed("8098009", "Sexually transmitted infectious disease (disorder)"));
     codeDirectory.put("foreign&cervical", snomed("262623002", "Foreign body in cervix (disorder)"));
@@ -302,15 +302,15 @@ public class CodeDirectoryConfig {
     codeDirectory.put("primaryHerpes", snomed("40981003", "Primary herpes simplex (disorder)"));
     codeDirectory.put("shingles", snomed("4740000", "Herpes zoster (disorder)"));
     codeDirectory.put("uti", snomed("68566005", "Urinary tract infectious disease (disorder)"));
-    codeDirectory.put("cystitis&incontinence", snomed("197834003", "Chronic interstitial cystitis (disorder)"));
+    codeDirectory.put("cystitis&incontinence", snomed("197834003", "Chronic interstitial cystitis (disorder)")); //165232002 | Urinary incontinence (finding)
     codeDirectory.put("acuteUrineRetention", snomed("236648008", "Acute retention of urine (disorder)"));
-    codeDirectory.put("uti&sti&neurogenic", snomed("68566005", "Urinary tract infectious disease (disorder)"));
-    codeDirectory.put("detrusor&bladder", snomed("61033006", "Detrusor instability of bladder (disorder)"));
-    codeDirectory.put("stiTesting", snomed("40675008", "Serologic test for syphilis (procedure)"));
+    codeDirectory.put("uti&sti&neurogenic", snomed("68566005", "Urinary tract infectious disease (disorder)")); //8098009 | Sexually transmitted infectious disease (disorder) // 279058003 | Neurogenic pain (finding)
+    codeDirectory.put("detrusor&bladder", snomed("61033006", "Detrusor instability of bladder (disorder)")); //126885006 | Neoplasm of bladder (disorder) // 70650003 | Urinary bladder stone (disorder)
+    codeDirectory.put("stiTesting", snomed("40675008", "Serologic test for syphilis (procedure)")); //171121004 | Human immunodeficiency virus screening (procedure)
     codeDirectory.put("rapeCare", snomed("386405009", "Rape trauma treatment (procedure)"));
-    codeDirectory.put("abuse&trafficking", snomed("225826001", "Victim of sexual abuse (finding)"));
+    codeDirectory.put("abuse&trafficking", snomed("225826001", "Victim of sexual abuse (finding)")); //734998001 | Victim of human trafficking (finding) 
     codeDirectory.put("dyspareunia", snomed("71315007", "Dyspareunia (finding)"));
-    codeDirectory.put("bacterialOrYeastInfection", snomed("87628006", "Bacterial infectious disease (disorder)"));
+    codeDirectory.put("bacterialOrYeastInfection", snomed("87628006", "Bacterial infectious disease (disorder)")); //78048006 | Candidiasis (disorder)
     codeDirectory.put("bacterialInfection", snomed("87628006", "Bacterial infectious disease (disorder)"));
 
     // Activities (Specialties)
