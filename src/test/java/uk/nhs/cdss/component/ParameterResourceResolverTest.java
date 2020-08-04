@@ -2,6 +2,7 @@ package uk.nhs.cdss.component;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.empty;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -95,5 +96,13 @@ public class ParameterResourceResolverTest {
     assertThat(resolved, containsInAnyOrder(patient, obs));
     verify(resourceLocator).locate(obsRef);
     verifyNoMoreInteractions(resourceLocator);
+  }
+
+  @Test
+  public void resolvesNullParameters() {
+    List<Resource> resolved = resourceResolver.resolve(null);
+
+    assertThat(resolved, empty());
+    verifyZeroInteractions(resourceLocator);
   }
 }
