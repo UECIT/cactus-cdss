@@ -2,7 +2,6 @@ package uk.nhs.cdss.transform.out;
 
 import java.util.Date;
 import lombok.RequiredArgsConstructor;
-import org.hl7.fhir.dstu3.model.CareConnectObservation;
 import org.hl7.fhir.dstu3.model.Observation;
 import org.hl7.fhir.dstu3.model.Observation.ObservationStatus;
 import org.springframework.stereotype.Component;
@@ -37,9 +36,9 @@ public class ObservationTransformer implements Transformer<ObservationBundle, Ob
   }
 
   @Override
-  public CareConnectObservation transform(ObservationBundle bundle) {
+  public Observation transform(ObservationBundle bundle) {
     var from = bundle.getAssertion();
-    var observation = new CareConnectObservation();
+    var observation = new Observation();
     
     if (from.getIssued() == null) {
       observation.setIssued(new Date());
