@@ -1,0 +1,18 @@
+{
+  "id": "palpitations2.drugUse",
+  "jurisdictions": [
+    "GB"
+  ],
+  "items": [
+    {
+      "id": "q",
+      "text": "Have you been taking any of the following drugs or sniffing any of the following solvents: cocaine, speed or marijuana. Solvents are things like glue, thinners, petrol or lighter fluid?",
+      "type": "CHOICE",
+      "required": true,
+      "options": [
+        "Yes",
+        "No"
+      ]
+    }
+  ]
+}

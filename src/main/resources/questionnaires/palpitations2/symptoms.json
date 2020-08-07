@@ -1,0 +1,38 @@
+{
+  "id": "palpitations2.symptoms",
+  "jurisdictions": [
+    "GB"
+  ],
+  "items": [
+    {
+      "id": "q",
+      "text": "Have you had any of the following symptoms in the last 24 hours?",
+      "type": "CHOICE",
+      "required": true,
+      "repeats": true,
+      "options": [
+        {
+          "stringValue": "Crushing or intense aching pain in the chest, upper back or upper abdominal area",
+          "code": "chestPains"
+        },
+        {
+          "stringValue": "Aching pain radiating from chest that goes to arm, neck or jaw",
+          "code": "neckPain"
+        },
+        {
+          "stringValue": "Significant breathlessness",
+          "code": "breathingProblems"
+        },
+        {
+          "stringValue": "Syncope or near syncope",
+          "code": "syncope"
+        },
+        {
+          "stringValue": "None of the above",
+          "code": "none",
+          "exclusive": true
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+    "id": "chestPains.immuneCompromised",
+    "items": [
+      {
+        "id": "q",
+        "text": "Does the patient have a weakened immune system - for example because of chemotherapy, diabetes or spleen removed?",
+        "type": "CHOICE",
+        "required": true,
+        "options": [
+          {
+            "stringValue": "Yes"
+          },
+          {
+            "stringValue": "No"
+          }
+        ]
+      }
+    ]
+  }

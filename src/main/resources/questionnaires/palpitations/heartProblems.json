@@ -1,0 +1,25 @@
+{
+  "id": "palpitations.heartProblems",
+  "jurisdictions": [
+    "GB"
+  ],
+  "items": [
+    {
+      "id": "q4",
+      "text": "Do you have a history of heart problems?",
+      "type": "CHOICE",
+      "required": true,
+      "options": [
+        {
+          "stringValue": "Yes"
+        },
+        {
+          "stringValue": "No"
+        },
+        {
+          "stringValue": "Unsure"
+        }
+      ]
+    }
+  ]
+}

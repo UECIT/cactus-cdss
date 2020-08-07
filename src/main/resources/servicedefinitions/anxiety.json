@@ -1,0 +1,27 @@
+{
+  "title": "Anxiety",
+  "description": "Anxiety 1st Party",
+  "usage": "To triage a patient suffering from anxiety",
+  "purpose": "To triage a patient suffering from anxiety",
+  "status": "ACTIVE",
+  "experimental": false,
+  "effectivePeriod": {
+    "start": "2019-01-01",
+    "end": "2040-01-01"
+  },
+  "jurisdictions": [
+    "GB"
+  ],
+  "observationTriggers": [
+    {
+      "code": "anxiety",
+      "value": "present"
+    }
+  ],
+  "dataRequirements": [
+    {
+      "type": "Observation",
+      "code": "anxiety"
+    }
+  ]
+}

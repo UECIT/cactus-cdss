@@ -1,0 +1,27 @@
+{
+    "id": "chestPains.coughingUpAny",
+    "items": [
+      {
+        "id": "q",
+        "text": "Patient coughing up any of the following:",
+        "type": "CHOICE",
+        "required": true,
+        "repeats": true,
+        "options": [
+          {
+            "stringValue": "Blood",
+            "code": "blood"
+          },
+          {
+            "stringValue": "Green or discoloured phlegm",
+            "code": "phlegm"
+          },
+          {
+            "stringValue": "None of the above",
+            "code": "none",
+            "exclusive": true
+          }
+        ]
+      }
+    ]
+  }

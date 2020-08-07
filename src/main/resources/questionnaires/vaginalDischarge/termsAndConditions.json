@@ -1,0 +1,16 @@
+{
+    "id": "vaginalDischarge.termsAndConditions",
+    "items": [
+      {
+        "id": "q",
+        "text": "Do you agree to the terms and conditions?",
+        "type": "CHOICE",
+        "required": true,
+        "options": [
+          {
+            "stringValue": "Yes"
+          }
+        ]
+      }
+    ]
+  }

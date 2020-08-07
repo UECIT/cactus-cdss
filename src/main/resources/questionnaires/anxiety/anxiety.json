@@ -1,0 +1,22 @@
+{
+  "id": "anxiety.anxiety",
+  "jurisdictions": [
+    "TK"
+  ],
+  "items": [
+    {
+      "id": "q",
+      "text": "Have you had anxiety attacks recently?",
+      "type": "CHOICE",
+      "required": true,
+      "options": [
+        {
+          "stringValue": "Yes"
+        },
+        {
+          "stringValue": "No"
+        }
+      ]
+    }
+  ]
+}

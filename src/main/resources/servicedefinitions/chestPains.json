@@ -1,0 +1,32 @@
+{
+  "id": "chestPains",
+  "title": "Chest Pains",
+  "description": "Chest pains 1st Party",
+  "usage": "To triage a patient who has chest pains",
+  "purpose": "To triage a patient who has chest pains",
+  "status": "ACTIVE",
+  "experimental": false,
+  "effectivePeriod": {
+    "start": "2019-01-01",
+    "end": "2040-01-01"
+  },
+  "jurisdictions": [
+    "GB"
+  ],
+  "observationTriggers": [
+    {
+      "code": "chestPain",
+      "value": "present"
+    }
+  ],
+  "useContext": [
+    {
+      "code": "setting",
+      "value": "online"
+    },
+    {
+      "code": "setting",
+      "value": "phone"
+    }
+  ]
+}

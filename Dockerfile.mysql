@@ -1,4 +1,0 @@
-FROM mysql
-ENV MYSQL_DATABASE cdss_supplier
-ENV MYSQL_ROOT_PASSWORD password
-COPY ./src/main/resources/SQL/populate_data.sql /docker-entrypoint-initdb.d/

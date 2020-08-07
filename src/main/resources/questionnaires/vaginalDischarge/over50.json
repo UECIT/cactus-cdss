@@ -1,0 +1,19 @@
+{
+    "id": "vaginalDischarge.over50",
+    "items": [
+      {
+        "id": "q",
+        "text": "Are you over 50 years old?",
+        "type": "CHOICE",
+        "required": true,
+        "options": [
+          {
+            "stringValue": "Yes"
+          },
+          {
+            "stringValue": "No"
+          }
+        ]
+      }
+    ]
+  }

@@ -1,0 +1,28 @@
+{
+  "id": "musculoskeletal",
+  "title": "Musculoskeletal Problems",
+  "description": "Musculoskeletal Problems 1st Party",
+  "usage": "To triage a patient who has musculoskeletal problems",
+  "purpose": "To triage a patient who has musculoskeletal problems",
+  "status": "ACTIVE",
+  "experimental": false,
+  "effectivePeriod": {
+    "start": "2019-01-01",
+    "end": "2040-01-01"
+  },
+  "jurisdictions": [
+    "GB"
+  ],
+  "observationTriggers": [
+    {
+      "code": "musculoskeletal",
+      "value": "present"
+    }
+  ],
+  "dataRequirements": [
+    {
+      "type": "Observation",
+      "code": "musculoskeletal"
+    }
+  ]
+}

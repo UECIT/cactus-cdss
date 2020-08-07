@@ -1,0 +1,47 @@
+{
+  "id": "palpitations",
+  "title": "Palpitations",
+  "description": "Palpitations 1st Party - Simple",
+  "usage": "To triage a patient who has palpitations",
+  "purpose": "To triage a patient who has palpitations",
+  "status": "ACTIVE",
+  "experimental": true,
+  "effectivePeriod": {
+    "start": "2019-01-01",
+    "end": "2040-01-01"
+  },
+  "jurisdictions": [
+    "GB"
+  ],
+  "observationTriggers": [
+    {
+      "code": "palpitations",
+      "value": "present"
+    },
+    {
+      "code": "debug",
+      "value": "present"
+    }
+  ],
+  "dataRequirements": [
+    { "type":  "Patient" },
+    { "type":  "Organization" },
+    { "type":  "Age" },
+    {
+      "type": "Observation",
+      "code": "chestPain"
+    },
+    {
+      "type": "Observation",
+      "code": "neckPain"
+    },
+    {
+      "type": "Observation",
+      "code": "shoulderPain"
+    },
+    {
+      "type": "Observation",
+      "code": "breathingProblems"
+    }
+  ]
+}

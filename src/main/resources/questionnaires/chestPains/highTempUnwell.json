@@ -1,0 +1,27 @@
+{
+    "id": "chestPains.highTempUnwell",
+    "items": [
+      {
+        "id": "q",
+        "text": "Does patient have any of the following symptoms:",
+        "type": "CHOICE",
+        "required": true,
+        "repeats": true,
+        "options": [
+          {
+            "stringValue": "High Temperature",
+            "code": "highTemp"
+          },
+          {
+            "stringValue": "Feeling generally unwell",
+            "code": "unwell"
+          },
+          {
+            "stringValue": "None of the above",
+            "exclusive": true,
+            "code": "none"
+          }
+        ]
+      }
+    ]
+  }

@@ -1,0 +1,267 @@
+package uk.nhs.cdss.rules
+
+import java.util.List;
+
+import uk.nhs.cdss.domain.Answer
+import uk.nhs.cdss.domain.Assertion
+import uk.nhs.cdss.domain.Redirection
+import uk.nhs.cdss.domain.Concept
+import uk.nhs.cdss.domain.Questionnaire
+import uk.nhs.cdss.domain.QuestionnaireResponse
+import uk.nhs.cdss.domain.Outcome
+
+import uk.nhs.cdss.engine.Constraints
+import org.slf4j.Logger
+
+global Logger log;
+
+declare InitialQuestionnaire
+    id: String @key
+end
+
+declare NextQuestion
+    next: String @key
+    questionnaireId: String @key
+    questionId: String
+    answers: List
+end
+
+declare ConditionalNextQuestion
+    id: String @key
+    next: String @key
+    questionnaireId: String @key
+    questionId: String
+    answers: List
+end
+
+declare NextQuestionCondition
+    id: String @key
+    conditionQuestionnaireId: String @key
+    questionId: String @key
+    answers: List
+end
+
+declare AnswersOptional
+    questionnaireId: String @key
+    questionId: String @key
+end
+
+declare Answered
+    questionnaireId: String @key
+    questionId: String @key
+    value: Object
+end
+
+declare NextQuestionConditionsSatisfied
+    id: String @key
+end
+
+declare NextQuestionValid
+    next: String @key
+end
+
+declare OutcomeAnswerCondition
+    id: String @key
+    questionnaireId: String @key
+    questionId: String @key
+    answers: List
+end
+
+declare ActiveOutcome
+    id: String
+    draft: Boolean
+end
+
+declare AnswerAssertion
+    questionnaireId: String @key
+    questionId: String @key
+    answer: String @key
+
+    code: Concept @key
+    value: Object
+end
+
+// Check whether a questionnaire has been answered or can be bypassed
+rule "Answer present"
+    salience 20
+when
+    Answer( $questionnaireId := questionnaireId, $questionId := questionId, $value := value )
+    NextQuestionValid( $questionnaireId := next )
+then
+    log.info("Answered: {}#{} == {}", $questionnaireId, $questionId, $value);
+    insert( new Answered($questionnaireId, $questionId, $value) );
+end
+
+rule "Assertion present"
+    salience 20
+when
+    AnswerAssertion( $questionnaireId := questionnaireId, $questionId := questionId, $code := code, $value := value, $answer := answer )
+    NextQuestionValid( $questionnaireId := next )
+    Assertion( $code := code, $value := value )
+    not Answered( $questionnaireId := questionnaireId, $questionId := questionId )
+then
+    log.info("Answered question: {}#{} == {} with assertion {} == {}",
+      $questionnaireId, $questionId, $answer, $code, $value);
+    insert( new Answered($questionnaireId, $questionId, $answer) );
+end
+
+// If no value or answer provided in answer assertion, answer the question with the value of the assertion
+rule "Any assertion present"
+    salience 20
+when
+    AnswerAssertion( $questionnaireId := questionnaireId, $questionId := questionId, $code := code, value == null, answer == null)
+    NextQuestionValid( $questionnaireId := next )
+    Assertion( $code := code, $value := value)
+then
+    log.info("Answered question: {}#{} with assertion {} == {}",
+      $questionnaireId, $questionId, $code, $value);
+    insert( new Answered($questionnaireId, $questionId, $value) );
+end
+
+rule "No answer question"
+salience 30
+when
+    AnswersOptional($questionnaireId := questionnaireId, $questionId := questionId)
+    $qr: QuestionnaireResponse($questionnaireId := questionnaireId, answers.isEmpty())
+then
+    log.info("No answer for question: " + $questionnaireId + "#" + $questionId);
+    insert( new Answer($questionnaireId, $questionId, Answer.MISSING) );
+end
+
+// Flow conditions
+rule "Answer conditions satisfied"
+when
+    ConditionalNextQuestion( $id := id, $next := next, $questionnaireId := questionnaireId )
+    forall (
+        NextQuestionCondition( $id := id, $cQuestionnaireId := conditionQuestionnaireId, $cQuestionId := questionId, $cAnswers := answers )
+        Answered( $cQuestionnaireId := questionnaireId, $cQuestionId := questionId, Constraints.isMemberOf(value, $cAnswers))
+    )
+then
+    log.info("Satisfied all conditions for link " + $id + ": from question " + $questionnaireId + " to " + $next);
+    insert( new NextQuestionConditionsSatisfied($id) );
+end
+
+// Question Flow
+rule "Ask first question"
+    salience -1
+when
+    not Questionnaire()
+    not ActiveOutcome( draft == false )
+    InitialQuestionnaire( $id := id )
+then
+    log.info("No answers: requesting questionnaire " + $id);
+    insert( new Questionnaire($id) );
+end
+
+rule "First question is always valid"
+when
+    InitialQuestionnaire($id := id)
+    not NextQuestionValid( $id := next )
+then
+    insert( new NextQuestionValid($id) );
+end
+
+rule "Valid to proceed to next question"
+    salience 15
+when
+    NextQuestion( $next := next, $questionnaireId := questionnaireId, questionId == null, answers == null )
+    $a: Answered( $questionnaireId := questionnaireId)
+    not Answered( $next := questionnaireId )
+then
+    log.info("Valid to proceed: from " + $questionnaireId + " to " + $next);
+    insert( new NextQuestionValid($next) );
+end
+
+rule "Valid to proceed to next question with answers"
+    salience 15
+when
+    NextQuestion( $next := next, $questionnaireId := questionnaireId, $questionId := questionId, $answers := answers )
+    Answered( $questionnaireId := questionnaireId, $questionId := questionId, Constraints.isMemberOf(value, $answers) )
+    not Answered( $next := questionnaireId )
+then
+    log.info("Valid to proceed: from " + $questionnaireId + " to " + $next);
+    insert( new NextQuestionValid($next) );
+end
+
+rule "Valid to proceed to conditional next question"
+    salience 15
+when
+    ConditionalNextQuestion( $id := id, $next := next, $questionnaireId := questionnaireId, questionId == null, answers == null )
+    NextQuestionConditionsSatisfied( $id := id )
+    Answered( $questionnaireId := questionnaireId)
+    not Answered( $next := questionnaireId )
+then
+    log.info("Valid to conditionally proceed: from " + $questionnaireId + " to " + $next);
+    insert( new NextQuestionValid($next) );
+end
+
+rule "Valid to proceed to conditional next question with answers"
+    salience 15
+when
+    ConditionalNextQuestion( $id := id, $next := next, $questionnaireId := questionnaireId, $questionId := questionId, $answers := answers )
+    NextQuestionConditionsSatisfied( $id := id )
+    Answered( $questionnaireId := questionnaireId, $questionId := questionId, Constraints.isMemberOf(value, $answers) )
+    not Answered( $next := questionnaireId )
+then
+    log.info("Valid to conditionally proceed: from " + $questionnaireId + " to " + $next);
+    insert( new NextQuestionValid($next) );
+end
+
+rule "Next question from Answer"
+    salience 10
+when
+    NextQuestionValid( $next := next )
+    not Answered( $next := questionnaireId )
+    not Questionnaire()
+    not ActiveOutcome( draft == false )
+then
+    log.info("Requesting questionnaire: {}", $next);
+    insert( new Questionnaire($next) );
+end
+
+rule "Outcome from Answers"
+    salience 200
+when
+    not ActiveOutcome( draft == false )
+    $o: Outcome( $id := id )
+    // Make sure all conditions for the outcome have been met with the valid answers in the 'Answered' object
+    (forall (
+        OutcomeAnswerCondition( $id := id, $questionnaireId := questionnaireId, $questionId := questionId, $answers := answers )
+        Answered( $questionnaireId := questionnaireId, $questionId := questionId, Constraints.isMemberOf(value, $answers))
+    ))
+then
+    log.info("All conditions for outcome " + $o);
+    insert( new ActiveOutcome($id, $o.isDraft()) );
+end
+
+// Simple assertions
+rule "Simple Assertions"
+    salience 20
+when
+    $a: Answer( $qid := questionnaireId, $ref := questionId )
+    $m: AnswerAssertion( $qid := questionnaireId, $ref := questionId, answer == $a.value )
+then
+    String question = $qid + "#" + $ref;
+    log.info("Assertion: " + question + " == " + $m.getAnswer() + " => " + $m.getCode() + " == " + $m.getValue());
+    insert( Assertion.builder()
+                    .status(Assertion.Status.AMENDED)
+                    .code($m.getCode())
+                    .value($m.getValue())
+                    .oneRelated($a.getQuestionnaireResponse())
+                    .build() );
+end
+
+
+// Queries
+query "assertions"
+  assertion : Assertion()
+end
+
+query "questionnaires"
+  questionnaire : Questionnaire()
+end
+
+query "outcomes"
+  outcome: Outcome($id:=id)
+  ActiveOutcome($id:=id)
+end

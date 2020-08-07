@@ -1,0 +1,37 @@
+{
+  "id": "vaginalDischarge",
+  "title": "Vaginal Discharge",
+  "description": "Female genitourinary problems",
+  "usage": "To triage a female patient with genitourinary problems",
+  "purpose": "To triage a female patient with genitourinary problems",
+  "status": "ACTIVE",
+  "experimental": false,
+  "effectivePeriod": {
+    "start": "2019-01-01",
+    "end": "2040-01-01"
+  },
+  "jurisdictions": [
+    "GB"
+  ],
+  "observationTriggers": [
+    {
+      "code": "genitoUrinaryProblems",
+      "value": "present"
+    },
+    {
+      "code": "gender",
+      "value": "female"
+    }
+  ],
+  "dataRequirements": [
+    { "type":  "Patient" },
+    { "type":  "Organization" },
+    { "type":  "Age" }
+  ],
+  "useContext": [
+    {
+      "code": "gender",
+      "value": "female"
+    }
+  ]
+}

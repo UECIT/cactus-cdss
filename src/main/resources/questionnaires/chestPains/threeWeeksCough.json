@@ -1,0 +1,20 @@
+{
+    "id": "chestPains.threeWeeksCough",
+    "items": [
+      {
+        "id": "q",
+        "text": "Cough for more than three weeks?",
+        "type": "CHOICE",
+        "required": true,
+        "options": [
+          {
+            "stringValue": "Yes"
+          },
+          {
+            "stringValue": "No"
+          }
+        ],
+        "contextHelp": "Persistent cough"
+      }
+    ]
+  }

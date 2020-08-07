@@ -1,0 +1,121 @@
+package uk.nhs.cdss.rules.palpitations
+
+import java.util.Arrays
+
+import uk.nhs.cdss.rules.InitialQuestionnaire
+import uk.nhs.cdss.rules.NextQuestion
+import uk.nhs.cdss.rules.AnswerAssertion
+import uk.nhs.cdss.rules.OutcomeAnswerCondition
+
+import uk.nhs.cdss.domain.Answer
+import uk.nhs.cdss.domain.Assertion
+import uk.nhs.cdss.domain.Assertion.Status
+import uk.nhs.cdss.domain.Questionnaire
+import uk.nhs.cdss.domain.Outcome
+import uk.nhs.cdss.domain.CarePlan
+import uk.nhs.cdss.domain.ReferralRequest
+import uk.nhs.cdss.domain.Concern
+import uk.nhs.cdss.domain.Concern.ClinicalStatus
+import uk.nhs.cdss.domain.Concern.VerificationStatus
+import uk.nhs.cdss.domain.enums.ObservationTriggerValue
+import uk.nhs.cdss.domain.Concept
+
+import uk.nhs.cdss.engine.CodeDirectory
+
+global CodeDirectory codeDirectory;
+
+rule "Init"
+salience 10000
+when
+    eval( true )
+then
+    Concept present = ObservationTriggerValue.PRESENT.toDomainConcept();
+
+    // Chest pains
+    insert( new InitialQuestionnaire("palpitations.chestPain") );
+    insert( new AnswerAssertion("palpitations.chestPain", "q1", "Yes", codeDirectory.get("chestPain"), present));
+
+    insert( call999("chestPains", "chest").interim() );
+    insert( new OutcomeAnswerCondition("chestPains", "palpitations.chestPain", "q1", Arrays.asList("Yes") ));
+
+    insert( new NextQuestion("palpitations.neckPain", "palpitations.chestPain") );
+
+    // Neck pains
+    insert( new AnswerAssertion("palpitations.neckPain", "q2", "Yes", codeDirectory.get("neckPain"), present));
+
+    insert( call999("neckPains", "head"));
+    insert( new OutcomeAnswerCondition("neckPains", "palpitations.neckPain", "q2", Arrays.asList("Yes") ));
+
+    insert( new NextQuestion("palpitations.breathing", "palpitations.neckPain") );
+
+    // Breathing
+    insert( new AnswerAssertion("palpitations.breathing", "q3", "Yes", codeDirectory.get("breathingProblems"), present));
+
+    insert( call999("breathing", "head"));
+    insert( new OutcomeAnswerCondition("breathing", "palpitations.breathing", "q3", Arrays.asList("Yes") ));
+
+    insert( new NextQuestion("palpitations.heartProblems", "palpitations.breathing") );
+
+    // Heart problems
+    insert( new AnswerAssertion("palpitations.heartProblems", "q4", "Yes", codeDirectory.get("heartProblems"), present));
+
+    insert( call999("heartProblems", "heart"));
+    insert( new OutcomeAnswerCondition("heartProblems", "palpitations.heartProblems", "q4", Arrays.asList("Yes") ));
+
+    // Answered no to all questions
+    insert( Outcome.of("noSymptoms", CarePlan.builder()
+        .id("selfCare")
+        .title("Self Care")
+        .textLine("Try sitting cross-legged and taking a slow breath in through your nostrils and then out through your mouth.")
+        .textLine("Repeat until you feel calm.")
+        .reason(Concern.builder()
+            .condition("anxiety")
+            .build())
+        .build()));
+    insert( new OutcomeAnswerCondition("noSymptoms", "palpitations.heartProblems", "q4", Arrays.asList("No", "Unsure") ));
+    insert( new OutcomeAnswerCondition("noSymptoms", "palpitations.breathing", "q3", Arrays.asList("No", "Unsure") ));
+    insert( new OutcomeAnswerCondition("noSymptoms", "palpitations.neckPain", "q2", Arrays.asList("No", "Unsure") ));
+    insert( new OutcomeAnswerCondition("noSymptoms", "palpitations.chestPain", "q1", Arrays.asList("No", "Unsure") ));
+end
+
+function Outcome call999(String id, String bodySite) {
+    return Outcome.of(id, 
+        ReferralRequest.builder()
+            .id("call999-cardio-ami-8m")
+            .description("Call 999")
+            .occurrence("PT8m")
+            .reasonCode("cardio")
+            .reason(Concern.builder()
+                .condition("ami")
+                .bodySite(bodySite)
+                .verificationStatus(VerificationStatus.CONFIRMED)
+                .build())
+            .build(),
+        CarePlan.builder()
+            .id("aspirin")
+            .title("Take Aspirin")
+            .textLine("While waiting for an ambulance, it may help to chew and then swallow"
+                + " a tablet of aspirin (ideally 300mg), as long as"
+                + " the person having a heart attack is not allergic to aspirin.")
+            .reason(Concern.builder()
+                .condition("ami")
+                .bodySite(bodySite)
+                .verificationStatus(VerificationStatus.CONFIRMED)
+                .build())
+            .build(),
+        CarePlan.builder()
+            .id("waitForAmbulance")
+            .title("Wait for an ambulance")
+            .textLine("Try to get someone to sit with you until the ambulance arrives")
+            .textLine("Unlock doors")
+            .textLine("If you have a dog put them in another room")
+            .textLine("Collect any medications to take to the hospital")
+            .textLine("Take a mobile phone if you have one")
+            .reason(Concern.builder()
+                .condition("ami")
+                .bodySite(bodySite)
+                .verificationStatus(VerificationStatus.CONFIRMED)
+                .build())
+            .build()
+    );
+}

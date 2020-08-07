@@ -1,0 +1,19 @@
+{
+    "id": "chestPains.heartAttackInPast",
+    "items": [
+      {
+        "id": "q",
+        "text": "Has the patient had a confirmed diagnosis of a heart attack?",
+        "type": "CHOICE",
+        "required": true,
+        "options": [
+          {
+            "stringValue": "Yes"
+          },
+          {
+            "stringValue": "No"
+          }
+        ]
+      }
+    ]
+  }

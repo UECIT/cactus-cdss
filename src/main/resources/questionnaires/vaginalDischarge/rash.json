@@ -1,0 +1,11 @@
+{
+    "id": "vaginalDischarge.rash",
+    "items": [
+      {
+        "id": "q",
+        "text": "Has the patient got a rash?",
+        "type": "ATTACHMENT",
+        "required": true
+      }
+    ]
+  }

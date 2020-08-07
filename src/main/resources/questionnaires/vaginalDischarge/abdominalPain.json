@@ -1,0 +1,19 @@
+{
+    "id": "vaginalDischarge.abdominalPain",
+    "items": [
+      {
+        "id": "q",
+        "text": "Is the patient experiencing any sharp intense abdominal pain?",
+        "type": "CHOICE",
+        "required": true,
+        "options": [
+          {
+            "stringValue": "Yes"
+          },
+          {
+            "stringValue": "No"
+          }
+        ]
+      }
+    ]
+  }

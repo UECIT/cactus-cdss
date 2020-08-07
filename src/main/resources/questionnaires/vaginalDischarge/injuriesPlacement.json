@@ -1,0 +1,12 @@
+{
+    "id": "vaginalDischarge.injuriesPlacement",
+    "items": [
+      {
+        "id": "q",
+        "text": "Can you tell me where the injuries are?",
+        "type": "IMAGE_MAP",
+        "required": true,
+        "resource": "body.png"
+      }
+    ]
+  }

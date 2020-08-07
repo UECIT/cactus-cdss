@@ -1,0 +1,53 @@
+{
+    "id": "chestPains.breathingCondition",
+    "items": [
+      {
+        "id": "q",
+        "text": "Has a doctor or other health care professional told you, you have any of the following that affects your breathing or chest wall function (select any which applies)",
+        "type": "CHOICE",
+        "repeats": true,
+        "options": [
+          {
+            "stringValue": "COPD",
+            "code": "hasBreathingCondition"
+          },
+          {
+            "stringValue": "Emphysema",
+            "code": "hasBreathingCondition"
+          },
+          {
+            "stringValue": "Asthma",
+            "code": "hasBreathingCondition"
+          },
+          {
+            "stringValue": "Chronic Bronchitis",
+            "code": "hasBreathingCondition"
+          },
+          {
+            "stringValue": "Tuberculosis",
+            "code": "hasBreathingCondition"
+          },
+          {
+            "stringValue": "Lung cancer",
+            "code": "hasBreathingCondition"
+          },
+          {
+            "stringValue": "Acute Respiratory Distress Syndrome",
+            "code": "hasBreathingCondition"
+          },
+          {
+            "stringValue": "Mesothelioma",
+            "code": "hasBreathingCondition"
+          },
+          {
+            "stringValue": "Myasthenia Gravis",
+            "code": "hasBreathingCondition"
+          },
+          {
+            "stringValue": "Cystic Fibrosis",
+            "code": "hasBreathingCondition"
+          }
+        ]
+      }
+    ]
+}

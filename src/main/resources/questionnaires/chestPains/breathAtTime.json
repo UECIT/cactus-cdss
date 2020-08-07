@@ -1,0 +1,19 @@
+{
+    "id": "chestPains.breathAtTime",
+    "items": [
+      {
+        "id": "q",
+        "text": "Did patient have any shortness of breath at the time of the pain?",
+        "type": "CHOICE",
+        "required": true,
+        "options": [
+          {
+            "stringValue": "Yes"
+          },
+          {
+            "stringValue": "No"
+          }
+        ]
+      }
+    ]
+  }

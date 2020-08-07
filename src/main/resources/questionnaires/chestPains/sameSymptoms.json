@@ -1,0 +1,22 @@
+{
+    "id": "chestPains.sameSymptoms",
+    "items": [
+      {
+        "id": "q",
+        "text": "Are the symptoms the patient is experiencing the same as when they had there previous MI?",
+        "type": "CHOICE",
+        "required": true,
+        "options": [
+          {
+            "stringValue": "Yes"
+          },
+          {
+            "stringValue": "No"
+          },
+          {
+            "stringValue": "Unsure"
+          }
+        ]
+      }
+    ]
+  }

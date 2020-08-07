@@ -1,26 +1,61 @@
-# CDSS-Supplier-Stub
-## Running with Docker
+# CDSS Test Engine
 
-To run this locally just run:
-```bash
-`$ docker-compose up
-```
+## Overview
 
-This will obtain the mySQL image, initialize the ```cdss-supplier``` database and run the ```populate_data.sql``` script which creates the tables and populates with the mock data.
+This service implements a Clinical Decision Support System.
 
-It will also download and run the cdss-supplise-stub image from the docker registry in gitlab.com.
+The Clinical Decision Support System is responsible for making clinical decisions, and communicating these to the EMS Test Harness
 
-Within the ```docker-compose.yml``` file. The mySQL host can be changed from ```cdss-mysql``` to ```localhost``` if the mysql server is being hosted on the local machine instead of the docker container.
+This proof of concept implementation is compliant with both v1.1 and v2.0 of the CDS API Spec and supports:
 
-Have a look at Docker documentation for more information.
+- Responding to searches for a service definition
+- Responding to the triage $evaluate interaction.
+- Generating Care Plan and Referral Request resources as a result of triage.
+- Implementations of several clinical scenarios
 
-## Running without Docker
+## Source Code Location
 
-Create a MySql database and run the sql scripts under `src/main/resources/sql`
+The repo for this project is located in a public GitLab space here: https://gitlab.com/ems-test-harness/cds-test-engine
 
-Update the `src/main/resources/application.properties` file to point to the database.
+## Usage
 
-**Note that for MySQL 8+ references to columns named system in the script need to be updated to \`system\` as it is a reserved word and must be escaped with the back-ticks**
+### Prerequisites
+Make sure you have everything installed as per the setup guide:
+- Maven
+- IntelliJ IDE (Recommended)
+
+### Build Steps
+To run the CDS Test Engine, simply run the maven task:
+
+`mvn spring-boot:run`
+
+By default, logs are formatted with the full JSON context, but you can optionally add a spring profile to the maven task for cleaner logging:
+
+- `-Dspring.profiles.active=dev` will output a simple 'TIME THREAD LEVEL MESSAGE' format
+- `-Dspring.profiles.active=prettylogs` will output the JSON logs in an easier to read format.
+
+## Project Structure
+### Implementation
+The CDSS is a Java Spring Application. It is split into three major layers:
+
+1. Resource Providers - These contain FHIR end points for various resources that the CDSS serves (such as Questionnaire's and Service Definitions).
+2. Transformation Layer - This contains transformations from the HAPI Library's FHIR Model to our own domain model and vice versa.
+3. Engine Layer - This layer contains the business logic of the service definitions using the Drools engine. The rules files are located in the resources/drools package.
+There are also packages for:
+
+- Utilities
+- Configuration (For Spring, security and fhir server)
+- Logging
+- 
+Static resources are provided in `resources/images`, `resources/questionnaires` and `resources/servicedefinitions`.
+
+
+### Tests
+Unit tests are provided for the majority of the transformation layer and for various 'routes' through the logic in the engine layer. There are also unit tests for the more complex methods in the resource provider layer.
+
+These are all in the `src/test/java...` package.
+
+A manual test pack for various CDS scenarios is located here and this can driven from the the EMS UI.
 
 ## Licence
 
@@ -30,8 +65,6 @@ This covers both the codebase and any sample code in the documentation.
 The documentation is [© Crown copyright][copyright] and available under the terms
 of the [Open Government 3.0][ogl] licence.
 
-[rvm]: https://www.ruby-lang.org/en/documentation/installation/#managers
-[bundler]: http://bundler.io/
-[mit]: LICENCE
+[mit]: LICENSE
 [copyright]: http://www.nationalarchives.gov.uk/information-management/re-using-public-sector-information/uk-government-licensing-framework/crown-copyright/
 [ogl]: http://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/

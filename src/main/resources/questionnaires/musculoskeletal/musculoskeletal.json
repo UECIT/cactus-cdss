@@ -1,0 +1,19 @@
+{
+    "id": "muskuloskeletal.muskuloskeletal",
+    "items": [
+      {
+        "id": "q",
+        "text": "Placeholder question?",
+        "type": "CHOICE",
+        "required": true,
+        "options": [
+          {
+            "stringValue": "Yes"
+          },
+          {
+            "stringValue": "No"
+          }
+        ]
+      }
+    ]
+  }

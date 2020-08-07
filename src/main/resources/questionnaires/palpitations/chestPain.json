@@ -1,0 +1,25 @@
+{
+  "id": "palpitations.chestPain",
+  "jurisdictions": [
+    "GB"
+  ],
+  "items": [
+    {
+      "id": "q1",
+      "text": "Are you suffering from any pain in your chest?",
+      "type": "CHOICE",
+      "required": true,
+      "options": [
+        {
+          "stringValue": "Yes"
+        },
+        {
+          "stringValue": "No"
+        },
+        {
+          "stringValue": "Unsure"
+        }
+      ]
+    }
+  ]
+}

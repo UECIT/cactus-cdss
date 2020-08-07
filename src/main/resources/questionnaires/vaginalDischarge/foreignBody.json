@@ -1,0 +1,22 @@
+{
+    "id": "vaginalDischarge.foreignBody",
+    "items": [
+      {
+        "id": "q",
+        "text": "Could the patient have retained a foreign body such as a tampon, condom or other material?",
+        "type": "CHOICE",
+        "required": true,
+        "options": [
+          {
+            "stringValue": "Yes"
+          },
+          {
+            "stringValue": "No"
+          },
+          {
+            "stringValue": "Unsure"
+          }
+        ]
+      }
+    ]
+  }

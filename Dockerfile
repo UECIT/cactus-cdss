@@ -1,17 +1,19 @@
-FROM openjdk:8-jdk-alpine as build
-WORKDIR /workspace/app
+FROM maven:3-jdk-11 as build
+WORKDIR /app
 
-COPY mvnw .
-COPY .mvn .mvn
-COPY pom.xml .
+ARG GITHUB_USER
+ARG GITHUB_TOKEN
+ENV GITHUB_USER=$GITHUB_USER GITHUB_TOKEN=$GITHUB_TOKEN
+COPY pom.xml settings.xml /app/
 COPY src src
+RUN mvn -B package -DskipTests --settings settings.xml
 
-RUN ./mvnw install -DskipTests
-
-FROM openjdk:8-jdk-alpine
+FROM openjdk:11-jre-slim
 WORKDIR /app
 VOLUME /tmp
-COPY --from=build /workspace/app/target/cdss-supplier-stub-0.0.1-SNAPSHOT.war /app
-COPY --from=build /workspace/app/target/classes/application.properties /app
+COPY run.sh /app
+RUN chmod +x run.sh
+ENTRYPOINT [ "/app/run.sh" ]
+EXPOSE 8080
 
-ENTRYPOINT [ "java", "-jar", "cdss-supplier-stub-0.0.1-SNAPSHOT.war", "application.properties" ]
+COPY --from=build /app/target/cds-test-engine.war /app

@@ -1,0 +1,42 @@
+{
+  "id": "vaginalDischarge.potentialDischargeDescription",
+  "items": [
+    {
+      "id": "q",
+      "text": "Has the patient developed any of the following?",
+      "type": "CHOICE",
+      "required": true,
+      "options": [
+        {
+          "stringValue": "White and lumpy discharge",
+          "code": "whiteOrFishyDischarge"
+        },
+        {
+          "stringValue": "Has noticed a fishy odour",
+          "code": "whiteOrFishyDischarge"
+        },
+        {
+          "stringValue": "Blood stained discharge",
+          "code": "bloodStainedDischarge"
+        },
+        {
+          "stringValue": "Yellow discharge",
+          "code": "colouredDischarge"
+        },
+        {
+          "stringValue": "Green discharge",
+          "code": "colouredDischarge"
+        },
+        {
+          "stringValue": "Brown discharge",
+          "code": "colouredDischarge"
+        },
+        {
+          "stringValue": "None of the above",
+          "code": "none",
+          "exclusive": true
+        }
+      ]
+    }
+  ]
+}

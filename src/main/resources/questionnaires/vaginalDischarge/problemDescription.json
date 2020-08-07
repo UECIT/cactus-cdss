@@ -1,0 +1,11 @@
+{
+    "id": "vaginalDischarge.problemDescription",
+    "items": [
+      {
+        "id": "q",
+        "text": "Can the patient describe the genital problem they are experiencing and for how long?",
+        "type": "TEXT",
+        "required": true
+      }
+    ]
+  }

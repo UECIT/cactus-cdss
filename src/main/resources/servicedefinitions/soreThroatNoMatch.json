@@ -1,0 +1,40 @@
+{
+  "title": "adult-1",
+  "description": "Sore Throat - No match",
+  "purpose": "No match for use context",
+  "usage": "No match for use context",
+  "status": "ACTIVE",
+  "experimental": false,
+  "version": "1.0",
+  "date": "2019-04-01T00:00:00+00:00",
+  "publisher": "NHS Digital",
+  "approvalDate": "2019-04-01",
+  "lastReviewDate": "2019-04-01",
+  "effectivePeriod": {
+    "start": "2019-01-01",
+    "end": "2030-12-31"
+  },
+  "jurisdictions": [
+    "GB"
+  ],
+  "topics": [
+    {
+      "code": "triage",
+      "userSelected": false
+    }
+  ],
+  "observationTriggers": [
+    {
+      "code": "soreThroat",
+      "value": "present",
+      "effective": {
+        "duration": "PT20m",
+        "comparator": "<="
+      }
+    },
+    {
+      "code": "lifeThreatening",
+      "value": "absent"
+    }
+  ]
+}

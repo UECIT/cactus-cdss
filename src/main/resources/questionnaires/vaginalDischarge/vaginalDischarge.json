@@ -1,0 +1,19 @@
+{
+    "id": "vaginalDischarge.vaginalDischarge",
+    "items": [
+      {
+        "id": "q",
+        "text": "Vaginal discharge present?",
+        "type": "CHOICE",
+        "required": true,
+        "options": [
+          {
+            "stringValue": "Yes"
+          },
+          {
+            "stringValue": "No"
+          }
+        ]
+      }
+    ]
+  }

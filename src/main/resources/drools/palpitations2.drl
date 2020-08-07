@@ -1,0 +1,649 @@
+package uk.nhs.cdss.rules.palpitations2
+
+import java.util.Arrays
+
+import uk.nhs.cdss.rules.InitialQuestionnaire
+import uk.nhs.cdss.rules.NextQuestion
+import uk.nhs.cdss.rules.ConditionalNextQuestion
+import uk.nhs.cdss.rules.NextQuestionCondition
+import uk.nhs.cdss.rules.AnswerAssertion
+import uk.nhs.cdss.rules.Answered
+import uk.nhs.cdss.rules.OutcomeAnswerCondition
+
+import uk.nhs.cdss.domain.Answer
+import uk.nhs.cdss.domain.Assertion
+import uk.nhs.cdss.domain.Assertion.Status
+import uk.nhs.cdss.domain.Patient
+import uk.nhs.cdss.domain.Patient.Sex
+import uk.nhs.cdss.domain.Questionnaire
+import uk.nhs.cdss.constants.SnomedConstants
+import uk.nhs.cdss.domain.Outcome
+import uk.nhs.cdss.domain.CarePlan
+import uk.nhs.cdss.domain.ReferralRequest
+import uk.nhs.cdss.domain.Redirection
+import uk.nhs.cdss.domain.Concern
+import uk.nhs.cdss.domain.Concern.ClinicalStatus
+import uk.nhs.cdss.domain.Concern.VerificationStatus
+import uk.nhs.cdss.domain.enums.ObservationTriggerValue
+import uk.nhs.cdss.domain.Concept
+
+import uk.nhs.cdss.engine.CodeDirectory
+import uk.nhs.cdss.engine.Constraints
+import org.slf4j.Logger
+
+global Logger log;
+global CodeDirectory codeDirectory;
+
+/**
+ * Question flow for extended palpitations triage example
+ *
+ * Based on version 0.4 of example decision flow diagram
+ */
+
+function Outcome heartAttack(String id, CarePlan[] carePlans) {
+    return Outcome.of(id, 
+        ReferralRequest.builder()
+            .id("call999-cardio-ami-8m")
+            .description("Call 999")
+            .occurrence("PT8m")
+            .reasonCode("cardio")
+            .reason(Concern.builder()
+                .condition("ami")
+                .verificationStatus(VerificationStatus.CONFIRMED)
+                .build())
+            .build(),
+            carePlans
+    );
+}
+
+function Outcome hypertension(String id, String description) {
+    return Outcome.of(id,
+        ReferralRequest.builder()
+            .id("hypertension-12h")
+            .description(description)
+            .occurrence("PT12h")
+            .reasonCode("primaryCareReview")
+            .reason(Concern.builder()
+                .condition("hypertension")
+                .verificationStatus(VerificationStatus.CONFIRMED)
+                .build())
+            .build(),
+        CarePlan.builder()
+            .id("pregnancy")
+            .title("Pregnancy")
+            .textLine("Pregnancy brings lots of changes.")
+            .textLine("Besides the obvious ones like a growing belly, there are some that aren't as noticeable.")
+            .textLine("One example is an increased amount of blood in the body.")
+            .textLine("This extra blood results in a heart rate that's about 25 percent faster than usual.")
+            .textLine("A faster rate can result in occasional heart palpitations.")
+            .textLine("These feel like your heart is fluttering or beating extremely fast.")
+            .textLine("Heart palpitations can be normal and non-harmful during pregnancy.")
+            .textLine("But there's always a chance they could mean you have a more serious underlying health condition.")
+            .reason(Concern.builder()
+                .condition("hypertension")
+                .verificationStatus(VerificationStatus.CONFIRMED)
+                .build())
+            .build()
+    );
+}
+
+function Outcome edHeartAttack(String id) {
+    return Outcome.of(id,
+        ReferralRequest.builder()
+            .id("ed-cardio-mi-8m")
+            .description("ED")
+            .occurrence("PT8m")
+            .reasonCode("cardio")
+            .reason(Concern.builder()
+                .condition("mi")
+                .verificationStatus(VerificationStatus.CONFIRMED)
+                .bodySite("heart")
+                .bodySite("chest")
+                .build())
+            .build(),
+        CarePlan.builder()
+            .id("edHeartAttack")
+            .title("Heart Attack")
+            .textLine("Get someone to drive you to ED")
+            .textLine("Take all medications")
+            .textLine("Take a mobile phone")
+            .textLine("If you develop any worsening or new symptoms call us back.")
+            .textLine("If you develop chest pain that radiates to your arm or jaw or you become breathless, dial 999")
+            .reason(Concern.builder()
+                .condition("mi")
+                .verificationStatus(VerificationStatus.CONFIRMED)
+                .bodySite("heart")
+                .bodySite("chest")
+                .build())
+            .build()
+    );
+}
+
+function Outcome utcStroke(String id, String bodySite) {
+    return Outcome.of(id,
+        ReferralRequest.builder()
+            .id("utc-primary-care-stroke")
+            .description("UTC")
+            .occurrence("PT4h")
+            .reasonCode("primaryCareReview")
+            .reason(Concern.builder()
+                .condition("stroke")
+                .bodySite(bodySite)
+                .verificationStatus(VerificationStatus.CONFIRMED)
+                .build())
+            .build(),
+        CarePlan.builder()
+            .id("stroke")
+            .title("Stroke Symptoms")
+            .textLine("The main symptoms of a stroke can be remembered with the word FAST:")
+            .textLine("Face - the face may have dropped on 1 side, the person may not be able to smile or their mouth or eye may have dropped.")
+            .textLine("Arms - the person with suspected stroke may not be able to lift both arms and keep them there because of weakness of numbers in 1 arm.")
+            .textLine("Speech - their speech may be slurred or garbled, or the person may not be able to talk at all despite appearing to be awake; "
+                + "they may also have problems understanding what you're saying to them.")
+            .textLine("Time - It's time to dial 999 immediately if you see any of these signs or symptoms.")
+            .reason(Concern.builder()
+                .condition("stroke")
+                .bodySite(bodySite)
+                .verificationStatus(VerificationStatus.CONFIRMED)
+                .build())
+            .build()
+    );
+}
+
+function Outcome utcArrhythmia(String id, String occurrence, String specialty, String onset) {
+    return Outcome.of(id,
+        ReferralRequest.builder()
+            .id("utc-arrhythmia")
+            .description("UTC")
+            .occurrence(occurrence)
+            .reasonCode(specialty)
+            .reason(Concern.builder()
+                .condition("arrhythmia")
+                .onset(onset)
+                .verificationStatus(VerificationStatus.CONFIRMED)
+                .build())
+            .build()
+    );
+}
+
+function Outcome gpArrhythmia(String id, String occurrence, String onset) {
+    return Outcome.of(id,
+        ReferralRequest.builder()
+            .id("gp-arrhythmia")
+            .description("Consult GP")
+            .occurrence(occurrence)
+            .reasonCode("gp")
+            .reason(Concern.builder()
+                .condition("arrhythmia")
+                .onset(onset)
+                .build())
+            .build()
+    );
+}
+
+function CarePlan defaultCarePlan() {
+    return CarePlan.builder()
+        .id("carePlan")
+        .title("Self care")
+        .textLine("Try sitting cross-legged and taking a slow breath in through your nostrils and then out through your mouth.")
+        .textLine("Repeat until you feel calm.")
+        .reason(Concern.builder()
+            .condition("arrhythmia")
+            .verificationStatus(VerificationStatus.CONFIRMED)
+            .build())
+        .build();
+}
+
+function CarePlan foodAndDrink() {
+    return CarePlan.builder()
+        .id("carePlan")
+        .title("Heart Palpitations")
+        .textLine("Heart palpitations are heartbeats that suddenly become more noticeable")
+        .textLine("Your heart may feel like it's pounding, fluttering or beating irregularly, often for just a few seconds or minutes.")
+        .textLine("You may also feel these sensations in your throat or neck.")
+        .textLine("Palpitations may seem alarming, but in most cases they're harmless and not a sign of a serious problem.")
+        .textLine("Try to keep a diary of food or drink you have consumed.")
+        .textLine("If your condition worsens or if you develop new or worsening symptoms call 111 back for further assessment")
+        .reason(Concern.builder()
+            .condition("adverseReaction")
+            .build())
+        .build();
+}
+
+function CarePlan waitForAmbulance() {
+    return CarePlan.builder()
+            .id("waitForAmbulance")
+            .title("Wait for an ambulance")
+            .textLine("Try to get someone to sit with you until the ambulance arrives")
+            .textLine("Unlock doors")
+            .textLine("If you have a dog put them in another room")
+            .textLine("Collect any medications to take to the hospital")
+            .textLine("Take a mobile phone if you have one")
+            .reason(Concern.builder()
+                .condition("ami")
+                .build())
+            .build();
+}
+
+function CarePlan aspirin() {
+    return CarePlan.builder()
+            .id("aspirin")
+            .title("Aspirin")
+            .textLine("If not allergic to Aspirin take 300mg now.")
+            .reason(Concern.builder()
+                .condition("ami")
+                .build())
+            .build();
+}
+
+rule "Init"
+salience 10000
+when // Always
+then
+    Concept present = ObservationTriggerValue.PRESENT.toDomainConcept();
+
+    // Are you experiencing palpitations now?
+    insert( new InitialQuestionnaire("common.birthDate"));
+    insert( new AnswerAssertion("common.birthDate", "q", null, codeDirectory.get(SnomedConstants.AGE)));
+
+    insert( new NextQuestion("palpitations2.hasPalpitations", "common.birthDate") );    
+    insert( new AnswerAssertion("palpitations2.hasPalpitations", "q", "Yes", codeDirectory.get("palpitationsNow"), present));
+
+    // Have you got an ICD (implanted cardiovascular defibrillator)?
+    insert( new NextQuestion("palpitations2.hasICD", "palpitations2.hasPalpitations", "q", Arrays.asList("Yes")) );
+    insert( new AnswerAssertion("palpitations2.hasICD", "q", "Yes", codeDirectory.get("hasICD"), present));
+    insert( heartAttack("hasICD", new CarePlan[]{waitForAmbulance()}) );
+    insert( new OutcomeAnswerCondition("hasICD", "palpitations2.hasICD", "q", Arrays.asList("Yes") ));
+
+    // Have you had any of the following symptoms in the last 24 hours?
+    insert( new NextQuestion("palpitations2.symptoms", "palpitations2.hasICD", "q", Arrays.asList("No", "Unsure")) );
+    insert( new AnswerAssertion("palpitations2.symptoms", "q", "chestPains", codeDirectory.get("chestPain"), present));
+    insert( new AnswerAssertion("palpitations2.symptoms", "q", "neckPain", codeDirectory.get("neckPain"), present));
+    insert( new AnswerAssertion("palpitations2.symptoms", "q", "breathingProblems", codeDirectory.get("breathingProblems"), present));
+    insert( new AnswerAssertion("palpitations2.symptoms", "q", "syncope", codeDirectory.get("syncope"), present));
+    insert( new AnswerAssertion("palpitations2.symptoms", "q", "none", codeDirectory.get("noSymptoms"), present));
+    insert( heartAttack("symptoms", new CarePlan[]{waitForAmbulance(), aspirin()}) );
+    insert( new OutcomeAnswerCondition("symptoms", "palpitations2.symptoms", "q", Arrays.asList("chestPains", "neckPain", "breathingProblems", "syncope") ));
+
+    insert( new NextQuestion("palpitations2.ageRange", "palpitations2.symptoms", "q", Arrays.asList("none")));
+    insert( new AnswerAssertion("palpitations2.ageRange", "group", "<12", codeDirectory.get("under12"), present));
+    insert( new AnswerAssertion("palpitations2.ageRange", "group", "12-45", codeDirectory.get("between12and45"), present));
+    insert( new AnswerAssertion("palpitations2.ageRange", "group", "45-50", codeDirectory.get("between45and50"), present));
+    insert( new AnswerAssertion("palpitations2.ageRange", "group", ">50", codeDirectory.get("over50"), present));
+
+    insert( new NextQuestion("common.gender", "palpitations2.ageRange"));
+
+    insert( new ConditionalNextQuestion("genderToPregnant", "common.pregnant", "common.gender", "q", Arrays.asList("Female")) );
+    insert( new NextQuestionCondition("genderToPregnant", "palpitations2.ageRange", "group", Arrays.asList("12-45", "45-50")) );
+
+    insert( new ConditionalNextQuestion("genderToFamilyHistoryUnder12", "palpitations2.familyHistory", "common.gender") );
+    insert( new NextQuestionCondition("genderToFamilyHistoryUnder12", "palpitations2.ageRange", "group", Arrays.asList("<12")) );
+    insert( new ConditionalNextQuestion("genderToFamilyHistoryOver12", "palpitations2.familyHistory", "common.gender") );
+    insert( new NextQuestionCondition("genderToFamilyHistoryOver12", "palpitations2.ageRange", "group", Arrays.asList("12-45")) );
+    insert( new NextQuestionCondition("genderToFamilyHistoryOver12", "common.gender", "q", Arrays.asList("Male")) );
+
+    insert( new ConditionalNextQuestion("genderToPersonalHistoryOver50", "palpitations2.personalHistory", "common.gender") );
+    insert( new NextQuestionCondition("genderToPersonalHistoryOver50", "palpitations2.ageRange", "group", Arrays.asList(">50")) );
+    insert( new NextQuestionCondition("genderToPersonalHistoryOver50", "palpitations2.hasPalpitations", "q", Arrays.asList("Yes") ));
+    insert( new ConditionalNextQuestion("genderToPersonalHistoryOver12", "palpitations2.personalHistory", "common.gender") );
+    insert( new NextQuestionCondition("genderToPersonalHistoryOver12", "palpitations2.ageRange", "group", Arrays.asList("45-50")) );
+    insert( new NextQuestionCondition("genderToPersonalHistoryOver12", "common.gender", "q", Arrays.asList("Male")) );
+    insert( new NextQuestionCondition("genderToPersonalHistoryOver12", "palpitations2.hasPalpitations", "q", Arrays.asList("Yes") ));
+
+    insert( hypertension("pregnancy-hasPalpitations", "Speak to Primary Care professional"));
+    insert( new OutcomeAnswerCondition("pregnancy-hasPalpitations", "common.pregnant", "q", Arrays.asList("Yes") ));
+    insert( new OutcomeAnswerCondition("pregnancy-hasPalpitations", "palpitations2.hasPalpitations", "q", Arrays.asList("Yes") ));
+    insert( hypertension("pregnancy-noPalpitations", "Consult GP"));
+    insert( new OutcomeAnswerCondition("pregnancy-noPalpitations", "common.pregnant", "q", Arrays.asList("Yes") ));
+    insert( new OutcomeAnswerCondition("pregnancy-noPalpitations", "palpitations2.hasPalpitations", "q", Arrays.asList("No") ));
+
+    insert( new ConditionalNextQuestion("pregnancyToFamilyHistory", "palpitations2.familyHistory", "common.pregnant", "q", Arrays.asList("No", "Unsure")) );
+    insert( new NextQuestionCondition("pregnancyToFamilyHistory", "palpitations2.ageRange", "group", Arrays.asList("12-45")) );
+    insert( new ConditionalNextQuestion("pregnancyToPersonalHistory", "palpitations2.personalHistory", "common.pregnant", "q", Arrays.asList("No", "Unsure")) );
+    insert( new NextQuestionCondition("pregnancyToPersonalHistory", "palpitations2.ageRange", "group", Arrays.asList("45-50")) );
+    insert( new NextQuestionCondition("pregnancyToPersonalHistory", "palpitations2.hasPalpitations", "q", Arrays.asList("Yes") ));
+
+    // Family history of sudden cardiac death under the age of 40 years
+    insert( new AnswerAssertion("palpitations2.familyHistory", "q", "Yes", codeDirectory.get("familyHistorySCD"), present));
+    insert( edHeartAttack("palpitationsFamilyHistory"));
+    insert( new OutcomeAnswerCondition("palpitationsFamilyHistory", "palpitations2.familyHistory", "q", Arrays.asList("Yes") ));
+    insert( new OutcomeAnswerCondition("palpitationsFamilyHistory", "palpitations2.hasPalpitations", "q", Arrays.asList("Yes") ));
+    insert( Outcome.of("noPalpitationsFamilyHistory", ReferralRequest.builder()
+                .id("utc-ami-12h")
+                .description("UTC")
+                .occurrence("PT12h")
+                .reasonCode("primaryCareReview")
+                .reason(Concern.builder()
+                    .condition("ami")
+                    .verificationStatus(VerificationStatus.CONFIRMED)
+                    .build())                
+                .build()));
+    insert( new OutcomeAnswerCondition("noPalpitationsFamilyHistory", "palpitations2.familyHistory", "q", Arrays.asList("Yes") ));
+    insert( new OutcomeAnswerCondition("noPalpitationsFamilyHistory", "palpitations2.hasPalpitations", "q", Arrays.asList("No") ));
+
+    insert( new ConditionalNextQuestion("familyHistoryToPersonalHistory", "palpitations2.personalHistory", "palpitations2.familyHistory", "q", Arrays.asList("No", "Unsure")) );
+    insert( new NextQuestionCondition("familyHistoryToPersonalHistory", "palpitations2.hasPalpitations", "q", Arrays.asList("Yes")) );
+
+    // Have you had any cardiac problems in the past?
+    insert( new AnswerAssertion("palpitations2.personalHistory", "q", "Yes", codeDirectory.get("personalHistory"), present));
+
+    // Have you had any pain in your chest or upper back in the last 24 hours
+    insert( new NextQuestion("palpitations2.chestPain24", "palpitations2.personalHistory", "q", Arrays.asList("Yes")) );
+    insert( new AnswerAssertion("palpitations2.chestPain24", "q", "Yes", codeDirectory.get("chestPain24"), present));
+    insert( edHeartAttack("palpitationsChestPain24"));
+    insert( new OutcomeAnswerCondition("palpitationsChestPain24", "palpitations2.chestPain24", "q", Arrays.asList("Yes") ));
+
+    // Have you seen a healthcare professional in the last 7 days about your heart problems
+    insert( new NextQuestion("palpitations2.seenHCP", "palpitations2.chestPain24", "q", Arrays.asList("No")) );
+
+    // Have you had a recent 12 lead EC?
+    insert( new NextQuestion("palpitations2.hadECG", "palpitations2.seenHCP", "q", Arrays.asList("Yes")) );
+    insert( new AnswerAssertion("palpitations2.hadECG", "q", "Yes", codeDirectory.get("hadECG"), present));
+    insert( Outcome.of("hadECG", ReferralRequest.builder()
+                .id("primaryCareReview")
+                .description("Speak to Primary Care professional")
+                .occurrence("PT12h")
+                .reasonCode("primaryCareReview")
+                .reason(Concern.builder() //TODO: No primary concern given on scenario
+                    .condition("aprimaryCareReviewmi")
+                    .verificationStatus(VerificationStatus.CONFIRMED)
+                    .build()) 
+                .build()));
+    insert( new OutcomeAnswerCondition("hadECG", "palpitations2.hadECG", "q", Arrays.asList("Yes") ));
+
+    // Have you had any of the following symptoms of a stroke in the last 7 days?
+    insert( new NextQuestion("palpitations2.strokeSymptoms", "palpitations2.hadECG", "q", Arrays.asList("No")) );
+    insert( new NextQuestion("palpitations2.strokeSymptoms", "palpitations2.seenHCP", "q", Arrays.asList("No")) ); // TODO - Confirm - not in v0.4
+
+    //  Face dropped
+    insert( new AnswerAssertion("palpitations2.strokeSymptoms", "q1", "Yes", codeDirectory.get("faceDropped"), present));
+    insert( utcStroke("faceDropped", "head"));
+    insert( new OutcomeAnswerCondition("faceDropped", "palpitations2.strokeSymptoms", "q1", Arrays.asList("Yes") ));
+    insert( new OutcomeAnswerCondition("faceDropped", "palpitations2.strokeSymptoms", "q4", Arrays.asList("No") ));
+
+    //  Arm lift problems
+    insert( new AnswerAssertion("palpitations2.strokeSymptoms", "q2", "Yes", codeDirectory.get("armLiftProblems"), present));
+    insert( utcStroke("armListProblems", "arm"));
+    insert( new OutcomeAnswerCondition("armListProblems", "palpitations2.strokeSymptoms", "q2", Arrays.asList("Yes") ));
+    insert( new OutcomeAnswerCondition("armListProblems", "palpitations2.strokeSymptoms", "q4", Arrays.asList("No") ));
+
+    //  Speaking problems
+    insert( new AnswerAssertion("palpitations2.strokeSymptoms", "q3", "Yes", codeDirectory.get("speakingProblems"), present));
+    insert( utcStroke("speakingProblems", "head"));
+    insert( new OutcomeAnswerCondition("speakingProblems", "palpitations2.strokeSymptoms", "q3", Arrays.asList("Yes") ));
+    insert( new OutcomeAnswerCondition("speakingProblems", "palpitations2.strokeSymptoms", "q4", Arrays.asList("No") ));
+    //  Symptoms right now
+    insert( new AnswerAssertion("palpitations2.strokeSymptoms", "q4", "Yes", codeDirectory.get("strokeSymptomsRightNow"), present));
+    insert( Outcome.of("strokeSymptomsRightNow", ReferralRequest.builder()
+                .id("call999-stroke")
+                .description("Call 999")
+                .occurrence("PT18m")
+                .reasonCode("primaryCareReview")
+                .reason(Concern.builder()
+                    .condition("stroke")
+                    .verificationStatus(VerificationStatus.CONFIRMED)
+                    .build()) 
+                .build(),
+            waitForAmbulance()));
+    insert( new OutcomeAnswerCondition("strokeSymptomsRightNow", "palpitations2.strokeSymptoms", "q4", Arrays.asList("Yes") ));
+
+    // Onset of palpitations precipitated by exercise
+    insert( new NextQuestion("palpitations2.exercise", "palpitations2.personalHistory", "q", Arrays.asList("No")) );
+    insert( new NextQuestion("palpitations2.exercise", "palpitations2.strokeSymptoms", "q5", Arrays.asList("Yes")) );
+    insert( new AnswerAssertion("palpitations2.exercise", "q", "Yes", codeDirectory.get("exerciseTriggered"), present));
+    insert( Outcome.of("exerciseTriggered", ReferralRequest.builder()
+                .id("ed-cardio-arrhythmia-4h")
+                .description("ED")
+                .occurrence("PT4h")
+                .reasonCode("cardio")
+                .reason(Concern.builder()
+                    .condition("arrhythmia")
+                    .verificationStatus(VerificationStatus.CONFIRMED)
+                    .build())
+                .build(),
+            defaultCarePlan()));
+    insert( new OutcomeAnswerCondition("exerciseTriggered", "palpitations2.exercise", "q", Arrays.asList("Yes") ));
+    insert( utcArrhythmia("notExerciseTriggered", "PT4h", "emergencyCareReview", "PT0h"));
+    insert( new OutcomeAnswerCondition("notExerciseTriggered", "palpitations2.exercise", "q", Arrays.asList("No") ));
+
+    // When did you last experience palpitations
+    insert( new NextQuestion("palpitations2.lastExperienced", "palpitations2.hasPalpitations", "q", Arrays.asList("No", "Unsure")) );
+
+    // Syncope or near syncope
+    insert( new AnswerAssertion("palpitations2.syncope", "q", "Yes", codeDirectory.get("syncope"), present));
+    //  If last experienced within 12 hours
+    insert( new NextQuestion("palpitations2.syncope", "palpitations2.lastExperienced", "q1", Arrays.asList("Yes")));
+    insert( new AnswerAssertion("palpitations2.lastExperienced", "q1", "Yes", codeDirectory.get("lastExperienced12Hrs"), present));
+    insert( Outcome.of("syncope12hrs", ReferralRequest.builder()
+                .id("ed-arrhythmia-emergency")
+                .description("ED")
+                .occurrence("PT4h")
+                .reasonCode("emergencyCareReview")
+                .reason(Concern.builder()
+                    .condition("arrhythmia")
+                    .verificationStatus(VerificationStatus.CONFIRMED)
+                    .build()) 
+                .build(),
+            waitForAmbulance()));
+    insert( new OutcomeAnswerCondition("syncope12hrs", "palpitations2.syncope", "q", Arrays.asList("Yes", "Unsure") ));
+    insert( new OutcomeAnswerCondition("syncope12hrs", "palpitations2.lastExperienced", "q1", Arrays.asList("Yes") ));
+    insert( new OutcomeAnswerCondition("syncope12hrs", "palpitations2.hasPalpitations", "q", Arrays.asList("No", "Unsure") ));
+    insert( utcArrhythmia("notSyncope12hrs", "PT4h", "emergencyCareReview", "PT0h"));
+    insert( new OutcomeAnswerCondition("notSyncope12hrs", "palpitations2.syncope", "q", Arrays.asList("No") ));
+    insert( new OutcomeAnswerCondition("notSyncope12hrs", "palpitations2.lastExperienced", "q1", Arrays.asList("Yes") ));
+    insert( new OutcomeAnswerCondition("notSyncope12hrs", "palpitations2.hasPalpitations", "q", Arrays.asList("No", "Unsure") ));
+
+    //  If last experienced within 48 hours
+    insert( new NextQuestion("palpitations2.syncope", "palpitations2.lastExperienced", "q2", Arrays.asList("Yes")));
+    insert( new AnswerAssertion("palpitations2.lastExperienced", "q2", "Yes", codeDirectory.get("lastExperienced48Hrs"), present));
+    insert( utcArrhythmia("syncope48hrs", "PT8h", "primaryCareReview", "PT12h"));
+    insert( new OutcomeAnswerCondition("syncope48hrs", "palpitations2.syncope", "q", Arrays.asList("Yes", "Unsure") ));
+    insert( new OutcomeAnswerCondition("syncope48hrs", "palpitations2.lastExperienced", "q2", Arrays.asList("Yes") ));
+    insert( new OutcomeAnswerCondition("syncope48hrs", "palpitations2.hasPalpitations", "q", Arrays.asList("No", "Unsure") ));
+    insert( gpArrhythmia("notSyncope48hrs", "PT24h", "PT12h"));
+    insert( new OutcomeAnswerCondition("notSyncope48hrs", "palpitations2.syncope", "q", Arrays.asList("No") ));
+    insert( new OutcomeAnswerCondition("notSyncope48hrs", "palpitations2.lastExperienced", "q2", Arrays.asList("Yes") ));
+    insert( new OutcomeAnswerCondition("notSyncope48hrs", "palpitations2.hasPalpitations", "q", Arrays.asList("No", "Unsure") ));
+
+    //  If last experienced more than 48 hours
+    insert( new NextQuestion("palpitations2.syncope", "palpitations2.lastExperienced", "q3", Arrays.asList("Yes", "No", "Unsure")));
+    insert( new AnswerAssertion("palpitations2.lastExperienced", "q3", "Yes", codeDirectory.get("lastExperiencedMoreThan48"), present));
+    insert( new AnswerAssertion("palpitations2.lastExperienced", "q3", "No", codeDirectory.get("lastExperiencedMoreThan48"), ObservationTriggerValue.ABSENT.toDomainConcept()));
+    insert( gpArrhythmia("syncopeOver48hrs", "PT72h", "PT48h"));
+    insert( new OutcomeAnswerCondition("syncopeOver48hrs", "palpitations2.syncope", "q", Arrays.asList("Yes", "Unsure") ));
+    insert( new OutcomeAnswerCondition("syncopeOver48hrs", "palpitations2.lastExperienced", "q3", Arrays.asList("Yes", "No", "Unsure") ));
+    insert( new OutcomeAnswerCondition("syncopeOver48hrs", "palpitations2.hasPalpitations", "q", Arrays.asList("No", "Unsure") ));
+
+    // Have you been taking any of the following drugs or sniffing any of the following solvents?
+    // cocaine, speed or marijuana. Solvents are things like glue, thinners, petrol or lighter fluid
+    insert( new NextQuestion("palpitations2.drugUse", "palpitations2.syncope", "q", Arrays.asList("No")) );
+    insert( Outcome.of("drugUse", ReferralRequest.builder()
+                .id("utc-hcpReview-4h")
+                .description("UTC")
+                .occurrence("PT4h")
+                .reasonCode("hcpReview")
+                .reason(Concern.builder()
+                    .condition("adverseReaction")
+                    .verificationStatus(VerificationStatus.CONFIRMED)
+                    .build()) 
+                .build()));
+    insert( new OutcomeAnswerCondition("drugUse", "palpitations2.drugUse", "q", Arrays.asList("Yes") ));
+
+    // Have you started any new prescribed medication or stopped any prescribed medication
+    insert( new NextQuestion("palpitations2.prescriptionUse", "palpitations2.drugUse", "q", Arrays.asList("No")) );
+    insert( Outcome.of("prescriptionUse", ReferralRequest.builder()
+                .id("gp-hcpReview-4h")
+                .description("Consult GP")
+                .occurrence("PT12h")
+                .reasonCode("gp")
+                .reason(Concern.builder()
+                    .condition("adverseReaction")
+                    .verificationStatus(VerificationStatus.CONFIRMED)
+                    .build()) 
+                .build()));
+    insert( new OutcomeAnswerCondition("prescriptionUse", "palpitations2.prescriptionUse", "q", Arrays.asList("Yes", "Unsure") ));
+
+    // Do you have any issues with Anxiety or panic attacks
+    insert( new NextQuestion("palpitations2.anxiety", "palpitations2.prescriptionUse", "q", Arrays.asList("No")) );
+    insert( new AnswerAssertion("palpitations2.anxiety", "q", "Yes", codeDirectory.get("anxiety"), present));
+
+    // Are you under the care of a Healthcare professional
+    insert( new NextQuestion("palpitations2.careHCP", "palpitations2.anxiety", "q", Arrays.asList("Yes")) );
+    insert( new AnswerAssertion("palpitations2.careHCP", "q", "Yes", codeDirectory.get("careHCP"), present));
+
+    // Do you have a care plan to follow
+    insert( new NextQuestion("palpitations2.hasCarePlan", "palpitations2.careHCP", "q", Arrays.asList("Yes")) );
+    insert( Outcome.of("hasCarePlan", defaultCarePlan()));
+    insert( new OutcomeAnswerCondition("hasCarePlan", "palpitations2.hasCarePlan", "q", Arrays.asList("Yes") ));
+    insert( Outcome.of("noCarePlan",  ReferralRequest.builder()
+                .id("gp-anxiety-72h")
+                .description("Consult GP")
+                .occurrence("PT72h")
+                .reasonCode("gp")
+                .reason(Concern.builder()
+                    .condition("anxiety")
+                    .build())
+                .build(),
+            CarePlan.builder()
+                .id("anxiety")
+                .title("Anxiety")
+                .textLine("Try talking about your feelings to a friend, family member, health professional or counsellor.")
+                .textLine("You could also contact Samaritans, call 116 123 or email jo@samaritans.org if you need someone to talk to.")
+                .textLine("Exercise - Activities such as running, walking, swimming and yoga can help you relax")
+                .textLine("Sleep: First of all, keep regular sleeping hours.")
+                .textLine("This programs the brain and internal body clock to get used to a set routine.")
+                .textLine("Most adults need between 6 and 9 hours of sleep every night.")
+                .textLine("By working out what time you need to wake up, you can set a regular bedtime schedule.")
+                .textLine("It is also important to try and wake up at the same time every day.")
+                .textLine("While it may seem like a good idea to try to catch up on sleep after a bad night, doing so on a regular basis can also disrupt your sleep routine.")
+                .reason(Concern.builder()
+                    .condition("anxiety")
+                    .build())
+                .build()));
+    insert( new OutcomeAnswerCondition("noCarePlan", "palpitations2.hasCarePlan", "q", Arrays.asList("No") ));
+
+    // Is your mental health a concern to you
+    insert( new NextQuestion("palpitations2.mentalHealthConcern", "palpitations2.careHCP", "q", Arrays.asList("No")) );
+    insert( new AnswerAssertion("palpitations2.mentalHealthConcern", "q", "Yes", codeDirectory.get("mentalHealthConcern"), present));
+
+    // Do any of these apply to you?
+    insert( new NextQuestion("palpitations2.causes", "palpitations2.mentalHealthConcern", "q", Arrays.asList("No")) );
+
+    insert( new NextQuestion("palpitations2.ageRange", "palpitations2.anxiety", "q", Arrays.asList("No")));
+
+    insert( new ConditionalNextQuestion("genderToCausesOver50", "palpitations2.causes", "common.gender") );
+    insert( new NextQuestionCondition("genderToCausesOver50", "palpitations2.ageRange", "group", Arrays.asList(">50")) );
+    insert( new NextQuestionCondition("genderToCausesOver50", "palpitations2.hasPalpitations", "q", Arrays.asList("No", "Unsure") ));
+    insert( new ConditionalNextQuestion("genderToCausesOver12", "palpitations2.causes", "common.gender") );
+    insert( new NextQuestionCondition("genderToCausesOver12", "palpitations2.ageRange", "group", Arrays.asList("45-50")) );
+    insert( new NextQuestionCondition("genderToCausesOver12", "common.gender", "q", Arrays.asList("Male")) );
+    insert( new NextQuestionCondition("genderToCausesOver12", "palpitations2.hasPalpitations", "q", Arrays.asList("No", "Unsure") ));
+
+    insert( new ConditionalNextQuestion("pregnancyToCauses", "palpitations2.causes", "common.pregnant", "q", Arrays.asList("No", "Unsure")) );
+    insert( new NextQuestionCondition("pregnancyToCauses", "palpitations2.ageRange", "group", Arrays.asList("45-50")) );
+    insert( new NextQuestionCondition("pregnancyToCauses", "palpitations2.hasPalpitations", "q", Arrays.asList("No", "Unsure") ));
+
+    insert( new ConditionalNextQuestion("familyHistoryToCauses", "palpitations2.causes", "palpitations2.familyHistory", "q", Arrays.asList("No", "Unsure")) );
+    insert( new NextQuestionCondition("familyHistoryToCauses", "palpitations2.hasPalpitations", "q", Arrays.asList("No", "Unsure")) );
+
+    //  Some foods cause
+    insert( Outcome.of("someFoods", foodAndDrink()));
+    insert( new OutcomeAnswerCondition("someFoods", "palpitations2.causes", "q1", Arrays.asList("Yes") ));
+
+    //  Some drinks cause
+    insert( Outcome.of("someDrinks", foodAndDrink()));
+    insert( new OutcomeAnswerCondition("someDrinks", "palpitations2.causes", "q2", Arrays.asList("Yes") ));
+
+    //  Smoker
+    insert( Outcome.of("smoker", ReferralRequest.builder()
+                .id("pharmacy-nicotine-168h")
+                .description("Consult Pharmacy")
+                .occurrence("PT168H")
+                .reasonCode("pharmacistReview")
+                .reason(Concern.builder()
+                    .condition("nicotine")
+                    .build())
+                .build(),
+            CarePlan.builder()
+                .id("nicotine")
+                .title("Nicotine")
+                .textLine("Speak to your pharmacist about available options for nicotine replacement")
+                .textLine("Try to relax and take your mind off smoking")
+                .textLine("Try to exercise")
+                .reason(Concern.builder()
+                    .condition("nicotine")
+                    .build())
+                .build()
+            ));
+    insert( new OutcomeAnswerCondition("smoker", "palpitations2.causes", "q3", Arrays.asList("Yes") ));
+
+    //  No causes
+    insert( Outcome.of("noCausesMentalHealthRoute", ReferralRequest.builder()
+                .id("pharmacy-nicotine-168h")
+                .description("Consult GP")
+                .reasonCode("gp")
+                .occurrence("PT168h")
+                .reason(Concern.builder()
+                    .condition("nicotine")
+                    .build()) 
+                .build()));
+    insert( new OutcomeAnswerCondition("noCausesMentalHealthRoute", "palpitations2.causes", "q4", Arrays.asList("Yes") ));
+    insert( new OutcomeAnswerCondition("noCausesMentalHealthRoute", "palpitations2.anxiety", "q", Arrays.asList("Yes") ));
+
+    insert( Outcome.of("noCausesNotMentalHealthRoute", 
+        CarePlan.builder()
+            .id("noCauses")
+            .title("No Causes")
+            .textLine("Try to relax")
+            .textLine("Make sure you are having enough sleep")
+            .textLine("If symptoms worsen call us back")
+            .reason(Concern.builder()
+                .condition("anxiety")
+                .build())
+            .build()
+        ));
+    insert( new OutcomeAnswerCondition("noCausesNotMentalHealthRoute", "palpitations2.causes", "q4", Arrays.asList("Yes") ));
+    insert( new OutcomeAnswerCondition("noCausesNotMentalHealthRoute", "palpitations2.anxiety", "q", Arrays.asList("No") ));
+end
+
+rule "Add age assertion"
+salience 100
+when
+    Assertion( code == codeDirectory.get(SnomedConstants.AGE), $value := value )
+    not Assertion( code == codeDirectory.get("under12") )
+    not Assertion( code == codeDirectory.get("between12and45") )
+    not Assertion( code == codeDirectory.get("between45and50") )
+    not Assertion( code == codeDirectory.get("under12") )
+then
+   int age = Constraints.convertAge($value);
+
+   String assertionId;
+   if (age < 12) {
+       assertionId = "under12";
+   } else if (age < 45) {
+       assertionId = "between12and45";
+   } else if (age < 50) {
+       assertionId = "between45and50";
+   } else {
+       assertionId = "over50";
+   }
+   log.info("Generating age assertion: " + assertionId);
+   insert( Assertion.builder()
+        .id(assertionId)
+        .status(Assertion.Status.AMENDED)
+        .code(codeDirectory.get(assertionId))
+        .value(ObservationTriggerValue.PRESENT.toDomainConcept())
+        .build() );
+end
+
+rule "Redirect Outcomes"
+when
+    $a: Assertion(code == codeDirectory.get(SnomedConstants.AGE))
+then
+    insert(Outcome.of("mentalHealthConcern", Redirection.builder()
+            .id("mentalHealthConcern")
+            .observationTrigger("anxiety", "present")
+            .patientTrigger($a.getValue())
+            .build()));
+    insert( new OutcomeAnswerCondition("mentalHealthConcern", "palpitations2.mentalHealthConcern", "q", Arrays.asList("Yes") ));
+end

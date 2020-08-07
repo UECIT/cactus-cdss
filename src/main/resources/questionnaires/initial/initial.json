@@ -1,0 +1,37 @@
+{
+  "id": "initial.initial",
+  "items": [
+    {
+      "id": "q",
+      "text": "What best describes your presenting complaint?",
+      "type": "CHOICE",
+      "required": true,
+      "options": [
+        {
+          "stringValue": "Pain in the chest",
+          "code": "chestPain"
+        },
+        {
+          "stringValue": "Palpitations",
+          "code": "palpitations"
+        },
+        {
+          "stringValue": "Female genito-urinary problems",
+          "code": "genitoUrinaryProblems"
+        },
+        {
+          "stringValue": "Constipation",
+          "code": "constipation"
+        },
+        {
+          "stringValue": "Sore Throat",
+          "code": "soreThroat"
+        },
+        {
+          "stringValue": "None of the above",
+          "code": "none"
+        }
+      ]
+    }
+  ]
+}

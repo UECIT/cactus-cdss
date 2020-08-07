@@ -1,0 +1,11 @@
+{
+    "id": "vaginalDischarge.lastPeriod",
+    "items": [
+      {
+        "id": "q",
+        "text": "When was your last period?",
+        "type": "STRING",
+        "required": true
+      }
+    ]
+  }

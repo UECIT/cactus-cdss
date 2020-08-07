@@ -1,0 +1,29 @@
+{
+    "id": "chestPains.conditions",
+    "items": [
+      {
+        "id": "q",
+        "text": "Does the patient have any of the following conditions:",
+        "type": "CHOICE",
+        "required": true,
+        "repeats": true,
+        "options": [
+          {
+            "stringValue": " Aortic Aneurysm",
+            "code": "aneurysm",
+            "contextHelp": "Patient must have a clinical diagnosis"
+          },
+          {
+            "stringValue": "Mafan Syndrome",
+            "code": "mafan",
+            "contextHelp": "Patient must have a clinical diagnosis"
+          },
+          {
+            "stringValue": "None of the above",
+            "code": "none",
+            "exclusive": true
+          }
+        ]
+      }
+    ]
+  }

@@ -1,0 +1,880 @@
+{
+  "resourceType": "Bundle",
+  "entry": [
+    {
+      "resource": {
+        "resourceType": "Parameters",
+        "meta": {
+          "profile": [
+            "http://hl7.org/fhir/OperationDefinition/ServiceDefinition-evaluate"
+          ]
+        },
+        "parameter": [
+          {
+            "name": "requestId",
+            "valueId": "427"
+          },
+          {
+            "name": "patient",
+            "resource": {
+              "resourceType": "Patient",
+              "meta": {
+                "profile": [
+                  "https://fhir.hl7.org.uk/STU3/StructureDefinition/CareConnect-Patient-1"
+                ]
+              },
+              "contained": [
+                {
+                  "resourceType": "Organization",
+                  "id": "1",
+                  "meta": {
+                    "profile": [
+                      "https://fhir.hl7.org.uk/STU3/StructureDefinition/CareConnect-Organization-1"
+                    ]
+                  },
+                  "name": "East Road Pharmacy"
+                },
+                {
+                  "resourceType": "Practitioner",
+                  "id": "2",
+                  "meta": {
+                    "profile": [
+                      "https://fhir.hl7.org.uk/STU3/StructureDefinition/CareConnect-Practitioner-1"
+                    ]
+                  },
+                  "extension": [
+                    {
+                      "url": "https://fhir.hl7.org.uk/STU3/StructureDefinition/Extension-CareConnect-NHSCommunication-1",
+                      "extension": [
+                        {
+                          "url": "https://fhir.hl7.org.uk/STU3/ValueSet/CareConnect-HumanLanguage-1",
+                          "valueCodeableConcept": {
+                            "coding": [
+                              {
+                                "system": "https://fhir.hl7.org.uk/STU3/ValueSet/CareConnect-HumanLanguage-1",
+                                "code": "bs",
+                                "display": "Bosnian"
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "url": "preferred",
+                          "valueBoolean": true
+                        },
+                        {
+                          "url": "https://fhir.hl7.org.uk/STU3/ValueSet/CareConnect-LanguageAbilityMode-1",
+                          "valueCodeableConcept": {
+                            "coding": [
+                              {
+                                "system": "https://fhir.hl7.org.uk/STU3/ValueSet/CareConnect-LanguageAbilityMode-1",
+                                "code": "RSP",
+                                "display": "Received spoken"
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "url": "https://fhir.hl7.org.uk/STU3/ValueSet/CareConnect-LanguageAbilityProficiency-1",
+                          "valueCodeableConcept": {
+                            "coding": [
+                              {
+                                "system": "https://fhir.hl7.org.uk/STU3/ValueSet/CareConnect-LanguageAbilityProficiency-1",
+                                "code": "E",
+                                "display": "Excellent"
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "url": "interpreterRequired",
+                          "valueBoolean": false
+                        }
+                      ]
+                    }
+                  ],
+                  "identifier": [
+                    {
+                      "type": {
+                        "coding": [
+                          {
+                            "system": "https://fhir.nhs.uk/Id/sds-user-id",
+                            "code": "SDS",
+                            "display": "SDS"
+                          }
+                        ]
+                      },
+                      "system": "https://fhir.nhs.uk/Id/sds-user-id",
+                      "value": "1"
+                    },
+                    {
+                      "type": {
+                        "coding": [
+                          {
+                            "system": "https://fhir.nhs.uk/Id/sds-role-profile-id",
+                            "code": "SDSR",
+                            "display": "SDS role"
+                          }
+                        ]
+                      },
+                      "system": "https://fhir.nhs.uk/Id/sds-role-profile-id",
+                      "value": "2"
+                    }
+                  ],
+                  "name": [
+                    {
+                      "family": "Khan",
+                      "given": [
+                        "M"
+                      ],
+                      "prefix": [
+                        "Dr"
+                      ]
+                    }
+                  ],
+                  "telecom": [
+                    {
+                      "system": "phone",
+                      "value": "01914564521",
+                      "use": "work"
+                    }
+                  ],
+                  "address": [
+                    {
+                      "use": "work",
+                      "type": "physical",
+                      "line": [
+                        "Dunelm Medical Practice",
+                        "Gilesgate Medical Centre",
+                        "Sunderland Rd"
+                      ],
+                      "city": "Durham",
+                      "postalCode": "S25 4HE"
+                    }
+                  ],
+                  "qualification": [
+                    {
+                      "code": {
+                        "coding": [
+                          {
+                            "system": "http://snomed.info/sct",
+                            "code": "62247001",
+                            "display": "General practitioner"
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ],
+              "extension": [
+                {
+                  "url": "https://fhir.hl7.org.uk/STU3/StructureDefinition/Extension-CareConnect-NominatedPharmacy-1",
+                  "valueReference": {
+                    "reference": "#1"
+                  }
+                }
+              ],
+              "identifier": [
+                {
+                  "extension": [
+                    {
+                      "url": "https://fhir.hl7.org.uk/STU3/StructureDefinition/Extension-CareConnect-NHSNumberVerificationStatus-1",
+                      "valueCodeableConcept": {
+                        "coding": [
+                          {
+                            "system": "https://fhir.hl7.org.uk/STU3/ValueSet/CareConnect-NHSNumberVerificationStatus-1",
+                            "code": "21",
+                            "display": "Number present and verified"
+                          }
+                        ]
+                      }
+                    }
+                  ],
+                  "type": {
+                    "coding": [
+                      {
+                        "system": "http://hl7.org/fhir/ValueSet/identifier-type",
+                        "code": "PPN",
+                        "display": "Passport number"
+                      }
+                    ]
+                  },
+                  "system": "https://fhir.hl7.org.uk/STU3/CodeSystem/CareConnect-NHSNumberVerificationStatus-1",
+                  "value": "4323543455"
+                }
+              ],
+              "name": [
+                {
+                  "use": "official",
+                  "family": "Bloggs",
+                  "given": [
+                    "Karen"
+                  ]
+                }
+              ],
+              "telecom": [
+                {
+                  "system": "phone",
+                  "value": "01231231234",
+                  "use": "home",
+                  "rank": 1,
+                  "period": {
+                    "start": "2019-10-30T16:07:28+00:00",
+                    "end": "2019-10-30T16:07:28+00:00"
+                  }
+                },
+                {
+                  "system": "phone",
+                  "value": "01234567899",
+                  "use": "mobile",
+                  "rank": 2,
+                  "period": {
+                    "start": "2019-10-30T16:07:28+00:00",
+                    "end": "2019-10-30T16:07:28+00:00"
+                  }
+                },
+                {
+                  "system": "email",
+                  "value": "exmaple@example.com",
+                  "use": "home",
+                  "rank": 3,
+                  "period": {
+                    "start": "2019-10-30T16:07:28+00:00",
+                    "end": "2019-10-30T16:07:28+00:00"
+                  }
+                }
+              ],
+              "gender": "female",
+              "birthDate": "1985-09-07",
+              "address": [
+                {
+                  "use": "home",
+                  "type": "both",
+                  "line": [
+                    "20 example street",
+                    "flat 1"
+                  ],
+                  "city": "Leeds",
+                  "district": "Headingly",
+                  "postalCode": "LS6 4EX",
+                  "country": "United Kingdom",
+                  "period": {
+                    "start": "2019-10-30T16:07:28+00:00",
+                    "end": "2019-10-30T16:07:28+00:00"
+                  }
+                }
+              ],
+              "communication": [
+                {
+                  "language": {
+                    "coding": [
+                      {
+                        "system": "http://uecdi-tom-terminology.eu-west-2.elasticbeanstalk.com/fhir/CodeSystem/languages",
+                        "code": "en",
+                        "display": "English"
+                      }
+                    ]
+                  }
+                }
+              ],
+              "generalPractitioner": [
+                {
+                  "reference": "#2"
+                }
+              ]
+            }
+          },
+          {
+            "name": "inputData",
+            "resource": {
+              "resourceType": "Observation",
+              "meta": {
+                "profile": [
+                  "https://fhir.hl7.org.uk/STU3/StructureDefinition/CareConnect-Observation-1"
+                ]
+              },
+              "status": "final",
+              "code": {
+                "coding": [
+                  {
+                    "system": "http://snomed.info/sct",
+                    "code": "263495000",
+                    "display": "Gender"
+                  }
+                ]
+              },
+              "valueString": "female"
+            }
+          },
+          {
+            "name": "inputData",
+            "resource": {
+              "resourceType": "Observation",
+              "meta": {
+                "profile": [
+                  "https://fhir.hl7.org.uk/STU3/StructureDefinition/CareConnect-Observation-1"
+                ]
+              },
+              "status": "final",
+              "code": {
+                "coding": [
+                  {
+                    "system": "http://snomed.info/sct",
+                    "code": "397669002",
+                    "display": "Age"
+                  }
+                ]
+              },
+              "valueString": "1985-09-07"
+            }
+          },
+          {
+            "name": "inputParameters",
+            "resource": {
+              "resourceType": "Parameters",
+              "parameter": [
+                {
+                  "name": "context",
+                  "part": [
+                    {
+                      "name": "party",
+                      "valueString": "1"
+                    },
+                    {
+                      "name": "skillset",
+                      "valueString": "CH"
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "inputData",
+            "resource": {
+              "resourceType": "QuestionnaireResponse",
+              "contained": [
+                {
+                  "resourceType": "Organization",
+                  "id": "2",
+                  "meta": {
+                    "profile": [
+                      "https://fhir.hl7.org.uk/STU3/StructureDefinition/CareConnect-Organization-1"
+                    ]
+                  },
+                  "name": "East Road Pharmacy"
+                },
+                {
+                  "resourceType": "Practitioner",
+                  "id": "3",
+                  "meta": {
+                    "profile": [
+                      "https://fhir.hl7.org.uk/STU3/StructureDefinition/CareConnect-Practitioner-1"
+                    ]
+                  },
+                  "extension": [
+                    {
+                      "url": "https://fhir.hl7.org.uk/STU3/StructureDefinition/Extension-CareConnect-NHSCommunication-1",
+                      "extension": [
+                        {
+                          "url": "https://fhir.hl7.org.uk/STU3/ValueSet/CareConnect-HumanLanguage-1",
+                          "valueCodeableConcept": {
+                            "coding": [
+                              {
+                                "system": "https://fhir.hl7.org.uk/STU3/ValueSet/CareConnect-HumanLanguage-1",
+                                "code": "bs",
+                                "display": "Bosnian"
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "url": "preferred",
+                          "valueBoolean": true
+                        },
+                        {
+                          "url": "https://fhir.hl7.org.uk/STU3/ValueSet/CareConnect-LanguageAbilityMode-1",
+                          "valueCodeableConcept": {
+                            "coding": [
+                              {
+                                "system": "https://fhir.hl7.org.uk/STU3/ValueSet/CareConnect-LanguageAbilityMode-1",
+                                "code": "RSP",
+                                "display": "Received spoken"
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "url": "https://fhir.hl7.org.uk/STU3/ValueSet/CareConnect-LanguageAbilityProficiency-1",
+                          "valueCodeableConcept": {
+                            "coding": [
+                              {
+                                "system": "https://fhir.hl7.org.uk/STU3/ValueSet/CareConnect-LanguageAbilityProficiency-1",
+                                "code": "E",
+                                "display": "Excellent"
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "url": "interpreterRequired",
+                          "valueBoolean": false
+                        }
+                      ]
+                    }
+                  ],
+                  "identifier": [
+                    {
+                      "type": {
+                        "coding": [
+                          {
+                            "system": "https://fhir.nhs.uk/Id/sds-user-id",
+                            "code": "SDS",
+                            "display": "SDS"
+                          }
+                        ]
+                      },
+                      "system": "https://fhir.nhs.uk/Id/sds-user-id",
+                      "value": "1"
+                    },
+                    {
+                      "type": {
+                        "coding": [
+                          {
+                            "system": "https://fhir.nhs.uk/Id/sds-role-profile-id",
+                            "code": "SDSR",
+                            "display": "SDS role"
+                          }
+                        ]
+                      },
+                      "system": "https://fhir.nhs.uk/Id/sds-role-profile-id",
+                      "value": "2"
+                    }
+                  ],
+                  "name": [
+                    {
+                      "family": "Khan",
+                      "given": [
+                        "M"
+                      ],
+                      "prefix": [
+                        "Dr"
+                      ]
+                    }
+                  ],
+                  "telecom": [
+                    {
+                      "system": "phone",
+                      "value": "01914564521",
+                      "use": "work"
+                    }
+                  ],
+                  "address": [
+                    {
+                      "use": "work",
+                      "type": "physical",
+                      "line": [
+                        "Dunelm Medical Practice",
+                        "Gilesgate Medical Centre",
+                        "Sunderland Rd"
+                      ],
+                      "city": "Durham",
+                      "postalCode": "S25 4HE"
+                    }
+                  ],
+                  "qualification": [
+                    {
+                      "code": {
+                        "coding": [
+                          {
+                            "system": "http://snomed.info/sct",
+                            "code": "62247001",
+                            "display": "General practitioner"
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                },
+                {
+                  "resourceType": "Patient",
+                  "id": "1",
+                  "meta": {
+                    "profile": [
+                      "https://fhir.hl7.org.uk/STU3/StructureDefinition/CareConnect-Patient-1"
+                    ]
+                  },
+                  "extension": [
+                    {
+                      "url": "https://fhir.hl7.org.uk/STU3/StructureDefinition/Extension-CareConnect-NominatedPharmacy-1",
+                      "valueReference": {
+                        "reference": "#2"
+                      }
+                    }
+                  ],
+                  "identifier": [
+                    {
+                      "extension": [
+                        {
+                          "url": "https://fhir.hl7.org.uk/STU3/StructureDefinition/Extension-CareConnect-NHSNumberVerificationStatus-1",
+                          "valueCodeableConcept": {
+                            "coding": [
+                              {
+                                "system": "https://fhir.hl7.org.uk/STU3/ValueSet/CareConnect-NHSNumberVerificationStatus-1",
+                                "code": "21",
+                                "display": "Number present and verified"
+                              }
+                            ]
+                          }
+                        }
+                      ],
+                      "type": {
+                        "coding": [
+                          {
+                            "system": "http://hl7.org/fhir/ValueSet/identifier-type",
+                            "code": "PPN",
+                            "display": "Passport number"
+                          }
+                        ]
+                      },
+                      "system": "https://fhir.hl7.org.uk/STU3/CodeSystem/CareConnect-NHSNumberVerificationStatus-1",
+                      "value": "4323543455"
+                    }
+                  ],
+                  "name": [
+                    {
+                      "use": "official",
+                      "family": "Bloggs",
+                      "given": [
+                        "Karen"
+                      ]
+                    }
+                  ],
+                  "telecom": [
+                    {
+                      "system": "phone",
+                      "value": "01231231234",
+                      "use": "home",
+                      "rank": 1,
+                      "period": {
+                        "start": "2019-10-30T16:07:28+00:00",
+                        "end": "2019-10-30T16:07:28+00:00"
+                      }
+                    },
+                    {
+                      "system": "phone",
+                      "value": "01234567899",
+                      "use": "mobile",
+                      "rank": 2,
+                      "period": {
+                        "start": "2019-10-30T16:07:28+00:00",
+                        "end": "2019-10-30T16:07:28+00:00"
+                      }
+                    },
+                    {
+                      "system": "email",
+                      "value": "exmaple@example.com",
+                      "use": "home",
+                      "rank": 3,
+                      "period": {
+                        "start": "2019-10-30T16:07:28+00:00",
+                        "end": "2019-10-30T16:07:28+00:00"
+                      }
+                    }
+                  ],
+                  "gender": "female",
+                  "birthDate": "1985-09-07",
+                  "address": [
+                    {
+                      "use": "home",
+                      "type": "both",
+                      "line": [
+                        "20 example street",
+                        "flat 1"
+                      ],
+                      "city": "Leeds",
+                      "district": "Headingly",
+                      "postalCode": "LS6 4EX",
+                      "country": "United Kingdom",
+                      "period": {
+                        "start": "2019-10-30T16:07:28+00:00",
+                        "end": "2019-10-30T16:07:28+00:00"
+                      }
+                    }
+                  ],
+                  "communication": [
+                    {
+                      "language": {
+                        "coding": [
+                          {
+                            "system": "http://uecdi-tom-terminology.eu-west-2.elasticbeanstalk.com/fhir/CodeSystem/languages",
+                            "code": "en",
+                            "display": "English"
+                          }
+                        ]
+                      }
+                    }
+                  ],
+                  "generalPractitioner": [
+                    {
+                      "reference": "#3"
+                    }
+                  ]
+                }
+              ],
+              "questionnaire": {
+                "reference": "Questionnaire/30"
+              },
+              "status": "completed",
+              "source": {
+                "reference": "#1"
+              },
+              "item": [
+                {
+                  "linkId": "30",
+                  "text": "Have you caused yourself any harm?",
+                  "answer": [
+                    {
+                      "valueCoding": {
+                        "code": "1",
+                        "display": "yes"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "linkId": "31",
+                  "text": "Do you feel like you may cause harm to yourself or others?",
+                  "answer": [
+                    {
+                      "valueCoding": {
+                        "code": "2",
+                        "display": "no"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "linkId": "32",
+                  "text": "Are you feeling irritated or agitated?",
+                  "answer": [
+                    {
+                      "valueCoding": {
+                        "code": "1",
+                        "display": "yes"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "linkId": "33",
+                  "text": "Are you hallucinating?",
+                  "answer": [
+                    {
+                      "valueCoding": {
+                        "code": "3",
+                        "display": "not sure"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "linkId": "34",
+                  "text": "Are you struggling to concentrate?",
+                  "answer": [
+                    {
+                      "valueCoding": {
+                        "code": "3",
+                        "display": "not sure"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "linkId": "35",
+                  "text": "How many days have you been feeling like this?",
+                  "answer": [
+                    {
+                      "valueInteger": 1
+                    }
+                  ]
+                },
+                {
+                  "linkId": "36",
+                  "text": "Are you struggling to sleep?",
+                  "answer": [
+                    {
+                      "valueBoolean": true
+                    }
+                  ]
+                },
+                {
+                  "linkId": "37",
+                  "text": "On average, how many hours of sleep are you getting each night?",
+                  "answer": [
+                    {
+                      "valueDecimal": 2.5
+                    }
+                  ]
+                },
+                {
+                  "linkId": "38",
+                  "text": "What date did this begin?",
+                  "answer": [
+                    {
+                      "valueDateTime": "2019-07-17T23:00:00.000Z"
+                    }
+                  ]
+                },
+                {
+                  "linkId": "40",
+                  "text": "Ask the individual to draw a clock at 11:10. Upload the image.",
+                  "answer": [
+                    {
+                      "valueAttachment": {
+                        "contentType": "image/png",
+                        "data": "UDFCT1J3MEtHZ29BQUFBTlNVaEVVZ0FBQUFFQUFBQUJDQVlBQUFBZkZUOEFBQUFLU1VSQlZIZy9Zd0FCQUFBRkFBRU5DaTAvQUFBQUFFbEZUa1EvUW1BLw=="
+                      }
+                    }
+                  ]
+                },
+                {
+                  "linkId": "41",
+                  "text": "Which colour do you prefer: red, blue, green or yellow?",
+                  "answer": [
+                    {
+                      "valueString": "ImageCoordinatePosition:387,76"
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "initiatingPerson",
+            "resource": {
+              "resourceType": "Person",
+              "name": [
+                {
+                  "family": "Bloggs",
+                  "given": [
+                    "Joe"
+                  ]
+                }
+              ],
+              "telecom": [
+                {
+                  "system": "phone",
+                  "value": "0123 123 1234"
+                }
+              ],
+              "gender": "male",
+              "birthDate": "2011-09-07"
+            }
+          },
+          {
+            "name": "userType",
+            "valueCodeableConcept": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "158974003",
+                  "display": "Call Handler"
+                }
+              ],
+              "text": "Call Handler"
+            }
+          },
+          {
+            "name": "userLanguage",
+            "valueCodeableConcept": {
+              "coding": [
+                {
+                  "system": "https://www.datadictionary.nhs.uk/",
+                  "code": "en",
+                  "display": "English"
+                }
+              ],
+              "text": "English"
+            }
+          },
+          {
+            "name": "userTaskContext",
+            "valueCodeableConcept": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "example",
+                  "display": "Triage"
+                }
+              ],
+              "text": "Triage"
+            }
+          },
+          {
+            "name": "receivingPerson",
+            "resource": {
+              "resourceType": "Person",
+              "name": [
+                {
+                  "family": "Bloggs",
+                  "given": [
+                    "Jane"
+                  ]
+                }
+              ],
+              "telecom": [
+                {
+                  "system": "phone",
+                  "value": "0123 123 1234"
+                }
+              ],
+              "gender": "female",
+              "birthDate": "2011-09-07"
+            }
+          },
+          {
+            "name": "recipientType",
+            "valueCodeableConcept": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "116154003",
+                  "display": "Patient"
+                }
+              ],
+              "text": "Patient"
+            }
+          },
+          {
+            "name": "recipientLanguage",
+            "valueCodeableConcept": {
+              "coding": [
+                {
+                  "system": "https://www.datadictionary.nhs.uk/",
+                  "code": "en",
+                  "display": "English"
+                }
+              ],
+              "text": "English"
+            }
+          },
+          {
+            "name": "setting",
+            "valueCodeableConcept": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "example",
+                  "display": "111"
+                }
+              ],
+              "text": "111"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

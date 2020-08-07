@@ -1,0 +1,39 @@
+package uk.nhs.cdss.rules.anxiety
+
+import java.util.Arrays
+
+import uk.nhs.cdss.rules.InitialQuestionnaire
+import uk.nhs.cdss.rules.AnswerAssertion
+import uk.nhs.cdss.rules.OutcomeAnswerCondition
+
+import uk.nhs.cdss.domain.Outcome
+import uk.nhs.cdss.domain.Concern
+import uk.nhs.cdss.domain.Concern.ClinicalStatus
+import uk.nhs.cdss.domain.Concern.VerificationStatus
+import uk.nhs.cdss.domain.ReferralRequest
+import uk.nhs.cdss.domain.enums.ObservationTriggerValue
+import uk.nhs.cdss.domain.Concept
+
+import uk.nhs.cdss.engine.CodeDirectory
+
+global CodeDirectory codeDirectory;
+
+rule "Init"
+when
+then
+    insert( new InitialQuestionnaire("anxiety.anxiety") );
+    Concept present = ObservationTriggerValue.PRESENT.toDomainConcept();
+    insert( new AnswerAssertion("anxiety.anxiety", "q", "Yes", codeDirectory.get("hasAnxiety"), present));
+    insert( Outcome.of("anxiety",
+        ReferralRequest.builder()
+            .id("gp-anxiety-72h")
+            .description("Consult GP")
+            .occurrence("PT72h")
+            .reasonCode("gp")
+            .reason(Concern.builder()
+                .condition("anxiety")
+                .verificationStatus(VerificationStatus.CONFIRMED)
+                .build())
+            .build()));
+    insert( new OutcomeAnswerCondition("anxiety", "anxiety.anxiety", "q", Arrays.asList("Yes", "No") ));
+end

@@ -1,0 +1,25 @@
+{
+  "id": "palpitations.breathing",
+  "jurisdictions": [
+    "GB"
+  ],
+  "items": [
+    {
+      "id": "q3",
+      "text": "Are you experiencing shortness of breath?",
+      "type": "CHOICE",
+      "required": true,
+      "options": [
+        {
+          "stringValue": "Yes"
+        },
+        {
+          "stringValue": "No"
+        },
+        {
+          "stringValue": "Unsure"
+        }
+      ]
+    }
+  ]
+}

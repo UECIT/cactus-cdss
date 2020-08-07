@@ -1,0 +1,39 @@
+package uk.nhs.cdss.rules.palpitations
+
+import java.util.Arrays
+
+import uk.nhs.cdss.rules.InitialQuestionnaire
+import uk.nhs.cdss.rules.AnswerAssertion
+import uk.nhs.cdss.rules.OutcomeAnswerCondition
+
+import uk.nhs.cdss.domain.Outcome
+import uk.nhs.cdss.domain.Concern
+import uk.nhs.cdss.domain.Concern.ClinicalStatus
+import uk.nhs.cdss.domain.Concern.VerificationStatus
+import uk.nhs.cdss.domain.ReferralRequest
+import uk.nhs.cdss.domain.enums.ObservationTriggerValue
+import uk.nhs.cdss.domain.Concept
+
+import uk.nhs.cdss.engine.CodeDirectory
+
+global CodeDirectory codeDirectory;
+
+rule "Init"
+when
+then
+    insert( new InitialQuestionnaire("musculoskeletal.musculoskeletal") );
+    Concept present = ObservationTriggerValue.PRESENT.toDomainConcept();
+    insert( new AnswerAssertion("musculoskeletal.musculoskeletal", "q", "Yes", codeDirectory.get("musculoskeletal"), present));
+    insert(  Outcome.of("musculoskeletal",
+        ReferralRequest.builder()
+            .id("musculoskeletal")
+            .description("PLACEHOLDER REFERRAL")
+            .occurrence("PT8m")
+            .reasonCode("cardio")
+            .reason(Concern.builder()
+                .condition("ami")
+                .verificationStatus(VerificationStatus.CONFIRMED)
+                .build())
+            .build())); //Temporary - this is not the right outcome
+    insert( new OutcomeAnswerCondition("musculoskeletal", "musculoskeletal.musculoskeletal", "q", Arrays.asList("Yes", "No") ));
+end

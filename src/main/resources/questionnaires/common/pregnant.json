@@ -1,0 +1,16 @@
+{
+  "id": "common.pregnant",
+  "items": [
+    {
+      "id": "q",
+      "text": "Is there any possibility of pregnancy?",
+      "type": "CHOICE",
+      "required": true,
+      "options": [
+        "Yes",
+        "No",
+        "Unsure"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+    "id": "chestPains.bloodLoss",
+    "items": [
+      {
+        "id": "q",
+        "text": "There is excessive bleeding, pulsating blood loss and bright red arterial blood",
+        "type": "CHOICE",
+        "required": true,
+        "options": [
+          {
+            "stringValue": "Yes"
+          },
+          {
+            "stringValue": "No"
+          }
+        ]
+      }
+    ]
+  }

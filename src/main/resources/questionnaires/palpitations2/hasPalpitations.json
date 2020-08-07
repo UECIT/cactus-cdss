@@ -1,0 +1,19 @@
+{
+  "id": "palpitations2.hasPalpitations",
+  "jurisdictions": [
+    "GB"
+  ],
+  "items": [
+    {
+      "id": "q",
+      "text": "Are you experiencing palpitations now?",
+      "type": "CHOICE",
+      "required": true,
+      "options": [
+        "Yes",
+        "No",
+        "Unsure"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+    "id": "chestPains.heartAttackInPast",
+    "items": [
+      {
+        "id": "q",
+        "text": "Have you had a heart attack in the past?",
+        "type": "CHOICE",
+        "required": true,
+        "options": [
+          {
+            "stringValue": "Yes"
+          },
+          {
+            "stringValue": "No"
+          }
+        ]
+      }
+    ]
+  }

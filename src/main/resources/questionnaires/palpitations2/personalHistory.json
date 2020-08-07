@@ -1,0 +1,19 @@
+{
+  "id": "palpitations2.personalHistory",
+  "jurisdictions": [
+    "GB"
+  ],
+  "items": [
+    {
+      "id": "q",
+      "text": "Have you had any cardiac problems in the past?",
+      "type": "CHOICE",
+      "required": true,
+      "options": [
+        "Yes",
+        "No",
+        "Unsure"
+      ]
+    }
+  ]
+}

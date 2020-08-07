@@ -1,0 +1,32 @@
+{
+  "id": "palpitations2.ageRange",
+  "jurisdictions": [
+    "GB"
+  ],
+  "items": [
+    {
+      "id": "group",
+      "text": "What age group does the patient belong to?",
+      "type": "CHOICE",
+      "required": true,
+      "options": [
+        {
+          "stringValue": "Under 12",
+          "code": "<12"
+        },
+        {
+          "stringValue": "Between 12 and 45",
+          "code": "12-45"
+        },
+        {
+          "stringValue": "Between 45 and 50",
+          "code": "45-50"
+        },
+        {
+          "stringValue": "Over 50",
+          "code": ">50"
+        }
+      ]
+    }
+  ]
+}

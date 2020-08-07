@@ -1,0 +1,42 @@
+{
+  "id": "vaginalDischarge.dischargeDescription",
+  "items": [
+    {
+      "id": "q",
+      "text": "Is the discharge described as any of the following?",
+      "type": "CHOICE",
+      "required": true,
+      "options": [
+        {
+          "stringValue": "White and lumpy",
+          "code": "whiteOrFishyDischarge"
+        },
+        {
+          "stringValue": "Has a fishy odour",
+          "code": "whiteOrFishyDischarge"
+        },
+        {
+          "stringValue": "Blood stained",
+          "code": "bloodStainedDischarge"
+        },
+        {
+          "stringValue": "Yellow",
+          "code": "colouredDischarge"
+        },
+        {
+          "stringValue": "Green",
+          "code": "colouredDischarge"
+        },
+        {
+          "stringValue": "Brown",
+          "code": "colouredDischarge"
+        },
+        {
+          "stringValue": "None of the above",
+          "code": "none",
+          "exclusive": true
+        }
+      ]
+    }
+  ]
+}
