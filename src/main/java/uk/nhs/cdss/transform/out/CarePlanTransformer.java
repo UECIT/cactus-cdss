@@ -1,7 +1,7 @@
 package uk.nhs.cdss.transform.out;
 
 import lombok.RequiredArgsConstructor;
-import org.hl7.fhir.dstu3.model.CareConnectCarePlan;
+import org.hl7.fhir.dstu3.model.CarePlan;
 import org.hl7.fhir.dstu3.model.CarePlan.CarePlanIntent;
 import org.hl7.fhir.dstu3.model.CarePlan.CarePlanStatus;
 import org.hl7.fhir.dstu3.model.Reference;
@@ -25,8 +25,8 @@ public class CarePlanTransformer
   private final NarrativeService narrativeService;
 
   @Override
-  public CareConnectCarePlan transform(CarePlanBundle bundle) {
-    CareConnectCarePlan result = new CareConnectCarePlan();
+  public CarePlan transform(CarePlanBundle bundle) {
+    CarePlan result = new CarePlan();
     var from = bundle.getCarePlan();
 
     Reference reasonRef = referenceStorageService.create(
