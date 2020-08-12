@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.hl7.fhir.dstu3.model.Base;
-import org.hl7.fhir.dstu3.model.CareConnectCarePlan;
+import org.hl7.fhir.dstu3.model.CarePlan;
 import org.hl7.fhir.dstu3.model.CarePlan.CarePlanIntent;
 import org.hl7.fhir.dstu3.model.CarePlan.CarePlanStatus;
 import org.hl7.fhir.dstu3.model.Condition;
@@ -69,7 +69,7 @@ public class FhirMatchers {
     return referenceTo(resource.getId());
   }
 
-  public static Matcher<CareConnectCarePlan> isValidV1CarePlan() {
+  public static Matcher<CarePlan> isValidV1CarePlan() {
     return new FunctionMatcher<>(carePlan ->
         !carePlan.hasId()
             && carePlan.hasText()
