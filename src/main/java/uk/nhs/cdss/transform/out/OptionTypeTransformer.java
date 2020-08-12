@@ -4,6 +4,7 @@ import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
 import org.hl7.fhir.dstu3.model.BooleanType;
 import org.hl7.fhir.dstu3.model.Coding;
+import org.hl7.fhir.dstu3.model.Extension;
 import org.hl7.fhir.dstu3.model.Questionnaire.QuestionnaireItemOptionComponent;
 import org.hl7.fhir.dstu3.model.Type;
 import org.springframework.stereotype.Component;
@@ -26,9 +27,8 @@ public class OptionTypeTransformer implements
     var optionComponent = new QuestionnaireItemOptionComponent(getType(option));
 
     if (option.isExclusive()) {
-      optionComponent.addExtension(
-          "http://hl7.org/fhir/StructureDefinition/questionnaire-optionExclusive",
-          new BooleanType(true));
+      optionComponent.addModifierExtension(
+          new Extension("http://hl7.org/fhir/StructureDefinition/questionnaire-optionExclusive"));
     }
 
     return optionComponent;
