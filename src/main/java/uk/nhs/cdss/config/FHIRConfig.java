@@ -5,7 +5,6 @@ import ca.uhn.fhir.model.api.annotation.ResourceDef;
 import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.hl7.fhir.dstu3.model.CareConnectEncounter;
 import org.hl7.fhir.dstu3.model.CareConnectLocation;
 import org.hl7.fhir.dstu3.model.CareConnectOrganization;
 import org.hl7.fhir.dstu3.model.CareConnectPatient;
@@ -25,7 +24,7 @@ public class FHIRConfig {
     FhirContext fhirContext = FhirContext.forDstu3();
 
     List<Class<? extends Resource>> profiles = Arrays.asList(
-        CareConnectEncounter.class,
+//        CareConnectEncounter.class,
         CareConnectLocation.class,
         CareConnectOrganization.class,
         CareConnectPatient.class,
