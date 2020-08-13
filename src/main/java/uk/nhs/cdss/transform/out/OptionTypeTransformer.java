@@ -28,7 +28,9 @@ public class OptionTypeTransformer implements
 
     if (option.isExclusive()) {
       optionComponent.addModifierExtension(
-          new Extension("http://hl7.org/fhir/StructureDefinition/questionnaire-optionExclusive"));
+          new Extension("http://hl7.org/fhir/StructureDefinition/questionnaire-optionExclusive")
+              .setValue(new BooleanType(true))
+      );
     }
 
     return optionComponent;

@@ -57,7 +57,6 @@ public class QuestionTransformer implements
     question
         .getItems()
         .stream()
-        .peek(subQuestion -> buildContextHelp(item, subQuestion.getContextHelp(), subQuestion.getId()))
         .map(this::transform)
         .forEach(item::addItem);
 
@@ -70,9 +69,9 @@ public class QuestionTransformer implements
       QuestionnaireItemComponent item, String text,
       String resource, String id) {
     Extension contextExtension = new Extension();
-    contextExtension.setUrl("https://hl7.org/fhir/STU3/extension-questionnaire-itemcontrol.html");
+    contextExtension.setUrl("http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl");
     contextExtension
-        .setValue(new Coding().setSystem("https://hl7.org/fhir/STU3/extension-questionnaire-itemcontrol.html")
+        .setValue(new Coding().setSystem("http://hl7.org/fhir/questionnaire-item-control")
             .setCode("imagemap")
             .setDisplay(id));
 
@@ -87,13 +86,13 @@ public class QuestionTransformer implements
       return;
     }
     QuestionnaireItemComponent contextHelp = new QuestionnaireItemComponent();
-    contextHelp.setLinkId(questionnaireItemComponent.getId());
+    contextHelp.setLinkId(questionnaireItemComponent.getLinkId() + ".context");
     contextHelp.setType(QuestionnaireItemType.DISPLAY);
     contextHelp.setText(questionContext);
     Extension contextExtension = new Extension();
-    contextExtension.setUrl("https://www.hl7.org/fhir/extension-questionnaire-displaycategory.html");
+    contextExtension.setUrl("http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory");
     contextExtension
-        .setValue(new Coding().setSystem("https://www.hl7.org/fhir/extension-questionnaire-displaycategory.html")
+        .setValue(new Coding().setSystem("http://hl7.org/fhir/questionnaire-display-category")
             .setCode("context")
             .setDisplay(id));
 
