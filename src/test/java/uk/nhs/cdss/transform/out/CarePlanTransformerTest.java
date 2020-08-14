@@ -13,7 +13,6 @@ import static uk.nhs.cdss.testHelpers.matchers.FhirMatchers.referenceTo;
 
 import java.util.Collections;
 import java.util.List;
-import org.hl7.fhir.dstu3.model.CareConnectCarePlan;
 import org.hl7.fhir.dstu3.model.CarePlan.CarePlanStatus;
 import org.hl7.fhir.dstu3.model.Condition;
 import org.hl7.fhir.dstu3.model.Narrative;
@@ -50,7 +49,7 @@ public class CarePlanTransformerTest {
   private ReferenceStorageService referenceStorageService;
 
   @Mock
-  private  NarrativeService narrativeService;
+  private NarrativeService narrativeService;
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
@@ -107,7 +106,7 @@ public class CarePlanTransformerTest {
         .carePlan(carePlanInput)
         .build();
 
-    CareConnectCarePlan transformed = carePlanTransformer.transform(input);
+    org.hl7.fhir.dstu3.model.CarePlan transformed = carePlanTransformer.transform(input);
 
     assertThat(transformed, isValidV1CarePlan());
 
@@ -162,7 +161,7 @@ public class CarePlanTransformerTest {
         .carePlan(carePlanInput)
         .build();
 
-    CareConnectCarePlan transformed = carePlanTransformer.transform(input);
+    org.hl7.fhir.dstu3.model.CarePlan transformed = carePlanTransformer.transform(input);
 
     assertThat(transformed, isValidV1CarePlan());
 

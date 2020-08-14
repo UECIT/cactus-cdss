@@ -16,11 +16,10 @@ import static uk.nhs.cdss.testHelpers.matchers.FhirMatchers.referenceTo;
 import java.time.Clock;
 import java.time.Instant;
 import org.hamcrest.Matcher;
-import org.hl7.fhir.dstu3.model.CareConnectCarePlan;
-import org.hl7.fhir.dstu3.model.CareConnectObservation;
 import org.hl7.fhir.dstu3.model.DataRequirement;
 import org.hl7.fhir.dstu3.model.GuidanceResponse;
 import org.hl7.fhir.dstu3.model.GuidanceResponse.GuidanceResponseStatus;
+import org.hl7.fhir.dstu3.model.Observation;
 import org.hl7.fhir.dstu3.model.QuestionnaireResponse;
 import org.hl7.fhir.dstu3.model.Reference;
 import org.hl7.fhir.dstu3.model.RequestGroup;
@@ -130,14 +129,14 @@ public class CDSOutputTransformerTest {
 
     CDSOutputBundle bundle = new CDSOutputBundle(output, "1", params);
 
-    var transformedObservation1 = new CareConnectObservation();
+    var transformedObservation1 = new Observation();
     transformedObservation1.setId("Observation/validObservation1");
-    var transformedObservation2 = new CareConnectObservation();
+    var transformedObservation2 = new Observation();
     transformedObservation2.setId("Observation/validObservation2");
 
-    var transformedCarePlan1 = new CareConnectCarePlan();
+    var transformedCarePlan1 = new org.hl7.fhir.dstu3.model.CarePlan();
     transformedCarePlan1.setId("CarePlan/validCarePlan1");
-    var transformedCarePlan2 = new CareConnectCarePlan();
+    var transformedCarePlan2 = new org.hl7.fhir.dstu3.model.CarePlan();
     transformedCarePlan2.setId("CarePlan/validCarePlan2");
 
     var transformedRequestGroup = new RequestGroup();
@@ -162,7 +161,8 @@ public class CDSOutputTransformerTest {
         .thenReturn(transformedCarePlan1);
     when(carePlanTransformer.transform(argThat(isCarePlanBundleFor(carePlan2, false))))
         .thenReturn(transformedCarePlan2);
-    when(referralRequestTransformer.transform(argThat(isReferralRequestBundleFor(referralRequest, false))))
+    when(referralRequestTransformer
+        .transform(argThat(isReferralRequestBundleFor(referralRequest, false))))
         .thenReturn(transformedReferralRequest);
     when(storageService.create(argThat(sameInstance(transformedCarePlan1))))
         .thenReturn(new Reference("CarePlan/validCarePlan1"));
@@ -179,7 +179,8 @@ public class CDSOutputTransformerTest {
     assertThat(guidanceResponse.getModule(), referenceTo("ServiceDefinition/1"));
     assertThat(guidanceResponse.getContext(), is(context));
     assertThat(guidanceResponse.getSubject(), is(patient));
-    assertThat(guidanceResponse.getOutputParameters(), referenceTo("Parameters/validOutputParameters"));
+    assertThat(guidanceResponse.getOutputParameters(),
+        referenceTo("Parameters/validOutputParameters"));
     assertThat(guidanceResponse.getResult(), referenceTo("RequestGroup/validRequestGroup"));
 
     verify(storageService).upsert(transformedRequestGroup);
@@ -231,17 +232,17 @@ public class CDSOutputTransformerTest {
 
     CDSOutputBundle bundle = new CDSOutputBundle(output, "1", params);
 
-    var transformedObservation1 = new CareConnectObservation();
+    var transformedObservation1 = new Observation();
     transformedObservation1.setId("Observation/validObservation1");
-    var transformedObservation2 = new CareConnectObservation();
+    var transformedObservation2 = new Observation();
     transformedObservation2.setId("Observation/validObservation2");
 
     var transformedDataRequirement1 = new DataRequirement();
     var transformedDataRequirement2 = new DataRequirement();
 
-    var transformedCarePlan1 = new CareConnectCarePlan();
+    var transformedCarePlan1 = new org.hl7.fhir.dstu3.model.CarePlan();
     transformedCarePlan1.setId("CarePlan/validCarePlan1");
-    var transformedCarePlan2 = new CareConnectCarePlan();
+    var transformedCarePlan2 = new org.hl7.fhir.dstu3.model.CarePlan();
     transformedCarePlan2.setId("CarePlan/validCarePlan2");
 
     var transformedRequestGroup = new RequestGroup();
@@ -270,7 +271,8 @@ public class CDSOutputTransformerTest {
         .thenReturn(transformedCarePlan1);
     when(carePlanTransformer.transform(argThat(isCarePlanBundleFor(carePlan2, true))))
         .thenReturn(transformedCarePlan2);
-    when(referralRequestTransformer.transform(argThat(isReferralRequestBundleFor(referralRequest, true))))
+    when(referralRequestTransformer
+        .transform(argThat(isReferralRequestBundleFor(referralRequest, true))))
         .thenReturn(transformedReferralRequest);
     when(storageService.create(argThat(sameInstance(transformedCarePlan1))))
         .thenReturn(new Reference("CarePlan/validCarePlan1"));
@@ -287,7 +289,8 @@ public class CDSOutputTransformerTest {
     assertThat(guidanceResponse.getModule(), referenceTo("ServiceDefinition/1"));
     assertThat(guidanceResponse.getContext(), is(context));
     assertThat(guidanceResponse.getSubject(), is(patient));
-    assertThat(guidanceResponse.getOutputParameters(), referenceTo("Parameters/validOutputParameters"));
+    assertThat(guidanceResponse.getOutputParameters(),
+        referenceTo("Parameters/validOutputParameters"));
     assertThat(guidanceResponse.getResult(), referenceTo("RequestGroup/validRequestGroup"));
 
     verify(storageService).upsert(transformedRequestGroup);
