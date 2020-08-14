@@ -5,6 +5,7 @@ import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 import lombok.AllArgsConstructor;
 import net.steppschuh.markdowngenerator.image.Image;
 import org.apache.commons.lang3.StringUtils;
+import org.hl7.fhir.dstu3.model.CodeableConcept;
 import org.hl7.fhir.dstu3.model.Coding;
 import org.hl7.fhir.dstu3.model.Extension;
 import org.hl7.fhir.dstu3.model.Questionnaire.QuestionnaireItemComponent;
@@ -44,7 +45,8 @@ public class QuestionTransformer implements
     question
         .getOptions()
         .stream()
-        .peek(option -> buildContextHelp(item, option.getContextHelp(), defaultIfNull(option.getCode(), option.getStringValue())))
+        .peek(option -> buildContextHelp(item, option.getContextHelp(),
+            defaultIfNull(option.getCode(), option.getStringValue())))
         .map(optionTransformer::transform)
         .forEach(item::addOption);
 
@@ -68,12 +70,14 @@ public class QuestionTransformer implements
   private String buildImageMap(
       QuestionnaireItemComponent item, String text,
       String resource, String id) {
-    Extension contextExtension = new Extension();
-    contextExtension.setUrl("http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl");
-    contextExtension
-        .setValue(new Coding().setSystem("http://hl7.org/fhir/questionnaire-item-control")
-            .setCode("imagemap")
-            .setDisplay(id));
+
+    // TODO CDSCT-490 this is not a valid Coding - imagemap not in value set
+    Extension contextExtension = new Extension()
+        .setUrl("http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl")
+        .setValue(new CodeableConcept()
+            .addCoding(new Coding().setSystem("http://hl7.org/fhir/questionnaire-item-control")
+                .setCode("imagemap")
+                .setDisplay(id)));
 
     item.getExtension().add(contextExtension);
 
@@ -89,12 +93,14 @@ public class QuestionTransformer implements
     contextHelp.setLinkId(questionnaireItemComponent.getLinkId() + ".context");
     contextHelp.setType(QuestionnaireItemType.DISPLAY);
     contextHelp.setText(questionContext);
-    Extension contextExtension = new Extension();
-    contextExtension.setUrl("http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory");
-    contextExtension
-        .setValue(new Coding().setSystem("http://hl7.org/fhir/questionnaire-display-category")
-            .setCode("context")
-            .setDisplay(id));
+
+    // TODO CDSCT-491 This is not a valid code (not in system) and is used strangely.
+    Extension contextExtension = new Extension()
+        .setUrl("http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory")
+        .setValue(new CodeableConcept()
+            .addCoding(new Coding().setSystem("http://hl7.org/fhir/questionnaire-display-category")
+                .setCode("context")
+                .setDisplay(id)));
 
     contextHelp.addExtension(contextExtension);
     questionnaireItemComponent.addItem(contextHelp);
